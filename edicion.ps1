@@ -1,4 +1,4 @@
-# Lanza la jornada completa de la redaccion de Politica en Claro (jefe de produccion + agentes) sin abrir VS Code.
+# Lanza la jornada completa de la redaccion de El Hoyformativo (jefe de produccion + agentes) sin abrir VS Code.
 # Uso:  powershell -ExecutionPolicy Bypass -File edicion.ps1 [AAAA-MM-DD]
 # Usa el Claude Code de la extension de VS Code (la version mas nueva instalada) con la cuenta del usuario.
 param([string]$Fecha = (Get-Date -Format "yyyy-MM-dd"))

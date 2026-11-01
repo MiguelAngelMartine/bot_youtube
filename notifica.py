@@ -50,12 +50,12 @@ def main(dia_txt, error=None, video=None, texto_video=None):
     api = f"https://api.telegram.org/bot{tok}"
     dia = RAIZ / "dia" / dia_txt
     if error:
-        envia(api, "sendMessage", data={"chat_id": chat, "text": f"⚠️ Política en Claro {dia_txt}: {error}"}, timeout=30)
+        envia(api, "sendMessage", data={"chat_id": chat, "text": f"⚠️ El Hoyformativo {dia_txt}: {error}"}, timeout=30)
         print("aviso de error enviado")
         return
     if video:
         v = Path(video) if Path(video).is_absolute() else RAIZ / video
-        manda_video(api, chat, v, f"🗳️ Política en Claro · {dia_txt}\nListo para revisar: {texto_video or v.name}")
+        manda_video(api, chat, v, f"🗳️ El Hoyformativo · {dia_txt}\nListo para revisar: {texto_video or v.name}")
         print("aviso de video enviado")
         return
     parte = (dia / "parte_del_dia.md").read_text(encoding="utf-8") if (dia / "parte_del_dia.md").exists() else "(sin parte)"
@@ -66,7 +66,7 @@ def main(dia_txt, error=None, video=None, texto_video=None):
             if l.strip() and not l.startswith("#"):
                 titulo = l.strip("*# ").strip()
                 break
-    texto = f"🗳️ Política en Claro · {dia_txt}\nListo para revisar.\n{titulo}\n\n{parte[-3000:]}"
+    texto = f"🗳️ El Hoyformativo · {dia_txt}\nListo para revisar.\n{titulo}\n\n{parte[-3000:]}"
     envia(api, "sendMessage", data={"chat_id": chat, "text": texto[:4000]}, timeout=30)
     if (dia / "miniatura.png").exists():
         with open(dia / "miniatura.png", "rb") as fh:

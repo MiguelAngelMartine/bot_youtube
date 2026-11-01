@@ -21,7 +21,7 @@ from PIL import Image
 import imagenes
 
 RAIZ = Path(__file__).parent
-UA = {"User-Agent": "PoliticaEnClaro/0.1 (canal informativo; uso con credito)"}
+UA = {"User-Agent": "ElHoyformativo/0.1 (canal informativo; uso con credito)"}
 ORDEN = {"cc0": 0, "pdm": 0, "public domain": 0, "by": 1, "by-sa": 2}
 
 

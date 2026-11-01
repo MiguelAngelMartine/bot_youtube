@@ -1,7 +1,7 @@
-# Libro de estilo de *Política en Claro*
+# Libro de estilo de *El Hoyformativo*
 
 ## Identidad (no cambia nunca)
-- **Canal:** Política en Claro. **Presentadora:** Urni, la urna.
+- **Canal:** El Hoyformativo. **Presentadora:** Urni, la urna.
 - **Voz (elegida por el usuario el 1-nov):** es-ES Álvaro, +14 % de velocidad, +6 Hz, **sin cambios de entonación** en ningún bloque. Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
 - **Lema:** «La política española del día, en cinco minutos».
 - **Colores:**

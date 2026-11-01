@@ -1,4 +1,4 @@
-# Instrucciones para Claude en bot_youtube (*Política en Claro*)
+# Instrucciones para Claude en bot_youtube (*El Hoyformativo*, antes «Política en Claro»)
 
 ## Cómo trabajar con el usuario
 - **Responder siempre en español.**
@@ -16,7 +16,7 @@
 - **Neutralidad:** todas las partes, sin adjetivos propios y con fuentes de todo el espectro. Del vídeo de referencia de TikTok («Te Ahorro el Click») se copia el lenguaje visual, nunca su sesgo.
 - **Monetizable:** el riesgo n.º 1 es el «contenido no auténtico» de YouTube, así que hace falta narrativa propia y variedad. Las tragedias van en tono sobrio. Nada de fotos de víctimas ni de medios o agencias.
 - **Identidad fija:**
-  - canal *Política en Claro*, presentadora **Urni** (la urna);
+  - canal ***El Hoyformativo*** (nombre elegido el 1-nov-2026; «Política en Claro» ya existía), lema «La política española del día, en claro», «HOY» en amarillo en el nombre; presentadora **Urni** (la urna);
   - rojo `#C8102E`, amarillo `#F1BF00` y azul noche;
   - logo = primer plano de Urni en un círculo azul con aro amarillo (opción B, elegida el 1-nov-2026; `genera_video2.logo`); sin el cuadrado rojo anterior;
   - música propia (musica.py).

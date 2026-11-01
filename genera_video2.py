@@ -18,9 +18,9 @@ import genera_video as V1
 import musica
 
 # identidad del canal: todo lo de marca en un sitio
-MARCA = "POLÍTICA EN CLARO"
+MARCA = "EL HOYFORMATIVO"
 PRESENTADORA = "Urni"
-LEMA = "La política española del día, en cinco minutos"
+LEMA = "La política española del día, en claro"
 VOZ = ("es-ES-AlvaroNeural", "+14%", "+6Hz")      # elegida por el usuario (muestra 2)
 INTRO, OUTRO = 3.0, 8.0                            # s de cabecera con sintonia y de cierre (pantalla final de YouTube: 5-20 s)
 

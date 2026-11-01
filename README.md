@@ -1,4 +1,4 @@
-# bot_youtube · *Política en Claro*
+# bot_youtube · *El Hoyformativo*
 
 Canal diario de política española en YouTube (y Shorts/TikTok), presentado por **Urni**, la urna del canal. Lo produce una **redacción de agentes de Claude Code** y lo revisa y publica una persona (el director).
 

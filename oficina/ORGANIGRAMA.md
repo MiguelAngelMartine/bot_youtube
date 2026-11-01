@@ -1,4 +1,4 @@
-# Redacción de *Política en Claro*: organigrama y cadena de montaje
+# Redacción de *El Hoyformativo*: organigrama y cadena de montaje
 
 La oficina funciona como una redacción de informativos de televisión:
 - cada puesto es un **agente** de Claude Code con una sola responsabilidad (definido en `.claude/agents/`);

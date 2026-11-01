@@ -246,6 +246,14 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
 
 
 # ---------- banner y avatar del canal ----------
+def partes_marca():
+    """El nombre del canal en trozos con su color: «HOY» en amarillo dentro de «EL HOYFORMATIVO»."""
+    m = G2.MARCA
+    i = m.find("HOY")
+    if i < 0:
+        return [(m, BLANCO)]
+    return [(m[:i], BLANCO), ("HOY", AMARILLO), (m[i + 3:], BLANCO)]
+
 def canal():
     dest = RAIZ / "canal"
     dest.mkdir(exist_ok=True)
@@ -264,7 +272,10 @@ def canal():
     yc = H2 // 2
     im.alpha_composite(G2.logo(tl), (x0, yc - tl // 2))
     xt = x0 + tl + 50
-    d.text((xt, yc - 70), G2.MARCA, font=fm, fill=BLANCO + (255,), anchor="lm")
+    x = xt                                             # «HOY» en amarillo: el juego de palabras del nombre
+    for trozo, col in partes_marca():
+        d.text((x, yc - 70), trozo, font=fm, fill=col + (255,), anchor="lm")
+        x += d.textlength(trozo, font=fm)
     d.rectangle([xt + 4, yc - 8, xt + 4 + int(d.textlength(G2.MARCA, font=fm) * 0.62), yc], fill=AMARILLO + (255,))
     d.text((xt + 4, yc + 50), G2.LEMA, font=fl, fill=(220, 225, 235, 255), anchor="lm")
     d.text((xt + 4, yc + 115), lado, font=fs, fill=AMARILLO + (255,), anchor="lm")
