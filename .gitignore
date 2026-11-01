@@ -12,3 +12,5 @@ dia/**/tmp*/
 dia/**/noticias.json
 *.log
 cache/
+client_secret*.json
+token_youtube.json

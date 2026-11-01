@@ -31,7 +31,7 @@
 - **Viñetas** (1-nov-2026): las notas de `claves`, `cronologia` y `breve` son viñetas de novela gráfica hechas con IA (Cloudflare Workers AI, plan gratuito; `ia_vinetas.py`, claves en `.env`), estilo de `canal/estilo_vineta.jpg` (colores planos, tinta gruesa, negros), texto arriba en franja del tono de la viñeta, **sin bocadillos**. Las personas con nombre salen como ellas mismas, dibujadas desde su foto libre, solo si es fiel y solo si la nota cuenta algo que dijeron o hicieron ellas.
 - **Mascota:** Urni tal como está (diseño A de `prototipo_animado.mascota`); se vieron variantes (plana, profe, chibi, reportera, con compañera) y prefirió la actual.
 - **Horario:** se publica por la tarde. La jornada arranca a las 15:00 y el vídeo tiene que estar listo hacia las 16:30.
-- **El usuario revisa y publica.** La oficina nunca sube nada a YouTube.
+- **El usuario revisa y publica.** Decisión del 1-nov-2026: la oficina **sube el vídeo a YouTube como privado** (API oficial, `subir.py`, pendiente de hacer), con título, descripción, miniatura y subtítulos, y avisa con el enlace; **publicarlo es siempre decisión del usuario**. Nunca se publica nada sin él.
 
 ## Estado y pendientes (1-nov-2026)
 - Carpeta de trabajo anterior: `../resumen_politico`, se conserva como copia; el proyecto vivo es este.
