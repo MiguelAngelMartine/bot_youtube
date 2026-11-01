@@ -1,1 +1,19 @@
-{}
+{
+  "Oscar Puente": {"cargo": "Ministro de Transportes", "partido": "PSOE", "fuente": "20minutos, El Mundo (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Santiago Abascal": {"cargo": "Lider de Vox", "partido": "Vox", "fuente": "20minutos (contexto 1-nov); cita en El Mundo", "verificado": "2026-11-01"},
+  "Alma Ezcurra": {"cargo": "Vicesecretaria del PP (Coordinacion Sectorial)", "partido": "PP", "fuente": "El Mundo, ABC; 20minutos dice 'Regeneracion Institucional' (discrepancia, se uso El Mundo/ABC)", "verificado": "2026-11-01"},
+  "Alberto Nunez Feijoo": {"cargo": "Presidente del PP", "partido": "PP", "fuente": "ABC, El Mundo (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Pedro Sanchez": {"cargo": "Presidente del Gobierno", "partido": "PSOE", "fuente": "El Mundo, ABC (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Veronica Martinez Barbero": {"cargo": "Coordinadora general de Movimiento Sumar y candidata del Frente Amplio", "partido": "Frente Amplio", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Miriam Nogueras": {"cargo": "Candidata de Junts al Congreso", "partido": "Junts", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Maribel Vaquero": {"cargo": "Portavoz del PNV en el Congreso", "partido": "PNV", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Irene Montero": {"cargo": "Numero 1 de Podemos al Congreso y eurodiputada", "partido": "Podemos", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Nestor Rego": {"cargo": "Diputado del BNG y candidato", "partido": "BNG", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
+  "Salvador Illa": {"cargo": "Presidente de la Generalitat", "partido": "PSC", "fuente": "contexto 1-nov (texto 113); tarjeta con cita en X", "verificado": "2026-11-01"},
+  "Alvise Perez": {"cargo": "Eurodiputado y lider de Se Acabo La Fiesta", "partido": "SALF", "fuente": "elDiario.es", "verificado": "2026-11-01"},
+  "Jaume Collboni": {"cargo": "Alcalde de Barcelona", "partido": "PSC", "fuente": "Tarjeta del episodio del 1-nov (cita en El Mundo); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Nuria Parlon": {"cargo": "Consellera de Interior", "partido": "PSC", "fuente": "Tarjeta del episodio del 1-nov (cita en elDiario.es); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Diego Martin": {"cargo": "Secretario general de SEMAF", "partido": "Institucion (sindicato)", "fuente": "Tarjeta del episodio del 1-nov (cita en El Pais); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Francisco Cerro": {"cargo": "Arzobispo de Toledo", "partido": "n/a", "fuente": "ABC (misa del 1-nov, citado en el episodio); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Andres Lopez": {"cargo": "Comandante de la Guardia Civil", "partido": "n/a", "fuente": "Citado en el episodio (Europa Press); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"}
+}
