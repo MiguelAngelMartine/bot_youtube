@@ -35,8 +35,8 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
 7. **Publicación.**
    - `editor-plataforma` → `publicacion.md`.
    - Termina el parte del día: temas, duración, vueltas de la mesa y avisos.
-   - Haz una copia ligera para el móvil: `.venv/Scripts/python.exe control_calidad.py <fecha> --ligero` (deja `episodio_720p.mp4`).
-   - Avisa al director: `.venv/Scripts/python.exe notifica.py <fecha>`, que manda por Telegram el parte resumido.
+   - Haz una copia ligera para el móvil: `.venv/bin/python control_calidad.py <fecha> --ligero` (deja `episodio_720p.mp4`).
+   - Avisa al director: `.venv/bin/python notifica.py <fecha>`, que manda por Telegram el parte resumido.
 8. **Archivo.** `documentalista` («archivo <fecha>»).
 
 ## Reglas

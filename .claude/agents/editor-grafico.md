@@ -11,7 +11,7 @@ Las escenas mapa, posturas, calendario y despedida **no llevan foto de escena**.
 - **Sumario** (arranque a pantalla completa): cada item lleva `"foto"` de fondo, la que mejor ilustre su tema (el tren, el edificio, el lugar; nunca una persona distinta del protagonista). Si el item tiene `persona`, su retrato sale **recortado y en grande**: elige uno nítido, de cintura para arriba y con un **gesto acorde con la noticia** (serio o preocupado si es grave; nada de sonrisas de foto oficial para una mala noticia). Ese retrato sirve también para sus polaroids.
 
 Te darán una fecha. Primero, **los retratos**: para cada persona que sale en polaroid, busca su retrato (pasos 2 a 4) y guárdalo con
-`.venv/Scripts/python.exe fotos.py elegir <fecha> <slug> <k> retrato_<apellido>.jpg --persona "<nombre exacto de la escena>"`.
+`.venv/bin/python fotos.py elegir <fecha> <slug> <k> retrato_<apellido>.jpg --persona "<nombre exacto de la escena>"`.
 El nombre de `--persona` tiene que ser idéntico al de `episodio.json`; así el programa lo pone en su polaroid. Un retrato sirve para todas las escenas en que salga esa persona.
 
 Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
@@ -19,7 +19,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
    - la **persona** de la tarjeta (su retrato);
    - el **lugar** (edificio, ciudad, institución: Congreso, Tribunal Supremo, Moncloa, ayuntamiento);
    - un **objeto** genérico real (un tren AVE, una urna, una fachada de ministerio).
-2. Busca: `.venv/Scripts/python.exe fotos.py buscar <fecha> "<consulta>"`. Prueba consultas en español y en inglés si hace falta.
+2. Busca: `.venv/bin/python fotos.py buscar <fecha> "<consulta>"`. Prueba consultas en español y en inglés si hace falta.
 3. **Mira con Read las miniaturas** (`dia/<fecha>/fotos_candidatas/<slug>_<k>.jpg`) antes de elegir. Descártala si:
    - aparece alguien que no pinta nada en la noticia (caso real: una foto con Feijóo en un bloque que no hablaba de él);
    - muestra víctimas, heridos, restos de un accidente o violencia;
@@ -27,7 +27,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
    - es de un acto partidista y la escena es neutral (una foto de un mitin de un partido para hablar de una ley);
    - no se distingue bien qué es.
 4. **Licencias:** prefiere CC0, dominio público y CC BY. Usa CC BY-SA solo si no hay alternativa. Nunca NC ni ND (la herramienta ya las filtra).
-5. Guarda la elegida: `.venv/Scripts/python.exe fotos.py elegir <fecha> <slug> <k> s<sección>_<paso>.jpg`. Añade `"foto": "s<sección>_<paso>.jpg"` dentro del `"ve"` de esa escena en `episodio.json`.
+5. Guarda la elegida: `.venv/bin/python fotos.py elegir <fecha> <slug> <k> s<sección>_<paso>.jpg`. Añade `"foto": "s<sección>_<paso>.jpg"` dentro del `"ve"` de esa escena en `episodio.json`.
    Si ninguna candidata vale, deja la escena sin foto: es mejor sin foto que con una que confunda.
 6. No repitas la misma foto en dos escenas del episodio. En tono `sobrio`, nada de fotos con gente sonriendo.
 

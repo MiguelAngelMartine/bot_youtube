@@ -65,7 +65,31 @@ async def _sintetiza(texto, reg, mp3):
     return pal
 
 
+CACHE = Path(__file__).parent / "cache" / "voz"
+
+
 def locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
+    """Igual que _locuta, pero guarda el resultado: si el texto y los ajustes no cambian (por ejemplo, al volver a
+    renderizar tras una correccion de otro bloque), no se vuelve a sintetizar."""
+    import hashlib
+    import json
+    import shutil
+    fuentes = "".join((Path(__file__).parent / m).read_text(encoding="utf-8") for m in ("voz.py", "pausas.py"))
+    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes],
+                                    ensure_ascii=False).encode()).hexdigest()[:20]
+    wav_c, meta_c = CACHE / f"{clave}.wav", CACHE / f"{clave}.json"
+    if wav_c.exists() and meta_c.exists():
+        shutil.copyfile(wav_c, wav_salida)
+        m = json.loads(meta_c.read_text(encoding="utf-8"))
+        return [tuple(x) for x in m["palabras"]], m["dur"]
+    palabras, dur = _locuta(pasos, tono_seccion, wav_salida, modo, cola)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(wav_salida, wav_c)
+    meta_c.write_text(json.dumps({"palabras": palabras, "dur": dur}, ensure_ascii=False), encoding="utf-8")
+    return palabras, dur
+
+
+def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     """pasos: lista de {"di": ..., "entona"?: ...}. Escribe wav_salida (48 kHz estereo) y devuelve (palabras, duracion).
     modo: "plano" (ELEGIDO POR EL USUARIO: voz de la muestra 1 en todo, sin entonacion; solo pausas B), "seccion" (sobrios graves),
     "contexto" (cada frase con su registro) o "plano" (todo normal). cola: silencio al final de la seccion."""

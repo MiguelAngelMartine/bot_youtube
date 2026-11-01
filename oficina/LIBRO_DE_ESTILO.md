@@ -16,8 +16,8 @@
   2. golpe de marca (`marca.py`, 2,6 s): logo, nombre del canal, fecha y sintonía, coreografiados con el sonido y encadenados con el primer bloque;
   3. bloques numerados «NN / TT»;
   4. breves;
-  5. despedida («Gracias por vernos. Mañana, más.»);
-  6. cierre de 8 s para la pantalla final de YouTube.
+  5. despedida a pantalla completa (`cierre.py`): «Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.», con el botón de suscripción y la campana animados al decirlo;
+  6. cierre de 8 s para la pantalla final de YouTube: la mitad derecha queda libre para el vídeo sugerido y el botón de suscripción de YouTube Studio.
 - Si hay **corrección** de un episodio anterior, va justo después del sumario con el rótulo «CORRECCIÓN» y en tono sobrio.
 
 ## La voz de Urni

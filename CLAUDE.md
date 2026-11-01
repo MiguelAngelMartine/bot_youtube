@@ -37,8 +37,9 @@
 - **Servidor** (miguel@192.168.1.129, portátil de 2011, Ubuntu + Docker): el 1-nov se pararon todos los contenedores salvo `allweather-market-recorder` para dedicarlo al canal. Plan:
   1. bots de recogida de noticias cada hora;
   2. Claude Code en el servidor lanzando `/edicion-diaria` a las 15:00;
-  3. medir si el servidor monta el vídeo a tiempo (el PC tarda ~13 min por episodio largo).
+  3. ~~medir si el servidor monta el vídeo a tiempo~~: medido el 1-nov. Al principio tardaba ~31 min por 6 min de vídeo; tras optimizar (4 procesos a la vez, OpenCV, caché de voz y música) tarda **~11 min**.
 - **Tipografías:** ahora son las de Windows (Segoe UI, Bahnschrift, Segoe Print), cuya licencia no permite copiarlas al servidor. Hay que pasar a libres (por ejemplo Inter, Barlow Condensed, Caveat) en las dos máquinas.
 - **Permisos** de la oficina para trabajar sola (`.claude/settings.json`): pendiente de que el usuario lo cree o lo apruebe.
+- **Acabado profesional del vídeo** (pedido el 1-nov): repaso hecho y pendientes ordenados en `oficina/REPASO_ACABADO.md`.
 - **Antes de monetizar:** pasar la voz a una opción con licencia comercial (por ejemplo Azure Speech) y una consulta breve con un abogado de propiedad intelectual.
 - **Pendiente de mejorar en el corto vertical:** piezas que se solapan en la escena de posturas; biblioteca de escenarios y personajes genéricos dibujados (lo que más engancha en el vídeo de referencia).

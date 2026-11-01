@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 import genera_video as V1
@@ -160,8 +161,31 @@ def capa_cabecera(fecha, con_marca=True):
     return im
 
 
+_liso = []
+
+try:                                   # OpenCV reescala 3-4 veces mas rapido que Pillow (si no esta, se usa Pillow)
+    import cv2 as _cv2
+except ImportError:
+    _cv2 = None
+
+
+def escala(im, tam, box=None):
+    """im.resize(tam, BILINEAR, box=box), con OpenCV cuando esta instalado. box: (x0, y0, x1, y1) enteros."""
+    if _cv2 is None:
+        return im.resize(tam, Image.BILINEAR, box=box)
+    a = np.asarray(im)
+    if box is not None:
+        a = a[int(box[1]):int(box[3]), int(box[0]):int(box[2])]
+    return Image.fromarray(_cv2.resize(a, tam, interpolation=_cv2.INTER_LINEAR), im.mode)
+
+
 def fondo_marca(t):
-    """Fondo azul con franjas diagonales que se desplazan despacio (cabecera y cierre)."""
+    """Fondo azul con franjas diagonales que se desplazan despacio (cabecera y cierre).
+    Pasados unos segundos las franjas ya han salido de pantalla: entonces se devuelve una copia del fondo liso."""
+    if -600 + 140 * t > AN:
+        if not _liso:
+            _liso.append(Image.new("RGBA", (AN, AL), (12, 20, 38, 255)))
+        return _liso[0].copy()
     im = Image.new("RGB", (AN, AL), (12, 20, 38))
     d = ImageDraw.Draw(im)
     x0 = int(-600 + 140 * t)

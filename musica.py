@@ -85,6 +85,26 @@ def reverb(x, seg=1.6, mezcla=0.18):
 
 
 def fondo(dur):
+    """Base continua en bucle: la progresion se repite cada 8 compases, asi que se compone una vez (16 compases, para
+    que el bucle lleve las colas del compas anterior), se guarda en cache/ y se repite hasta 'dur'."""
+    from pathlib import Path
+    import hashlib
+    clave = hashlib.sha1(Path(__file__).read_bytes()).hexdigest()[:12]
+    f = Path(__file__).parent / "cache" / f"fondo_{clave}.npy"
+    if f.exists():
+        base = np.load(f)
+    else:
+        base = _fondo(16 * COMPAS)
+        f.parent.mkdir(exist_ok=True)
+        np.save(f, base)
+    n8 = int(round(8 * COMPAS * SR))
+    inicio, bucle = base[:n8], base[n8:2 * n8]
+    n = int(dur * SR)
+    veces = max(0, -(-(n - n8) // n8))
+    return np.concatenate([inicio] + [bucle] * veces)[:n]
+
+
+def _fondo(dur):
     """Base continua: colchon + arpegio + bajo + pulso suave. Alterna la progresion A y B cada 4 compases."""
     out = np.zeros((int(dur * SR) + SR, 2))
     n_comp = int(dur / COMPAS) + 1
@@ -136,6 +156,20 @@ def pop():
     t = t_(0.09)
     f = 520 + 1300 * np.exp(-t / 0.025)
     return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.028) * np.minimum(1, t / 0.002)
+
+
+def clic():
+    """Clic de raton: transitorio corto y seco."""
+    t = t_(0.03)
+    return paso(rng.standard_normal(len(t)), 2500, "high") * np.exp(-t / 0.004) * 0.8
+
+
+def campana():
+    """«Ding» de notificacion: dos parciales en La (la tonalidad del canal) con caida larga."""
+    t = t_(1.4)
+    x = np.sin(2 * np.pi * hz(24) * t) + 0.45 * np.sin(2 * np.pi * hz(31) * t) + 0.2 * np.sin(2 * np.pi * hz(36) * t)
+    x = x * np.exp(-t / 0.45) * np.minimum(1, t / 0.003)
+    return reverb(np.stack([x, x], axis=1), 1.2, 0.25)[:, 0]
 
 
 def lee_wav(ruta):
@@ -205,6 +239,10 @@ def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablan
     for te, tipo in efectos:                    # ritmo de video corto: "pop" por dato, "whoosh" por cambio de escena
         if tipo == "pop":
             suma(ef, bp, te, 0.13, pan=float(rng.uniform(-0.3, 0.3)))
+        elif tipo == "clic":
+            suma(ef, clic(), te, 0.35)
+        elif tipo == "campana":
+            suma(ef, campana(), te, 0.22, pan=-0.2)
         else:
             suma(ef, bw, te - 0.12, 0.2)
     x = v + fondo_tot + ef

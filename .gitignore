@@ -11,3 +11,4 @@ dia/**/*.jpg
 dia/**/tmp*/
 dia/**/noticias.json
 *.log
+cache/

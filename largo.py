@@ -12,7 +12,11 @@ import argparse
 import bisect
 import json
 import math
+import multiprocessing as mp
+import os
 import subprocess
+import time
+import traceback
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +29,7 @@ import genera_video2 as G2
 import musica
 import voz
 import prototipo_animado as P
+import cierre as CI
 import marca
 import titulares as TIT
 from corto import estrecha, nota, pegatina, polaroid, sello
@@ -32,6 +37,7 @@ from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, sua
 
 INTRO = 0.4        # el video entra directo con los titulares (sin cabecera ni presentacion; decision del 1-nov-2026)
 GOLPE = marca.DUR  # golpe de marca (logo y sintonia, marca.py) entre el sumario y el primer bloque
+CALIENTA = 40      # fotogramas que cada trozo dibuja sin grabar antes de empezar (la camara suaviza con ~0,2 s)
 BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
 AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
 CREMA = (255, 246, 196)
@@ -238,12 +244,39 @@ def vista_tablero(pt, t, cam):
         a = 1 - math.exp(-(1 / FPS) / 0.22)
         cam[:] = [c0 + (c1 - c0) * a for c0, c1 in zip(cam, (cx, cy, z))]
     ccx, ccy, cz = cam
-    vw, vh = base.width / cz, base.height / cz
-    bx = min(max(ccx - vw / 2, 0), base.width - vw)
-    by = min(max(ccy - vh / 2, 0), base.height - vh)
-    vista = base.crop((int(bx), int(by), int(bx + vw) + 1, int(by + vh) + 1))
+    # capa fija: el tablero con las piezas que ya terminaron de entrar (se amplia a medida que llegan; no se recompone)
+    quietas = 0
+    while quietas < len(visibles) and t - visibles[quietas][3] >= 0.3:
+        quietas += 1
+    fijo = pt.get("_fijo")
+    if fijo is None or fijo[0] > quietas:
+        fijo = (0, base.copy())
+    if fijo[0] < quietas:
+        img = fijo[1] if fijo[0] else fijo[1].copy()
+        dfi = ImageDraw.Draw(img)
+        for pc, x, y, ta in visibles[fijo[0]:quietas]:
+            if isinstance(pc, tuple):
+                (x0, y0), (x1, y1) = pc[1], pc[2]
+                dfi.line([(x0, y0), (x1, y1)], fill=AMARILLO + (255,), width=12)
+                ang = math.atan2(y1 - y0, x1 - x0)
+                dfi.polygon([(x1, y1), (x1 - 40 * math.cos(ang - 0.5), y1 - 40 * math.sin(ang - 0.5)),
+                             (x1 - 40 * math.cos(ang + 0.5), y1 - 40 * math.sin(ang + 0.5))], fill=AMARILLO + (255,))
+            else:
+                img.alpha_composite(pc, (int(x), int(y)))
+        fijo = (quietas, img)
+    pt["_fijo"] = fijo
+    sin_zoom = abs(cz - 1) < 1e-3 and base.size == (BW, BH)
+    if sin_zoom:                                       # el caso mas comun: ni recorte ni reescalado
+        bx = by = 0
+        vw, vh = BW, BH
+        vista = fijo[1].copy()
+    else:
+        vw, vh = base.width / cz, base.height / cz
+        bx = min(max(ccx - vw / 2, 0), base.width - vw)
+        by = min(max(ccy - vh / 2, 0), base.height - vh)
+        vista = fijo[1].crop((int(bx), int(by), int(bx + vw) + 1, int(by + vh) + 1))
     dv = ImageDraw.Draw(vista)
-    for pc, x, y, ta in visibles:
+    for pc, x, y, ta in visibles[quietas:]:
         e = (t - ta) / 0.3
         if isinstance(pc, tuple):                      # flecha que se dibuja
             (x0, y0), (x1, y1) = pc[1], pc[2]
@@ -264,19 +297,29 @@ def vista_tablero(pt, t, cam):
             pega(vista, im, x - bx + (pc.width - im.width) / 2, y - by + (pc.height - im.height) / 2, min(1.0, e * 3))
         else:
             vista.alpha_composite(pc, (int(x - bx), int(y - by)))
-    vista = vista.resize((BW, BH), Image.BILINEAR)
+    if not sin_zoom:
+        vista = G2.escala(vista, (BW, BH))
     # barrido con desenfoque al cambiar de escena dentro del bloque
     for borde, sentido in ((pt["t0"], 1), (pt["t1"], -1)):
         dt = (t - borde) if sentido == 1 else (borde - t)
-        if 0 <= dt < 0.22 and (sentido == -1 or pt["k"] > 0):
+        if 0 <= dt < 0.22 and ((sentido == -1 and not pt.get("sin_salida")) or (sentido == 1 and pt["k"] > 0)):
             off = int((1 - dt / 0.22) ** 2 * 900) * sentido
-            capas = [vista.transform(vista.size, Image.AFFINE, (1, 0, -(off + j * 50 * sentido), 0, 1, 0)) for j in range(5)]
+            capas = [vista.transform(vista.size, Image.AFFINE, (1, 0, -(off + j * 50 * sentido), 0, 1, 0),
+                                     fillcolor=(22, 36, 64, 255)) for j in range(5)]   # lo que entra: color del tablero
             acc = np.mean([np.asarray(cc, dtype=np.float32) for cc in capas], axis=0)
             vista = Image.fromarray(acc.astype(np.uint8), "RGBA")
     return vista
 
 
 # ------------------------------------------------------------------ montaje
+
+def trabajadores(nf):
+    """Cuantos procesos dibujan a la vez: uno por hilo del procesador (variable RENDER_PROCESOS para cambiarlo).
+    En Windows no hay fork, asi que alli se dibuja en un solo proceso."""
+    if "fork" not in mp.get_all_start_methods():
+        return 1
+    n = int(os.environ.get("RENDER_PROCESOS", os.cpu_count() or 1))
+    return max(1, min(n, nf // (FPS * 10)))           # trozos de al menos 10 s
 
 def main(dia_txt, solo_fotogramas=False, hasta=None):
     dia = Path(__file__).parent / "dia" / dia_txt
@@ -290,7 +333,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     tmp = dia / "tmp_largo"
     tmp.mkdir(exist_ok=True)
     t = INTRO
-    golpe0 = None
+    golpe0 = desp = None
     plan, wavs, subs, caps, calma, usadas = [], [], [], [], [], {}
     for i, s in enumerate(secs):
         texto = " ".join(p["di"] for p in s["pasos"])
@@ -315,8 +358,14 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
             c += len(p["di"]) + 1
         if not partes:
             raise ValueError(f"el bloque {i} no tiene ninguna escena")
+        for pt in partes:                              # despedida a pantalla completa (cierre.py), sincronizada con la voz
+            if pt["tipo"] == "despedida":
+                ev = {k: T.cuando(w, 0, None) for k, w in (("suscribete", "suscríbete"), ("campanita", "campanita"),
+                                                           ("gracias", "Gracias por vernos"))}
+                desp = {"t0": pt["t0"], "ev": {k: (v - pt["t0"] if v is not None else None) for k, v in ev.items()}}
         for a, b in zip(partes, partes[1:]):
             a["t1"] = b["t0"]
+            a["sin_salida"] = b["tipo"] == "despedida"     # el cierre ya trae su barrida: sin dos transiciones seguidas
         partes[-1]["t1"] = t + dur
         for pt in partes:
             pt["piezas"], pt["base"] = encaja(pt["piezas"])
@@ -356,6 +405,14 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     efectos += [(tj["t0"] - 0.05, "whoosh") for tj in tarj] + [(tj["t0"] + TIT.ENTRA, "pop") for tj in tarj if not tj["sobrio"]]
     cortes = [p["t0"] for p in plan if not p["tit"]] + [fin_voz]
     sin_fondo = []
+    if desp:
+        efectos.append((desp["t0"], "whoosh"))
+        es, ec = desp["ev"]["suscribete"], desp["ev"]["campanita"]
+        if es is not None:
+            efectos.append((desp["t0"] + es, "clic"))
+        if ec is not None:
+            efectos += [(desp["t0"] + ec, "clic"), (desp["t0"] + ec + 0.02, "campana")]
+        cortes = [c for c in cortes if abs(c - fin_voz) > 0.01]
     if golpe0 is not None:                             # el golpe de marca suena solo: sintonia y sus dos barridos
         efectos += [(golpe0, "whoosh"), (golpe0 + 2.05, "whoosh")]
         cortes = [c for c in cortes if abs(c - (golpe0 + GOLPE)) > 0.01]
@@ -382,7 +439,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         x = suave((t - plan[i]["t0"] - 0.3) / 0.6)
         return (antes + (dentro - antes) * x) if i > 0 else float(dentro) * suave((t - plan[0]["t0"]) / 0.6)
 
-    gm, sin_marca = [], []
+    gm, sin_marca, cie = [], [], []
     cab_sin = G2.capa_cabecera(G["fecha"], con_marca=False)
 
     def barra(fr, t):
@@ -393,6 +450,22 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         if plan[0]["tit"] and t < (golpe0 if golpe0 is not None else plan[0]["t0"] + plan[0]["dur"]):   # sumario
             tj = [x for x in plan[0]["tit"] if x["t0"] <= t + 1e-9] or plan[0]["tit"][:1]
             return barra(TIT.cuadro(tj[-1], max(0.0, t - tj[-1]["t0"]), t), t)
+        if desp and t >= desp["t0"]:                  # despedida y pantalla final
+            if not cie:
+                cie.append(CI.Cierre(G["fecha"]))
+                cie.append(cuadro(desp["t0"] - 1e-3).convert("RGBA"))
+            urni = None
+            if t < fin_voz + 0.9:
+                k = min(int((t - INTRO) * FPS), len(boca) - 1)
+                m = P.mascota(t, float(boca[k]) if t < fin_voz else 0.0, (t % 3.7) < 0.12, 1.0)
+                urni = m.resize((int(m.width * 1.05), int(m.height * 1.05)), Image.BILINEAR)
+            fr = cie[0].cuadro(t - desp["t0"], cie[1], desp["ev"], urni, fin_voz - desp["t0"])
+            if t < fin_voz:
+                fr = barra(fr, t)
+            fundido = (t - (total - 0.6)) / 0.6
+            if fundido > 0:                            # fundido a negro en el ultimo medio segundo
+                fr.alpha_composite(Image.new("RGBA", (AN, AL), (0, 0, 0, int(255 * min(1.0, fundido)))))
+            return fr
         if golpe0 is not None and golpe0 <= t < golpe0 + GOLPE:
             if not gm:                                 # se preparan una vez: la pieza, el ultimo titular y el tablero
                 ult = plan[0]["tit"][-1]
@@ -415,7 +488,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         p = plan[i]
         pt = p["partes"][max(j for j, x in enumerate(p["partes"]) if x["t0"] <= t + 1e-9 or j == 0)]
         fr = G2.fondo_marca(t)
-        fr.alpha_composite(vista_tablero(pt, t, cam), (BX, BY))
+        fr.paste(vista_tablero(pt, t, cam), (BX, BY))  # el tablero es opaco: pegar es mucho mas rapido que componer
         d = ImageDraw.Draw(fr)
         d.rectangle([BX, BY - 4, BX + BW, BY], fill=AMARILLO + (255,))
         d.rectangle([BX, BY + BH, BX + BW, BY + BH + 4], fill=AMARILLO + (255,))
@@ -474,17 +547,56 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         print(f"FOTOGRAMAS {len(escenas)} -> {sal}")
         return
     out = dia / ("inicio_prueba.mp4" if hasta else "episodio.mp4")
-    ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{AN}x{AL}",
-                           "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
-                           "-crf", "20", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
-                           "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], stdin=subprocess.PIPE)
     nf = int(math.ceil((min(total, hasta) if hasta else total) * FPS))
-    for fi in range(nf):
-        ff.stdin.write(cuadro(fi / FPS).convert("RGB").tobytes())
-        if fi % (FPS * 30) == 0:
-            print(f"  fotograma {fi}/{nf}", flush=True)
-    ff.stdin.close()
-    ff.wait()
+    t_ini = time.time()
+    n = trabajadores(nf)
+    bordes = [nf * k // n for k in range(n + 1)]
+
+    def dibuja_trozo(k):
+        """Dibuja los fotogramas [bordes[k], bordes[k+1]) en tmp/trozoK.mp4 (solo imagen)."""
+        a, b = bordes[k], bordes[k + 1]
+        cam.clear()
+        for fi in range(max(0, a - CALIENTA), a):      # la camara del tablero se asienta antes de grabar
+            cuadro(fi / FPS)
+        ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN}x{AL}",
+                               "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                               "-threads", "2", "-pix_fmt", "yuv420p", str(tmp / f"trozo{k}.mp4")], stdin=subprocess.PIPE)
+        for fi in range(a, b):
+            fr = cuadro(fi / FPS)                      # RGBA tal cual: ffmpeg convierte a yuv420p sin paso intermedio
+            ff.stdin.write((fr if fr.mode == "RGBA" else fr.convert("RGBA")).tobytes())
+            if k == 0 and (fi - a) % (FPS * 15) == 0:
+                print(f"  fotograma {(fi - a) * n}/{nf} aprox. ({n} a la vez)", flush=True)
+        ff.stdin.close()
+        return ff.wait()
+
+    if n > 1:                                          # en paralelo: un proceso por hilo del procesador (Linux)
+        ctx = mp.get_context("fork")
+
+        def hijo(k):
+            try:
+                if G2._cv2 is not None:
+                    G2._cv2.setNumThreads(1)           # ya hay un proceso por hilo
+                os._exit(dibuja_trozo(k))
+            except Exception:
+                traceback.print_exc()
+                os._exit(1)
+        procs = [ctx.Process(target=hijo, args=(k,)) for k in range(n)]
+        for pr in procs:
+            pr.start()
+        for pr in procs:
+            pr.join()
+        if any(pr.exitcode for pr in procs):
+            raise RuntimeError(f"fallo un trozo del render: {[pr.exitcode for pr in procs]}")
+    elif dibuja_trozo(0):
+        raise RuntimeError("fallo el render")
+    lista_v = tmp / "trozos.txt"
+    lista_v.write_text("".join(f"file 'trozo{k}.mp4'\n" for k in range(n)), encoding="utf-8")
+    subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista_v),
+                    "-i", str(tmp / "audio.wav"), "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
+                    "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], check=True)
+    for k in range(n):
+        (tmp / f"trozo{k}.mp4").unlink(missing_ok=True)
+    print(f"  render: {(time.time() - t_ini) / 60:.1f} min con {n} proceso(s) para {nf / FPS / 60:.1f} min de video", flush=True)
     if hasta:
         print(f"PRUEBA de los primeros {hasta:.0f} s -> {out}")
         return

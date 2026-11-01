@@ -28,7 +28,7 @@ Escribe `dia/<fecha>/episodio.json` con:
    - Escena `claves` con titulo «CORRECCIÓN» y fuente.
 3. **Los bloques** en el orden de la escaleta, copiados de `bloques/` sin cambiar los hechos.
    - Solo puedes retocar transiciones y la primera frase para que el episodio fluya.
-4. **Breves**, y como último paso de esa sección la despedida: «Esto ha sido todo por hoy. Gracias por vernos. Mañana, más.», con escena `despedida`.
+4. **Breves**, y como último paso de esa sección la despedida, literal (el cierre anima el botón y la campana con estas palabras): «Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.», con escena `despedida`.
 5. **`titulo_video`:** el de la escaleta + « | Política en Claro · <fecha corta>». **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:

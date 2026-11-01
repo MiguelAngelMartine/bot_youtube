@@ -30,14 +30,14 @@ Puede salir una persona con gesto serio (un responsable, nunca una víctima ni u
 ## Pasos (te darán una fecha)
 1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia principal (el primer bloque, salvo que la escaleta diga otra cosa), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.
 2. **Foto del protagonista** (si la noticia tiene uno claro):
-   - busca: `.venv/Scripts/python.exe fotos.py buscar <fecha> "<nombre>"` (prueba también «<nombre> ministro», «<nombre> Congreso», «<nombre> 2025»...);
+   - busca: `.venv/bin/python fotos.py buscar <fecha> "<nombre>"` (prueba también «<nombre> ministro», «<nombre> Congreso», «<nombre> 2025»...);
    - mira con Read las candidatas y elige una con el **gesto adecuado** y de cintura para arriba, con la cara grande y nítida (mínimo unos 600 px de ancho);
    - descarta las de otros actos que confundan (otra tragedia, un mitin si la noticia es institucional), las de grupo en que no se le distinga, y las que tengan texto, marcas de agua o logos;
-   - guárdala: `.venv/Scripts/python.exe fotos.py elegir <fecha> <slug> <k> miniatura_<apellido>.jpg --persona "<Nombre>"` (así queda su crédito en `creditos.json`).
+   - guárdala: `.venv/bin/python fotos.py elegir <fecha> <slug> <k> miniatura_<apellido>.jpg --persona "<Nombre>"` (así queda su crédito en `creditos.json`).
    Si ninguna vale, haz la miniatura sin persona: la foto del tema a todo el ancho.
 3. **Foto de fondo:** una de `dia/<fecha>/imagenes/` que ya ilustre el tema (no la de otra persona) o, si no hay, busca y guarda una con `fotos.py elegir ... miniatura_fondo.jpg`.
 4. Ejecuta:
-   `.venv/Scripts/python.exe miniatura.py <fecha> --titular "..." --destaca "<palabra>" --etiqueta "..." --persona miniatura_<apellido>.jpg --fondo <foto>.jpg [--sobrio]`
+   `.venv/bin/python miniatura.py <fecha> --titular "..." --destaca "<palabra>" --etiqueta "..." --persona miniatura_<apellido>.jpg --fondo <foto>.jpg [--sobrio]`
    La primera vez que recorta a alguien tarda algo más (descarga el modelo).
 5. **Mira `dia/<fecha>/miniatura.png` con Read** y compárala con la referencia:
    - el titular se lee entero y grande (en el móvil se ve a unos 160 px de ancho);
@@ -46,7 +46,7 @@ Puede salir una persona con gesto serio (un responsable, nunca una víctima ni u
    - es fiel al vídeo.
    Si algo falla, cambia el texto o la foto y repite; como mucho 3 intentos.
 
-**Banner y avatar del canal** (solo si te lo piden): `.venv/Scripts/python.exe miniatura.py --canal`, revísalos y describe el resultado.
+**Banner y avatar del canal** (solo si te lo piden): `.venv/bin/python miniatura.py --canal`, revísalos y describe el resultado.
 
 Reglas:
 - Solo fotos de licencia libre buscadas con `fotos.py` (con su crédito); nunca fotos de medios o agencias, ni logos de partidos.

@@ -24,13 +24,15 @@ ENTRA = 0.28                                  # s que tarda el titular en caer e
 def _fondo(ruta: Path | None, sobrio: bool):
     """Fondo un poco mas grande que la pantalla para poder acercarse despacio (Ken Burns)."""
     if ruta is None or not ruta.exists():
-        return G2.fondo_marca(1.0).resize((int(AN * 1.08), int(AL * 1.08))).convert("RGB")
+        return G2.fondo_marca(1.0).resize((int(AN * 1.08), int(AL * 1.08))).convert("RGBA")
     f = ImageOps.fit(Image.open(ruta).convert("RGB"), (int(AN * 1.08), int(AL * 1.08)), Image.LANCZOS)
     if sobrio:
         f = ImageOps.grayscale(f).convert("RGB")
     f = f.filter(ImageFilter.GaussianBlur(3))
     f = ImageEnhance.Brightness(f).enhance(0.55 if sobrio else 0.68)
-    return ImageEnhance.Contrast(f).enhance(1.15)
+    f = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
+    f.alpha_composite(_oscuro().resize(f.size, Image.BILINEAR))    # la sombra de abajo va ya en la foto (una vez)
+    return f
 
 
 def _seccion_de(k, item, secs):
@@ -82,9 +84,7 @@ def cuadro(tj, tl, t_abs):
     z = 1.0 + 0.06 * min(tl / 6.0, 1.0)                       # acercamiento lento
     cw, ch = int(AN * 1.08 / z), int(AL * 1.08 / z)
     x0, y0 = (f.width - cw) // 2, (f.height - ch) // 2
-    fr = f.resize((AN, AL), Image.BILINEAR, box=(x0, y0, x0 + cw, y0 + ch)).convert("RGBA")
-    M_osc = _oscuro()
-    fr.alpha_composite(M_osc)
+    fr = G2.escala(f, (AN, AL), box=(x0, y0, x0 + cw, y0 + ch))
     if tj["persona"]:
         c, pad = tj["persona"]
         a = suave(tl / 0.35)

@@ -35,7 +35,8 @@ def lienzo(w, h):
 
 
 def baja(im):
-    return im.resize((im.width // S, im.height // S), Image.LANCZOS)
+    # promedio de bloques de SxS con alfa premultiplicado (sin halos oscuros en los bordes): mucho mas rapido que LANCZOS
+    return im.convert("RGBa").reduce(S).convert("RGBA")
 
 
 def f(n, t):
