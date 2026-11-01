@@ -55,8 +55,8 @@ Lo que pase después de las 15:00 entra en el episodio del día siguiente, y la 
 | 1 | **Recopilador** | Lanza la recopilación de los 11 medios, limpia duplicados y agrupa las noticias por tema, indicando qué medios cubren cada uno. | Elegir qué es importante | sonnet |
 | 1 | **Investigador** (uno por tema) | Lee las noticias completas (al menos dos medios de líneas distintas). Saca hechos, cifras, citas literales y la versión de cada parte, y marca cada hecho como CONTRASTADO (2+ medios) o ATRIBUIDO (1 medio). | Redactar el guion | sonnet |
 | 2 | **Jefe de edición** | Consejo de redacción: elige 4-6 temas por relevancia informativa, decide orden, tono (normal/sobrio), enfoque y tiempo de cada bloque, y los breves. | Escribir el texto | opus |
-| 3 | **Redactor** (uno por bloque) | Escribe el bloque con la voz de Urni (libro de estilo): gancho, hechos, contexto, «qué pasa ahora». Elige las escenas del catálogo. | Añadir nada que no esté en el dossier | opus |
-| 4 | **Verificador** | Comprueba frase a frase contra el dossier y el texto de las noticias: cifras, fechas, cargos, citas literales, atribuciones. | Corregir el estilo | opus |
+| 3 | **Redactor** (uno por bloque) | Escribe el bloque con la voz de Urni (libro de estilo): gancho, hechos, contexto, «qué pasa ahora». Elige las escenas del catálogo. | Añadir nada que no esté en el dossier | sonnet |
+| 4 | **Verificador** | Comprueba frase a frase contra el dossier y el texto de las noticias: cifras, fechas, cargos, citas literales, atribuciones. | Corregir el estilo | sonnet |
 | 4 | **Defensor de la neutralidad** | Mide el equilibrio: versiones de Gobierno, oposición y socios; tiempo por partido; adjetivos valorativos; encuadres. | Censurar hechos incómodos | sonnet |
 | 4 | **Asesor de cumplimiento** | Revisa YouTube (contenido no auténtico, anuncios en tragedias, elecciones) y la ley: citas breves y atribuidas, sin textos copiados, derecho al honor. | Asesoría jurídica formal | sonnet |
 | 5 | **Editor de cierre** | Monta el episodio final: sumario, bloques corregidos, despedida y corrección si la hay. Comprueba la duración (6-8 min) y la coherencia. | Meter hechos nuevos | opus |
