@@ -12,8 +12,8 @@
   - titular enorme en blanco con una palabra en amarillo-oro (relieve, contorno e inclinación) y etiqueta roja con el hecho;
   - gancho en la forma, literal en el fondo: citas textuales o hechos del vídeo, sin valoraciones; en tragedias, la versión sobria.
 - **Estructura fija:**
-  1. sintonía y entrada;
-  2. sumario de Urni («Buenas noches, soy Urni, y esto es Política en Claro»);
+  1. **arranque directo (decisión del usuario del 1-nov):** sumario de titulares a pantalla completa con el estilo de la miniatura, sin presentación ni saludo, una frase contundente por bloque y «Vamos con ello.»;
+  2. golpe de marca: logo, nombre del canal, fecha y sintonía (2 s);
   3. bloques numerados «NN / TT»;
   4. breves;
   5. despedida («Gracias por vernos. Mañana, más.»);
@@ -49,7 +49,7 @@ Cada escena dura desde el paso donde se pide hasta la siguiente. Los objetos apa
 
 | tipo | para qué | campos | límites |
 |---|---|---|---|
-| `sumario` | titulares del día (solo en el bloque 0) | `items[{texto, cuando}]` | ≤ 4 items, ≤ 70 caracteres |
+| `sumario` | titulares del día a pantalla completa (solo en el bloque 0) | `items[{texto, cuando, titular, destaca, etiqueta, persona?, foto?}]` | ≤ 4 items; texto ≤ 70 caracteres, titular 2-5 palabras |
 | `mapa` | dónde ha pasado | `puntos[{nombre, lon, lat, cuando?, aviso?, pulso?, izq?, abajo?}]`, `ruta?`, `tren?`, `aviso_ruta?`, `titular`, `sub`, `fuente` | ≤ 5 puntos; titular ≤ 40 caracteres |
 | `cifra` | el número clave | `numero` (≤ 4 caracteres), `etiqueta`, `sub`, `nota?`, `cuando_nota?`, `fuente` | etiqueta ≤ 28 caracteres |
 | `claves` | 3-4 ideas con icono | `titulo`, `items[{icono, texto, cuando}]`, `fuente` | ≤ 4 items, ≤ 95 caracteres |

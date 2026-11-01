@@ -4,7 +4,8 @@ narra abajo a la izquierda. Es el episodio completo (todas las secciones de epis
 las cortinillas y el cierre del canal. Los bloques "sobrio" van sin Urni, sin "pop" y con la musica mas baja.
 Escribe lo mismo que episodio.py (episodio.mp4, episodio.srt, escenas.json, episodio_descripcion.txt), asi que el control
 de calidad y la publicacion no cambian.
-Uso: python largo.py AAAA-MM-DD [--fotogramas]   (--fotogramas: sin video, un PNG del final de cada escena en tmp_largo/)"""
+El arranque es el sumario a pantalla completa de titulares.py, sin presentacion, y un golpe de marca (logo y sintonia).
+Uso: python largo.py AAAA-MM-DD [--fotogramas] [--hasta S]   (--fotogramas: sin video, un PNG del final de cada escena en tmp_largo/)"""
 from __future__ import annotations
 
 import argparse
@@ -24,9 +25,12 @@ import genera_video2 as G2
 import musica
 import voz
 import prototipo_animado as P
+import titulares as TIT
 from corto import estrecha, nota, pegatina, polaroid, sello
 from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, suave
 
+INTRO = 0.4        # el video entra directo con los titulares (sin cabecera ni presentacion; decision del 1-nov-2026)
+GOLPE = 2.0        # golpe de marca (logo y sintonia) entre el sumario y el primer bloque
 BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
 AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
 CREMA = (255, 246, 196)
@@ -273,16 +277,19 @@ def vista_tablero(pt, t, cam):
 
 # ------------------------------------------------------------------ montaje
 
-def main(dia_txt, solo_fotogramas=False):
+def main(dia_txt, solo_fotogramas=False, hasta=None):
     dia = Path(__file__).parent / "dia" / dia_txt
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
     secs = G["secciones"]
     cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
-    fotos = C.fotos_personas({n for s in secs for p in s["pasos"] if p.get("ve") for n in C.personas_de(p["ve"])},
-                             cred, dia / "imagenes")
+    nombres = {n for s in secs for p in s["pasos"] if p.get("ve") for n in C.personas_de(p["ve"])}
+    nombres |= {it["persona"] for s in secs[:1] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"
+                for it in p["ve"]["items"] if it.get("persona")}
+    fotos = C.fotos_personas(nombres, cred, dia / "imagenes")
     tmp = dia / "tmp_largo"
     tmp.mkdir(exist_ok=True)
-    t = G2.INTRO
+    t = INTRO
+    golpe0 = None
     plan, wavs, subs, caps, calma, usadas = [], [], [], [], [], {}
     for i, s in enumerate(secs):
         texto = " ".join(p["di"] for p in s["pasos"])
@@ -312,13 +319,25 @@ def main(dia_txt, solo_fotogramas=False):
         partes[-1]["t1"] = t + dur
         for pt in partes:
             pt["piezas"], pt["base"] = encaja(pt["piezas"])
+        tit = None
+        vs = next((p["ve"] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"), None) if i == 0 else None
+        if vs:                                         # sumario a pantalla completa: una tarjeta por titular
+            tit = TIT.prepara(vs, secs, dia / "imagenes", fotos, cred, usadas)
+            for k, tj in enumerate(tit):
+                tj["t0"] = t if k == 0 else T.cuando(tj["cuando"], 0, t + 2.0 * k) if tj["cuando"] else t + 2.0 * k
+        else:
+            caps += C.grupos_palabras(T, set())
         subs += T.subtitulos()
-        caps += C.grupos_palabras(T, set())
-        plan.append({"t0": t, "dur": dur, "sec": s, "partes": partes, "pops": sorted(T.eventos),
+        plan.append({"t0": t, "dur": dur, "sec": s, "partes": partes, "pops": [] if tit else sorted(T.eventos), "tit": tit,
                      "blq": P.capa_bloque(s["titulo"], "HOY" if i == 0 else f"{i:02d} / {len(secs) - 1:02d}")})
         if s["tono"] == "sobrio":
             calma.append((t, t + dur))
         t += dur
+        if tit:                                        # silencio para el golpe de marca
+            golpe0 = t
+            musica.escribe_wav(tmp / "golpe.wav", np.zeros((int(GOLPE * musica.SR), 2)))
+            wavs.append(tmp / "golpe.wav")
+            t += GOLPE
     fin_voz = t
     lista = tmp / "voz.txt"
     lista.write_text("".join(f"file '{w.name}'\n" for w in wavs), encoding="utf-8")
@@ -326,9 +345,13 @@ def main(dia_txt, solo_fotogramas=False):
                     str(tmp / "voz.wav")], check=True)
     # ritmo: "pop" con cada pieza que entra y barrido con cada cambio de escena; en los bloques sobrios no hay "pop"
     pops = sorted(x for p in plan if p["sec"]["tono"] != "sobrio" for x in p["pops"])
-    cambios = sorted(pt["t0"] for p in plan for pt in p["partes"][1:])
-    total = musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", G2.INTRO, G2.OUTRO, [p["t0"] for p in plan] + [fin_voz],
-                          calma=calma, efectos=[(x, "pop") for x in pops] + [(x, "whoosh") for x in cambios])
+    cambios = sorted(pt["t0"] for p in plan if not p["tit"] for pt in p["partes"][1:])
+    tarj = [tj for p in plan if p["tit"] for tj in p["tit"]]
+    efectos = [(x, "pop") for x in pops] + [(x, "whoosh") for x in cambios]
+    efectos += [(tj["t0"] - 0.05, "whoosh") for tj in tarj] + [(tj["t0"] + TIT.ENTRA, "pop") for tj in tarj if not tj["sobrio"]]
+    total = musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", INTRO, G2.OUTRO,
+                          [p["t0"] for p in plan if not p["tit"]] + [fin_voz], calma=calma, efectos=efectos,
+                          sintonia_en=golpe0 if golpe0 is not None else 0.0, sintonia_dur=GOLPE + 0.8 if golpe0 else None)
     v, sr = musica.lee_wav(tmp / "voz.wav")
     hop = sr // FPS
     rms = np.sqrt(np.mean(v[: len(v) // hop * hop, 0].reshape(-1, hop) ** 2, axis=1))
@@ -348,9 +371,18 @@ def main(dia_txt, solo_fotogramas=False):
         x = suave((t - plan[i]["t0"] - 0.3) / 0.6)
         return (antes + (dentro - antes) * x) if i > 0 else float(dentro) * suave((t - plan[0]["t0"]) / 0.6)
 
+    def barra(fr, t):
+        ImageDraw.Draw(fr).rectangle([0, AL - 8, int(AN * max(0.0, t - INTRO) / (fin_voz - INTRO)), AL], fill=AMARILLO + (255,))
+        return fr
+
     def cuadro(t):
-        if t < G2.INTRO or t >= fin_voz:
-            fr = G2.cuadro_intro(t, G["fecha"]) if t < G2.INTRO else G2.cuadro_cierre(t - fin_voz, G["fecha"])
+        if plan[0]["tit"] and t < plan[0]["t0"] + plan[0]["dur"]:      # sumario a pantalla completa
+            tj = [x for x in plan[0]["tit"] if x["t0"] <= t + 1e-9] or plan[0]["tit"][:1]
+            return barra(TIT.cuadro(tj[-1], max(0.0, t - tj[-1]["t0"]), t), t)
+        if golpe0 is not None and golpe0 <= t < golpe0 + GOLPE:
+            return barra(TIT.golpe_marca(t - golpe0, G["fecha"]), t)
+        if t < INTRO or t >= fin_voz:
+            fr = G2.cuadro_intro(t, G["fecha"]) if t < INTRO else G2.cuadro_cierre(t - fin_voz, G["fecha"])
             q = (t - fin_voz) / G2.CORTINILLA
             if 0 <= q < 1:
                 d = ImageDraw.Draw(fr)
@@ -377,7 +409,7 @@ def main(dia_txt, solo_fotogramas=False):
             fr.alpha_composite(tarjeta_fuente(pt["fuente"]), (40, BY))
         pm = presente(t, i)
         if pm > 0.001:                                 # Urni narra abajo a la izquierda y da un saltito con cada pieza
-            k = min(int((t - G2.INTRO) * FPS), len(boca) - 1)
+            k = min(int((t - INTRO) * FPS), len(boca) - 1)
             ge = 1.0 if pt["tipo"] == "despedida" else float(gesto[k])
             par = (t % 3.7) < 0.12 or (t % 5.3) < 0.1
             kp = bisect.bisect_right(pops, t)
@@ -393,7 +425,7 @@ def main(dia_txt, solo_fotogramas=False):
             cp = cp.resize((int(cp.width * s), int(cp.height * s)), Image.BILINEAR)
             pega(fr, cp, BX + BW / 2 - cp.width / 2, 985 - cp.height / 2)
         d = ImageDraw.Draw(fr)
-        d.rectangle([0, AL - 8, int(AN * (t - G2.INTRO) / (fin_voz - G2.INTRO)), AL], fill=AMARILLO + (255,))
+        d.rectangle([0, AL - 8, int(AN * (t - INTRO) / (fin_voz - INTRO)), AL], fill=AMARILLO + (255,))
         tl = t - p["t0"]
         if tl < G2.CORTINILLA:                         # cortinilla roja y amarilla al cambiar de bloque
             x0 = int(AN * (2.2 * tl / G2.CORTINILLA - 1.2))
@@ -401,7 +433,13 @@ def main(dia_txt, solo_fotogramas=False):
             d.rectangle([x0 + AN, 0, x0 + AN + 40, AL], fill=AMARILLO + (255,))
         return fr
 
-    escenas = [(i, pt["tipo"], pt["t0"], pt["t1"]) for i, p in enumerate(plan) for pt in p["partes"]]
+    escenas = [(i, pt["tipo"], pt["t0"], pt["t1"]) for i, p in enumerate(plan) if not p["tit"] for pt in p["partes"]]
+    for i, p in enumerate(plan):                       # el control de calidad mira cada tarjeta del sumario y el golpe
+        if p["tit"]:
+            fins = [x["t0"] for x in p["tit"][1:]] + [p["t0"] + p["dur"]]
+            escenas[0:0] = [(i, f"titular{k + 1}", x["t0"], b) for k, (x, b) in enumerate(zip(p["tit"], fins))]
+    if golpe0 is not None:
+        escenas.insert(len(plan[0]["tit"]), (0, "golpe_marca", golpe0, golpe0 + GOLPE))
     if solo_fotogramas:
         sal = tmp / "fotogramas"
         sal.mkdir(exist_ok=True)
@@ -410,18 +448,21 @@ def main(dia_txt, solo_fotogramas=False):
             cuadro(b - 0.3).convert("RGB").save(sal / f"{k:02d}_b{i}_{tipo}.png")
         print(f"FOTOGRAMAS {len(escenas)} -> {sal}")
         return
-    out = dia / "episodio.mp4"
+    out = dia / ("inicio_prueba.mp4" if hasta else "episodio.mp4")
     ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{AN}x{AL}",
                            "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
                            "-crf", "20", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
                            "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], stdin=subprocess.PIPE)
-    nf = int(math.ceil(total * FPS))
+    nf = int(math.ceil((min(total, hasta) if hasta else total) * FPS))
     for fi in range(nf):
         ff.stdin.write(cuadro(fi / FPS).convert("RGB").tobytes())
         if fi % (FPS * 30) == 0:
             print(f"  fotograma {fi}/{nf}", flush=True)
     ff.stdin.close()
     ff.wait()
+    if hasta:
+        print(f"PRUEBA de los primeros {hasta:.0f} s -> {out}")
+        return
     E.escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, usadas)
     print(f"EPISODIO {total / 60:.1f} min -> {out}")
 
@@ -430,5 +471,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("dia")
     ap.add_argument("--fotogramas", action="store_true")
+    ap.add_argument("--hasta", type=float, help="solo los primeros N s, en inicio_prueba.mp4 (para revisar el arranque)")
     a = ap.parse_args()
-    main(a.dia, a.fotogramas)
+    main(a.dia, a.fotogramas, a.hasta)

@@ -152,7 +152,8 @@ def escribe_wav(ruta, x):
         w.writeframes((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
 
 
-def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablando=0.055, calma=(), efectos=(), con_sintonia=True):
+def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablando=0.055, calma=(), efectos=(), con_sintonia=True,
+           sintonia_en=0.0, sintonia_dur=None):
     """voz (que empieza en 'intro') + fondo que baja solo cuando se habla + sintonia + barridos en los 'cortes'."""
     voz, sr = lee_wav(voz_wav)
     assert sr == SR
@@ -190,7 +191,9 @@ def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablan
         x = x[: len(ef) - i]
         ef[i:i + len(x)] += x * gan
     if con_sintonia:                            # en los cortos verticales se entra directo con el gancho
-        estereo(s, 0.0, 0.7)
+        if sintonia_dur:                        # recortada con fundido (golpe de marca del largo, tras el sumario)
+            s = s[: int(sintonia_dur * SR)] * np.clip((sintonia_dur - np.arange(int(sintonia_dur * SR)) / SR) / 0.6, 0, 1)[:, None]
+        estereo(s, sintonia_en, 0.7)
         estereo(s[: int(3.2 * SR)], total - outro + 0.3, 0.6)
     b = barrido()
     for c in cortes:

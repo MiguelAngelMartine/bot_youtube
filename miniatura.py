@@ -116,7 +116,8 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96):
     f = fuente("Inter-Black.ttf", tam)
     m = negro + exterior + relieve + 30
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
-    ancho = int(max(medir.textlength(" ".join(p for p, _ in l), font=f) for l in lineas)) + 2 * m
+    hueco = int(1.2 * (negro + exterior))              # el contorno se come el espacio entre palabras
+    ancho = int(max(medir.textlength(" ".join(p for p, _ in l), font=f) + hueco * (len(l) - 1) for l in lineas)) + 2 * m
     alto = int(tam * interlinea * len(lineas) + tam * 0.35) + 2 * m
     relleno = Image.new("RGBA", (ancho, alto))
     M, S, E = (Image.new("L", (ancho, alto)) for _ in range(3))
@@ -133,7 +134,7 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96):
             M.paste(255, (0, 0), mk)
             ImageDraw.Draw(S).text((xx, yy), pal, font=f, fill=255, stroke_width=negro, stroke_fill=255)
             ImageDraw.Draw(E).text((xx, yy), pal, font=f, fill=255, stroke_width=negro + exterior, stroke_fill=255)
-            xx += medir.textlength(pal + " ", font=f)
+            xx += medir.textlength(pal + " ", font=f) + hueco
         yy += int(tam * interlinea)
     out = Image.new("RGBA", (ancho, alto))
     negra = lambda mascara, col=(0, 0, 0): Image.merge("RGBA", (*Image.new("RGB", (ancho, alto), col).split(), mascara))
@@ -162,13 +163,13 @@ def ajusta(titular, destaca, ancho, sobrio):
             extra = 2 * (6 if sobrio else 25)
             lineas, cur = [], []
             for p in palabras:
-                if cur and medir.textlength(" ".join(x for x, _ in cur + [p]), font=f) + extra > ancho:
+                if cur and medir.textlength(" ".join(x for x, _ in cur + [p]), font=f) + extra + 30 * len(cur) > ancho:
                     lineas.append(cur)
                     cur = [p]
                 else:
                     cur.append(p)
             lineas.append(cur)
-            if len(lineas) <= max_lineas and all(medir.textlength(" ".join(x for x, _ in l), font=f) + extra <= ancho
+            if len(lineas) <= max_lineas and all(medir.textlength(" ".join(x for x, _ in l), font=f) + extra + 30 * (len(l) - 1) <= ancho
                                                  for l in lineas):
                 return tam, lineas
     return 110, lineas

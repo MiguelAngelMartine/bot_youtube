@@ -870,7 +870,8 @@ def escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, fotos_usadas):
                 "t0": round(a, 2), "t1": round(b, 2)} for i, tipo, a, b in escenas]
     (dia / "escenas.json").write_text(json.dumps({"total": round(total, 2), "fin_voz": round(fin_voz, 2), "escenas": escenas},
                                                  ensure_ascii=False, indent=1), encoding="utf-8")
-    capitulos = "0:00 Inicio\n" + "\n".join(f"{int(p['t0'] // 60)}:{int(p['t0'] % 60):02d} {p['sec']['titulo']}" for p in plan)
+    capitulos = "0:00 Inicio\n" + "\n".join(f"{int(p['t0'] // 60)}:{int(p['t0'] % 60):02d} {p['sec']['titulo']}" for p in plan
+                                         if p["t0"] >= 10)          # YouTube: capitulos de 10 s o mas, sin repetir el 0:00
     fuentes = sorted({x for s in secs for x in s.get("fuentes", [])})
     desc = (f"{G['titulo_video']}\n\n{G2.MARCA.title().replace(' En ', ' en ')}: lo más relevante de la política española del "
             f"{G['fecha'].lower()}, contado por {G2.PRESENTADORA} con datos, "
