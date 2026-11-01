@@ -5,3 +5,4 @@ imageio-ffmpeg
 pillow
 numpy
 scipy
+rembg[cpu]   # recorte de personas para la miniatura (descarga un modelo de 176 MB la primera vez)

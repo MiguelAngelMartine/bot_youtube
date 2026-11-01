@@ -61,7 +61,7 @@ Ordenado de más a menos medios. Solo política española y sus consecuencias (n
 ## Fase 6
 - **`episodio.mp4`**, **`episodio.srt`**, **`episodio_descripcion.txt`**, **`escenas.json`** (los escribe `largo.py`; `episodio.py`, el estilo anterior, escribe los mismos); log en `render.log`.
 - **`calidad/informe.md`** (Control de calidad): `APTO` o `CORREGIR`, con la lista de problemas y el segundo exacto.
-- **`miniatura.png`** (Diseñador gráfico): 1280x720.
+- **`miniatura.png`** (Diseñador gráfico): 1280x720, estilo de `canal/miniatura_referencia.png`. Sus fotos (`imagenes/miniatura_<apellido>.jpg`, y `miniatura_fondo.jpg` si hizo falta) quedan con su crédito en `creditos.json`; el recorte se guarda como `<foto>_recorte.png`.
 
 ## Fase 7
 - **`publicacion.md`** (Editor de plataforma): título, descripción, etiquetas, hashtags, comentario fijado, categoría y lista de comprobación de YouTube Studio.

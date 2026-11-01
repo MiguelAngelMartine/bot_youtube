@@ -63,7 +63,7 @@ Lo que pase después de las 15:00 entra en el episodio del día siguiente, y la 
 | 5 | **Editor gráfico** | Elige para cada escena de texto una foto real, de licencia libre, que corresponda a lo que se narra. Mira cada candidata antes de elegirla. | Fotos de víctimas, de medios o agencias, o con personas ajenas a la noticia | sonnet |
 | 6 | **Montador** | Renderiza el vídeo. Si una escena falla (trozo no encontrado, texto largo), lo ajusta y repite. | Cambiar el contenido | sonnet |
 | 6 | **Control de calidad** | Mira los fotogramas de cada escena (textos cortados, solapes, huecos), el volumen y la sincronía voz-escena. Aprueba o devuelve al montador. | Opinar del contenido | sonnet |
-| 6 | **Diseñador gráfico** | Miniatura de cada episodio (titular corto, Urni, marca). Banner y avatar del canal, una sola vez. | Usar caras de políticos o imágenes ajenas | sonnet |
+| 6 | **Diseñador gráfico** | Miniatura de cada episodio hecha para su noticia principal: protagonista recortado con gesto acorde, foto del tema y titular de gancho literal (estilo en `canal/miniatura_referencia.png`). Banner y avatar del canal, una sola vez. | Titulares engañosos o con valoraciones; fotos sin licencia libre o de víctimas | sonnet |
 | 7 | **Editor de plataforma** | Título (≤ 70 caracteres), descripción con capítulos y fuentes, etiquetas, hashtags, comentario fijado y la lista de comprobación de YouTube Studio. | Títulos de gancho engañoso | sonnet |
 | todas | **Jefe de producción** | Coordina la jornada, lanza a cada puesto con su encargo, decide las vueltas atrás, escribe el parte del día y avisa por Telegram. | Saltarse la mesa de control | (sesión principal) |
 

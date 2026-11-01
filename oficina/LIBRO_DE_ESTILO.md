@@ -7,6 +7,10 @@
 - **Colores:**
   - rojo `#C8102E`, amarillo `#F1BF00`, azul noche `#0C1426`;
   - tipografía Segoe UI (Black para titulares, Semibold para textos).
+- **Miniatura (elegida por el usuario el 1-nov):** estilo de `canal/miniatura_referencia.png`, hecha para la noticia principal de cada vídeo:
+  - foto real del tema de fondo y el protagonista recortado, con filo blanco fino y un gesto acorde con la noticia;
+  - titular enorme en blanco con una palabra en amarillo-oro (relieve, contorno e inclinación) y etiqueta roja con el hecho;
+  - gancho en la forma, literal en el fondo: citas textuales o hechos del vídeo, sin valoraciones; en tragedias, la versión sobria.
 - **Estructura fija:**
   1. sintonía y entrada;
   2. sumario de Urni («Buenas noches, soy Urni, y esto es Política en Claro»);

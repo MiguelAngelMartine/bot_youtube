@@ -26,6 +26,7 @@
 - **Formatos:**
   - largo horizontal **estilo tablero** (`largo.py`, el mismo lenguaje que el vertical adaptado a 16:9), para YouTube; el estilo anterior con fotos de fondo (`episodio.py`) queda descartado (1-nov-2026);
   - corto vertical estilo tablero (`corto.py`), para Shorts y TikTok.
+- **Miniatura** (1-nov-2026): estilo de `canal/miniatura_referencia.png` (`miniatura.py`), hecha para la noticia principal de cada vídeo: foto del tema de fondo, protagonista recortado con filo blanco fino (sin halo) y gesto acorde con la noticia, titular enorme blanco y amarillo-oro con relieve, y etiqueta roja con el hecho. Gancho en la forma, literal en el texto; en tragedias, `--sobrio`. Detalle en `.claude/agents/disenador-grafico.md`.
 - **Mascota:** Urni tal como está (diseño A de `prototipo_animado.mascota`); se vieron variantes (plana, profe, chibi, reportera, con compañera) y prefirió la actual.
 - **Horario:** se publica por la tarde. La jornada arranca a las 15:00 y el vídeo tiene que estar listo hacia las 16:30.
 - **El usuario revisa y publica.** La oficina nunca sube nada a YouTube.
