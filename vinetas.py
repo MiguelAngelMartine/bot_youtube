@@ -526,8 +526,31 @@ def vineta_grafica(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro
     return out
 
 
-def vineta(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro=0.0, proporcion=0.58, estilo="comic"):
-    """Vineta lista para pegar en el tablero: el dato arriba (cartela del estilo) y la ilustracion entera debajo."""
+def tono_de(im):
+    """Color de la franja a juego con la ilustracion: el matiz del tono con color mas presente en la vineta, llevado a
+    una version intensa y algo oscura (como las cartelas de la novela grafica), con texto crema encima."""
+    import colorsys
+    peq = im.convert("RGB").resize((64, 64), Image.BILINEAR).quantize(8, method=Image.Quantize.MEDIANCUT)
+    pal = peq.getpalette()
+    total = 64 * 64
+    mejor, puntos = None, -1.0
+    for n, i in peq.getcolors():
+        c = pal[i * 3:i * 3 + 3]
+        h, sat, v = colorsys.rgb_to_hsv(*(x / 255 for x in c))
+        if v < 0.18 or (sat < 0.12 and v > 0.85):          # casi negro o casi blanco: no dan color a la franja
+            continue
+        p = (n / total) * (0.25 + sat)
+        if p > puntos:
+            mejor, puntos = (h, sat, v), p
+    h, sat, v = mejor or (0.6, 0.4, 0.4)
+    r, g, b = colorsys.hsv_to_rgb(h, min(0.75, max(0.42, sat * 1.25)), 0.40)
+    return (int(r * 255), int(g * 255), int(b * 255)), (248, 240, 222)
+
+
+def vineta(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro=0.0, proporcion=0.58, estilo="comic",
+           imagen=None):
+    """Vineta lista para pegar en el tablero: el dato arriba (cartela del estilo) y la ilustracion entera debajo.
+    imagen: ilustracion ya hecha (por ejemplo, de ia_vinetas.ilustra); si no, se dibuja la escena del catalogo."""
     if estilo == "grafica":
         return vineta_grafica(escena, texto, ancho, sobrio, fuente_txt, giro)
     tipo, rel, mayus, fondo_c, tinta_c = CARTELAS[estilo]
@@ -541,12 +564,18 @@ def vineta(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro=0.0, pr
     alto_l = int(f.size * (1.16 if estilo != "pixel" else 1.0))
     hc = alto_l * len(lin) + int(f.size * (0.75 if estilo != "pixel" else 0.6))
     alto_i = int(ancho * proporcion)
-    L = Lienzo(ancho, alto_i, (255, 255, 255), estilo)
-    ESCENAS[escena](L, sobrio)
-    if sobrio:                                       # version apagada para tragedias
-        from PIL import ImageEnhance
-        L.im = ImageEnhance.Color(L.im).enhance(0.3)
-    ilus = L.final(ancho, alto_i)
+    if imagen is not None:
+        from PIL import ImageOps
+        ilus = ImageOps.fit(imagen.convert("RGB"), (ancho, alto_i), Image.LANCZOS).convert("RGBA")
+        if estilo == "comic":                        # franja del color de la propia vineta
+            fondo_c, tinta_c = tono_de(ilus)
+    else:
+        L = Lienzo(ancho, alto_i, (255, 255, 255), estilo)
+        ESCENAS[escena](L, sobrio)
+        if sobrio:                                   # version apagada para tragedias
+            from PIL import ImageEnhance
+            L.im = ImageEnhance.Color(L.im).enhance(0.3)
+        ilus = L.final(ancho, alto_i)
     if fuente_txt:
         ff = fuente("Inter-SemiBold.ttf", max(13, int(ancho * 0.027)))
         tw = d0.textlength(fuente_txt, font=ff)
