@@ -18,7 +18,7 @@
 - **Identidad fija:**
   - canal *Política en Claro*, presentadora **Urni** (la urna);
   - rojo `#C8102E`, amarillo `#F1BF00` y azul noche;
-  - logo = silueta de la urna;
+  - logo = primer plano de Urni en un círculo azul con aro amarillo (opción B, elegida el 1-nov-2026; `genera_video2.logo`); sin el cuadrado rojo anterior;
   - música propia (musica.py).
 
 ## Decisiones ya tomadas por el usuario (no volver a proponer)

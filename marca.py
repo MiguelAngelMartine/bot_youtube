@@ -60,24 +60,9 @@ def tramo(t, a, b):
 
 # ---------------------------------------------------------------- piezas (se dibujan una vez, grandes)
 def _logo_partes(tam):
-    """Cuadrado con la urna (sin sobre) y el sobre aparte, dibujados a 4x con la geometria de genera_video2.logo."""
-    k = 4
-    T = tam * k
-    u = lambda *v: [x * T / 100 for x in v]
-    base = Image.new("RGBA", (T, T))
-    d = ImageDraw.Draw(base)
-    d.rounded_rectangle(u(0, 0, 100, 100), radius=T // 6, fill=ROJO + (255,))
-    d.rounded_rectangle(u(22, 34, 78, 44), radius=T // 40, fill=BLANCO + (255,))     # tapa
-    d.rounded_rectangle(u(39, 37.5, 61, 40.5), radius=T // 80, fill=ROJO + (255,))  # ranura
-    d.rounded_rectangle(u(27, 46, 73, 82), radius=T // 25, fill=BLANCO + (255,))     # cuerpo
-    d.rectangle(u(27, 70, 73, 74), fill=AMARILLO + (255,))                          # franja
-    sobre = Image.new("RGBA", (T, T))
-    d = ImageDraw.Draw(sobre)
-    d.rectangle(u(41, 17, 59, 38), fill=AMARILLO + (255,))
-    d.line(u(41, 17, 50, 25, 59, 17), fill=ROJO + (255,), width=max(1, T // 50))
-    tapa = Image.new("L", (T, T))                                                    # lo que tapa al sobre al entrar
-    ImageDraw.Draw(tapa).rectangle(u(0, 39, 100, 100), fill=255)
-    return [x.resize((tam, tam), Image.LANCZOS) for x in (base, sobre)] + [tapa.resize((tam, tam), Image.LANCZOS)]
+    """Logo de Urni sin el sobre y el sobre suelto (genera_video2.logo_partes), a tamano tam."""
+    sin, sobre, _ = G2.logo_partes()
+    return [sin.resize((tam, tam), Image.LANCZOS), sobre.resize((tam, tam), Image.LANCZOS), None]
 
 
 def _nombre(tam, color, espaciado=0.0):
@@ -219,7 +204,7 @@ class Golpe:
                 capa.alpha_composite(sob, (0, int(L * 0.8) + dy))
                 # lo que asoma por encima del cuadrado se ve; lo que queda por debajo de la ranura, no
                 corte = Image.new("L", capa.size, 255)
-                ImageDraw.Draw(corte).rectangle([0, int(L * 0.8) + int(L * 0.39), L, capa.height], fill=0)
+                ImageDraw.Draw(corte).rectangle([0, int(L * 0.8) + int(L * G2.logo_partes()[2]), L, capa.height], fill=0)
                 capa.putalpha(Image.composite(capa.getchannel("A"), Image.new("L", capa.size), corte))
                 todo = Image.new("RGBA", capa.size)
                 todo.alpha_composite(lg, (0, int(L * 0.8)))

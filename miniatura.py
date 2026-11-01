@@ -255,19 +255,24 @@ def canal():
     base = G2.fondo_marca(3.0).resize((W2, H2), Image.LANCZOS)
     im.alpha_composite(base)
     d = ImageDraw.Draw(im)
-    x0, y0 = (W2 - 1546) // 2, (H2 - 423) // 2
-    im.alpha_composite(G2.logo(260), (x0 + 10, y0 + 82))
-    d.text((x0 + 300, y0 + 150), G2.MARCA, font=fuente("Inter-Black.ttf", 92), fill=BLANCO + (255,), anchor="lm")
-    d.text((x0 + 304, y0 + 250), G2.LEMA, font=fuente("Inter-Regular.ttf", 42), fill=(220, 225, 235, 255), anchor="lm")
-    d.text((x0 + 304, y0 + 315), "Cada tarde, con datos y fuentes", font=fuente("Inter-SemiBold.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
-    u = P.mascota(0.6, 0.0, False, 1.0)
-    u = u.resize((int(u.width * 0.74), int(u.height * 0.74)), Image.LANCZOS)
-    im.alpha_composite(u, (x0 + 1546 - u.width, y0 + 423 - u.height + 20))
+    # logo (Urni) a la izquierda y el texto a su lado, el conjunto centrado en la zona segura
+    fm, fl, fs = fuente("Inter-Black.ttf", 104), fuente("Inter-Regular.ttf", 44), fuente("Inter-SemiBold.ttf", 40)
+    lado = "Cada tarde, con datos y fuentes"
+    ancho_txt = max(d.textlength(G2.MARCA, font=fm), d.textlength(G2.LEMA, font=fl), d.textlength(lado, font=fs))
+    tl = 330
+    x0 = int((W2 - (tl + 50 + ancho_txt)) / 2)
+    yc = H2 // 2
+    im.alpha_composite(G2.logo(tl), (x0, yc - tl // 2))
+    xt = x0 + tl + 50
+    d.text((xt, yc - 70), G2.MARCA, font=fm, fill=BLANCO + (255,), anchor="lm")
+    d.rectangle([xt + 4, yc - 8, xt + 4 + int(d.textlength(G2.MARCA, font=fm) * 0.62), yc], fill=AMARILLO + (255,))
+    d.text((xt + 4, yc + 50), G2.LEMA, font=fl, fill=(220, 225, 235, 255), anchor="lm")
+    d.text((xt + 4, yc + 115), lado, font=fs, fill=AMARILLO + (255,), anchor="lm")
     d.rectangle([0, H2 - 30, W2, H2 - 18], fill=AMARILLO + (255,))
     d.rectangle([0, H2 - 18, W2, H2], fill=ROJO + (255,))
     im.convert("RGB").save(dest / "banner.png")
     # avatar: YouTube lo recorta en circulo; el logo ocupa el centro sobre rojo liso
-    av = Image.new("RGBA", (800, 800), ROJO + (255,))
+    av = Image.new("RGBA", (800, 800), (22, 40, 78, 255))   # fuera del circulo, el mismo azul (YouTube recorta)
     av.alpha_composite(G2.logo(800))
     av.convert("RGB").save(dest / "avatar.png")
     print(f"banner y avatar -> {dest}")

@@ -45,7 +45,7 @@ def f(n, t):
 
 # ------------------------------------------------------------------ presentador: la urna
 
-def mascota(t, boca, parpadeo, gesto):
+def mascota(t, boca, parpadeo, gesto, sobre=True):
     im, d = lienzo(400, 500)
     b = 8 * math.sin(2 * math.pi * t / 2.4)
     sx = lambda *v: [x * S / 2 for x in v]           # coordenadas pensadas en un lienzo de 800x1000
@@ -61,8 +61,9 @@ def mascota(t, boca, parpadeo, gesto):
     d.ellipse(sx(hx - 30, hy - 30, hx + 30, hy + 30), fill=BLANCO, outline=NAVY, width=10)
     # sobre entrando por la ranura
     e = 10 * math.sin(t * 1.3)
-    d.rectangle(sx(330, 140 + b + e, 470, 280 + b), fill=AMARILLO, outline=NAVY, width=8)
-    d.line(sx(330, 140 + b + e, 400, 200 + b + e, 470, 140 + b + e), fill=NAVY, width=7)
+    if sobre:
+        d.rectangle(sx(330, 140 + b + e, 470, 280 + b), fill=AMARILLO, outline=NAVY, width=8)
+        d.line(sx(330, 140 + b + e, 400, 200 + b + e, 470, 140 + b + e), fill=NAVY, width=7)
     # cuerpo de cristal
     d.rounded_rectangle(sx(150, 300 + b, 650, 900 + b), radius=56, fill=(232, 240, 250), outline=NAVY, width=12)
     d.rounded_rectangle(sx(185, 340 + b, 225, 620 + b), radius=20, fill=(255, 255, 255))

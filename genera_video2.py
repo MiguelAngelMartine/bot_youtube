@@ -195,21 +195,55 @@ def fondo_marca(t):
     return im.convert("RGBA")
 
 
+_logo_cache = {}
+
+
+def logo_partes(T=1600):
+    """Logo del canal (elegido por el usuario el 1-nov-2026, opcion B): primer plano de Urni en un circulo azul con aro
+    amarillo. Devuelve (sin_sobre, sobre, ranura): el logo sin el sobre, el sobre suelto en su sitio y la altura
+    (fraccion) de la ranura de la tapa, para que el golpe de marca haga caer el sobre dentro de Urni."""
+    if T in _logo_cache:
+        return _logo_cache[T]
+    import prototipo_animado as P
+    def urni(con_sobre):
+        P.S, viejo = 4, P.baja
+        P.baja = lambda im: im
+        try:
+            u = P.mascota(0.6, 0.0, False, 0.0, sobre=con_sobre)
+        finally:
+            P.S, P.baja = 2, viejo
+        return u
+    def compone(u, caja):
+        fondo = Image.new("RGBA", (T, T))
+        ImageDraw.Draw(fondo).ellipse([0, 0, T - 1, T - 1], fill=(22, 40, 78, 255))
+        cara = u.crop((caja[0], caja[1], caja[2], caja[1] + int((caja[3] - caja[1]) * 0.80)))
+        k = T * 0.7375 / cara.width
+        cara = cara.resize((int(cara.width * k), int(cara.height * k)), Image.LANCZOS)
+        capa = Image.new("RGBA", (T, T))
+        capa.alpha_composite(cara, ((T - cara.width) // 2, int(T * 0.53 - cara.height / 2)))
+        m = Image.new("L", (T, T))
+        ImageDraw.Draw(m).ellipse([T * 0.056, T * 0.056, T * 0.944, T * 0.944], fill=255)
+        capa.putalpha(ImageChops.multiply(capa.getchannel("A"), m))
+        fondo.alpha_composite(capa)
+        ImageDraw.Draw(fondo).ellipse([T * 0.019, T * 0.019, T * 0.981, T * 0.981], outline=AMARILLO + (255,),
+                                      width=int(T * 0.0375))
+        return fondo
+    con, sin = urni(True), urni(False)
+    caja = con.getchannel("A").getbbox()                 # el mismo encuadre para las dos versiones
+    a, b = compone(con, caja), compone(sin, caja)
+    dif = ImageChops.difference(a.convert("RGB"), b.convert("RGB")).convert("L").point(lambda v: 255 if v > 12 else 0)
+    sobre = a.copy()
+    sobre.putalpha(dif)
+    bb = dif.getbbox()
+    _logo_cache[T] = (b, sobre, bb[3] / T)
+    return _logo_cache[T]
+
+
 def logo(tam):
-    """Marca: cuadrado rojo con la silueta de Urni (la urna) y un sobre amarillo entrando por la ranura.
-    Se dibuja a 4x y se reduce para que los bordes salgan suaves a cualquier tamano."""
-    k = 4
-    T = tam * k
-    im = Image.new("RGBA", (T, T), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    u = lambda *v: [x * T / 100 for x in v]
-    d.rounded_rectangle(u(0, 0, 100, 100), radius=T // 6, fill=ROJO + (255,))
-    d.rectangle(u(41, 17, 59, 38), fill=AMARILLO + (255,))                       # sobre
-    d.line(u(41, 17, 50, 25, 59, 17), fill=ROJO + (255,), width=max(1, T // 50))
-    d.rounded_rectangle(u(22, 34, 78, 44), radius=T // 40, fill=BLANCO + (255,))  # tapa
-    d.rounded_rectangle(u(39, 37.5, 61, 40.5), radius=T // 80, fill=ROJO + (255,))  # ranura
-    d.rounded_rectangle(u(27, 46, 73, 82), radius=T // 25, fill=BLANCO + (255,))  # cuerpo
-    d.rectangle(u(27, 70, 73, 74), fill=AMARILLO + (255,))                        # franja del canal
+    """El logo del canal a cualquier tamano (circulo con fondo transparente fuera)."""
+    sin, sobre, _ = logo_partes()
+    im = sin.copy()
+    im.alpha_composite(sobre)
     return im.resize((tam, tam), Image.LANCZOS)
 
 
