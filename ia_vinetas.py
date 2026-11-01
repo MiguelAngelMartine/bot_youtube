@@ -1,8 +1,8 @@
 """ILUSTRACIONES DE LAS VINETAS con IA (Cloudflare Workers AI, plan gratuito; decision del usuario del 1-nov-2026).
 
-- Escenas genericas: FLUX.2 klein 4B a partir de una descripcion de la escena y una plantilla de estilo fija.
-- Personas con nombre propio: se parte de su retrato real con licencia libre (el de creditos.json) y la IA lo redibuja
-  en version comic, para que sea esa persona y no una cara inventada.
+- Escenas genericas: FLUX.1 schnell con la plantilla de estilo del canal (la de canal/estilo_vineta.jpg).
+- Personas con nombre propio: FLUX.2 klein 4B con dos imagenes, su retrato real y la vineta de referencia (solo la tecnica de dibujo)
+  con licencia libre (el de creditos.json), para que sea esa persona y no una cara inventada.
 Reglas: el texto nunca lo dibuja la IA (lo pone vinetas.py en la franja de narracion); gesto sereno e igual para todos
 (nada de caricaturas que ridiculicen ni de escenas que no ocurrieron); nunca victimas.
 Las imagenes se guardan en cache/vinetas/: la misma escena no vuelve a gastar cuota.
@@ -19,13 +19,18 @@ from PIL import Image
 
 RAIZ = Path(__file__).parent
 CACHE = RAIZ / "cache" / "vinetas"
-MODELO = "@cf/black-forest-labs/flux-2-klein-4b"
-ESTILO = ("Panel of a modern European graphic novel: flat limited colour palette of cream, ochre, crimson red, "
-          "dark navy blue and black; bold black ink shadows; clean confident ink outlines; cinematic composition. "
-          "Absolutely no text, no letters, no numbers, no speech bubbles, no captions, no logos, no signs with writing.")
-PERSONA = ("Redraw the person from image 0 as a character in this graphic novel panel, keeping his or her face, hair "
-           "and features clearly recognizable and drawn with respect, with a calm, serious, professional expression. ")
-SOBRIO = " Muted, desaturated colours, quiet and respectful mood, no dramatic effects."
+REFERENCIA = RAIZ / "canal" / "estilo_vineta.jpg"     # vineta modelo del estilo del canal (elegida por el usuario)
+ESCENAS = "@cf/black-forest-labs/flux-1-schnell"       # escenas: el estilo que eligio el usuario, rapido y barato
+PERSONAS = "@cf/black-forest-labs/flux-2-klein-4b"     # personas: admite su foto real y la referencia de estilo
+# sin la palabra "comic": con ella el modelo dibuja bocadillos con letras inventadas
+ESTILO = "wordless graphic novel illustration, flat limited colors, thick black ink outlines, heavy black shadows, silent scene: "
+PERSONA = ("Redraw the person from image 0 as a wordless graphic novel illustration, using only the drawing technique of "
+           "image 1 (flat limited colors, thick black ink outlines, heavy solid black shadows, simple shapes). Do not copy "
+           "anything else from image 1: no train, no objects, no background from it. Keep the likeness of image 0 exactly: "
+           "same face shape, same hair, same beard, same age, and do not add glasses, hats or accessories that are not in "
+           "image 0. Same pose and framing as image 0, calm serious expression, drawn with respect. {escena}"
+           "Plain simple background. No text, no letters, no speech bubbles.")
+SOBRIO = ", muted desaturated colors, quiet respectful mood"
 
 
 def _claves():
@@ -37,29 +42,39 @@ def _claves():
     return env["CLOUDFLARE_ACCOUNT_ID"], env["CLOUDFLARE_API_TOKEN"]
 
 
-def ilustra(escena, retrato: Path | None = None, sobrio=False, ancho=1024, alto=592, semilla=None):
+def _jpg(ruta, lado=500):
+    im = Image.open(ruta).convert("RGB")
+    im.thumbnail((lado, lado))                       # el modelo de personas pide imagenes de menos de 512x512
+    b = io.BytesIO()
+    im.save(b, "JPEG", quality=92)
+    return b.getvalue()
+
+
+def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     """escena: descripcion en ingles de lo que se ve (sin texto). retrato: foto real de la persona, si la hay.
-    Devuelve una imagen RGB o lanza RuntimeError con el motivo (sin claves)."""
-    prompt = (PERSONA if retrato else "") + escena.strip().rstrip(".") + ". " + ESTILO + (SOBRIO if sobrio else "")
-    foto = b""
+    intento: para pedir otra version de la misma escena. Devuelve RGB o lanza RuntimeError (sin claves)."""
     if retrato:
-        im = Image.open(retrato).convert("RGB")
-        im.thumbnail((500, 500))                      # el modelo pide imagenes de menos de 512x512
-        b = io.BytesIO()
-        im.save(b, "JPEG", quality=92)
-        foto = b.getvalue()
-    clave = hashlib.sha1((MODELO + prompt + str(ancho) + str(alto) + str(semilla)).encode() + foto).hexdigest()[:20]
+        modelo = PERSONAS
+        prompt = PERSONA.format(escena=(escena.strip().rstrip(".") + ". ") if escena else "") + (SOBRIO if sobrio else "")
+        fotos = [_jpg(retrato), _jpg(REFERENCIA)]
+    else:
+        modelo = ESCENAS
+        prompt = ESTILO + escena.strip().rstrip(".") + (SOBRIO if sobrio else "")
+        fotos = []
+    clave = hashlib.sha1((modelo + prompt + str(intento)).encode() + b"".join(fotos)).hexdigest()[:20]
     f = CACHE / f"{clave}.jpg"
     if f.exists():
         return Image.open(f).convert("RGB")
     acc, tok = _claves()
-    campos = {"prompt": (None, prompt), "width": (None, str(ancho)), "height": (None, str(alto))}
-    if semilla is not None:
-        campos["seed"] = (None, str(semilla))
-    if foto:
-        campos["input_image_0"] = ("retrato.jpg", foto, "image/jpeg")
-    r = requests.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{MODELO}",
-                      headers={"Authorization": f"Bearer {tok}"}, files=campos, timeout=180)
+    url = f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{modelo}"
+    cab = {"Authorization": f"Bearer {tok}"}
+    if fotos:
+        campos = {"prompt": (None, prompt), "width": (None, "1024"), "height": (None, "592"), "seed": (None, str(intento))}
+        for k, b in enumerate(fotos):
+            campos[f"input_image_{k}"] = (f"img{k}.jpg", b, "image/jpeg")
+        r = requests.post(url, headers=cab, files=campos, timeout=180)
+    else:
+        r = requests.post(url, headers=cab, json={"prompt": prompt + (" " * intento), "steps": 6}, timeout=180)
     try:
         j = r.json()
     except ValueError:
