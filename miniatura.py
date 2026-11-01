@@ -259,7 +259,7 @@ def canal():
     im.alpha_composite(G2.logo(260), (x0 + 10, y0 + 82))
     d.text((x0 + 300, y0 + 150), G2.MARCA, font=fuente("Inter-Black.ttf", 92), fill=BLANCO + (255,), anchor="lm")
     d.text((x0 + 304, y0 + 250), G2.LEMA, font=fuente("Inter-Regular.ttf", 42), fill=(220, 225, 235, 255), anchor="lm")
-    d.text((x0 + 304, y0 + 315), "Cada noche, con datos y fuentes", font=fuente("Inter-SemiBold.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
+    d.text((x0 + 304, y0 + 315), "Cada tarde, con datos y fuentes", font=fuente("Inter-SemiBold.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
     u = P.mascota(0.6, 0.0, False, 1.0)
     u = u.resize((int(u.width * 0.74), int(u.height * 0.74)), Image.LANCZOS)
     im.alpha_composite(u, (x0 + 1546 - u.width, y0 + 423 - u.height + 20))
