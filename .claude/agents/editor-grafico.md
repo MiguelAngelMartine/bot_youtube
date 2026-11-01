@@ -39,7 +39,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
    - algo que no corresponde al dato o que engaña;
    - víctimas, heridos o violencia.
    Si tras 3 intentos sigue mal, `ia_vinetas.py descartar <fecha> <clave>`: la nota sale con su texto.
-3. **Personas** (`persona_vineta`): hay 3 candidatas en `vinetas/candidatas/` y la foto real en la hoja. Acepta una **solo si es fiel**: misma cara, pelo, barba o no, gafas o no, edad, y gesto sereno (`ia_vinetas.py elegir <fecha> <clave> <versión>`). Si ninguna lo es, `descartar`. Ante la duda, descartar: nunca puede salir alguien con rasgos que no tiene.
+3. **Personas** (`persona_vineta`): hay 2 candidatas en `vinetas/candidatas/` y la foto real en la hoja. Acepta una **solo si es fiel**: misma cara, pelo, barba o no, gafas o no, edad, y gesto sereno (`ia_vinetas.py elegir <fecha> <clave> <versión>`). Si ninguna lo es, `descartar`. Ante la duda, descartar: nunca puede salir alguien con rasgos que no tiene.
 
 No cambies ningún texto ni dato del episodio: solo añades el campo `foto` y los retratos.
 Responde con tres tablas (la tercera: viñeta → aceptada, rehecha N veces o descartada, y por qué): persona → retrato (licencia, autor) o «iniciales» y por qué; escena → foto elegida (licencia, autor) o «sin foto» y por qué.

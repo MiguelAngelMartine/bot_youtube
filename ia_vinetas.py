@@ -70,12 +70,12 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     url = f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{modelo}"
     cab = {"Authorization": f"Bearer {tok}"}
     if fotos:
-        campos = {"prompt": (None, prompt), "width": (None, "1024"), "height": (None, "592"), "seed": (None, str(intento))}
+        campos = {"prompt": (None, prompt), "width": (None, "768"), "height": (None, "448"), "seed": (None, str(intento))}
         for k, b in enumerate(fotos):
             campos[f"input_image_{k}"] = (f"img{k}.jpg", b, "image/jpeg")
         r = requests.post(url, headers=cab, files=campos, timeout=180)
     else:
-        r = requests.post(url, headers=cab, json={"prompt": prompt + (" " * intento), "steps": 6}, timeout=180)
+        r = requests.post(url, headers=cab, json={"prompt": prompt + (" " * intento), "steps": 4}, timeout=180)
     try:
         j = r.json()
     except ValueError:
@@ -108,7 +108,7 @@ def notas_con_vineta(G):
     return out
 
 
-def preparar(dia_txt, versiones=3):
+def preparar(dia_txt, versiones=2):
     import json
     import shutil
     import corto as C
