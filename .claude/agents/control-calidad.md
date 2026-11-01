@@ -22,6 +22,7 @@ Te darán una fecha. `control_calidad.py` ya habrá dejado en `dia/<fecha>/calid
    Y en las piezas de pantalla completa (decisiones del usuario del 1-nov-2026):
    - **`titularN`** (sumario del arranque, sin presentación): titular enorme entero y legible, sin palabras pegadas; protagonista recortado limpio (sin restos de fondo ni recuadros) y con un gesto acorde con la noticia; foto de fondo del tema; en los bloques sobrios, en grises y sin golpes;
    - **`golpe_marca`**: logo, nombre y fecha completos y centrados, sin nada a medias;
+   - **viñetas** (en `claves`, `cronologia` y `breve`): sin letras inventadas en la ilustración, franja de texto entera y legible, personas fieles a su foto;
    - **`despedida`** (cierre): botón «SUSCRITO» y campana encendida tras decirlo, «Gracias por vernos. Mañana, más.» entero; en los últimos 8 s la mitad derecha libre (Urni ya se ha ido) para la pantalla final de YouTube.
 3. Escribe `dia/<fecha>/calidad/informe.md` con el veredicto **APTO** o **CORREGIR** y, por cada problema, la escena, el segundo, qué se ve mal y una sugerencia (por ejemplo, «acortar el texto del item 2 a ≤ 80 caracteres» o «etiqueta de Madrid con izq»).
 

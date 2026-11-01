@@ -548,7 +548,7 @@ def tono_de(im):
 
 
 def vineta(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro=0.0, proporcion=0.58, estilo="comic",
-           imagen=None):
+           imagen=None, letra=1.0):
     """Vineta lista para pegar en el tablero: el dato arriba (cartela del estilo) y la ilustracion entera debajo.
     imagen: ilustracion ya hecha (por ejemplo, de ia_vinetas.ilustra); si no, se dibuja la escena del catalogo."""
     if estilo == "grafica":
@@ -557,7 +557,7 @@ def vineta(escena, texto, ancho=520, sobrio=False, fuente_txt=None, giro=0.0, pr
     if sobrio:
         fondo_c = {"comic": (242, 238, 226), "plano": (245, 245, 245), "3d": (50, 54, 64), "pixel": (30, 30, 34)}[estilo]
         tinta_c = (230, 230, 230) if estilo in ("3d", "pixel") else TINTA
-    f = fuente(tipo, max(14, int(ancho * rel)))
+    f = fuente(tipo, max(14, int(ancho * rel * letra)))
     d0 = ImageDraw.Draw(Image.new("L", (1, 1)))
     margen = f.size * (0.6 if estilo != "plano" else 1.3)
     lin = _lineas(d0, texto.upper() if mayus else texto, f, ancho - margen - f.size * 0.7)

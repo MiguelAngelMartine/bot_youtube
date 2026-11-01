@@ -32,6 +32,7 @@ import prototipo_animado as P
 import cierre as CI
 import marca
 import titulares as TIT
+import vinetas as VIN
 from corto import estrecha, nota, pegatina, polaroid, sello
 from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, suave
 
@@ -148,7 +149,13 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         ancho = 520 if lado else 680
         txts = [(f"{k + 1:02d} · " if tipo == "sumario" else (it["hora"] + " · " if it.get("hora") else "")) + it["texto"]
                 for k, it in enumerate(ve["items"])]
-        notas = [nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
+        vin = ve.get("_vin", {})
+        if vin and tipo != "sumario":                  # viñetas de novela grafica en vez de notas manuscritas
+            ancho = 660                                # panoramicas: 4 caben en el tablero con la letra legible
+            txts = [(it["hora"] + " · " if it.get("hora") else "") + it["texto"] for it in ve["items"]]
+        notas = [VIN.vineta(None, tx, ancho, sobrio=ve.get("_sobrio", False), imagen=Image.open(vin[k]),
+                            proporcion=0.40, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4]) if k in vin
+                 else nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
         out += rejilla(notas, 40, 100, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
         if lado:
             out.append((lado, 1140, 110, t0 + 0.6))
@@ -172,9 +179,14 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             y += 66 + nt.height - 6
     elif tipo == "breve":
         out.append((pegatina(ve["lugar"], ROJO, BLANCO, 44), 40, 30, t0 + 0.1))
-        out.append((nota(ve["titular"], 760, 48), 40, 130, t0 + 0.3))
-        out.append((nota(ve["sub"], 640, 34, "Fuente: " + ve["fuente"], color=AMARILLA), 120, 470, t0 + 1.2))
-        out.append((lado, 900, 70, t0 + 0.6) if lado else (E.icono(ve["icono"], 200), 1000, 140, t0 + 0.6))
+        if 0 in ve.get("_vin", {}):
+            out.append((VIN.vineta(None, ve["titular"], 700, sobrio=ve.get("_sobrio", False),
+                                   imagen=Image.open(ve["_vin"][0]), letra=1.2), 40, 110, t0 + 0.3))
+            out.append((nota(ve["sub"], 560, 34, "Fuente: " + ve["fuente"], color=AMARILLA), 800, 160, t0 + 1.2))
+        else:
+            out.append((nota(ve["titular"], 760, 48), 40, 130, t0 + 0.3))
+            out.append((nota(ve["sub"], 640, 34, "Fuente: " + ve["fuente"], color=AMARILLA), 120, 470, t0 + 1.2))
+            out.append((lado, 900, 70, t0 + 0.6) if lado else (E.icono(ve["icono"], 200), 1000, 140, t0 + 0.6))
     elif tipo == "despedida":
         out.append((nota("Gracias por vernos.", 720, 64), 380, 110, t0 + 0.1))
         out.append((pegatina("MAÑANA, MÁS.", tam=64), 560, 400, t0 + 0.9))
@@ -342,9 +354,13 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         T = E.Tiempos(texto, pal, t)
         print(f"  bloque {i}: {dur:5.1f} s, {T.casadas}/{len(T.toks)} palabras con tiempo", flush=True)
         partes, c = [], 0
-        for p in s["pasos"]:
+        for jp, p in enumerate(s["pasos"]):
             ve = p.get("ve")
             if ve:
+                ve = dict(ve)                          # viñetas ya aceptadas de este paso (dia/<fecha>/vinetas/)
+                ve["_vin"] = {k: f for k in range(len(ve.get("items", [])) or 1)
+                              if (f := dia / "vinetas" / f"s{i}_{jp}_{k}.jpg").exists()}
+                ve["_sobrio"] = s["tono"] == "sobrio"
                 t0 = T.en(c) if partes else t
                 foto, fn = None, ve.get("foto")
                 if fn and ve["tipo"] in E.CON_FOTO:

@@ -23,7 +23,8 @@ REFERENCIA = RAIZ / "canal" / "estilo_vineta.jpg"     # vineta modelo del estilo
 ESCENAS = "@cf/black-forest-labs/flux-1-schnell"       # escenas: el estilo que eligio el usuario, rapido y barato
 PERSONAS = "@cf/black-forest-labs/flux-2-klein-4b"     # personas: admite su foto real y la referencia de estilo
 # sin la palabra "comic": con ella el modelo dibuja bocadillos con letras inventadas
-ESTILO = "wordless graphic novel illustration, flat limited colors, thick black ink outlines, heavy black shadows, silent scene: "
+ESTILO = ("wordless graphic novel illustration, flat limited colors, thick black ink outlines, heavy black shadows, "
+          "set in Spain, plain surfaces without writing, silent scene: ")
 PERSONA = ("Redraw the person from image 0 as a wordless graphic novel illustration, using only the drawing technique of "
            "image 1 (flat limited colors, thick black ink outlines, heavy solid black shadows, simple shapes). Do not copy "
            "anything else from image 1: no train, no objects, no background from it. Keep the likeness of image 0 exactly: "
@@ -86,3 +87,117 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     CACHE.mkdir(parents=True, exist_ok=True)
     f.write_bytes(base64.b64decode(img))
     return Image.open(f).convert("RGB")
+
+
+# ------------------------------------------------------------------ jornada: preparar y elegir las vinetas del dia
+# Cada nota con viñeta lleva en episodio.json "escena" (en ingles, lo que se ve) y, si sale alguien con nombre,
+# "persona_vineta" (nombre exacto, con retrato libre en creditos.json). Clave de cada viñeta: s<seccion>_<paso>_<item>.
+# Escenas: se generan y quedan en dia/<fecha>/vinetas/<clave>.jpg. Personas: 3 versiones en vinetas/candidatas/ y el
+# editor grafico acepta una fiel (elegir) o ninguna (la nota sale sin viñeta). El render solo lee vinetas/<clave>.jpg.
+
+def notas_con_vineta(G):
+    """[(clave, item, seccion)] de todas las notas que piden viñeta."""
+    out = []
+    for i, s in enumerate(G["secciones"]):
+        for j, p in enumerate(s["pasos"]):
+            ve = p.get("ve") or {}
+            if ve.get("tipo") in ("claves", "cronologia"):
+                out += [(f"s{i}_{j}_{k}", it, s) for k, it in enumerate(ve["items"]) if it.get("escena")]
+            elif ve.get("tipo") == "breve" and ve.get("escena"):
+                out.append((f"s{i}_{j}_0", ve, s))
+    return out
+
+
+def preparar(dia_txt, versiones=3):
+    import json
+    import shutil
+    import corto as C
+    dia = RAIZ / "dia" / dia_txt
+    G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
+    notas = notas_con_vineta(G)
+    fotos = C.fotos_personas({it["persona_vineta"] for _, it, _ in notas if it.get("persona_vineta")}, cred, dia / "imagenes")
+    (dia / "vinetas" / "candidatas").mkdir(parents=True, exist_ok=True)
+    hoja = []
+    for clave, it, sec in notas:
+        sobrio = sec.get("tono") == "sobrio"
+        destino = dia / "vinetas" / f"{clave}.jpg"
+        quien = it.get("persona_vineta")
+        try:
+            if quien:
+                if quien not in fotos:
+                    print(f"  {clave}: {quien} no tiene retrato en creditos.json; sin viñeta")
+                    continue
+                if destino.exists():
+                    continue
+                for v in range(versiones):
+                    try:
+                        IA_im = ilustra(it["escena"], fotos[quien], sobrio, intento=v)
+                        IA_im.save(dia / "vinetas" / "candidatas" / f"{clave}_v{v}.jpg", quality=92)
+                        hoja.append((f"{clave} v{v} · {quien}", IA_im))
+                    except RuntimeError as e:
+                        print(f"  {clave} v{v}: rechazada ({str(e)[:60]})")
+                hoja.append((f"{clave} · FOTO REAL", Image.open(fotos[quien]).convert("RGB")))
+                print(f"  {clave}: {quien}, candidatas listas: hay que elegir una fiel")
+            else:
+                if not destino.exists():
+                    ilustra(it["escena"], None, sobrio).save(destino, quality=92)
+                hoja.append((clave, Image.open(destino).convert("RGB")))
+                print(f"  {clave}: lista")
+        except RuntimeError as e:
+            print(f"  {clave}: fallo ({str(e)[:80]}); sin viñeta")
+    if hoja:
+        from PIL import ImageDraw
+        from genera_video2 import fuente
+        w, h = 420, 270
+        sh = Image.new("RGB", (3 * w, ((len(hoja) + 2) // 3) * (h + 30)), (22, 36, 64))
+        d = ImageDraw.Draw(sh)
+        for k, (et, im) in enumerate(hoja):
+            x, y = (k % 3) * w, (k // 3) * (h + 30)
+            im = im.copy()
+            im.thumbnail((w - 10, h))
+            sh.paste(im, (x + 5, y + 28))
+            d.text((x + 6, y + 4), et, font=fuente("Inter-Bold.ttf", 18), fill=(241, 191, 0))
+        sh.save(dia / "vinetas" / "hoja.png")
+    print(f"{len(notas)} notas con viñeta -> {dia / 'vinetas'} (hoja de contacto: vinetas/hoja.png)")
+
+
+def elegir(dia_txt, clave, version):
+    import shutil
+    dia = RAIZ / "dia" / dia_txt
+    shutil.copyfile(dia / "vinetas" / "candidatas" / f"{clave}_v{version}.jpg", dia / "vinetas" / f"{clave}.jpg")
+    print(f"{clave}: aceptada la versión {version}")
+
+
+def rehacer(dia_txt, clave, intento=1):
+    """Otra version de una escena (por ejemplo, si salen letras inventadas o no ilustra bien el dato)."""
+    import json
+    dia = RAIZ / "dia" / dia_txt
+    G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    for c, it, sec in notas_con_vineta(G):
+        if c == clave:
+            ilustra(it["escena"], None, sec.get("tono") == "sobrio", intento=intento).save(dia / "vinetas" / f"{clave}.jpg", quality=92)
+            print(f"{clave}: rehecha (intento {intento})")
+            return
+    print(f"{clave}: no existe")
+
+
+def descartar(dia_txt, clave):
+    f = RAIZ / "dia" / dia_txt / "vinetas" / f"{clave}.jpg"
+    f.unlink(missing_ok=True)
+    print(f"{clave}: sin viñeta (la nota sale con su texto)")
+
+
+if __name__ == "__main__":
+    import sys
+    a = sys.argv[1:]
+    if a[:1] == ["preparar"]:
+        preparar(a[1])
+    elif a[:1] == ["elegir"]:
+        elegir(a[1], a[2], int(a[3]))
+    elif a[:1] == ["rehacer"]:
+        rehacer(a[1], a[2], int(a[3]) if len(a) > 3 else 1)
+    elif a[:1] == ["descartar"]:
+        descartar(a[1], a[2])
+    else:
+        print("uso: ia_vinetas.py preparar <fecha> | rehacer <fecha> <clave> [intento] | elegir <fecha> <clave> <version> | descartar <fecha> <clave>")

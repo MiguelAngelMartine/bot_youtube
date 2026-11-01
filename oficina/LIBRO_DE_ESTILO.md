@@ -52,17 +52,22 @@ Cada escena dura desde el paso donde se pide hasta la siguiente. Los objetos apa
 | `sumario` | titulares del día a pantalla completa (solo en el bloque 0) | `items[{texto, cuando, titular, destaca, etiqueta, persona?, foto?}]` | ≤ 4 items; texto ≤ 70 caracteres, titular 2-5 palabras |
 | `mapa` | dónde ha pasado | `puntos[{nombre, lon, lat, cuando?, aviso?, pulso?, izq?, abajo?}]`, `ruta?`, `tren?`, `aviso_ruta?`, `titular`, `sub`, `fuente` | ≤ 5 puntos; titular ≤ 40 caracteres |
 | `cifra` | el número clave | `numero` (≤ 4 caracteres), `etiqueta`, `sub`, `nota?`, `cuando_nota?`, `fuente` | etiqueta ≤ 28 caracteres |
-| `claves` | 3-4 ideas con icono | `titulo`, `items[{icono, texto, cuando}]`, `fuente` | ≤ 4 items, ≤ 95 caracteres |
-| `cronologia` | qué pasó y cuándo | `titulo`, `items[{hora, texto, cuando}]`, `fuente` | ≤ 4 items, ≤ 90 caracteres |
+| `claves` | 3-4 ideas en viñetas | `titulo`, `items[{icono, texto, cuando, escena?, persona_vineta?}]`, `fuente` | ≤ 4 items, ≤ 95 caracteres |
+| `cronologia` | qué pasó y cuándo | `titulo`, `items[{hora, texto, cuando, escena?, persona_vineta?}]`, `fuente` | ≤ 4 items, ≤ 90 caracteres |
 | `persona` | una persona y su cita | `persona{nombre, cargo, partido, cita?, medio?, cita_cuando?}`, `sello?`, `sello_cuando?`, `flujo?{etiqueta, cuando, a{...}, a_cuando}` | cita ≤ 70 caracteres; sello ≤ 14 caracteres |
 | `citas` | 2-3 voces enfrentadas | `titulo`, `items[{nombre, cargo, partido, cita, medio, cuando}]` | ≤ 3 citas, ≤ 110 caracteres |
 | `posturas` | quién presiona a quién | `titulo`, `centro{nombre, cargo, partido}`, `presionan[{nombre, partido, cuando}]`, `etiqueta`, `etiqueta_cuando`, `aparte{nombre, partido, texto, cuando}`, `fuente` | ≤ 4 presionan |
 | `calendario` | fechas que vienen | `dia`, `mes`, `pie`, `items[{hora, texto, cuando}]`, `fuente` | ≤ 3 items |
-| `breve` | noticia corta | `lugar`, `icono`, `titular`, `sub`, `fuente` | titular ≤ 80 caracteres |
+| `breve` | noticia corta | `lugar`, `icono`, `titular`, `sub`, `fuente`, `escena?`, `persona_vineta?` | titular ≤ 80 caracteres |
 | `despedida` | cierre de Urni | — | solo en el último paso |
 
 - **Foto de la escena:** las escenas `persona`, `citas`, `claves`, `cronologia`, `cifra` y `breve` admiten `"foto": "sN_M.jpg"`. La elige el editor gráfico; el redactor no la pone. En el tablero sale impresa y pegada, con «Foto de archivo» y el crédito (en `citas` y en `persona` con `flujo` no hay sitio y no sale).
 - **Retratos:** las personas de `persona`, `citas` y `posturas` salen en polaroid con el retrato que el editor gráfico marca con `--persona`; si no hay, con sus iniciales.
+- **Viñetas** (decisión del usuario del 1-nov-2026, estilo de `canal/estilo_vineta.jpg`): cada item de `claves` y `cronologia`, y el titular de cada `breve`, sale como una viñeta de novela gráfica ilustrada por IA, con el texto arriba en una franja del tono de la viñeta (sin bocadillos). Para pedirla:
+  - `"escena"`: en inglés, lo que se ve, concreto y sin texto, en 1 frase (por ejemplo, `"a judge's wooden gavel on a courtroom bench, scales of justice behind"`). Fiel al dato: nada que no haya pasado. No nombres lo que no quieres que salga (si escribes «sin banderas», el modelo las dibuja).
+  - `"persona_vineta"` (opcional): el nombre exacto de una persona con nombre propio **solo si la nota cuenta algo que dijo o hizo ella misma** (no lo de su ministerio o su partido). Sale ella dibujada a partir de su foto real.
+  - Nunca víctimas, heridos, violencia explícita ni niños identificables. En los bloques sobrios, escenas tranquilas (lugar, objeto, velas).
+  - Sin `escena`, la nota sale como antes.
 - **Iconos:** vela, persona, documento, reloj, escudo, tren, mazo, altavoz, tienda, grafico, urna, alerta.
 - **Partidos y colores definidos:**
   - PSOE, PSC, PP, Vox, Sumar, Frente Amplio, Podemos, PNV, BNG, Junts, ERC, EH Bildu, CC, UPN, SALF, Compromís;

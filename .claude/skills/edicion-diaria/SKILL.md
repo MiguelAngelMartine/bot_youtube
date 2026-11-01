@@ -27,7 +27,7 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - Por cada bloque con algún CORREGIR: vuelve a lanzar a su `redactor` («fecha <fecha>, bloque NN, aplica las correcciones de revision/») y después repite **solo** la revisión de los bloques corregidos.
    - Máximo 2 vueltas. Si un bloque sigue en CORREGIR, sale del episodio y se anota en el parte.
 5. **Cierre.** `editor-de-cierre` («fecha <fecha>») → `episodio.json`.
-   Después, `editor-grafico` («fecha <fecha>») añade los retratos de las personas en polaroid y la foto de cada escena de texto (campo `foto` + `imagenes/` + `creditos.json`).
+   Después, `editor-grafico` («fecha <fecha>») añade los retratos de las personas en polaroid, la foto de cada escena de texto (campo `foto` + `imagenes/` + `creditos.json`) y prepara y revisa las viñetas (`dia/<fecha>/vinetas/`). Si Cloudflare no responde, sigue sin viñetas: las notas salen con su texto.
 6. **Producción.**
    - `montador` («fecha <fecha>») → vídeo y material de calidad.
    - Luego, en paralelo, `control-calidad` y `disenador-grafico`.

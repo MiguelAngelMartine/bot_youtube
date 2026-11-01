@@ -23,6 +23,11 @@ Te darán una fecha y un número de bloque (o «breves»).
    - Cada `cuando` debe ser un trozo **literal** de 2-4 palabras del `di` de ese paso o de los siguientes de la misma escena.
    - Tarjetas de personas: cargo y partido como en `contexto.md`/`archivo/personas.json`. Fuente en cada escena.
    - En los breves: un paso por breve, con escena `breve`. No pongas la despedida: la añade el editor de cierre.
+   - **Viñetas** (decisión del usuario del 1-nov-2026, estilo de `canal/estilo_vineta.jpg`): cada item de `claves` y `cronologia`, y el titular de cada `breve`, sale como una viñeta de novela gráfica ilustrada por IA, con el texto arriba en una franja del tono de la viñeta (sin bocadillos). Para pedirla:
+     - `"escena"`: en inglés, lo que se ve, concreto y sin texto, en 1 frase (por ejemplo, `"a judge's wooden gavel on a courtroom bench, scales of justice behind"`). Fiel al dato: nada que no haya pasado. No nombres lo que no quieres que salga (si escribes «sin banderas», el modelo las dibuja).
+     - `"persona_vineta"` (opcional): el nombre exacto de una persona con nombre propio **solo si la nota cuenta algo que dijo o hizo ella misma** (no lo de su ministerio o su partido). Sale ella dibujada a partir de su foto real.
+     - Nunca víctimas, heridos, violencia explícita ni niños identificables. En los bloques sobrios, escenas tranquilas (lugar, objeto, velas).
+     - Sin `escena`, la nota sale como antes.
 3. Si te devuelven el bloque con correcciones (`dia/<fecha>/revision/*.md`), aplícalas todas. Si no estás de acuerdo con alguna, explícalo en tu respuesta, pero no la ignores en silencio.
 
 Responde con: número de palabras, duración estimada, escenas usadas y cualquier hecho del enfoque que no pudiste cubrir porque no estaba en el dossier.
