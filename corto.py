@@ -285,16 +285,16 @@ def capa_cap(palabras, clave, activa, escala=1.0, ancho_max=AN - 60):
         col = AMARILLO if es_clave else BLANCO
         d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
         tw = int(d0.textlength(w, font=fnt)) + 30
-        im = Image.new("RGBA", (tw, 170), (0, 0, 0, 0))
-        ImageDraw.Draw(im).text((15, 20), w, font=fnt, fill=col + (255,), stroke_width=9, stroke_fill=(0, 0, 0, 255))
-        if es_clave:
-            im = im.rotate(4, expand=True, resample=Image.BICUBIC)
+        im = Image.new("RGBA", (tw, int(190 * escala)), (0, 0, 0, 0))
+        # rectos y sobre la misma linea base (la palabra clave, mas grande y en amarillo, sin inclinar)
+        ImageDraw.Draw(im).text((15, int(150 * escala)), w, font=fnt, fill=col + (255,), anchor="ls",
+                                stroke_width=9, stroke_fill=(0, 0, 0, 255))
         partes.append(im)
     w = sum(p.width for p in partes) + 10 * (len(partes) - 1)
     out = Image.new("RGBA", (max(w, 1), max(p.height for p in partes)), (0, 0, 0, 0))
     x = 0
     for p in partes:
-        out.alpha_composite(p, (x, (out.height - p.height) // 2))
+        out.alpha_composite(p, (x, 0))
         x += p.width + 10
     if out.width > ancho_max:
         r = ancho_max / out.width
