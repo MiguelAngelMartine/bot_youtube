@@ -5,6 +5,7 @@ Usa el canal KRAKEN del proyecto anterior (TELEGRAM_KRAKEN_TOKEN y TELEGRAM_KRAK
 servidor, ../kraken_bot/allweather_bot). Nunca imprime las claves.
 Uso: python notifica.py AAAA-MM-DD [--error "texto"] [--video ruta.mp4 ["texto"]]"""
 from __future__ import annotations
+import json
 
 import sys
 from pathlib import Path
@@ -66,7 +67,10 @@ def main(dia_txt, error=None, video=None, texto_video=None):
             if l.strip() and not l.startswith("#"):
                 titulo = l.strip("*# ").strip()
                 break
-    texto = f"🗳️ El Hoyformativo · {dia_txt}\nListo para revisar.\n{titulo}\n\n{parte[-3000:]}"
+    yt = json.loads((dia / "youtube.json").read_text(encoding="utf-8")) if (dia / "youtube.json").exists() else None
+    enlace = (f"\n\n▶️ Subido a YouTube como PRIVADO. Revísalo y publícalo tú:\n{yt['studio']}"
+              + (f"\nAvisos: {'; '.join(yt['avisos'])}" if yt.get("avisos") else "")) if yt else ""
+    texto = f"🗳️ El Hoyformativo · {dia_txt}\nListo para revisar.\n{titulo}{enlace}\n\n{parte[-2800:]}"
     envia(api, "sendMessage", data={"chat_id": chat, "text": texto[:4000]}, timeout=30)
     if (dia / "miniatura.png").exists():
         with open(dia / "miniatura.png", "rb") as fh:

@@ -37,12 +37,13 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - `editor-plataforma` → `publicacion.md`.
    - Termina el parte del día: temas, duración, vueltas de la mesa y avisos.
    - Haz una copia ligera para el móvil: `.venv/bin/python control_calidad.py <fecha> --ligero` (deja `episodio_720p.mp4`).
-   - Avisa al director: `.venv/bin/python notifica.py <fecha>`, que manda por Telegram el parte resumido.
+   - Sube el vídeo a YouTube **como privado**: `.venv/bin/python subir.py <fecha>` (título, descripción, etiquetas, miniatura y subtítulos de `publicacion.md`; deja `youtube.json` con el enlace). Si falla, anótalo en el parte y sigue: el director puede subirlo a mano.
+   - Avisa al director: `.venv/bin/python notifica.py <fecha>`, que manda por Telegram el parte resumido y el enlace al vídeo privado en YouTube Studio.
 8. **Archivo.** `documentalista` («archivo <fecha>»).
 
 ## Reglas
 - Lanza las fases en paralelo cuando no dependen entre sí. Dentro de una fase, un agente por pieza.
 - Antes de pasar de fase, comprueba que el fichero existe y tiene el formato del contrato. Si no, repite el encargo una vez explicando qué falta.
 - Si algo falla dos veces, para esa pieza, anótalo en el parte y sigue con el resto. Si falla una fase crítica (recopilación o montaje), avisa con `notifica.py <fecha> --error "<qué ha pasado>"` y termina.
-- **No publiques nada en YouTube:** eso lo hace el director después de ver el vídeo.
+- **Nunca publiques en YouTube:** la oficina sube el vídeo como privado y el director lo publica después de verlo.
 - Al terminar, responde con el parte del día.
