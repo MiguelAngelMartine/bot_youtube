@@ -1,0 +1,250 @@
+{
+ "fecha": "Sábado, 31 de octubre de 2026",
+ "titulo_video": "Urda, Puente, Blocus y el 29N | Política en Claro · 31 de octubre de 2026",
+ "secciones": [
+  {
+   "titulo": "Lo más importante del día",
+   "tono": "normal",
+   "fuentes": [],
+   "pasos": [
+    {
+     "di": "Buenas noches, soy Urni, y esto es Política en Claro. Esto es lo que ha pasado hoy, sábado treinta y uno de octubre, en la política española.",
+     "ve": {
+      "tipo": "sumario",
+      "items": [
+       {
+        "texto": "Urda: el funeral y una cadena de fallos en el sistema de seguridad",
+        "cuando": "Urda despide"
+       },
+       {
+        "texto": "Puente no dimite y la presión llega de los socios",
+        "cuando": "Óscar Puente no"
+       },
+       {
+        "texto": "Blocus: prisión para su presunto fundador y ciudades en alerta",
+        "cuando": "Blocus: la"
+       },
+       {
+        "texto": "29N: empieza el sorteo de las mesas electorales",
+        "cuando": "Y a cuatro"
+       }
+      ]
+     }
+    },
+    {
+     "di": "Urda despide a sus víctimas, mientras la investigación apunta a una cadena de fallos en el sistema de seguridad. Óscar Puente no dimite, y la presión le llega ya también de los socios del Gobierno. Blocus: la justicia envía a prisión a su presunto fundador, y varias ciudades se blindan esta noche. Y a cuatro semanas de las elecciones, arranca el sorteo de las mesas electorales. Vamos con ello."
+    }
+   ]
+  },
+  {
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "fuentes": [
+    "20minutos",
+    "ABC",
+    "El Mundo",
+    "El País",
+    "Europa Press",
+    "RTVE"
+   ],
+   "pasos": [
+    {
+     "di": "El miércoles veintiocho de octubre, un tren de Iryo y un AVE chocaron a la altura de Urda, en Toledo. Los dos se dirigían a la estación de Santa Justa, en Sevilla.",
+     "ve": {
+      "tipo": "mapa",
+      "puntos": [
+       {
+        "nombre": "Madrid",
+        "lon": -3.7,
+        "lat": 40.42
+       },
+       {
+        "nombre": "Urda (Toledo)",
+        "lon": -3.71,
+        "lat": 39.41,
+        "aviso": true,
+        "cuando": "Urda, en"
+       },
+       {
+        "nombre": "Sevilla",
+        "lon": -5.98,
+        "lat": 37.39,
+        "izq": true,
+        "cuando": "Santa Justa"
+       }
+      ],
+      "ruta": [
+       "Madrid",
+       "Urda (Toledo)",
+       "Sevilla"
+      ],
+      "titular": "Choque entre un Iryo y un AVE",
+      "sub": "Miércoles 28 de octubre · los dos trenes iban a Sevilla",
+      "fuente": "ABC"
+     }
+    },
+    {
+     "di": "Tres días después, el balance es de sesenta y nueve fallecidos y más de cien heridos. Los forenses han identificado ya a cincuenta y seis de las víctimas. Es el segundo gran accidente ferroviario en diez meses, después del de Adamuz, en Córdoba.",
+     "ve": {
+      "tipo": "cifra",
+      "numero": "69",
+      "etiqueta": "fallecidos",
+      "sub": "y más de 100 heridos · 56 víctimas ya identificadas",
+      "nota": "Segundo gran accidente ferroviario en diez meses, tras el de Adamuz (Córdoba)",
+      "cuando_nota": "Es el segundo",
+      "fuente": "ABC · El Mundo · Europa Press · RTVE",
+      "foto": "s1_1.jpg"
+     }
+    }
+   ]
+  },
+  {
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "fuentes": [
+    "La Vanguardia",
+    "El Mundo",
+    "Europa Press",
+    "20minutos",
+    "elDiario.es"
+   ],
+   "pasos": [
+    {
+     "di": "Óscar Puente sigue al frente de Transportes. El ministro descarta dimitir. Ha reconocido que puso su cargo a disposición de Pedro Sánchez, y que el presidente consideró injusto cesarle. Según El Mundo, Sánchez le mantiene un respaldo absoluto. Y Puente asume lo que viene: me espera un calvario, ha dicho.",
+     "ve": {
+      "tipo": "persona",
+      "persona": {
+       "nombre": "Óscar Puente",
+       "cargo": "Ministro de Transportes · PSOE",
+       "partido": "PSOE",
+       "cita": "«Me espera un calvario»",
+       "medio": "La Vanguardia",
+       "cita_cuando": "me espera"
+      },
+      "sello": "NO DIMITE",
+      "sello_cuando": "descarta dimitir",
+      "flujo": {
+       "etiqueta": "Puso su cargo a disposición del presidente",
+       "cuando": "Ha reconocido",
+       "a": {
+        "nombre": "Pedro Sánchez",
+        "cargo": "Presidente del Gobierno · PSOE",
+        "partido": "PSOE",
+        "cita": "Consideró «injusto» cesarle y le mantiene su respaldo",
+        "medio": "La Vanguardia · El Mundo"
+       },
+       "a_cuando": "consideró injusto"
+      },
+      "foto": "s2_0.jpg"
+     }
+    },
+    {
+     "di": "Y abre otro frente: Puente ha planteado un posible cierre de la alta velocidad entre Madrid y Barcelona, por motivos de seguridad.",
+     "ve": {
+      "tipo": "mapa",
+      "puntos": [
+       {
+        "nombre": "Madrid",
+        "lon": -3.7,
+        "lat": 40.42,
+        "izq": true
+       },
+       {
+        "nombre": "Barcelona",
+        "lon": 2.17,
+        "lat": 41.39,
+        "abajo": true
+       }
+      ],
+      "ruta": [
+       "Madrid",
+       "Barcelona"
+      ],
+      "tren": true,
+      "aviso_ruta": true,
+      "titular": "¿Cierre del AVE Madrid–Barcelona?",
+      "sub": "Lo plantea Óscar Puente por motivos de seguridad",
+      "fuente": "La Vanguardia · Europa Press"
+     }
+    },
+    {
+     "di": "La oposición aprieta. El PP, por boca de Juan Bravo, exige consecuencias: esto no se puede despachar diciendo que es una fatalidad o buscando una cabeza de turco. Y reclama una gestión ferroviaria que recupere la cultura de la seguridad. Vox va más allá: Santiago Abascal sostiene que el posible cierre demuestra que el Gobierno miente al atribuir el accidente al error humano. E Ignacio Garriga habla de la tercermundización de la red ferroviaria.",
+     "ve": {
+      "tipo": "citas",
+      "titulo": "LA OPOSICIÓN",
+      "items": [
+       {
+        "nombre": "Juan Bravo",
+        "cargo": "Vicesecretario del PP",
+        "partido": "PP",
+        "cita": "«Esto no se puede despachar diciendo que es una fatalidad o buscando una cabeza de turco»",
+        "medio": "20minutos · Europa Press",
+        "cuando": "El PP, por"
+       },
+       {
+        "nombre": "Santiago Abascal",
+        "cargo": "Presidente de Vox",
+        "partido": "Vox",
+        "cita": "El posible cierre demuestra que el Gobierno «miente» al culpar al «error humano»",
+        "medio": "Europa Press",
+        "cuando": "Santiago Abascal"
+       },
+       {
+        "nombre": "Ignacio Garriga",
+        "cargo": "Vox",
+        "partido": "Vox",
+        "cita": "Denuncia la «tercermundización» de la red ferroviaria",
+        "medio": "20minutos",
+        "cuando": "Ignacio Garriga"
+       }
+      ],
+      "foto": "s4_0.jpg"
+     }
+    },
+    {
+     "di": "La presión llega también desde los socios. Frente Amplio, PNV y BNG piden que se asuman responsabilidades. El Frente Amplio, de Ada Colau, carga contra lo que llama el modelo neoliberal ferroviario de los socialistas. Podemos evita pedir expresamente la dimisión, pero denuncia mantenimiento insuficiente, plantillas escasas y falta de descansos. Y el sindicato UGT también exige que el ministro responda. Todo, a dos semanas del inicio de la campaña.",
+     "ve": {
+      "tipo": "posturas",
+      "titulo": "LOS SOCIOS DEL GOBIERNO",
+      "centro": {
+       "nombre": "Óscar Puente",
+       "cargo": "Ministro de Transportes",
+       "partido": "PSOE"
+      },
+      "presionan": [
+       {
+        "nombre": "Frente Amplio",
+        "partido": "Frente Amplio",
+        "cuando": "Frente Amplio, PNV"
+       },
+       {
+        "nombre": "PNV",
+        "partido": "PNV",
+        "cuando": "PNV y BNG"
+       },
+       {
+        "nombre": "BNG",
+        "partido": "BNG",
+        "cuando": "BNG piden"
+       },
+       {
+        "nombre": "UGT",
+        "partido": "UGT",
+        "cuando": "sindicato UGT"
+       }
+      ],
+      "etiqueta": "Piden responsabilidades",
+      "etiqueta_cuando": "piden que",
+      "aparte": {
+       "nombre": "Podemos",
+       "partido": "Podemos",
+       "texto": "No pide la dimisión, pero denuncia falta de mantenimiento y de plantilla",
+       "cuando": "Podemos evita"
+      },
+      "fuente": "elDiario.es · 20minutos"
+     }
+    }
+   ]
+  }
+ ]
+}

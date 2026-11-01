@@ -1,0 +1,79 @@
+# Libro de estilo de *Política en Claro*
+
+## Identidad (no cambia nunca)
+- **Canal:** Política en Claro. **Presentadora:** Urni, la urna.
+- **Voz (elegida por el usuario el 1-nov):** es-ES Álvaro, +14 % de velocidad, +6 Hz, **sin cambios de entonación** en ningún bloque. Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
+- **Lema:** «La política española del día, en cinco minutos».
+- **Colores:**
+  - rojo `#C8102E`, amarillo `#F1BF00`, azul noche `#0C1426`;
+  - tipografía Segoe UI (Black para titulares, Semibold para textos).
+- **Estructura fija:**
+  1. sintonía y entrada;
+  2. sumario de Urni («Buenas noches, soy Urni, y esto es Política en Claro»);
+  3. bloques numerados «NN / TT»;
+  4. breves;
+  5. despedida («Gracias por vernos. Mañana, más.»);
+  6. cierre de 8 s para la pantalla final de YouTube.
+- Si hay **corrección** de un episodio anterior, va justo después del sumario con el rótulo «CORRECCIÓN» y en tono sobrio.
+
+## La voz de Urni
+- Cercana pero informativa. Frases cortas: una idea por frase y 25 palabras como mucho.
+- Cada bloque empieza con un **gancho** de 3-8 palabras («¿Qué falló?», «La oposición aprieta», «Y abre otro frente»).
+- Cada bloque tiene, por este orden: qué ha pasado → quién dice qué (todas las partes) → **contexto** (por qué importa, de dónde viene) → **qué pasa ahora** (próximos pasos con fecha si la hay).
+- Los números se escriben **con letras** en el texto que se lee («sesenta y nueve», «dos mil veintitrés»), para que la voz los pronuncie bien. En pantalla van con cifras.
+- Las citas textuales se leen sin anunciar las comillas; en pantalla van entre «». Siempre breves (una frase) y atribuidas con nombre y cargo.
+- **Prohibido:**
+  - adjetivos valorativos propios («escándalo», «vergonzoso», «histórico»);
+  - especular;
+  - «al parecer» sin fuente;
+  - frases hechas de tertulia;
+  - dar por cierta una sola encuesta;
+  - detalles escabrosos de víctimas.
+- **Atribución:**
+  - «según El País» cuando solo lo publica un medio;
+  - sin atribución solo si está CONTRASTADO (2+ medios de líneas distintas);
+  - las acusaciones, siempre atribuidas.
+- **Duración:** el episodio entero, 6-8 min (unas 1.000-1.300 palabras). Un bloque principal, 60-110 s (170-320 palabras). Un breve, 10-20 s.
+- **Tono «sobrio»** (muertes, accidentes, atentados): sin Urni en pantalla, sin ganchos llamativos, música baja.
+
+## Equilibrio
+- En cada polémica: versión del Gobierno, de la oposición principal y, si la hay, de los socios. Si una parte no ha hablado, se dice («el Gobierno no ha respondido»).
+- Los medios de referencia cubren todo el espectro: El País, elDiario.es, Público, La Vanguardia, RTVE, Europa Press, 20minutos, El Confidencial, El Mundo, ABC, La Razón. Un hecho que solo publica la prensa de una línea va **atribuido**.
+
+## Catálogo de escenas (lo que el redactor puede pedir en `"ve"`)
+Cada escena dura desde el paso donde se pide hasta la siguiente. Los objetos aparecen cuando la voz dice el trozo de `"cuando"`, que debe copiarse **literal** del texto `"di"` (unas 2-4 palabras seguidas).
+
+| tipo | para qué | campos | límites |
+|---|---|---|---|
+| `sumario` | titulares del día (solo en el bloque 0) | `items[{texto, cuando}]` | ≤ 4 items, ≤ 70 caracteres |
+| `mapa` | dónde ha pasado | `puntos[{nombre, lon, lat, cuando?, aviso?, pulso?, izq?, abajo?}]`, `ruta?`, `tren?`, `aviso_ruta?`, `titular`, `sub`, `fuente` | ≤ 5 puntos; titular ≤ 40 caracteres |
+| `cifra` | el número clave | `numero` (≤ 4 caracteres), `etiqueta`, `sub`, `nota?`, `cuando_nota?`, `fuente` | etiqueta ≤ 28 caracteres |
+| `claves` | 3-4 ideas con icono | `titulo`, `items[{icono, texto, cuando}]`, `fuente` | ≤ 4 items, ≤ 95 caracteres |
+| `cronologia` | qué pasó y cuándo | `titulo`, `items[{hora, texto, cuando}]`, `fuente` | ≤ 4 items, ≤ 90 caracteres |
+| `persona` | una persona y su cita | `persona{nombre, cargo, partido, cita?, medio?, cita_cuando?}`, `sello?`, `sello_cuando?`, `flujo?{etiqueta, cuando, a{...}, a_cuando}` | cita ≤ 70 caracteres; sello ≤ 14 caracteres |
+| `citas` | 2-3 voces enfrentadas | `titulo`, `items[{nombre, cargo, partido, cita, medio, cuando}]` | ≤ 3 citas, ≤ 110 caracteres |
+| `posturas` | quién presiona a quién | `titulo`, `centro{nombre, cargo, partido}`, `presionan[{nombre, partido, cuando}]`, `etiqueta`, `etiqueta_cuando`, `aparte{nombre, partido, texto, cuando}`, `fuente` | ≤ 4 presionan |
+| `calendario` | fechas que vienen | `dia`, `mes`, `pie`, `items[{hora, texto, cuando}]`, `fuente` | ≤ 3 items |
+| `breve` | noticia corta | `lugar`, `icono`, `titular`, `sub`, `fuente` | titular ≤ 80 caracteres |
+| `despedida` | cierre de Urni | — | solo en el último paso |
+
+- **Fondo de foto:** las escenas `persona`, `citas`, `claves`, `cronologia`, `cifra` y `breve` admiten `"foto": "sN_M.jpg"`. La elige el editor gráfico; el redactor no la pone. Sale oscurecida, con el color del canal, el rótulo «Foto de archivo» y el crédito.
+- **Iconos:** vela, persona, documento, reloj, escudo, tren, mazo, altavoz, tienda, grafico, urna, alerta.
+- **Partidos y colores definidos:**
+  - PSOE, PSC, PP, Vox, Sumar, Frente Amplio, Podemos, PNV, BNG, Junts, ERC, EH Bildu, CC, UPN, SALF, Compromís;
+  - UGT, CCOO, Gobierno, Institución, Encuesta.
+- **Tono por escenas:** no repetir el mismo tipo de escena dos veces seguidas, y que cada bloque principal use al menos 3 tipos distintos.
+
+## Coordenadas de referencia (lon, lat)
+| Ciudad | lon, lat | Ciudad | lon, lat | Ciudad | lon, lat |
+|---|---|---|---|---|---|
+| Madrid | -3.70, 40.42 | Barcelona | 2.17, 41.39 | Valencia | -0.38, 39.47 |
+| Sevilla | -5.98, 37.39 | Bilbao | -2.93, 43.26 | Zaragoza | -0.88, 41.65 |
+| Málaga | -4.42, 36.72 | Murcia | -1.13, 37.98 | Valladolid | -4.72, 41.65 |
+| A Coruña | -8.41, 43.36 | Santiago | -8.54, 42.88 | Oviedo | -5.85, 43.36 |
+| Santander | -3.80, 43.46 | Pamplona | -1.64, 42.81 | Vitoria | -2.67, 42.85 |
+| San Sebastián | -1.98, 43.32 | Toledo | -4.02, 39.86 | Córdoba | -4.78, 37.89 |
+| Granada | -3.60, 37.18 | Alicante | -0.48, 38.35 | Palma | 2.65, 39.57 |
+| Badajoz | -6.97, 38.88 | Salamanca | -5.66, 40.96 | Logroño | -2.45, 42.47 |
+
+Canarias, Ceuta y Melilla quedan fuera del mapa dibujado: en esos casos se usa `claves` o `breve`.

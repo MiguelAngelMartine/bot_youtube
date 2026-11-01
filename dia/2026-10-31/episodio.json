@@ -1,0 +1,595 @@
+{
+ "fecha": "Sábado, 31 de octubre de 2026",
+ "titulo_video": "Urda, Puente, Blocus y el 29N | Política en Claro · 31 de octubre de 2026",
+ "secciones": [
+  {
+   "titulo": "Lo más importante del día",
+   "tono": "normal",
+   "fuentes": [],
+   "pasos": [
+    {
+     "di": "Buenas noches, soy Urni, y esto es Política en Claro. Esto es lo que ha pasado hoy, sábado treinta y uno de octubre, en la política española.",
+     "ve": {
+      "tipo": "sumario",
+      "items": [
+       {
+        "texto": "Urda: el funeral y una cadena de fallos en el sistema de seguridad",
+        "cuando": "Urda despide"
+       },
+       {
+        "texto": "Puente no dimite y la presión llega de los socios",
+        "cuando": "Óscar Puente no"
+       },
+       {
+        "texto": "Blocus: prisión para su presunto fundador y ciudades en alerta",
+        "cuando": "Blocus: la"
+       },
+       {
+        "texto": "29N: empieza el sorteo de las mesas electorales",
+        "cuando": "Y a cuatro"
+       }
+      ]
+     }
+    },
+    {
+     "di": "Urda despide a sus víctimas, mientras la investigación apunta a una cadena de fallos en el sistema de seguridad. Óscar Puente no dimite, y la presión le llega ya también de los socios del Gobierno. Blocus: la justicia envía a prisión a su presunto fundador, y varias ciudades se blindan esta noche. Y a cuatro semanas de las elecciones, arranca el sorteo de las mesas electorales. Vamos con ello."
+    }
+   ]
+  },
+  {
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "fuentes": [
+    "20minutos",
+    "ABC",
+    "El Mundo",
+    "El País",
+    "Europa Press",
+    "RTVE"
+   ],
+   "pasos": [
+    {
+     "di": "El miércoles veintiocho de octubre, un tren de Iryo y un AVE chocaron a la altura de Urda, en Toledo. Los dos se dirigían a la estación de Santa Justa, en Sevilla.",
+     "ve": {
+      "tipo": "mapa",
+      "puntos": [
+       {
+        "nombre": "Madrid",
+        "lon": -3.7,
+        "lat": 40.42
+       },
+       {
+        "nombre": "Urda (Toledo)",
+        "lon": -3.71,
+        "lat": 39.41,
+        "aviso": true,
+        "cuando": "Urda, en"
+       },
+       {
+        "nombre": "Sevilla",
+        "lon": -5.98,
+        "lat": 37.39,
+        "izq": true,
+        "cuando": "Santa Justa"
+       }
+      ],
+      "ruta": [
+       "Madrid",
+       "Urda (Toledo)",
+       "Sevilla"
+      ],
+      "titular": "Choque entre un Iryo y un AVE",
+      "sub": "Miércoles 28 de octubre · los dos trenes iban a Sevilla",
+      "fuente": "ABC"
+     }
+    },
+    {
+     "di": "Tres días después, el balance es de sesenta y nueve fallecidos y más de cien heridos. Los forenses han identificado ya a cincuenta y seis de las víctimas. Es el segundo gran accidente ferroviario en diez meses, después del de Adamuz, en Córdoba.",
+     "ve": {
+      "tipo": "cifra",
+      "numero": "69",
+      "etiqueta": "fallecidos",
+      "sub": "y más de 100 heridos · 56 víctimas ya identificadas",
+      "nota": "Segundo gran accidente ferroviario en diez meses, tras el de Adamuz (Córdoba)",
+      "cuando_nota": "Es el segundo",
+      "fuente": "ABC · El Mundo · Europa Press · RTVE"
+     }
+    },
+    {
+     "di": "Hoy, el adiós. El arzobispo de Toledo ha presidido una misa funeral, en la que un mensaje del Papa ha emocionado a los asistentes, y ha pedido que tragedias como esta no vuelvan a repetirse. Ha asistido el presidente de Castilla-La Mancha, Emiliano García-Page. El Mundo destaca que no hubo representación del Gobierno. Pedro Sánchez participó este sábado en la reunión de coordinación de la emergencia, en Madrid.",
+     "ve": {
+      "tipo": "claves",
+      "titulo": "HOY, EL ADIÓS",
+      "items": [
+       {
+        "icono": "vela",
+        "texto": "Misa funeral presidida por el arzobispo de Toledo: «que no vuelvan a repetirse»",
+        "cuando": "El arzobispo"
+       },
+       {
+        "icono": "persona",
+        "texto": "Asiste el presidente de Castilla-La Mancha, Emiliano García-Page",
+        "cuando": "Ha asistido"
+       },
+       {
+        "icono": "documento",
+        "texto": "Sin representación del Gobierno, según El Mundo",
+        "cuando": "El Mundo destaca"
+       },
+       {
+        "icono": "reloj",
+        "texto": "Sánchez, en la reunión de coordinación de la emergencia en Madrid",
+        "cuando": "Pedro Sánchez participó"
+       }
+      ],
+      "fuente": "El País · El Mundo · 20minutos · Europa Press"
+     }
+    },
+    {
+     "di": "¿Qué falló? Según El País, una cadena de fallos técnicos dejó fuera de servicio el LZB, el sistema que impide que dos trenes coincidan en el mismo punto. Adif abrió una incidencia a las ocho y media de la mañana, veintitrés minutos antes del choque, por pérdidas de tensión, comunicaciones telefónicas caídas y pérdida de información intermitente. Transportes, en cambio, niega que hubiera una cadena de fallos: según el ministerio, hasta el choque solo se produjo la caída del LZB.",
+     "ve": {
+      "tipo": "cronologia",
+      "titulo": "¿QUÉ FALLÓ? · EL SISTEMA LZB",
+      "items": [
+       {
+        "hora": "LZB",
+        "texto": "Sistema que impide que dos trenes coincidan en el mismo punto",
+        "cuando": "el sistema que"
+       },
+       {
+        "hora": "8:30",
+        "texto": "Adif abre una incidencia: pérdidas de tensión, teléfonos caídos, información intermitente",
+        "cuando": "Adif abrió"
+       },
+       {
+        "hora": "+23 min",
+        "texto": "Choque de los dos trenes",
+        "cuando": "veintitrés minutos"
+       },
+       {
+        "hora": "Transportes",
+        "texto": "Lo niega: hasta el choque «sólo se produjo la caída del sistema LZB»",
+        "cuando": "Transportes, en cambio"
+       }
+      ],
+      "fuente": "El País · 20minutos (versión de Transportes)"
+     }
+    },
+    {
+     "di": "Y no es un caso aislado: el mismo diario ha contado al menos ciento setenta caídas de este sistema en lo que va de año. Una cada dos días.",
+     "ve": {
+      "tipo": "cifra",
+      "numero": "170",
+      "etiqueta": "caídas del LZB este año",
+      "sub": "una cada dos días",
+      "fuente": "El País"
+     }
+    },
+    {
+     "di": "La Guardia Civil baraja una serie de fallos de seguridad previos a un error humano, según 20minutos, en línea con las primeras conclusiones de la Comisión de Investigación de Accidentes Ferroviarios. Renfe, por su parte, sostiene que el accidente no es atribuible a la compañía, y que vincularlo con supuestas carencias de su material o de su organización del trabajo carece de sentido.",
+     "ve": {
+      "tipo": "claves",
+      "titulo": "LA INVESTIGACIÓN",
+      "items": [
+       {
+        "icono": "escudo",
+        "texto": "Guardia Civil: fallos de seguridad previos a un error humano",
+        "cuando": "La Guardia Civil"
+       },
+       {
+        "icono": "documento",
+        "texto": "En línea con las primeras conclusiones de la Comisión de Investigación de Accidentes Ferroviarios",
+        "cuando": "en línea con"
+       },
+       {
+        "icono": "tren",
+        "texto": "Renfe: el accidente «no es atribuible» a la compañía",
+        "cuando": "Renfe, por"
+       }
+      ],
+      "fuente": "20minutos"
+     }
+    }
+   ]
+  },
+  {
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "fuentes": [
+    "La Vanguardia",
+    "El Mundo",
+    "Europa Press",
+    "20minutos",
+    "elDiario.es"
+   ],
+   "pasos": [
+    {
+     "di": "Óscar Puente sigue al frente de Transportes. El ministro descarta dimitir. Ha reconocido que puso su cargo a disposición de Pedro Sánchez, y que el presidente consideró injusto cesarle. Según El Mundo, Sánchez le mantiene un respaldo absoluto. Y Puente asume lo que viene: me espera un calvario, ha dicho.",
+     "ve": {
+      "tipo": "persona",
+      "persona": {
+       "nombre": "Óscar Puente",
+       "cargo": "Ministro de Transportes · PSOE",
+       "partido": "PSOE",
+       "cita": "«Me espera un calvario»",
+       "medio": "La Vanguardia",
+       "cita_cuando": "me espera"
+      },
+      "sello": "NO DIMITE",
+      "sello_cuando": "descarta dimitir",
+      "flujo": {
+       "etiqueta": "Puso su cargo a disposición del presidente",
+       "cuando": "Ha reconocido",
+       "a": {
+        "nombre": "Pedro Sánchez",
+        "cargo": "Presidente del Gobierno · PSOE",
+        "partido": "PSOE",
+        "cita": "Consideró «injusto» cesarle y le mantiene su respaldo",
+        "medio": "La Vanguardia · El Mundo"
+       },
+       "a_cuando": "consideró injusto"
+      }
+     }
+    },
+    {
+     "di": "Y abre otro frente: Puente ha planteado un posible cierre de la alta velocidad entre Madrid y Barcelona, por motivos de seguridad.",
+     "ve": {
+      "tipo": "mapa",
+      "puntos": [
+       {
+        "nombre": "Madrid",
+        "lon": -3.7,
+        "lat": 40.42,
+        "izq": true
+       },
+       {
+        "nombre": "Barcelona",
+        "lon": 2.17,
+        "lat": 41.39,
+        "abajo": true
+       }
+      ],
+      "ruta": [
+       "Madrid",
+       "Barcelona"
+      ],
+      "tren": true,
+      "aviso_ruta": true,
+      "titular": "¿Cierre del AVE Madrid–Barcelona?",
+      "sub": "Lo plantea Óscar Puente por motivos de seguridad",
+      "fuente": "La Vanguardia · Europa Press"
+     }
+    },
+    {
+     "di": "La oposición aprieta. El PP, por boca de Juan Bravo, exige consecuencias: esto no se puede despachar diciendo que es una fatalidad o buscando una cabeza de turco. Y reclama una gestión ferroviaria que recupere la cultura de la seguridad. Vox va más allá: Santiago Abascal sostiene que el posible cierre demuestra que el Gobierno miente al atribuir el accidente al error humano. E Ignacio Garriga habla de la tercermundización de la red ferroviaria.",
+     "ve": {
+      "tipo": "citas",
+      "titulo": "LA OPOSICIÓN",
+      "items": [
+       {
+        "nombre": "Juan Bravo",
+        "cargo": "Vicesecretario del PP",
+        "partido": "PP",
+        "cita": "«Esto no se puede despachar diciendo que es una fatalidad o buscando una cabeza de turco»",
+        "medio": "20minutos · Europa Press",
+        "cuando": "El PP, por"
+       },
+       {
+        "nombre": "Santiago Abascal",
+        "cargo": "Presidente de Vox",
+        "partido": "Vox",
+        "cita": "El posible cierre demuestra que el Gobierno «miente» al culpar al «error humano»",
+        "medio": "Europa Press",
+        "cuando": "Santiago Abascal"
+       },
+       {
+        "nombre": "Ignacio Garriga",
+        "cargo": "Vox",
+        "partido": "Vox",
+        "cita": "Denuncia la «tercermundización» de la red ferroviaria",
+        "medio": "20minutos",
+        "cuando": "Ignacio Garriga"
+       }
+      ]
+     }
+    },
+    {
+     "di": "La presión llega también desde los socios. Frente Amplio, PNV y BNG piden que se asuman responsabilidades. El Frente Amplio, de Ada Colau, carga contra lo que llama el modelo neoliberal ferroviario de los socialistas. Podemos evita pedir expresamente la dimisión, pero denuncia mantenimiento insuficiente, plantillas escasas y falta de descansos. Y el sindicato UGT también exige que el ministro responda. Todo, a dos semanas del inicio de la campaña.",
+     "ve": {
+      "tipo": "posturas",
+      "titulo": "LOS SOCIOS DEL GOBIERNO",
+      "centro": {
+       "nombre": "Óscar Puente",
+       "cargo": "Ministro de Transportes",
+       "partido": "PSOE"
+      },
+      "presionan": [
+       {
+        "nombre": "Frente Amplio",
+        "partido": "Frente Amplio",
+        "cuando": "Frente Amplio, PNV"
+       },
+       {
+        "nombre": "PNV",
+        "partido": "PNV",
+        "cuando": "PNV y BNG"
+       },
+       {
+        "nombre": "BNG",
+        "partido": "BNG",
+        "cuando": "BNG piden"
+       },
+       {
+        "nombre": "UGT",
+        "partido": "UGT",
+        "cuando": "sindicato UGT"
+       }
+      ],
+      "etiqueta": "Piden responsabilidades",
+      "etiqueta_cuando": "piden que",
+      "aparte": {
+       "nombre": "Podemos",
+       "partido": "Podemos",
+       "texto": "No pide la dimisión, pero denuncia falta de mantenimiento y de plantilla",
+       "cuando": "Podemos evita"
+      },
+      "fuente": "elDiario.es · 20minutos"
+     }
+    }
+   ]
+  },
+  {
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "fuentes": [
+    "ABC",
+    "El Confidencial",
+    "20minutos",
+    "Europa Press",
+    "La Vanguardia",
+    "El Mundo"
+   ],
+   "pasos": [
+    {
+     "di": "Esta noche de Halloween, varias ciudades están en alerta por Blocus. ¿Qué es? Una red anónima nacida en Francia, donde blocus significa bloqueo, que empezó como una protesta estudiantil por mejoras en los institutos. Al extenderse por redes sociales como TikTok, perdió esa motivación: según los Mossos, no es un movimiento político ni una ideología. A esta red se atribuyen los saqueos del pasado veinticuatro de octubre en Barcelona.",
+     "ve": {
+      "tipo": "claves",
+      "titulo": "¿QUÉ ES BLOCUS?",
+      "items": [
+       {
+        "icono": "documento",
+        "texto": "Nace en Francia («bloqueo») como protesta estudiantil por los institutos",
+        "cuando": "nacida en Francia"
+       },
+       {
+        "icono": "altavoz",
+        "texto": "Se extiende por redes sociales como TikTok, de forma anónima",
+        "cuando": "Al extenderse"
+       },
+       {
+        "icono": "escudo",
+        "texto": "Mossos: «no es un movimiento político ni una ideología»",
+        "cuando": "según los Mossos"
+       },
+       {
+        "icono": "tienda",
+        "texto": "Se le atribuyen los saqueos del 24 de octubre en Barcelona",
+        "cuando": "A esta red"
+       }
+      ],
+      "fuente": "ABC · El Confidencial"
+     }
+    },
+    {
+     "di": "Una jueza de Torrent ha enviado a prisión provisional sin fianza a su presunto fundador en España, detenido el viernes en Picanya. Está investigado por organización criminal para incitar a desórdenes públicos, robos con fuerza en comercios y daños.",
+     "ve": {
+      "tipo": "claves",
+      "titulo": "PRISIÓN PARA SU PRESUNTO FUNDADOR",
+      "items": [
+       {
+        "icono": "mazo",
+        "texto": "Prisión provisional sin fianza, decretada por una jueza de Torrent",
+        "cuando": "Una jueza"
+       },
+       {
+        "icono": "persona",
+        "texto": "Detenido el viernes en Picanya (Valencia)",
+        "cuando": "detenido el viernes"
+       },
+       {
+        "icono": "documento",
+        "texto": "Organización criminal para incitar a desórdenes públicos, robos con fuerza y daños",
+        "cuando": "Está investigado"
+       }
+      ],
+      "fuente": "ABC · 20minutos"
+     }
+    },
+    {
+     "di": "Los detenidos son ya once, según ABC. El último, en Barcelona: el administrador de uno de los grupos usados para coordinar los saqueos. Entre ellos hay un menor, detenido hoy en Valencia, al que la policía acusa de repartir accesos a los chats de la convocatoria.",
+     "ve": {
+      "tipo": "cifra",
+      "numero": "11",
+      "etiqueta": "detenidos",
+      "sub": "el último, en Barcelona: administrador de un grupo de coordinación",
+      "nota": "Entre ellos, un menor en Valencia que repartía accesos a los chats",
+      "cuando_nota": "Entre ellos",
+      "fuente": "ABC · Europa Press"
+     }
+    },
+    {
+     "di": "Mientras, comercios del centro de Madrid, Valencia, Bilbao y Barcelona han tapiado sus escaparates. En Cataluña, el dispositivo policial ha arrancado a las tres de la tarde, con controles en el transporte público. Y en Valencia, según ABC, cientos de agentes han blindado el centro y han neutralizado la convocatoria.",
+     "ve": {
+      "tipo": "mapa",
+      "puntos": [
+       {
+        "nombre": "Madrid",
+        "lon": -3.7,
+        "lat": 40.42,
+        "pulso": true,
+        "cuando": "Madrid"
+       },
+       {
+        "nombre": "Valencia",
+        "lon": -0.38,
+        "lat": 39.47,
+        "pulso": true,
+        "cuando": "Valencia, Bilbao"
+       },
+       {
+        "nombre": "Bilbao",
+        "lon": -2.93,
+        "lat": 43.26,
+        "pulso": true,
+        "cuando": "Bilbao"
+       },
+       {
+        "nombre": "Barcelona",
+        "lon": 2.17,
+        "lat": 41.39,
+        "pulso": true,
+        "izq": true,
+        "cuando": "Barcelona han"
+       }
+      ],
+      "titular": "Escaparates tapiados",
+      "sub": "Dispositivo policial en Cataluña desde las 15:00 y centro de Valencia blindado",
+      "fuente": "Europa Press · El Confidencial · ABC"
+     }
+    },
+    {
+     "di": "El presidente de la Generalitat, Salvador Illa, asegura que los Mossos están preparados, y advierte: quien venga a saquear responderá ante la justicia.",
+     "ve": {
+      "tipo": "persona",
+      "persona": {
+       "nombre": "Salvador Illa",
+       "cargo": "Presidente de la Generalitat · PSC",
+       "partido": "PSC",
+       "cita": "«Quien venga a saquear responderá ante la justicia»",
+       "medio": "El Confidencial · La Vanguardia",
+       "cita_cuando": "quien venga"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "titulo": "Camino al 29N",
+   "tono": "normal",
+   "fuentes": [
+    "elDiario.es",
+    "20minutos",
+    "El Confidencial"
+   ],
+   "pasos": [
+    {
+     "di": "Quedan cuatro semanas para las elecciones generales del veintinueve de noviembre, y dos para que arranque la campaña. Las candidaturas provisionales al Congreso ya están publicadas en el Boletín Oficial del Estado, provincia a provincia. Y desde hoy, los ayuntamientos sortean quién formará las mesas electorales. Tienen de plazo hasta el miércoles cuatro de noviembre, aunque Madrid, Valladolid y Oviedo ya han hecho el suyo.",
+     "ve": {
+      "tipo": "calendario",
+      "dia": "29",
+      "mes": "NOVIEMBRE",
+      "pie": "Elecciones generales",
+      "items": [
+       {
+        "hora": "Ya",
+        "texto": "Candidaturas provisionales publicadas en el BOE",
+        "cuando": "Las candidaturas"
+       },
+       {
+        "hora": "31 oct – 4 nov",
+        "texto": "Sorteo de los miembros de las mesas electorales",
+        "cuando": "los ayuntamientos"
+       },
+       {
+        "hora": "En 2 semanas",
+        "texto": "Arranca la campaña electoral",
+        "cuando": "arranque la campaña"
+       }
+      ],
+      "fuente": "elDiario.es · 20minutos"
+     }
+    },
+    {
+     "di": "¿Y las encuestas? Narciso Michavila, presidente de GAD3, afirma en El Confidencial que detecta un cambio abrupto de voto desde el accidente. Según su lectura, el PP podría mejorar sus resultados de dos mil veintitrés, el PSOE caería en Andalucía a su peor marca, y ve imposible que Sánchez sea el más votado. Es la valoración de una encuestadora: habrá que ver si otros sondeos la confirman.",
+     "ve": {
+      "tipo": "claves",
+      "titulo": "LAS ENCUESTAS · GAD3",
+      "items": [
+       {
+        "icono": "grafico",
+        "texto": "«Un cambio abrupto de voto» desde el accidente",
+        "cuando": "detecta un"
+       },
+       {
+        "icono": "urna",
+        "texto": "El PP podría mejorar sus resultados de 2023",
+        "cuando": "el PP podría"
+       },
+       {
+        "icono": "urna",
+        "texto": "El PSOE caería en Andalucía a su peor marca",
+        "cuando": "el PSOE caería"
+       },
+       {
+        "icono": "alerta",
+        "texto": "Es la lectura de una sola encuestadora",
+        "cuando": "Es la valoración"
+       }
+      ],
+      "fuente": "El Confidencial (Narciso Michavila, GAD3)"
+     }
+    }
+   ]
+  },
+  {
+   "titulo": "En breve",
+   "tono": "normal",
+   "fuentes": [
+    "ABC",
+    "El Confidencial",
+    "El País"
+   ],
+   "pasos": [
+    {
+     "di": "Y en breve. Valencia: dos años después de la dana que causó doscientas treinta y cuatro muertes, una manifestación ha vuelto a reclamar justicia, verdad y asunción de responsabilidades.",
+     "ve": {
+      "tipo": "breve",
+      "lugar": "VALENCIA",
+      "icono": "vela",
+      "titular": "Dos años de la dana: «justicia, verdad y asunción de responsabilidades»",
+      "sub": "La dana de octubre de 2024 causó 234 muertes",
+      "fuente": "ABC"
+     }
+    },
+    {
+     "di": "Madrid: tras más de un mes, los organizadores de la acampada de la Puerta del Sol dejan la plaza. Trasladan su actividad a los barrios para preparar una huelga general.",
+     "ve": {
+      "tipo": "breve",
+      "lugar": "MADRID",
+      "icono": "altavoz",
+      "titular": "La acampada de Sol deja la plaza para preparar una huelga general",
+      "sub": "Tras más de un mes de protesta, las comisiones pasan a los barrios",
+      "fuente": "El Confidencial · ABC"
+     }
+    },
+    {
+     "di": "Y el Tribunal Supremo ha admitido a sesenta y nueve personas y tres asociaciones como afectados por la suspensión del voto a los nacionalizados por la llamada ley de nietos.",
+     "ve": {
+      "tipo": "breve",
+      "lugar": "TRIBUNAL SUPREMO",
+      "icono": "mazo",
+      "titular": "69 personas y 3 asociaciones, admitidas como afectadas",
+      "sub": "Por la suspensión del voto a los nacionalizados por la «ley de nietos»",
+      "fuente": "El País"
+     }
+    },
+    {
+     "di": "Esto ha sido todo por hoy. Gracias por vernos. Mañana, más.",
+     "ve": {
+      "tipo": "despedida"
+     }
+    }
+   ]
+  }
+ ]
+}

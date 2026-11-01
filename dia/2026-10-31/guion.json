@@ -1,0 +1,130 @@
+{
+ "fecha": "Sábado, 31 de octubre de 2026",
+ "titulo_video": "Resumen político de España · 31 de octubre de 2026: Urda, Puente, Blocus y el 29N",
+ "secciones": [
+  {
+   "titulo": "Resumen político del día",
+   "puntos": [
+    "Urda: funeral e investigación",
+    "Presión sobre Óscar Puente",
+    "Blocus: alerta en las ciudades",
+    "Camino al 29N"
+   ],
+   "texto": "Buenas noches. Esto es lo que ha pasado hoy, sábado treinta y uno de octubre, en la política española. Urda despide a sus víctimas, y las primeras informaciones apuntan a fallos en el sistema de seguridad. Óscar Puente no dimite, y la presión crece. Varias ciudades, en alerta por Blocus. Y sigue la cuenta atrás para el veintinueve de noviembre.",
+   "fuentes": [],
+   "imagenes": [
+    "Congreso de los Diputados fachada#2",
+    "accidente ferroviario de Urda#3",
+    "Mossos d Esquadra#0"
+   ]
+  },
+  {
+   "titulo": "Urda: funeral y primeras pistas de la investigación",
+   "puntos": [
+    "69 fallecidos en el choque entre un Iryo y un AVE",
+    "Misa funeral presidida por el arzobispo de Toledo",
+    "Sánchez, en la reunión de seguimiento de la emergencia",
+    "El sistema de seguridad LZB falló antes del choque"
+   ],
+   "texto": "Tres días después del choque de Urda, en Toledo, entre un tren de Iryo y un AVE, el balance es de sesenta y nueve fallecidos y más de cien heridos. Hoy, el adiós. El arzobispo de Toledo ha presidido una misa funeral, con la asistencia del presidente de Castilla-La Mancha, Emiliano García-Page. El Mundo destaca que no hubo representación del Gobierno. Pedro Sánchez participó por la mañana en la reunión de coordinación de la emergencia. ¿Qué falló? Según El País, una cadena de fallos técnicos dejó fuera de servicio el sistema de seguridad LZB, el que impide que dos trenes coincidan en el mismo punto. La incidencia se abrió veintitrés minutos antes del choque. 20minutos informa de que la Guardia Civil baraja fallos de seguridad previos a un error humano. Renfe, por su parte, sostiene que el accidente no es atribuible a la compañía.",
+   "fuentes": [
+    "El País",
+    "El Mundo",
+    "Europa Press",
+    "20minutos",
+    "ABC"
+   ],
+   "imagenes": [
+    "accidente ferroviario de Urda#0",
+    "Urda Toledo#0",
+    "Iryo Frecciarossa#0"
+   ]
+  },
+  {
+   "titulo": "Óscar Puente: no dimite y crece la presión",
+   "puntos": [
+    "Puso su cargo a disposición de Sánchez, que no lo aceptó",
+    "Plantea un posible cierre del AVE Madrid-Barcelona",
+    "PP: «no se puede despachar con una cabeza de turco»",
+    "Frente Amplio, PNV y BNG piden responsabilidades"
+   ],
+   "texto": "Óscar Puente sigue al frente de Transportes. El ministro descarta dimitir, y reconoce que puso su cargo a disposición de Pedro Sánchez, que consideró injusto cesarle. Y abre otro frente: plantea un posible cierre de la alta velocidad entre Madrid y Barcelona por motivos de seguridad. La oposición aprieta. Juan Bravo, del Partido Popular, exige consecuencias y acusa al ministro de buscar una cabeza de turco. Santiago Abascal, de Vox, sostiene que ese posible cierre demuestra la responsabilidad del Gobierno, e Ignacio Garriga habla de la tercermundización de la red ferroviaria. La presión llega también de los socios. Frente Amplio, PNV y BNG piden que se asuman responsabilidades. Podemos, en cambio, evita reclamar expresamente la dimisión.",
+   "fuentes": [
+    "La Vanguardia",
+    "ABC",
+    "Europa Press",
+    "20minutos",
+    "elDiario.es",
+    "El Mundo"
+   ],
+   "imagenes": [
+    "Óscar Puente#0",
+    "AVE Renfe S-103#0",
+    "Santiago Abascal#3",
+    "Juan Bravo Baena#0"
+   ]
+  },
+  {
+   "titulo": "Blocus: ciudades en alerta esta noche",
+   "puntos": [
+    "Prisión sin fianza para el presunto fundador en España",
+    "Una decena de detenidos en los últimos días",
+    "Comercios tapiados en Madrid, Valencia, Bilbao y Barcelona",
+    "Illa: «quien venga a saquear responderá ante la justicia»"
+   ],
+   "texto": "Noche de Halloween con un fuerte dispositivo policial en varias ciudades. El motivo: las convocatorias de Blocus, una red anónima que se organiza en redes sociales y a la que se atribuyen los saqueos de hace una semana en Barcelona. Una jueza de Torrent ha enviado a prisión provisional sin fianza al presunto fundador del movimiento en España, detenido en Picanya. Las fuerzas de seguridad suman ya alrededor de una decena de detenidos, entre ellos un menor en Valencia. En el centro de Madrid, Valencia, Bilbao y Barcelona hay comercios que han tapiado sus escaparates. El presidente de la Generalitat, Salvador Illa, advierte: quien venga a saquear responderá ante la justicia.",
+   "fuentes": [
+    "20minutos",
+    "ABC",
+    "El Confidencial",
+    "Europa Press",
+    "La Vanguardia",
+    "El Mundo"
+   ],
+   "imagenes": [
+    "Mossos d Esquadra#0",
+    "Plaza de Ayuntamiento Valencia#2",
+    "Salvador Illa#0"
+   ]
+  },
+  {
+   "titulo": "Camino al 29N",
+   "puntos": [
+    "Listas provisionales publicadas en el BOE",
+    "Sorteo de las mesas electorales hasta el 4 de noviembre",
+    "Campaña en dos semanas",
+    "GAD3 detecta un «cambio abrupto» de voto tras Urda"
+   ],
+   "texto": "Faltan cuatro semanas para las elecciones del veintinueve de noviembre, y dos para que empiece la campaña. Las listas provisionales al Congreso ya están publicadas en el Boletín Oficial del Estado. Y desde hoy, los ayuntamientos sortean quién formará las mesas electorales. Tienen de plazo hasta el miércoles cuatro de noviembre. ¿Y las encuestas? Narciso Michavila, presidente de GAD3, afirma en El Confidencial que detecta un cambio abrupto de voto desde el accidente, y ve imposible que el PSOE sea el partido más votado el veintinueve de noviembre. Es la lectura de una encuestadora; habrá que ver si otros sondeos la confirman.",
+   "fuentes": [
+    "elDiario.es",
+    "20minutos",
+    "El Confidencial"
+   ],
+   "imagenes": [
+    "Congreso de los Diputados fachada#0",
+    "Pedro Sánchez 2024#0",
+    "Alberto Núñez Feijóo#0"
+   ]
+  },
+  {
+   "titulo": "Breves",
+   "puntos": [
+    "Dana: manifestación en Valencia a los dos años",
+    "Sol: la acampada se retira para preparar una huelga general",
+    "Supremo: 69 afectados por la suspensión del voto de la ‘ley de nietos’"
+   ],
+   "texto": "Y en breve. Valencia: una manifestación reclama verdad y justicia a los dos años de la dana que causó doscientos treinta y cuatro muertos. Madrid: la acampada de la Puerta del Sol deja la plaza. Sus organizadores dicen que es para preparar una huelga general. Y el Tribunal Supremo admite a sesenta y nueve personas y tres asociaciones como afectados por la suspensión del voto a los nacionalizados por la llamada ley de nietos. Esto ha sido todo por hoy. Gracias por vernos. Mañana, más.",
+   "fuentes": [
+    "ABC",
+    "El Confidencial",
+    "El País"
+   ],
+   "imagenes": [
+    "dana Valencia 2024#0",
+    "Puerta del Sol Madrid#1",
+    "Tribunal Supremo España sede#2"
+   ]
+  }
+ ]
+}

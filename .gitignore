@@ -1,0 +1,13 @@
+# entorno y secretos
+.venv/
+__pycache__/
+.env
+# medios pesados que se regeneran (los guiones, dossiers y revisiones si se guardan)
+dia/**/*.mp4
+dia/**/*.mp3
+dia/**/*.wav
+dia/**/*.png
+dia/**/*.jpg
+dia/**/tmp*/
+dia/**/noticias.json
+*.log
