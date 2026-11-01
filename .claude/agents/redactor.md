@@ -15,7 +15,8 @@ Te darán una fecha y un número de bloque (o «breves»).
    - `oficina/CONTRATOS.md`.
 2. Escribe `dia/<fecha>/bloques/NN.json` (NN con dos cifras; los breves en el número siguiente al último bloque).
    - **Todo hecho, cifra y cita sale del dossier.** Si algo no está en el dossier, no existe.
-   - Respeta la atribución del dossier: lo `ATRIBUIDO` va con «según <medio>».
+   - Respeta la atribución del dossier, **pero en pantalla, no en la voz**: el `di` no nombra medios (nada de «según El País», «recoge ABC», «dice en El Mundo»). Lo `ATRIBUIDO` lleva «según <medio>» en el texto de pantalla de su nota o tarjeta, y la escena su `fuente`.
+     En la voz sí: quién dice algo («Feijóo asegura…», «según el Gobierno», «según los Mossos») y que algo no está confirmado («sin confirmación oficial», «está previsto», «hay versiones distintas»). Nunca presentes como hecho lo que solo es una previsión o una versión.
    - Estructura: gancho → lo nuevo → quién dice qué (todas las partes del dossier) → contexto → qué pasa ahora.
    - Ajusta la longitud a los `segundos` de la escaleta (unas 2,9 palabras por segundo).
    - Números con letras en `di`, cifras en pantalla.

@@ -36,6 +36,19 @@ def envia(api, metodo, **kw):
         raise SystemExit(f"Telegram rechazo {metodo}: {r.status_code} {r.json().get('description', '') if r.content else ''}")
 
 
+def aviso_subida(info):
+    """Aviso corto en cuanto hay un video subido a YouTube esperando a que el director lo publique (norma del 1-nov)."""
+    tok, chat = credenciales()
+    api = f"https://api.telegram.org/bot{tok}"
+    txt = (f"▶️ El Hoyformativo: vídeo subido a YouTube como PRIVADO, listo para que lo revises y lo publiques.\n"
+           f"{info['titulo']}\n{info['studio']}")
+    if info.get("sustituye_a"):
+        txt += "\n(Sustituye a la versión anterior de ese día, que se ha borrado.)"
+    if info.get("avisos"):
+        txt += "\nAvisos: " + "; ".join(info["avisos"])
+    envia(api, "sendMessage", data={"chat_id": chat, "text": txt[:4000]}, timeout=30)
+
+
 def manda_video(api, chat, v, texto):
     if v.stat().st_size < MAX_TG:
         with open(v, "rb") as fh:

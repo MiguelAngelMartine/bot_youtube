@@ -16,7 +16,8 @@ Para cada frase y cada dato en pantalla:
 2. Señala como problema:
    - una cifra, fecha, hora, lugar o cargo distinto del de la fuente;
    - una cita que no es literal o está mal atribuida;
-   - algo ATRIBUIDO presentado sin «según»;
+   - algo ATRIBUIDO sin su «según <medio>» en el texto de pantalla, o dicho en la voz como hecho confirmado cuando es una previsión o una sola versión (la voz no nombra medios, pero debe marcar lo no confirmado);
+   - un medio nombrado en la voz (`di`): ya no se hace, va en pantalla;
    - un hecho que no está en el dossier;
    - una deducción presentada como hecho (incluidas las sumas o restas que no dé la fuente);
    - un dato ya desmentido.

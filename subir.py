@@ -122,6 +122,12 @@ def subir(dia_txt):
             "estado": "privado", "titulo": titulo, "avisos": avisos, "sustituye_a": anterior}
     (dia / "youtube.json").write_text(json.dumps(info, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(info, ensure_ascii=False, indent=1))
+    try:                                                   # norma: con cada video subido, aviso por Telegram
+        import notifica
+        notifica.aviso_subida(info)
+        print("aviso por Telegram enviado")
+    except (SystemExit, Exception) as e:
+        print(f"AVISO: no se pudo avisar por Telegram ({e})")
 
 
 if __name__ == "__main__":

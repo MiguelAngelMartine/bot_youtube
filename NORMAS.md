@@ -5,7 +5,7 @@ Revisadas el 1-nov-2026 con las páginas oficiales de YouTube, Creative Commons 
 Esto NO es asesoramiento jurídico: antes de activar la monetización conviene una consulta breve con un abogado de propiedad intelectual.
 
 ## 1. Veracidad (lo que sale en el vídeo es real)
-- Cada dato debe venir de **al menos dos medios distintos**, o ir **atribuido** al único medio que lo publica ("según El País...").
+- Cada dato debe venir de **al menos dos medios distintos**, o ir **atribuido** al único medio que lo publica. Desde el 1-nov-2026 la atribución a medios va en pantalla («según El País» en la nota y el recuadro «FUENTES»), no en la voz; la voz sí marca lo no confirmado.
 - Nada de cifras, fechas o citas que no estén en las noticias del día. Si hay duda, se quita.
 - Las **declaraciones** van entre comillas o en estilo indirecto, siempre con nombre y cargo de quien las hace.
 - Una sola encuesta **no** es una tendencia: se presenta como la lectura de esa encuestadora.

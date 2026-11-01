@@ -12,7 +12,7 @@
 - **Todo lo que aparece tiene que ser real y contrastado:**
   - cada frase se comprueba contra el texto completo de las noticias, no solo contra los titulares (error real: dar por ausente a una persona que sí aparecía en una entradilla);
   - no inventar detalles («por la mañana» sin fuente);
-  - si solo lo cuenta un medio, «según X».
+  - si solo lo cuenta un medio, se atribuye, pero la atribución va **en pantalla, no en la voz** (decisión del 1-nov-2026, para que el vídeo sea dinámico): la voz no nombra medios; el texto de pantalla de la nota lleva «según X» y la escena su recuadro «FUENTES». La voz sí dice quién afirma algo («Feijóo asegura…») y si algo no está confirmado («sin confirmación oficial», «está previsto»).
 - **Neutralidad:** todas las partes, sin adjetivos propios y con fuentes de todo el espectro. Del vídeo de referencia de TikTok («Te Ahorro el Click») se copia el lenguaje visual, nunca su sesgo.
 - **Monetizable:** el riesgo n.º 1 es el «contenido no auténtico» de YouTube, así que hace falta narrativa propia y variedad. Las tragedias van en tono sobrio. Nada de fotos de víctimas ni de medios o agencias.
 - **Identidad fija:**
@@ -31,7 +31,7 @@
 - **Viñetas** (1-nov-2026): las notas de `claves`, `cronologia` y `breve` son viñetas de novela gráfica hechas con IA (Cloudflare Workers AI, plan gratuito; `ia_vinetas.py`, claves en `.env`), estilo de `canal/estilo_vineta.jpg` (colores planos, tinta gruesa, negros), texto arriba en franja del tono de la viñeta, **sin bocadillos**. Las personas con nombre salen como ellas mismas, dibujadas desde su foto libre, solo si es fiel y solo si la nota cuenta algo que dijeron o hicieron ellas.
 - **Mascota:** Urni tal como está (diseño A de `prototipo_animado.mascota`); se vieron variantes (plana, profe, chibi, reportera, con compañera) y prefirió la actual.
 - **Horario:** se publica por la tarde. La jornada arranca a las 15:00 y el vídeo tiene que estar listo hacia las 16:30.
-- **El usuario revisa y publica.** Decisión del 1-nov-2026: la oficina **sube el vídeo a YouTube como privado** (API oficial, `subir.py`, funcionando desde el 1-nov; claves en `client_secret.json` y `token_youtube.json`, fuera de git), con título, descripción, miniatura y subtítulos, y avisa con el enlace; **publicarlo es siempre decisión del usuario**. Nunca se publica nada sin él. De cada día queda solo la última versión: al subir otra, `subir.py` borra la anterior si sigue privada (nunca toca una ya publicada).
+- **El usuario revisa y publica.** Decisión del 1-nov-2026: la oficina **sube el vídeo a YouTube como privado** (API oficial, `subir.py`, funcionando desde el 1-nov; claves en `client_secret.json` y `token_youtube.json`, fuera de git), con título, descripción, miniatura y subtítulos, y avisa con el enlace; **publicarlo es siempre decisión del usuario**. Nunca se publica nada sin él. **Cada vez que hay un vídeo subido para publicar, aviso por Telegram** (lo hace `subir.py` solo). De cada día queda solo la última versión: al subir otra, `subir.py` borra la anterior si sigue privada (nunca toca una ya publicada).
 
 ## Estado y pendientes (1-nov-2026)
 - Carpeta de trabajo anterior: `../resumen_politico`, se conserva como copia; el proyecto vivo es este.

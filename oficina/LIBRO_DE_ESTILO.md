@@ -34,7 +34,7 @@
   - dar por cierta una sola encuesta;
   - detalles escabrosos de víctimas.
 - **Atribución:**
-  - «según El País» cuando solo lo publica un medio;
+  - cuando solo lo publica un medio, «según El País» **en el texto de pantalla** de la nota, nunca en la voz (decisión del 1-nov-2026: la voz no nombra medios para no estar citando fuentes continuamente). La voz sí dice quién afirma algo y si no está confirmado («sin confirmación oficial», «está previsto», «hay versiones distintas»);
   - sin atribución solo si está CONTRASTADO (2+ medios de líneas distintas);
   - las acusaciones, siempre atribuidas.
 - **Duración:** el episodio entero, 6-8 min (unas 1.000-1.300 palabras). Un bloque principal, 60-110 s (170-320 palabras). Un breve, 10-20 s.
