@@ -1,0 +1,434 @@
+"""LARGO HORIZONTAL (16:9) para YouTube con el estilo tablero del corto vertical: polaroids con fotos reales, notas,
+pegatinas, sellos y flechas que se van pegando en un tablero; la camara viaja a cada pieza cuando la voz la nombra y Urni
+narra abajo a la izquierda. Es el episodio completo (todas las secciones de episodio.json) con la cabecera, la sintonia,
+las cortinillas y el cierre del canal. Los bloques "sobrio" van sin Urni, sin "pop" y con la musica mas baja.
+Escribe lo mismo que episodio.py (episodio.mp4, episodio.srt, escenas.json, episodio_descripcion.txt), asi que el control
+de calidad y la publicacion no cambian.
+Uso: python largo.py AAAA-MM-DD [--fotogramas]   (--fotogramas: sin video, un PNG del final de cada escena en tmp_largo/)"""
+from __future__ import annotations
+
+import argparse
+import bisect
+import json
+import math
+import subprocess
+from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageDraw
+
+import corto as C
+import episodio as E
+import genera_video as V1
+import genera_video2 as G2
+import musica
+import voz
+import prototipo_animado as P
+from corto import estrecha, nota, pegatina, polaroid, sello
+from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, suave
+
+BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
+AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
+CREMA = (255, 246, 196)
+
+
+def foto_suelta(ruta, credito, ancho=360):
+    """Foto de archivo de la escena, impresa y pegada en el tablero, con su credito al pie."""
+    f = Image.open(ruta).convert("RGB")
+    alto_f = int(ancho * 0.72)
+    im = Image.new("RGBA", (ancho + 30, alto_f + 90), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle([15, 20, ancho + 15, alto_f + 80], fill=(0, 0, 0, 70))
+    d.rectangle([8, 12, ancho + 8, alto_f + 72], fill=BLANCO + (255,))
+    r = max((ancho - 30) / f.width, (alto_f - 30) / f.height)
+    f = f.resize((math.ceil(f.width * r), math.ceil(f.height * r)), Image.LANCZOS)
+    x0, y0 = (f.width - (ancho - 30)) // 2, (f.height - (alto_f - 30)) // 3
+    im.paste(f.crop((x0, y0, x0 + ancho - 30, y0 + alto_f - 30)), (23, 27))
+    d.text((ancho / 2 + 8, alto_f + 24), f"Foto de archivo: {credito['autor'][:34]} · {credito['licencia']}",
+           font=fuente("Inter-Regular.ttf", 17), fill=(130, 135, 145), anchor="mt")
+    C.celo(im, ancho / 2 - 50, -3)
+    return im.rotate(-2, expand=True, resample=Image.BICUBIC)
+
+
+def rejilla(notas, x0, y0, ancho, t_de):
+    """Notas en dos columnas, con la segunda fila algo desplazada para que no parezca una tabla."""
+    out, y, fila = [], y0, []
+    for k, nt in enumerate(notas):
+        x = x0 + (ancho + 30) * (k % 2) + (40 if (k // 2) % 2 else 0)
+        out.append((nt, x, y, t_de(k)))
+        fila.append(nt.height)
+        if k % 2 == 1:
+            y += max(fila) - 10
+            fila = []
+    return out
+
+
+# ------------------------------------------------------------------ de la escena del guion a piezas en el tablero
+
+def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
+    """Lista de (pieza, x, y, t_aparece) sobre un tablero de BW de ancho. foto: (ruta, credito) de la escena o None."""
+    def foto_de(nombre):
+        f = fotos.get(nombre)
+        if not f:
+            return None, None
+        usadas[f.name] = cred[f.name]
+        return f, cred[f.name]
+
+    def cuando(tr, defecto):
+        return T.cuando(tr, c0, defecto) if tr else defecto
+    lado = foto_suelta(*foto) if foto else None
+    out, tipo = [], ve["tipo"]
+    if tipo == "persona":
+        p = ve["persona"]
+        f, c = foto_de(p["nombre"])
+        out.append((polaroid(f, p["nombre"], p["cargo"], p["partido"], c, 340), 40, 30, t0 + 0.1))
+        if ve.get("sello"):
+            out.append((sello(ve["sello"]), 90, 190, cuando(ve.get("sello_cuando"), t0 + 1.2)))
+        if p.get("cita"):
+            out.append((nota(p["cita"], 480, 42, "Fuente: " + p.get("medio", "")), 440, 50, cuando(p.get("cita_cuando"), t0 + 2)))
+        fl = ve.get("flujo")
+        if fl:
+            a = fl["a"]
+            f2, c2 = foto_de(a["nombre"])
+            ta = cuando(fl.get("a_cuando"), t0 + 4)
+            tf = cuando(fl.get("cuando"), ta - 1)
+            out.append((nota(fl["etiqueta"], 380, 32, color=AMARILLA), 450, 440, tf))
+            out.append((("flecha", (860, 540), (1090, 330)), 0, 0, tf + 0.2))
+            out.append((polaroid(f2, a["nombre"], a["cargo"], a["partido"], c2, 300), 1120, 30, ta))
+            if a.get("cita"):
+                out.append((nota(a["cita"], 470, 34, "Fuente: " + a.get("medio", "")), 980, 520, ta + 1.2))
+        elif lado:
+            out.append((lado, 1060, 90, t0 + 0.6))
+    elif tipo == "mapa":
+        out.append((C.mapa(ve["puntos"], ve.get("ruta", []), 620), 40, 40, t0 + 0.1))
+        out.append((pegatina(ve["titular"].upper(), tam=44), 760, 60, t0 + 1.2))
+        out.append((nota(ve.get("sub", ""), 640, 38, "Fuente: " + ve.get("fuente", "")), 760, 180, t0 + 2.0))
+    elif tipo == "citas":
+        out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
+        n = len(ve["items"])
+        col = (BW - 60) // n
+        ap = min(260, int(col * 0.56))
+        for k, it in enumerate(ve["items"]):
+            f, c = foto_de(it["nombre"])
+            ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
+            x = 30 + col * k
+            out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 100, ti))
+            out.append((nota(it["cita"], col - 40, 32, "Fuente: " + it["medio"]), x, 100 + ap + 150, ti + 0.6))
+    elif tipo == "posturas":
+        out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
+        cc = ve["centro"]
+        f, c = foto_de(cc["nombre"])
+        out.append((polaroid(f, cc["nombre"], cc["cargo"], cc["partido"], c, 300), 40, 100, t0 + 0.3))
+        y = 100
+        for k, it in enumerate(ve["presionan"]):
+            col = P.PARTIDO.get(it["partido"], (90, 100, 120))
+            ti = cuando(it.get("cuando"), t0 + 1 + 0.5 * k)
+            out.append((pegatina(it["nombre"].upper(), col, BLANCO, 44), 720, y, ti))
+            out.append((("flecha", (710, y + 40), (400, 250 + 40 * k)), 0, 0, ti + 0.25))
+            y += 100
+        out.append((nota(ve["etiqueta"], 400, 38, color=AMARILLA), 1080, 100, cuando(ve.get("etiqueta_cuando"), t0 + 3)))
+        ap = ve["aparte"]
+        ta = cuando(ap.get("cuando"), t0 + 6)
+        out.append((pegatina(ap["nombre"].upper(), (150, 150, 160), BLANCO, 44), 720, y + 30, ta))
+        out.append((nota(ap["texto"], 760, 34, "Fuentes: " + ve.get("fuente", "")), 720, y + 120, ta + 0.5))
+    elif tipo in ("claves", "cronologia", "sumario"):
+        titulo = "HOY EN EL RESUMEN" if tipo == "sumario" else ve["titulo"]
+        out.append((pegatina(titulo, tam=46), 40, 20, t0 + 0.1))
+        ancho = 520 if lado else 680
+        txts = [(f"{k + 1:02d} · " if tipo == "sumario" else (it["hora"] + " · " if it.get("hora") else "")) + it["texto"]
+                for k, it in enumerate(ve["items"])]
+        notas = [nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
+        out += rejilla(notas, 40, 100, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
+        if lado:
+            out.append((lado, 1140, 110, t0 + 0.6))
+    elif tipo == "cifra":
+        out.append((pegatina(ve["numero"], ROJO, BLANCO, 200), 60, 40, t0 + 0.1))
+        out.append((pegatina(ve["etiqueta"].upper(), tam=50), 60, 300, t0 + 0.6))
+        out.append((nota(ve.get("sub", ""), 620, 38, "Fuente: " + ve.get("fuente", "")), 60, 400, t0 + 1.2))
+        if lado:
+            out.append((lado, 1060, 40, t0 + 0.9))
+        if ve.get("nota"):
+            out.append((nota(ve["nota"], 560, 36, color=AMARILLA), 760, 420 if lado else 120,
+                        cuando(ve.get("cuando_nota"), t0 + 3)))
+    elif tipo == "calendario":
+        out.append((E.hoja_calendario(ve["dia"], ve["mes"], ve["pie"]), 60, 60, t0 + 0.1))
+        y = 30
+        for k, it in enumerate(ve["items"]):
+            ti = cuando(it.get("cuando"), t0 + 1 + k)
+            nt = nota(it["texto"], 820, 36)
+            out.append((pegatina(it["hora"].upper(), tam=40), 480, y, ti))
+            out.append((nt, 480, y + 66, ti + 0.2))
+            y += 66 + nt.height - 6
+    elif tipo == "breve":
+        out.append((pegatina(ve["lugar"], ROJO, BLANCO, 44), 40, 30, t0 + 0.1))
+        out.append((nota(ve["titular"], 760, 48), 40, 130, t0 + 0.3))
+        out.append((nota(ve["sub"], 640, 34, "Fuente: " + ve["fuente"], color=AMARILLA), 120, 470, t0 + 1.2))
+        out.append((lado, 900, 70, t0 + 0.6) if lado else (E.icono(ve["icono"], 200), 1000, 140, t0 + 0.6))
+    elif tipo == "despedida":
+        out.append((nota("Gracias por vernos.", 720, 64), 380, 110, t0 + 0.1))
+        out.append((pegatina("MAÑANA, MÁS.", tam=64), 560, 400, t0 + 0.9))
+    else:
+        raise ValueError(f"escena sin version de tablero: {tipo}")
+    if lado and any(pc is lado for pc, *_ in out):     # en la descripcion solo se acredita la foto que sale
+        usadas[foto[0].name] = foto[1]
+    return out
+
+
+# ------------------------------------------------------------------ capas fijas
+
+_cache_fte = {}
+
+
+def tarjeta_fuente(txt):
+    """Columna izquierda: de donde sale lo que se esta contando."""
+    if txt not in _cache_fte:
+        fnt = fuente("Inter-Regular.ttf", 24)
+        ls = C.lineas(txt, fnt, 256)[:6]
+        alto = 66 + len(ls) * 32 + 14
+        im = Image.new("RGBA", (300, alto), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle([0, 0, 299, alto - 1], radius=14, fill=(10, 18, 34, 235), outline=(44, 62, 100, 255), width=2)
+        d.text((22, 18), "FUENTES" if any(s in txt for s in "·,") else "FUENTE", font=estrecha(32), fill=AMARILLO + (255,))
+        for j, l in enumerate(ls):
+            d.text((22, 64 + 32 * j), l, font=fnt, fill=(220, 225, 235, 255))
+        _cache_fte[txt] = im
+    return _cache_fte[txt]
+
+
+def encaja(piezas):
+    """Tablero de la escena con la proporcion de la ventana y las piezas centradas en el, para que se vea entero."""
+    def caja(pc, x, y):
+        if isinstance(pc, tuple):
+            return max(pc[1][0], pc[2][0]) + 40, max(pc[1][1], pc[2][1]) + 40
+        return x + pc.width, y + pc.height
+    ancho = max(caja(pc, x, y)[0] for pc, x, y, _ in piezas) + 40
+    alto = max(caja(pc, x, y)[1] for pc, x, y, _ in piezas) + 40
+    wb = max(BW, ancho, math.ceil(alto * BW / BH))
+    hb = math.ceil(wb * BH / BW)
+    dx, dy = (wb - ancho) // 2, (hb - alto) // 2
+    mueve = lambda pc, x, y: ((("flecha", (pc[1][0] + dx, pc[1][1] + dy), (pc[2][0] + dx, pc[2][1] + dy)), 0, 0)
+                              if isinstance(pc, tuple) else (pc, x + dx, y + dy))
+    return [(*mueve(pc, x, y), ta) for pc, x, y, ta in piezas], C.tablero_base(hb, wb)
+
+
+def vista_tablero(pt, t, cam):
+    """Lo que ve la camara del tablero en el instante t (BW x BH). cam: [cx, cy, z] suavizado, se actualiza aqui.
+    Se ve el tablero entero; cuando entra una pieza, la camara se acerca un poco hacia ella y vuelve despacio."""
+    base = pt["base"]
+    visibles = [(pc, x, y, ta) for pc, x, y, ta in pt["piezas"] if ta <= t]
+    cx, cy, z = base.width / 2, base.height / 2, 1.0
+    if visibles:
+        pc, x, y, ta = visibles[-1]
+        if isinstance(pc, tuple):
+            (x0, y0), (x1, y1) = pc[1], pc[2]
+            px, py = (x0 + x1) / 2, (y0 + y1) / 2
+        else:
+            px, py = x + pc.width / 2, y + pc.height / 2
+        golpe = math.exp(-(t - ta) / 0.7)
+        z = 1.0 + 0.12 * golpe
+        cx, cy = cx + (px - cx) * golpe, cy + (py - cy) * golpe
+    if not cam or t - pt["t0"] < 1 / FPS:
+        cam[:] = [cx, cy, z]
+    else:
+        a = 1 - math.exp(-(1 / FPS) / 0.22)
+        cam[:] = [c0 + (c1 - c0) * a for c0, c1 in zip(cam, (cx, cy, z))]
+    ccx, ccy, cz = cam
+    vw, vh = base.width / cz, base.height / cz
+    bx = min(max(ccx - vw / 2, 0), base.width - vw)
+    by = min(max(ccy - vh / 2, 0), base.height - vh)
+    vista = base.crop((int(bx), int(by), int(bx + vw) + 1, int(by + vh) + 1))
+    dv = ImageDraw.Draw(vista)
+    for pc, x, y, ta in visibles:
+        e = (t - ta) / 0.3
+        if isinstance(pc, tuple):                      # flecha que se dibuja
+            (x0, y0), (x1, y1) = pc[1], pc[2]
+            q = min(1.0, e)
+            xe, ye = x0 + (x1 - x0) * q, y0 + (y1 - y0) * q
+            dv.line([(x0 - bx, y0 - by), (xe - bx, ye - by)], fill=AMARILLO + (255,), width=12)
+            if q >= 1:
+                ang = math.atan2(y1 - y0, x1 - x0)
+                tri = [(x1, y1), (x1 - 40 * math.cos(ang - 0.5), y1 - 40 * math.sin(ang - 0.5)),
+                       (x1 - 40 * math.cos(ang + 0.5), y1 - 40 * math.sin(ang + 0.5))]
+                dv.polygon([(a_ - bx, b_ - by) for a_, b_ in tri], fill=AMARILLO + (255,))
+            continue
+        if x - bx > vw or y - by > vh or x + pc.width - bx < 0 or y + pc.height - by < 0:
+            continue
+        if e < 1:
+            s = 0.6 + 0.4 * E.rebote(e)
+            im = pc.resize((max(1, int(pc.width * s)), max(1, int(pc.height * s))), Image.BILINEAR)
+            pega(vista, im, x - bx + (pc.width - im.width) / 2, y - by + (pc.height - im.height) / 2, min(1.0, e * 3))
+        else:
+            vista.alpha_composite(pc, (int(x - bx), int(y - by)))
+    vista = vista.resize((BW, BH), Image.BILINEAR)
+    # barrido con desenfoque al cambiar de escena dentro del bloque
+    for borde, sentido in ((pt["t0"], 1), (pt["t1"], -1)):
+        dt = (t - borde) if sentido == 1 else (borde - t)
+        if 0 <= dt < 0.22 and (sentido == -1 or pt["k"] > 0):
+            off = int((1 - dt / 0.22) ** 2 * 900) * sentido
+            capas = [vista.transform(vista.size, Image.AFFINE, (1, 0, -(off + j * 50 * sentido), 0, 1, 0)) for j in range(5)]
+            acc = np.mean([np.asarray(cc, dtype=np.float32) for cc in capas], axis=0)
+            vista = Image.fromarray(acc.astype(np.uint8), "RGBA")
+    return vista
+
+
+# ------------------------------------------------------------------ montaje
+
+def main(dia_txt, solo_fotogramas=False):
+    dia = Path(__file__).parent / "dia" / dia_txt
+    G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    secs = G["secciones"]
+    cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
+    fotos = C.fotos_personas({n for s in secs for p in s["pasos"] if p.get("ve") for n in C.personas_de(p["ve"])},
+                             cred, dia / "imagenes")
+    tmp = dia / "tmp_largo"
+    tmp.mkdir(exist_ok=True)
+    t = G2.INTRO
+    plan, wavs, subs, caps, calma, usadas = [], [], [], [], [], {}
+    for i, s in enumerate(secs):
+        texto = " ".join(p["di"] for p in s["pasos"])
+        pal, dur = voz.locuta(s["pasos"], s["tono"], tmp / f"s{i}.wav")      # voz elegida: plana, con pausas naturales
+        wavs.append(tmp / f"s{i}.wav")
+        T = E.Tiempos(texto, pal, t)
+        print(f"  bloque {i}: {dur:5.1f} s, {T.casadas}/{len(T.toks)} palabras con tiempo", flush=True)
+        partes, c = [], 0
+        for p in s["pasos"]:
+            ve = p.get("ve")
+            if ve:
+                t0 = T.en(c) if partes else t
+                foto, fn = None, ve.get("foto")
+                if fn and ve["tipo"] in E.CON_FOTO:
+                    if fn in cred and (dia / "imagenes" / fn).exists():
+                        foto = (dia / "imagenes" / fn, cred[fn])
+                    else:
+                        print(f"  AVISO: la foto {fn} no esta en imagenes/ o no tiene credito; la escena va sin foto")
+                pz = sorted(piezas_h(ve, T, c, t0, fotos, cred, foto, usadas), key=lambda z: z[3])
+                partes.append({"k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
+                               "fuente": ve.get("fuente") or " · ".join(s.get("fuentes", [])[:3])})
+            c += len(p["di"]) + 1
+        if not partes:
+            raise ValueError(f"el bloque {i} no tiene ninguna escena")
+        for a, b in zip(partes, partes[1:]):
+            a["t1"] = b["t0"]
+        partes[-1]["t1"] = t + dur
+        for pt in partes:
+            pt["piezas"], pt["base"] = encaja(pt["piezas"])
+        subs += T.subtitulos()
+        caps += C.grupos_palabras(T, set())
+        plan.append({"t0": t, "dur": dur, "sec": s, "partes": partes, "pops": sorted(T.eventos),
+                     "blq": P.capa_bloque(s["titulo"], "HOY" if i == 0 else f"{i:02d} / {len(secs) - 1:02d}")})
+        if s["tono"] == "sobrio":
+            calma.append((t, t + dur))
+        t += dur
+    fin_voz = t
+    lista = tmp / "voz.txt"
+    lista.write_text("".join(f"file '{w.name}'\n" for w in wavs), encoding="utf-8")
+    subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista), "-c", "copy",
+                    str(tmp / "voz.wav")], check=True)
+    # ritmo: "pop" con cada pieza que entra y barrido con cada cambio de escena; en los bloques sobrios no hay "pop"
+    pops = sorted(x for p in plan if p["sec"]["tono"] != "sobrio" for x in p["pops"])
+    cambios = sorted(pt["t0"] for p in plan for pt in p["partes"][1:])
+    total = musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", G2.INTRO, G2.OUTRO, [p["t0"] for p in plan] + [fin_voz],
+                          calma=calma, efectos=[(x, "pop") for x in pops] + [(x, "whoosh") for x in cambios])
+    v, sr = musica.lee_wav(tmp / "voz.wav")
+    hop = sr // FPS
+    rms = np.sqrt(np.mean(v[: len(v) // hop * hop, 0].reshape(-1, hop) ** 2, axis=1))
+    boca = np.clip(rms / np.percentile(rms[rms > 0.01], 90), 0, 1) ** 0.8
+    gesto = np.convolve(boca, np.ones(25) / 25, mode="same")
+
+    cab = G2.capa_cabecera(G["fecha"])
+    ini_caps = [x[0] for x in caps]
+    for j, p in enumerate(plan[:-1]):
+        p["teaser"] = E.capa_teaser(plan[j + 1]["sec"]["titulo"])
+    cam = []
+
+    def presente(t, i):
+        """1 si Urni esta en pantalla (bloques normales), con entrada y salida suaves."""
+        dentro = plan[i]["sec"]["tono"] != "sobrio"
+        antes = plan[i - 1]["sec"]["tono"] != "sobrio" if i > 0 else False
+        x = suave((t - plan[i]["t0"] - 0.3) / 0.6)
+        return (antes + (dentro - antes) * x) if i > 0 else float(dentro) * suave((t - plan[0]["t0"]) / 0.6)
+
+    def cuadro(t):
+        if t < G2.INTRO or t >= fin_voz:
+            fr = G2.cuadro_intro(t, G["fecha"]) if t < G2.INTRO else G2.cuadro_cierre(t - fin_voz, G["fecha"])
+            q = (t - fin_voz) / G2.CORTINILLA
+            if 0 <= q < 1:
+                d = ImageDraw.Draw(fr)
+                x0 = int(AN * (2.2 * q - 1.2))
+                d.rectangle([x0, 0, x0 + AN, AL], fill=ROJO + (255,))
+                d.rectangle([x0 + AN, 0, x0 + AN + 40, AL], fill=AMARILLO + (255,))
+            return fr
+        i = max(j for j, p in enumerate(plan) if p["t0"] <= t + 1e-9)
+        p = plan[i]
+        pt = p["partes"][max(j for j, x in enumerate(p["partes"]) if x["t0"] <= t + 1e-9 or j == 0)]
+        fr = G2.fondo_marca(t)
+        fr.alpha_composite(vista_tablero(pt, t, cam), (BX, BY))
+        d = ImageDraw.Draw(fr)
+        d.rectangle([BX, BY - 4, BX + BW, BY], fill=AMARILLO + (255,))
+        d.rectangle([BX, BY + BH, BX + BW, BY + BH + 4], fill=AMARILLO + (255,))
+        fr.alpha_composite(cab)
+        pega(fr, p["blq"], 100, 108)
+        if 0 < i < len(plan) - 1:                      # "A continuacion": anuncia el bloque siguiente (retencion)
+            falta = plan[i + 1]["t0"] - t
+            if falta < 4.5:
+                tz = p["teaser"]
+                pega(fr, tz, BX + BW - 16 - tz.width * E.rebote((4.5 - falta) / 0.4), BY + 16, min(1.0, (4.5 - falta) * 3))
+        if pt["fuente"]:
+            fr.alpha_composite(tarjeta_fuente(pt["fuente"]), (40, BY))
+        pm = presente(t, i)
+        if pm > 0.001:                                 # Urni narra abajo a la izquierda y da un saltito con cada pieza
+            k = min(int((t - G2.INTRO) * FPS), len(boca) - 1)
+            ge = 1.0 if pt["tipo"] == "despedida" else float(gesto[k])
+            par = (t % 3.7) < 0.12 or (t % 5.3) < 0.1
+            kp = bisect.bisect_right(pops, t)
+            salto = max([math.sin(math.pi * (t - x) / 0.34) for x in pops[max(0, kp - 4):kp] if t - x < 0.34] + [0])
+            m = P.mascota(t, float(boca[k]), par, ge)
+            m = m.resize((int(m.width * 0.7), int(m.height * 0.7)), Image.BILINEAR)
+            pega(fr, m, 50, AL - m.height - 24 - 30 * salto + 300 * (1 - pm), pm)
+        j = bisect.bisect_right(ini_caps, t) - 1       # subtitulo de 1-2 palabras con la clave en amarillo
+        if j >= 0 and t < caps[j][1]:
+            a, _, ws, clave, _ = caps[j]
+            cp = C.capa_cap(ws, clave, 0, 0.72, BW - 60)
+            s = 0.8 + 0.2 * E.rebote((t - a) / 0.12)
+            cp = cp.resize((int(cp.width * s), int(cp.height * s)), Image.BILINEAR)
+            pega(fr, cp, BX + BW / 2 - cp.width / 2, 985 - cp.height / 2)
+        d = ImageDraw.Draw(fr)
+        d.rectangle([0, AL - 8, int(AN * (t - G2.INTRO) / (fin_voz - G2.INTRO)), AL], fill=AMARILLO + (255,))
+        tl = t - p["t0"]
+        if tl < G2.CORTINILLA:                         # cortinilla roja y amarilla al cambiar de bloque
+            x0 = int(AN * (2.2 * tl / G2.CORTINILLA - 1.2))
+            d.rectangle([x0, 0, x0 + AN, AL], fill=ROJO + (255,))
+            d.rectangle([x0 + AN, 0, x0 + AN + 40, AL], fill=AMARILLO + (255,))
+        return fr
+
+    escenas = [(i, pt["tipo"], pt["t0"], pt["t1"]) for i, p in enumerate(plan) for pt in p["partes"]]
+    if solo_fotogramas:
+        sal = tmp / "fotogramas"
+        sal.mkdir(exist_ok=True)
+        for k, (i, tipo, a, b) in enumerate(escenas):
+            cam.clear()
+            cuadro(b - 0.3).convert("RGB").save(sal / f"{k:02d}_b{i}_{tipo}.png")
+        print(f"FOTOGRAMAS {len(escenas)} -> {sal}")
+        return
+    out = dia / "episodio.mp4"
+    ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{AN}x{AL}",
+                           "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
+                           "-crf", "20", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
+                           "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], stdin=subprocess.PIPE)
+    nf = int(math.ceil(total * FPS))
+    for fi in range(nf):
+        ff.stdin.write(cuadro(fi / FPS).convert("RGB").tobytes())
+        if fi % (FPS * 30) == 0:
+            print(f"  fotograma {fi}/{nf}", flush=True)
+    ff.stdin.close()
+    ff.wait()
+    E.escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, usadas)
+    print(f"EPISODIO {total / 60:.1f} min -> {out}")
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("dia")
+    ap.add_argument("--fotogramas", action="store_true")
+    a = ap.parse_args()
+    main(a.dia, a.fotogramas)

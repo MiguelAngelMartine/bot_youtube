@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 AN, AL = 1920, 1080
 FONDO, TARJETA, TEXTO, GRIS, ROJO, AMARILLO = "#0f1a2e", "#16243d", "#f2f4f8", "#9aa7bd", "#c8102e", "#f1bf00"
-F = "C:/Windows/Fonts/"
+F = str(Path(__file__).parent / "fuentes") + "/"     # tipografias libres (OFL) del repositorio: Inter, Barlow Condensed, Caveat
 PAUSA = 0.7                     # silencio al final de cada seccion (s)
 
 
@@ -43,17 +43,17 @@ def diapositiva(sec, i, n, fecha, ruta):
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, AN, 14], fill=ROJO)
     d.rectangle([0, 14, AN, 22], fill=AMARILLO)
-    d.text((110, 70), "RESUMEN POLÍTICO · ESPAÑA", font=fuente("segoeuib.ttf", 34), fill=AMARILLO)
-    d.text((AN - 110, 70), fecha, font=fuente("segoeui.ttf", 34), fill=GRIS, anchor="ra")
+    d.text((110, 70), "RESUMEN POLÍTICO · ESPAÑA", font=fuente("Inter-Bold.ttf", 34), fill=AMARILLO)
+    d.text((AN - 110, 70), fecha, font=fuente("Inter-Regular.ttf", 34), fill=GRIS, anchor="ra")
     if i > 0:
-        d.text((110, 150), f"{i:02d}", font=fuente("segoeuib.ttf", 60), fill=ROJO)
-    ft = fuente("segoeuib.ttf", 76 if i else 96)
+        d.text((110, 150), f"{i:02d}", font=fuente("Inter-Bold.ttf", 60), fill=ROJO)
+    ft = fuente("Inter-Bold.ttf", 76 if i else 96)
     y = 240 if i else 300
     for l in parte_lineas(d, sec["titulo"], ft, AN - 220):
         d.text((110, y), l, font=ft, fill=TEXTO)
         y += 96 if i else 118
     y += 40
-    fp = fuente("segoeui.ttf", 46)
+    fp = fuente("Inter-Regular.ttf", 46)
     for p in sec["puntos"]:
         ls = parte_lineas(d, p, fp, AN - 330)
         alto = 62 * len(ls) + 34
@@ -65,7 +65,7 @@ def diapositiva(sec, i, n, fecha, ruta):
             yy += 62
         y += alto + 22
     if sec.get("fuentes"):
-        d.text((110, AL - 80), "Fuentes: " + " · ".join(sec["fuentes"]), font=fuente("segoeui.ttf", 30), fill=GRIS)
+        d.text((110, AL - 80), "Fuentes: " + " · ".join(sec["fuentes"]), font=fuente("Inter-Regular.ttf", 30), fill=GRIS)
     if i > 0:                                                    # barra de avance
         d.rectangle([0, AL - 12, AN, AL], fill=TARJETA)
         d.rectangle([0, AL - 12, int(AN * i / (n - 1)), AL], fill=AMARILLO)

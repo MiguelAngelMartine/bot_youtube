@@ -1,663 +1,663 @@
 1
-00:00:03,097 --> 00:00:05,619
+00:00:03,050 --> 00:00:05,572
 Buenas noches, soy Urni, y esto es Política
 
 2
-00:00:05,619 --> 00:00:07,970
+00:00:05,572 --> 00:00:07,573
 en Claro. Esto es lo que ha pasado
 
 3
-00:00:07,970 --> 00:00:09,845
+00:00:07,573 --> 00:00:09,448
 hoy, sábado treinta y uno de octubre,
 
 4
-00:00:09,845 --> 00:00:11,286
+00:00:09,448 --> 00:00:10,988
 en la política española.
 
 5
-00:00:11,742 --> 00:00:14,396
+00:00:10,988 --> 00:00:13,642
 Urda despide a sus víctimas, mientras la investigación
 
 6
-00:00:14,396 --> 00:00:15,854
+00:00:13,642 --> 00:00:15,100
 apunta a una cadena de fallos en el
 
 7
-00:00:15,854 --> 00:00:17,108
+00:00:15,100 --> 00:00:16,454
 sistema de seguridad.
 
 8
-00:00:17,568 --> 00:00:19,563
+00:00:16,454 --> 00:00:18,450
 Óscar Puente no dimite, y la presión le
 
 9
-00:00:19,563 --> 00:00:21,727
+00:00:18,450 --> 00:00:20,714
 llega ya también de los socios del Gobierno.
 
 10
-00:00:22,181 --> 00:00:24,209
+00:00:20,714 --> 00:00:22,742
 Blocus: la justicia envía a prisión a su
 
 11
-00:00:24,209 --> 00:00:26,534
+00:00:22,742 --> 00:00:25,067
 presunto fundador, y varias ciudades se blindan esta
 
 12
-00:00:26,534 --> 00:00:29,582
+00:00:25,067 --> 00:00:27,758
 noche. Y a cuatro semanas de las elecciones,
 
 13
-00:00:29,582 --> 00:00:31,965
+00:00:27,758 --> 00:00:30,242
 arranca el sorteo de las mesas electorales.
 
 14
-00:00:32,422 --> 00:00:33,754
+00:00:30,242 --> 00:00:31,574
 Vamos con ello.
 
 15
-00:00:34,925 --> 00:00:37,184
+00:00:32,104 --> 00:00:34,362
 El miércoles veintiocho de octubre, un tren de
 
 16
-00:00:37,184 --> 00:00:38,587
+00:00:34,362 --> 00:00:35,766
 Iryo y un AVE chocaron a la altura
 
 17
-00:00:38,587 --> 00:00:40,203
+00:00:35,766 --> 00:00:37,482
 de Urda, en Toledo.
 
 18
-00:00:40,653 --> 00:00:42,145
+00:00:37,482 --> 00:00:38,973
 Los dos se dirigían a la estación de
 
 19
-00:00:42,145 --> 00:00:43,903
+00:00:38,973 --> 00:00:40,831
 Santa Justa, en Sevilla.
 
 20
-00:00:44,363 --> 00:00:46,490
+00:00:40,831 --> 00:00:42,958
 Tres días después, el balance es de sesenta
 
 21
-00:00:46,490 --> 00:00:48,566
+00:00:42,958 --> 00:00:45,135
 y nueve fallecidos y más de cien heridos.
 
 22
-00:00:49,020 --> 00:00:51,136
+00:00:45,135 --> 00:00:47,251
 Los forenses han identificado ya a cincuenta y
 
 23
-00:00:51,136 --> 00:00:52,456
+00:00:47,251 --> 00:00:48,671
 seis de las víctimas.
 
 24
-00:00:52,912 --> 00:00:55,050
+00:00:48,671 --> 00:00:50,809
 Es el segundo gran accidente ferroviario en diez
 
 25
-00:00:55,050 --> 00:00:57,620
+00:00:50,809 --> 00:00:53,479
 meses, después del de Adamuz, en Córdoba.
 
 26
-00:00:58,080 --> 00:00:59,487
+00:00:53,479 --> 00:00:54,986
 Hoy, el adiós.
 
 27
-00:00:59,941 --> 00:01:01,903
+00:00:54,986 --> 00:00:56,949
 El arzobispo de Toledo ha presidido una misa
 
 28
-00:01:01,903 --> 00:01:03,910
+00:00:56,949 --> 00:00:58,955
 funeral, en la que un mensaje del Papa
 
 29
-00:01:03,910 --> 00:01:06,070
+00:00:58,955 --> 00:01:01,116
 ha emocionado a los asistentes, y ha pedido
 
 30
-00:01:06,070 --> 00:01:08,585
+00:01:01,116 --> 00:01:03,730
 que tragedias como esta no vuelvan a repetirse.
 
 31
-00:01:09,045 --> 00:01:11,347
+00:01:03,730 --> 00:01:06,033
 Ha asistido el presidente de Castilla-La Mancha,
 
 32
-00:01:11,347 --> 00:01:14,560
+00:01:06,033 --> 00:01:08,889
 Emiliano García-Page. El Mundo destaca que no hubo
 
 33
-00:01:14,560 --> 00:01:16,176
+00:01:08,889 --> 00:01:10,605
 representación del Gobierno.
 
 34
-00:01:16,632 --> 00:01:18,836
+00:01:10,605 --> 00:01:12,809
 Pedro Sánchez participó este sábado en la reunión
 
 35
-00:01:18,836 --> 00:01:21,099
+00:01:12,809 --> 00:01:15,172
 de coordinación de la emergencia, en Madrid.
 
 36
-00:01:21,556 --> 00:01:24,483
+00:01:15,172 --> 00:01:17,743
 ¿Qué falló? Según El País, una cadena de
 
 37
-00:01:24,483 --> 00:01:27,120
+00:01:17,743 --> 00:01:20,379
 fallos técnicos dejó fuera de servicio el LZB,
 
 38
-00:01:27,120 --> 00:01:29,126
+00:01:20,379 --> 00:01:22,386
 el sistema que impide que dos trenes coincidan
 
 39
-00:01:29,126 --> 00:01:30,391
+00:01:22,386 --> 00:01:23,751
 en el mismo punto.
 
 40
-00:01:30,851 --> 00:01:32,507
+00:01:23,751 --> 00:01:25,406
 Adif abrió una incidencia a las ocho y
 
 41
-00:01:32,507 --> 00:01:34,656
+00:01:25,406 --> 00:01:27,556
 media de la mañana, veintitrés minutos antes del
 
 42
-00:01:34,656 --> 00:01:38,058
+00:01:27,556 --> 00:01:30,958
 choque, por pérdidas de tensión, comunicaciones telefónicas caídas
 
 43
-00:01:38,058 --> 00:01:40,101
+00:01:30,958 --> 00:01:33,101
 y pérdida de información intermitente.
 
 44
-00:01:40,558 --> 00:01:43,146
+00:01:33,101 --> 00:01:35,689
 Transportes, en cambio, niega que hubiera una cadena
 
 45
-00:01:43,146 --> 00:01:45,711
+00:01:35,689 --> 00:01:38,255
 de fallos: según el ministerio, hasta el choque
 
 46
-00:01:45,711 --> 00:01:47,908
+00:01:38,255 --> 00:01:40,552
 solo se produjo la caída del LZB.
 
 47
-00:01:48,365 --> 00:01:49,787
+00:01:40,552 --> 00:01:41,974
 Y no es un caso aislado:
 
 48
-00:01:49,787 --> 00:01:51,717
+00:01:41,974 --> 00:01:43,904
 el mismo diario ha contado al menos ciento
 
 49
-00:01:51,717 --> 00:01:53,428
+00:01:43,904 --> 00:01:45,614
 setenta caídas de este sistema en lo que
 
 50
-00:01:53,428 --> 00:01:54,374
+00:01:45,614 --> 00:01:46,661
 va de año.
 
 51
-00:01:54,834 --> 00:01:56,318
+00:01:46,661 --> 00:01:48,246
 Una cada dos días.
 
 52
-00:01:56,775 --> 00:01:58,738
+00:01:48,246 --> 00:01:50,208
 La Guardia Civil baraja una serie de fallos
 
 53
-00:01:58,738 --> 00:02:00,569
+00:01:50,208 --> 00:01:52,039
 de seguridad previos a un error humano,
 
 54
-00:02:00,569 --> 00:02:03,507
+00:01:52,039 --> 00:01:54,978
 según 20minutos, en línea con las primeras conclusiones
 
 55
-00:02:03,507 --> 00:02:06,274
+00:01:54,978 --> 00:01:57,845
 de la Comisión de Investigación de Accidentes Ferroviarios.
 
 56
-00:02:06,731 --> 00:02:09,286
+00:01:57,845 --> 00:02:00,400
 Renfe, por su parte, sostiene que el accidente
 
 57
-00:02:09,286 --> 00:02:10,766
+00:02:00,400 --> 00:02:01,880
 no es atribuible a la compañía,
 
 58
-00:02:10,766 --> 00:02:12,674
+00:02:01,880 --> 00:02:03,788
 y que vincularlo con supuestas carencias de su
 
 59
-00:02:12,674 --> 00:02:14,692
+00:02:03,788 --> 00:02:05,806
 material o de su organización del trabajo carece
 
 60
-00:02:14,692 --> 00:02:15,717
+00:02:05,806 --> 00:02:06,831
 de sentido.
 
 61
-00:02:16,833 --> 00:02:19,271
+00:02:07,361 --> 00:02:09,899
 Óscar Puente sigue al frente de Transportes.
 
 62
-00:02:19,722 --> 00:02:21,480
+00:02:09,899 --> 00:02:11,757
 El ministro descarta dimitir.
 
 63
-00:02:21,936 --> 00:02:23,899
+00:02:11,757 --> 00:02:13,720
 Ha reconocido que puso su cargo a disposición
 
 64
-00:02:23,899 --> 00:02:26,092
+00:02:13,720 --> 00:02:15,913
 de Pedro Sánchez, y que el presidente consideró
 
 65
-00:02:26,092 --> 00:02:29,747
+00:02:15,913 --> 00:02:19,208
 injusto cesarle. Según El Mundo, Sánchez le mantiene
 
 66
-00:02:29,747 --> 00:02:31,143
+00:02:19,208 --> 00:02:20,704
 un respaldo absoluto.
 
 67
-00:02:31,597 --> 00:02:32,989
+00:02:20,704 --> 00:02:22,097
 Y Puente asume lo que viene:
 
 68
-00:02:32,989 --> 00:02:34,967
+00:02:22,097 --> 00:02:24,174
 me espera un calvario, ha dicho.
 
 69
-00:02:35,426 --> 00:02:36,589
+00:02:24,174 --> 00:02:25,337
 Y abre otro frente:
 
 70
-00:02:36,589 --> 00:02:38,222
+00:02:25,337 --> 00:02:26,970
 Puente ha planteado un posible cierre de la
 
 71
-00:02:38,222 --> 00:02:40,171
+00:02:26,970 --> 00:02:28,919
 alta velocidad entre Madrid y Barcelona,
 
 72
-00:02:40,171 --> 00:02:41,622
+00:02:28,919 --> 00:02:30,470
 por motivos de seguridad.
 
 73
-00:02:42,079 --> 00:02:43,574
+00:02:30,470 --> 00:02:32,066
 La oposición aprieta.
 
 74
-00:02:44,034 --> 00:02:45,843
+00:02:32,066 --> 00:02:33,875
 El PP, por boca de Juan Bravo,
 
 75
-00:02:45,843 --> 00:02:48,877
+00:02:33,875 --> 00:02:36,909
 exige consecuencias: esto no se puede despachar diciendo
 
 76
-00:02:48,877 --> 00:02:50,643
+00:02:36,909 --> 00:02:38,674
 que es una fatalidad o buscando una cabeza
 
 77
-00:02:50,643 --> 00:02:53,738
+00:02:38,674 --> 00:02:41,410
 de turco. Y reclama una gestión ferroviaria que
 
 78
-00:02:53,738 --> 00:02:55,562
+00:02:41,410 --> 00:02:43,334
 recupere la cultura de la seguridad.
 
 79
-00:02:56,018 --> 00:02:57,137
+00:02:43,334 --> 00:02:44,452
 Vox va más allá:
 
 80
-00:02:57,137 --> 00:02:59,757
+00:02:44,452 --> 00:02:47,073
 Santiago Abascal sostiene que el posible cierre demuestra
 
 81
-00:02:59,757 --> 00:03:01,600
+00:02:47,073 --> 00:02:48,915
 que el Gobierno miente al atribuir el accidente
 
 82
-00:03:01,600 --> 00:03:02,507
+00:02:48,915 --> 00:02:49,822
 al error humano.
 
 83
-00:03:02,507 --> 00:03:04,722
+00:02:49,822 --> 00:02:52,037
 E Ignacio Garriga habla de la tercermundización de
 
 84
-00:03:04,722 --> 00:03:06,008
+00:02:52,037 --> 00:02:53,424
 la red ferroviaria.
 
 85
-00:03:06,465 --> 00:03:08,695
+00:02:53,424 --> 00:02:55,754
 La presión llega también desde los socios.
 
 86
-00:03:09,154 --> 00:03:11,665
+00:02:55,754 --> 00:02:58,265
 Frente Amplio, PNV y BNG piden que se
 
 87
-00:03:11,665 --> 00:03:15,522
+00:02:58,265 --> 00:03:01,768
 asuman responsabilidades. El Frente Amplio, de Ada Colau,
 
 88
-00:03:15,522 --> 00:03:17,331
+00:03:01,768 --> 00:03:03,577
 carga contra lo que llama el modelo neoliberal
 
 89
-00:03:17,331 --> 00:03:19,068
+00:03:03,577 --> 00:03:05,413
 ferroviario de los socialistas.
 
 90
-00:03:19,527 --> 00:03:21,830
+00:03:05,413 --> 00:03:07,716
 Podemos evita pedir expresamente la dimisión,
 
 91
-00:03:21,830 --> 00:03:25,054
+00:03:07,716 --> 00:03:10,940
 pero denuncia mantenimiento insuficiente, plantillas escasas y falta
 
 92
-00:03:25,054 --> 00:03:28,409
+00:03:10,940 --> 00:03:13,938
 de descansos. Y el sindicato UGT también exige
 
 93
-00:03:28,409 --> 00:03:29,860
+00:03:13,938 --> 00:03:15,490
 que el ministro responda.
 
 94
-00:03:30,317 --> 00:03:32,016
+00:03:15,490 --> 00:03:17,189
 Todo, a dos semanas del inicio de la
 
 95
-00:03:32,016 --> 00:03:33,008
+00:03:17,189 --> 00:03:18,181
 campaña.
 
 96
-00:03:34,168 --> 00:03:36,394
+00:03:18,711 --> 00:03:20,937
 Esta noche de Halloween, varias ciudades están en
 
 97
-00:03:36,394 --> 00:03:37,626
+00:03:20,937 --> 00:03:22,269
 alerta por Blocus.
 
 98
-00:03:38,076 --> 00:03:41,136
+00:03:22,269 --> 00:03:24,972
 ¿Qué es? Una red anónima nacida en Francia,
 
 99
-00:03:41,136 --> 00:03:43,625
+00:03:24,972 --> 00:03:27,461
 donde blocus significa bloqueo, que empezó como una
 
 100
-00:03:43,625 --> 00:03:46,271
+00:03:27,461 --> 00:03:30,207
 protesta estudiantil por mejoras en los institutos.
 
 101
-00:03:46,728 --> 00:03:49,085
+00:03:30,207 --> 00:03:32,565
 Al extenderse por redes sociales como TikTok,
 
 102
-00:03:49,085 --> 00:03:50,335
+00:03:32,565 --> 00:03:33,815
 perdió esa motivación:
 
 103
-00:03:50,335 --> 00:03:52,744
+00:03:33,815 --> 00:03:36,224
 según los Mossos, no es un movimiento político
 
 104
-00:03:52,744 --> 00:03:53,976
+00:03:36,224 --> 00:03:37,556
 ni una ideología.
 
 105
-00:03:54,433 --> 00:03:56,209
+00:03:37,556 --> 00:03:39,332
 A esta red se atribuyen los saqueos del
 
 106
-00:03:56,209 --> 00:03:58,527
+00:03:39,332 --> 00:03:41,750
 pasado veinticuatro de octubre en Barcelona.
 
 107
-00:03:58,986 --> 00:04:00,741
+00:03:41,750 --> 00:03:43,504
 Una jueza de Torrent ha enviado a prisión
 
 108
-00:04:00,741 --> 00:04:02,736
+00:03:43,504 --> 00:03:45,500
 provisional sin fianza a su presunto fundador en
 
 109
-00:04:02,736 --> 00:04:05,306
+00:03:45,500 --> 00:03:48,170
 España, detenido el viernes en Picanya.
 
 110
-00:04:05,760 --> 00:04:08,216
+00:03:48,170 --> 00:03:50,626
 Está investigado por organización criminal para incitar a
 
 111
-00:04:08,216 --> 00:04:10,968
+00:03:50,626 --> 00:03:53,378
 desórdenes públicos, robos con fuerza en comercios y
 
 112
-00:04:10,968 --> 00:04:13,654
+00:03:53,378 --> 00:03:55,708
 daños. Los detenidos son ya once,
 
 113
-00:04:13,654 --> 00:04:16,670
+00:03:55,708 --> 00:03:58,367
 según ABC. El último, en Barcelona:
 
 114
-00:04:16,670 --> 00:04:18,446
+00:03:58,367 --> 00:04:00,143
 el administrador de uno de los grupos usados
 
 115
-00:04:18,446 --> 00:04:20,051
+00:04:00,143 --> 00:04:01,848
 para coordinar los saqueos.
 
 116
-00:04:20,511 --> 00:04:22,451
+00:04:01,848 --> 00:04:03,788
 Entre ellos hay un menor, detenido hoy en
 
 117
-00:04:22,451 --> 00:04:24,762
+00:04:03,788 --> 00:04:06,099
 Valencia, al que la policía acusa de repartir
 
 118
-00:04:24,762 --> 00:04:26,849
+00:04:06,099 --> 00:04:08,286
 accesos a los chats de la convocatoria.
 
 119
-00:04:27,306 --> 00:04:29,422
+00:04:08,286 --> 00:04:10,403
 Mientras, comercios del centro de Madrid,
 
 120
-00:04:29,422 --> 00:04:32,737
+00:04:10,403 --> 00:04:13,818
 Valencia, Bilbao y Barcelona han tapiado sus escaparates.
 
 121
-00:04:33,194 --> 00:04:35,749
+00:04:13,818 --> 00:04:16,373
 En Cataluña, el dispositivo policial ha arrancado a
 
 122
-00:04:35,749 --> 00:04:37,514
+00:04:16,373 --> 00:04:18,138
 las tres de la tarde, con controles en
 
 123
-00:04:37,514 --> 00:04:38,921
+00:04:18,138 --> 00:04:19,645
 el transporte público.
 
 124
-00:04:39,378 --> 00:04:42,054
+00:04:19,645 --> 00:04:22,321
 Y en Valencia, según ABC, cientos de agentes
 
 125
-00:04:42,054 --> 00:04:43,764
+00:04:22,321 --> 00:04:24,031
 han blindado el centro y han neutralizado la
 
 126
-00:04:43,764 --> 00:04:46,834
+00:04:24,031 --> 00:04:26,745
 convocatoria. El presidente de la Generalitat,
 
 127
-00:04:46,834 --> 00:04:49,532
+00:04:26,745 --> 00:04:29,442
 Salvador Illa, asegura que los Mossos están preparados,
 
 128
-00:04:49,532 --> 00:04:51,936
+00:04:29,442 --> 00:04:31,847
 y advierte: quien venga a saquear responderá ante
 
 129
-00:04:51,936 --> 00:04:53,082
+00:04:31,847 --> 00:04:32,992
 la justicia.
 
 130
-00:04:54,212 --> 00:04:56,515
+00:04:33,522 --> 00:04:35,825
 Quedan cuatro semanas para las elecciones generales del
 
 131
-00:04:56,515 --> 00:04:58,731
+00:04:35,825 --> 00:04:38,042
 veintinueve de noviembre, y dos para que arranque
 
 132
-00:04:58,731 --> 00:05:02,309
+00:04:38,042 --> 00:04:41,260
 la campaña. Las candidaturas provisionales al Congreso ya
 
 133
-00:05:02,309 --> 00:05:04,743
+00:04:41,260 --> 00:04:43,694
 están publicadas en el Boletín Oficial del Estado,
 
 134
-00:05:04,743 --> 00:05:06,260
+00:04:43,694 --> 00:04:45,311
 provincia a provincia.
 
 135
-00:05:06,714 --> 00:05:09,170
+00:04:45,311 --> 00:04:47,767
 Y desde hoy, los ayuntamientos sortean quién formará
 
 136
-00:05:09,170 --> 00:05:10,654
+00:04:47,767 --> 00:04:49,351
 las mesas electorales.
 
 137
-00:05:11,114 --> 00:05:12,879
+00:04:49,351 --> 00:04:51,117
 Tienen de plazo hasta el miércoles cuatro de
 
 138
-00:05:12,879 --> 00:05:15,368
+00:04:51,117 --> 00:04:53,606
 noviembre, aunque Madrid, Valladolid y Oviedo ya han
 
 139
-00:05:15,368 --> 00:05:16,392
+00:04:53,606 --> 00:04:54,729
 hecho el suyo.
 
 140
-00:05:16,848 --> 00:05:18,058
+00:04:54,729 --> 00:04:56,039
 ¿Y las encuestas?
 
 141
-00:05:18,512 --> 00:05:21,769
+00:04:56,039 --> 00:04:59,296
 Narciso Michavila, presidente de GAD3, afirma en El
 
 142
-00:05:21,769 --> 00:05:23,896
+00:04:59,296 --> 00:05:01,423
 Confidencial que detecta un cambio abrupto de voto
 
 143
-00:05:23,896 --> 00:05:25,106
+00:05:01,423 --> 00:05:02,733
 desde el accidente.
 
 144
-00:05:25,565 --> 00:05:27,934
+00:05:02,733 --> 00:05:05,102
 Según su lectura, el PP podría mejorar sus
 
 145
-00:05:27,934 --> 00:05:30,562
+00:05:05,102 --> 00:05:07,730
 resultados de dos mil veintitrés, el PSOE caería
 
 146
-00:05:30,562 --> 00:05:32,098
+00:05:07,730 --> 00:05:09,265
 en Andalucía a su peor marca,
 
 147
-00:05:32,098 --> 00:05:33,676
+00:05:09,265 --> 00:05:10,844
 y ve imposible que Sánchez sea el más
 
 148
-00:05:33,676 --> 00:05:36,662
+00:05:10,844 --> 00:05:13,470
 votado. Es la valoración de una encuestadora:
 
 149
-00:05:36,662 --> 00:05:39,036
+00:05:13,470 --> 00:05:15,844
 habrá que ver si otros sondeos la confirman.
 
 150
-00:05:40,173 --> 00:05:41,164
+00:05:16,374 --> 00:05:17,465
 Y en breve.
 
 151
-00:05:41,614 --> 00:05:43,621
+00:05:17,465 --> 00:05:19,471
 Valencia: dos años después de la dana que
 
 152
-00:05:43,621 --> 00:05:45,682
+00:05:19,471 --> 00:05:21,533
 causó doscientas treinta y cuatro muertes,
 
 153
-00:05:45,682 --> 00:05:47,974
+00:05:21,533 --> 00:05:23,824
 una manifestación ha vuelto a reclamar justicia,
 
 154
-00:05:47,974 --> 00:05:50,050
+00:05:23,824 --> 00:05:26,001
 verdad y asunción de responsabilidades.
 
 155
-00:05:50,510 --> 00:05:52,165
+00:05:26,001 --> 00:05:27,656
 Madrid: tras más de un mes,
 
 156
-00:05:52,165 --> 00:05:53,887
+00:05:27,656 --> 00:05:29,378
 los organizadores de la acampada de la Puerta
 
 157
-00:05:53,887 --> 00:05:55,371
+00:05:29,378 --> 00:05:30,962
 del Sol dejan la plaza.
 
 158
-00:05:55,828 --> 00:05:57,988
+00:05:30,962 --> 00:05:33,122
 Trasladan su actividad a los barrios para preparar
 
 159
-00:05:57,988 --> 00:05:59,231
+00:05:33,122 --> 00:05:34,465
 una huelga general.
 
 160
-00:05:59,687 --> 00:06:01,562
+00:05:34,465 --> 00:05:36,340
 Y el Tribunal Supremo ha admitido a sesenta
 
 161
-00:06:01,562 --> 00:06:03,832
+00:05:36,340 --> 00:05:38,610
 y nueve personas y tres asociaciones como afectados
 
 162
-00:06:03,832 --> 00:06:06,332
+00:05:38,610 --> 00:05:41,110
 por la suspensión del voto a los nacionalizados
 
 163
-00:06:06,332 --> 00:06:07,981
+00:05:41,110 --> 00:05:42,858
 por la llamada ley de nietos.
 
 164
-00:06:08,434 --> 00:06:09,995
+00:05:42,858 --> 00:05:44,519
 Esto ha sido todo por hoy.
 
 165
-00:06:10,452 --> 00:06:11,903
+00:05:44,519 --> 00:05:46,071
 Gracias por vernos.
 
 166
-00:06:12,360 --> 00:06:13,834
+00:05:46,071 --> 00:05:47,545
 Mañana, más.

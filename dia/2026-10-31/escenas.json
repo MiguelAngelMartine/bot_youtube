@@ -1,0 +1,182 @@
+{
+ "total": 356.03,
+ "fin_voz": 348.03,
+ "escenas": [
+  {
+   "seccion": 0,
+   "titulo": "Lo más importante del día",
+   "tono": "normal",
+   "tipo": "sumario",
+   "t0": 3.0,
+   "t1": 32.05
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "mapa",
+   "t0": 32.05,
+   "t1": 40.83
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "cifra",
+   "t0": 40.83,
+   "t1": 53.48
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "claves",
+   "t0": 53.48,
+   "t1": 75.17
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "cronologia",
+   "t0": 75.17,
+   "t1": 100.55
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "cifra",
+   "t0": 100.55,
+   "t1": 108.25
+  },
+  {
+   "seccion": 1,
+   "titulo": "Urda: el adiós y lo que falló",
+   "tono": "sobrio",
+   "tipo": "claves",
+   "t0": 108.25,
+   "t1": 127.31
+  },
+  {
+   "seccion": 2,
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "tipo": "persona",
+   "t0": 127.31,
+   "t1": 144.17
+  },
+  {
+   "seccion": 2,
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "tipo": "mapa",
+   "t0": 144.17,
+   "t1": 150.47
+  },
+  {
+   "seccion": 2,
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "tipo": "citas",
+   "t0": 150.47,
+   "t1": 173.42
+  },
+  {
+   "seccion": 2,
+   "titulo": "Puente no dimite y crece la presión",
+   "tono": "normal",
+   "tipo": "posturas",
+   "t0": 173.42,
+   "t1": 198.66
+  },
+  {
+   "seccion": 3,
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "tipo": "claves",
+   "t0": 198.66,
+   "t1": 221.75
+  },
+  {
+   "seccion": 3,
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "tipo": "claves",
+   "t0": 221.75,
+   "t1": 234.32
+  },
+  {
+   "seccion": 3,
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "tipo": "cifra",
+   "t0": 234.32,
+   "t1": 248.29
+  },
+  {
+   "seccion": 3,
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "tipo": "mapa",
+   "t0": 248.29,
+   "t1": 265.2
+  },
+  {
+   "seccion": 3,
+   "titulo": "Blocus: detenciones y ciudades en alerta",
+   "tono": "normal",
+   "tipo": "persona",
+   "t0": 265.2,
+   "t1": 273.47
+  },
+  {
+   "seccion": 4,
+   "titulo": "Camino al 29N",
+   "tono": "normal",
+   "tipo": "calendario",
+   "t0": 273.47,
+   "t1": 294.73
+  },
+  {
+   "seccion": 4,
+   "titulo": "Camino al 29N",
+   "tono": "normal",
+   "tipo": "claves",
+   "t0": 294.73,
+   "t1": 316.32
+  },
+  {
+   "seccion": 5,
+   "titulo": "En breve",
+   "tono": "normal",
+   "tipo": "breve",
+   "t0": 316.32,
+   "t1": 326.0
+  },
+  {
+   "seccion": 5,
+   "titulo": "En breve",
+   "tono": "normal",
+   "tipo": "breve",
+   "t0": 326.0,
+   "t1": 334.47
+  },
+  {
+   "seccion": 5,
+   "titulo": "En breve",
+   "tono": "normal",
+   "tipo": "breve",
+   "t0": 334.47,
+   "t1": 342.86
+  },
+  {
+   "seccion": 5,
+   "titulo": "En breve",
+   "tono": "normal",
+   "tipo": "despedida",
+   "t0": 342.86,
+   "t1": 348.03
+  }
+ ]
+}

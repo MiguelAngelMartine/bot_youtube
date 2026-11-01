@@ -106,51 +106,51 @@ def tarjeta_compacta(nombre, cargo, partido, ancho, cita, medio, tc=30):
     """Nombre y cargo en una fila y la cita al lado del circulo: caben tres en pantalla."""
     col = PARTIDO[partido]
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    lc = G2.texto_lineas(d0, cita, fuente("segoeuii.ttf", tc), ancho - 170)
+    lc = G2.texto_lineas(d0, cita, fuente("Inter-Italic.ttf", tc), ancho - 170)
     alto = 70 + len(lc) * int(tc * 1.35) + 38
     im, d = lienzo(ancho, alto)
     d.rounded_rectangle([0, 0, ancho * S, alto * S], radius=22 * S, fill=PANEL + (240,))
     d.rounded_rectangle([0, 0, 12 * S, alto * S], radius=6 * S, fill=col)
     d.ellipse([32 * S, 22 * S, 116 * S, 106 * S], fill=col, outline=BLANCO, width=4 * S)
-    d.text((74 * S, 64 * S), iniciales(nombre), font=f("seguibl.ttf", 32), fill=BLANCO, anchor="mm")
-    d.text((140 * S, 18 * S), nombre, font=f("seguibl.ttf", 34), fill=BLANCO)
-    w = d0.textlength(nombre, font=fuente("seguibl.ttf", 34))
-    d.text(((150 + w) * S, 26 * S), "·  " + cargo, font=f("segoeui.ttf", 26), fill=GRIS)
+    d.text((74 * S, 64 * S), iniciales(nombre), font=f("Inter-Black.ttf", 32), fill=BLANCO, anchor="mm")
+    d.text((140 * S, 18 * S), nombre, font=f("Inter-Black.ttf", 34), fill=BLANCO)
+    w = d0.textlength(nombre, font=fuente("Inter-Black.ttf", 34))
+    d.text(((150 + w) * S, 26 * S), "·  " + cargo, font=f("Inter-Regular.ttf", 26), fill=GRIS)
     y = 66
     for l in lc:
-        d.text((140 * S, y * S), l, font=f("segoeuii.ttf", tc), fill=BLANCO)
+        d.text((140 * S, y * S), l, font=f("Inter-Italic.ttf", tc), fill=BLANCO)
         y += int(tc * 1.35)
-    d.text((140 * S, (y + 4) * S), "Fuente: " + medio, font=f("segoeui.ttf", 22), fill=GRIS)
+    d.text((140 * S, (y + 4) * S), "Fuente: " + medio, font=f("Inter-Regular.ttf", 22), fill=GRIS)
     return baja(im)
 
 
 def tarjeta(nombre, cargo, partido, ancho=600, cita=None, medio=None, ini=None, tc=34):
     col = PARTIDO[partido]
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    lc = G2.texto_lineas(d0, cita, fuente("segoeuii.ttf", tc), ancho - 70) if cita else []
+    lc = G2.texto_lineas(d0, cita, fuente("Inter-Italic.ttf", tc), ancho - 70) if cita else []
     alto = 150 + (len(lc) * int(tc * 1.35) + 40 if cita else 0)
     im, d = lienzo(ancho, alto)
     d.rounded_rectangle([0, 0, ancho * S, alto * S], radius=24 * S, fill=PANEL + (240,))
     d.rounded_rectangle([0, 0, 12 * S, alto * S], radius=6 * S, fill=col)
     d.ellipse([34 * S, 27 * S, 130 * S, 123 * S], fill=col, outline=BLANCO, width=4 * S)
-    d.text((82 * S, 75 * S), ini or iniciales(nombre), font=f("seguibl.ttf", 36), fill=BLANCO, anchor="mm")
-    d.text((154 * S, 32 * S), nombre, font=f("seguibl.ttf", 40), fill=BLANCO)
-    d.text((154 * S, 86 * S), cargo, font=f("segoeui.ttf", 28), fill=GRIS)
+    d.text((82 * S, 75 * S), ini or iniciales(nombre), font=f("Inter-Black.ttf", 36), fill=BLANCO, anchor="mm")
+    d.text((154 * S, 32 * S), nombre, font=f("Inter-Black.ttf", 40), fill=BLANCO)
+    d.text((154 * S, 86 * S), cargo, font=f("Inter-Regular.ttf", 28), fill=GRIS)
     y = 150
     for l in lc:
-        d.text((40 * S, y * S), l, font=f("segoeuii.ttf", tc), fill=BLANCO)
+        d.text((40 * S, y * S), l, font=f("Inter-Italic.ttf", tc), fill=BLANCO)
         y += int(tc * 1.35)
     if medio:
-        d.text((40 * S, (y + 8) * S), "Fuente: " + medio, font=f("segoeui.ttf", 22), fill=GRIS)
+        d.text((40 * S, (y + 8) * S), "Fuente: " + medio, font=f("Inter-Regular.ttf", 22), fill=GRIS)
     return baja(im)
 
 
 def sello(txt, ang=-7):
-    ft = fuente("seguibl.ttf", 46)
+    ft = fuente("Inter-Black.ttf", 46)
     w = int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(txt, font=ft)) + 60
     im, d = lienzo(w, 90)
     d.rounded_rectangle([4 * S, 4 * S, (w - 4) * S, 86 * S], radius=14 * S, fill=(12, 20, 38, 220), outline=AMARILLO, width=6 * S)
-    d.text((w * S // 2, 45 * S), txt, font=f("seguibl.ttf", 46), fill=AMARILLO, anchor="mm")
+    d.text((w * S // 2, 45 * S), txt, font=f("Inter-Black.ttf", 46), fill=AMARILLO, anchor="mm")
     return baja(im).rotate(ang, expand=True, resample=Image.BICUBIC)
 
 
@@ -161,17 +161,17 @@ def chip(txt, partido, ancho=440, apagado=False):
         d.rounded_rectangle([3 * S, 3 * S, (ancho - 3) * S, 75 * S], radius=39 * S, fill=PANEL + (230,), outline=col, width=5 * S)
     else:
         d.rounded_rectangle([0, 0, ancho * S, 78 * S], radius=39 * S, fill=col)
-    d.text((ancho * S // 2, 39 * S), txt, font=f("seguibl.ttf", 36), fill=BLANCO, anchor="mm")
+    d.text((ancho * S // 2, 39 * S), txt, font=f("Inter-Black.ttf", 36), fill=BLANCO, anchor="mm")
     return baja(im)
 
 
 def rotulo(txt):
     im, d = lienzo(900, 50)
-    d.text((0, 25 * S), txt, font=f("seguibl.ttf", 32), fill=AMARILLO, anchor="lm")
+    d.text((0, 25 * S), txt, font=f("Inter-Black.ttf", 32), fill=AMARILLO, anchor="lm")
     return baja(im)
 
 
-def texto(txt, tam=34, color=BLANCO, n="segoeui.ttf", ancho=1100):
+def texto(txt, tam=34, color=BLANCO, n="Inter-Regular.ttf", ancho=1100):
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     ls = G2.texto_lineas(d0, txt, fuente(n, tam), ancho)
     im, d = lienzo(ancho, int(len(ls) * tam * 1.35) + 10)
@@ -218,7 +218,7 @@ def capa_mapa():
     for nombre, lon, lat, dx in (("Madrid", -3.7, 40.4, -150), ("Barcelona", 2.17, 41.39, -120)):
         x, y = proy(lon, lat)
         d.ellipse([(x - 13) * S, (y - 13) * S, (x + 13) * S, (y + 13) * S], fill=BLANCO, outline=NAVY, width=4 * S)
-        d.text(((x + dx) * S, (y + 22) * S), nombre, font=f("seguisb.ttf", 32), fill=BLANCO)
+        d.text(((x + dx) * S, (y + 22) * S), nombre, font=f("Inter-SemiBold.ttf", 32), fill=BLANCO)
     return baja(im)
 
 
@@ -234,12 +234,12 @@ def tren(ang):
 def aviso():
     im, d = lienzo(120, 110)
     d.polygon([(60 * S, 4 * S), (116 * S, 104 * S), (4 * S, 104 * S)], fill=AMARILLO, outline=NAVY)
-    d.text((60 * S, 70 * S), "!", font=f("seguibl.ttf", 60), fill=NAVY, anchor="mm")
+    d.text((60 * S, 70 * S), "!", font=f("Inter-Black.ttf", 60), fill=NAVY, anchor="mm")
     return baja(im)
 
 
 def capa_sub(txt):
-    ft = fuente("seguisb.ttf", 40)
+    ft = fuente("Inter-SemiBold.ttf", 40)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     ls = G2.texto_lineas(d0, txt, ft, 1180)
     w = int(max(d0.textlength(l, font=ft) for l in ls)) + 50
@@ -255,8 +255,8 @@ def capa_sub(txt):
 def capa_bloque(titulo, etiqueta):
     im, d = lienzo(1800, 80)
     d.rounded_rectangle([0, 10 * S, 170 * S, 64 * S], radius=27 * S, fill=ROJO)
-    d.text((85 * S, 37 * S), etiqueta, font=f("seguibl.ttf", 28), fill=BLANCO, anchor="mm")
-    d.text((196 * S, 37 * S), titulo, font=f("seguibl.ttf", 48), fill=BLANCO, anchor="lm")
+    d.text((85 * S, 37 * S), etiqueta, font=f("Inter-Black.ttf", 28), fill=BLANCO, anchor="mm")
+    d.text((196 * S, 37 * S), titulo, font=f("Inter-Black.ttf", 48), fill=BLANCO, anchor="lm")
     return baja(im)
 
 
@@ -302,7 +302,7 @@ def main(dia_txt):
     xm, ym = proy(-3.7, 40.4)
     xb, yb = proy(2.17, 41.39)
     tr = tren(math.atan2(yb - ym, xb - xm))
-    txt_b1 = texto("¿Cierre del AVE Madrid–Barcelona?", 44, BLANCO, "seguibl.ttf", 440)
+    txt_b1 = texto("¿Cierre del AVE Madrid–Barcelona?", 44, BLANCO, "Inter-Black.ttf", 440)
     txt_b2 = texto("Lo plantea Óscar Puente por motivos de seguridad", 30, GRIS, ancho=440)
     txt_b3 = texto("Fuente: Europa Press", 22, GRIS)
     # escena C
@@ -317,7 +317,7 @@ def main(dia_txt):
     puente_d = tarjeta("Óscar Puente", "Ministro de Transportes", "PSOE", 520)
     chips = [chip("Frente Amplio", "Frente Amplio"), chip("PNV", "PNV"), chip("BNG", "BNG")]
     pod = chip("Podemos", "Podemos", apagado=True)
-    txt_d1 = texto("Piden que se asuman responsabilidades", 30, BLANCO, "seguisb.ttf", 470)
+    txt_d1 = texto("Piden que se asuman responsabilidades", 30, BLANCO, "Inter-SemiBold.ttf", 470)
     txt_d2 = texto("Evita pedir expresamente la dimisión", 30, GRIS, ancho=470)
     txt_d3 = texto("Fuentes: elDiario.es · Europa Press", 22, GRIS)
 

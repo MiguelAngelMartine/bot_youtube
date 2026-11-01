@@ -22,7 +22,7 @@ RAIZ = Path(__file__).parent
 def lineas_ajustadas(d, palabras, ancho, tam_max, tam_min, max_lineas=2):
     """La letra mas grande con la que el titular cabe en max_lineas."""
     for tam in range(tam_max, tam_min - 1, -6):
-        f = fuente("seguibl.ttf", tam)
+        f = fuente("Inter-Black.ttf", tam)
         lineas, cur = [], []
         for w in palabras:
             if cur and d.textlength(" ".join(cur + [w]), font=f) > ancho:
@@ -44,20 +44,20 @@ def miniatura(dia_txt, titular, destaca="", ante="", sobrio=False):
     d.rectangle([0, 0, W, 14], fill=ROJO + (255,))
     d.rectangle([0, 14, W, 22], fill=AMARILLO + (255,))
     im.alpha_composite(G2.logo(120), (80, 70))
-    d.text((222, 130), G2.MARCA, font=fuente("seguibl.ttf", 58), fill=AMARILLO + (255,), anchor="lm")
+    d.text((222, 130), G2.MARCA, font=fuente("Inter-Black.ttf", 58), fill=AMARILLO + (255,), anchor="lm")
     y, m, dd = (int(x) for x in dia_txt.split("-"))
     etiqueta = f"{dd} {MESES[m - 1]} {y}"
-    fe = fuente("seguibl.ttf", 50)
+    fe = fuente("Inter-Black.ttf", 50)
     we = int(d.textlength(etiqueta, font=fe)) + 70
     d.rounded_rectangle([W - 80 - we, 92, W - 80, 168], radius=38, fill=ROJO + (255,))
     d.text((W - 80 - we / 2, 130), etiqueta, font=fe, fill=BLANCO + (255,), anchor="mm")
     ancho = 1750 if sobrio else 1120
     yt = 300
     if ante:
-        d.text((90, yt), ante.upper(), font=fuente("seguibl.ttf", 66), fill=AMARILLO + (255,))
+        d.text((90, yt), ante.upper(), font=fuente("Inter-Black.ttf", 66), fill=AMARILLO + (255,))
         yt += 110
     tam, lineas = lineas_ajustadas(d, titular.split(), ancho, 230, 120)
-    f = fuente("seguibl.ttf", tam)
+    f = fuente("Inter-Black.ttf", tam)
     marca = {w.lower().strip("¿?¡!.,:;") for w in destaca.split()}
     for l in lineas:
         x = 90
@@ -87,9 +87,9 @@ def canal():
     d = ImageDraw.Draw(im)
     x0, y0 = (W - 1546) // 2, (H - 423) // 2
     im.alpha_composite(G2.logo(260), (x0 + 10, y0 + 82))
-    d.text((x0 + 300, y0 + 150), G2.MARCA, font=fuente("seguibl.ttf", 92), fill=BLANCO + (255,), anchor="lm")
-    d.text((x0 + 304, y0 + 250), G2.LEMA, font=fuente("segoeui.ttf", 42), fill=(220, 225, 235, 255), anchor="lm")
-    d.text((x0 + 304, y0 + 315), "Cada noche, con datos y fuentes", font=fuente("seguisb.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
+    d.text((x0 + 300, y0 + 150), G2.MARCA, font=fuente("Inter-Black.ttf", 92), fill=BLANCO + (255,), anchor="lm")
+    d.text((x0 + 304, y0 + 250), G2.LEMA, font=fuente("Inter-Regular.ttf", 42), fill=(220, 225, 235, 255), anchor="lm")
+    d.text((x0 + 304, y0 + 315), "Cada noche, con datos y fuentes", font=fuente("Inter-SemiBold.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
     u = P.mascota(0.6, 0.0, False, 1.0)
     u = u.resize((int(u.width * 0.74), int(u.height * 0.74)), Image.LANCZOS)
     im.alpha_composite(u, (x0 + 1546 - u.width, y0 + 423 - u.height + 20))

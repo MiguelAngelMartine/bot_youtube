@@ -28,7 +28,7 @@ ZOOM = 1.14
 FUNDIDO = 0.7                      # s de fundido entre fotos
 CORTINILLA = 0.55                  # s de la barra que barre la pantalla al cambiar de bloque
 ROJO, AMARILLO, BLANCO = (200, 16, 46), (241, 191, 0), (245, 247, 250)
-F = "C:/Windows/Fonts/"
+F = str(Path(__file__).parent / "fuentes") + "/"     # tipografias libres (OFL) del repositorio: Inter, Barlow Condensed, Caveat
 
 
 def fuente(n, t):
@@ -95,9 +95,9 @@ def capa_titulo(titulo, n_sec, i):
     if i > 0:
         etiqueta = f"{i:02d} / {n_sec - 1:02d}"
         d.rounded_rectangle([0, 0, 170, 52], radius=26, fill=ROJO + (255,))
-        d.text((85, 26), etiqueta, font=fuente("seguibl.ttf", 28), fill=BLANCO, anchor="mm")
+        d.text((85, 26), etiqueta, font=fuente("Inter-Black.ttf", 28), fill=BLANCO, anchor="mm")
         y = 76
-    ft = fuente("seguibl.ttf", 92 if i == 0 else 78)
+    ft = fuente("Inter-Black.ttf", 92 if i == 0 else 78)
     for l in texto_lineas(d, titulo, ft, 1120):
         d.text((4, y + 4), l, font=ft, fill=(0, 0, 0, 120))
         d.text((0, y), l, font=ft, fill=BLANCO)
@@ -106,7 +106,7 @@ def capa_titulo(titulo, n_sec, i):
 
 
 def capa_punto(txt):
-    f = fuente("seguisb.ttf", 42)
+    f = fuente("Inter-SemiBold.ttf", 42)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     ls = texto_lineas(d0, txt, f, 900)
     alto = 58 * len(ls) + 28
@@ -120,7 +120,7 @@ def capa_punto(txt):
 
 
 def capa_subtitulo(txt):
-    f = fuente("seguisb.ttf", 44)
+    f = fuente("Inter-SemiBold.ttf", 44)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     ls = texto_lineas(d0, txt, f, 1500)
     w = int(max(d0.textlength(l, font=f) for l in ls)) + 60
@@ -135,7 +135,7 @@ def capa_subtitulo(txt):
 
 def capa_credito(c):
     txt = f"Foto: {c['autor']} · {c['licencia']} · Wikimedia Commons"
-    f = fuente("segoeui.ttf", 22)
+    f = fuente("Inter-Regular.ttf", 22)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     w = int(d0.textlength(txt, font=f)) + 24
     im = Image.new("RGBA", (w, 36), (0, 0, 0, 0))
@@ -152,10 +152,10 @@ def capa_cabecera(fecha):
     d.rectangle([0, 8, AN, 13], fill=AMARILLO + (255,))
     lg = logo(46)
     im.alpha_composite(lg, (100, 62 - 23))
-    fm = fuente("seguibl.ttf", 30)
+    fm = fuente("Inter-Black.ttf", 30)
     d.text((160, 62), MARCA, font=fm, fill=AMARILLO + (255,), anchor="lm")
     x = 160 + d.textlength(MARCA, font=fm) + 18
-    d.text((x, 62), "·  " + fecha, font=fuente("segoeui.ttf", 28), fill=(220, 225, 235, 255), anchor="lm")
+    d.text((x, 62), "·  " + fecha, font=fuente("Inter-Regular.ttf", 28), fill=(220, 225, 235, 255), anchor="lm")
     return im
 
 
@@ -194,7 +194,7 @@ def cuadro_intro(t, fecha):
     lg = logo(220)
     pega(fr, lg, 160, 330 + 40 * (1 - a), a)
     b = suave((t - 0.45) / 0.6)
-    ft = fuente("seguibl.ttf", 120)
+    ft = fuente("Inter-Black.ttf", 120)
     tx = Image.new("RGBA", (1400, 150), (0, 0, 0, 0))
     ImageDraw.Draw(tx).text((0, 0), MARCA, font=ft, fill=BLANCO)
     pega(fr, tx, 430 + 80 * (1 - b), 330, b)
@@ -202,7 +202,7 @@ def cuadro_intro(t, fecha):
     d = ImageDraw.Draw(fr)
     d.rectangle([430, 480, 430 + int(d.textlength(MARCA, font=ft) * c), 490], fill=AMARILLO + (255,))
     tf = Image.new("RGBA", (1400, 70), (0, 0, 0, 0))
-    ImageDraw.Draw(tf).text((0, 0), fecha, font=fuente("segoeui.ttf", 50), fill=(220, 225, 235))
+    ImageDraw.Draw(tf).text((0, 0), fecha, font=fuente("Inter-Regular.ttf", 50), fill=(220, 225, 235))
     pega(fr, tf, 430, 510, suave((t - 1.1) / 0.5))
     return fr
 
@@ -214,13 +214,13 @@ def cuadro_cierre(t, fecha):
     pega(fr, logo(150), 120, 300, a)
     tx = Image.new("RGBA", (800, 520), (0, 0, 0, 0))
     d = ImageDraw.Draw(tx)
-    d.text((0, 0), MARCA, font=fuente("seguibl.ttf", 64), fill=BLANCO)
+    d.text((0, 0), MARCA, font=fuente("Inter-Black.ttf", 64), fill=BLANCO)
     d.rectangle([0, 92, 520, 99], fill=AMARILLO + (255,))
     y = 130
-    for l in texto_lineas(d, LEMA, fuente("segoeui.ttf", 40), 760):
-        d.text((0, y), l, font=fuente("segoeui.ttf", 40), fill=(220, 225, 235))
+    for l in texto_lineas(d, LEMA, fuente("Inter-Regular.ttf", 40), 760):
+        d.text((0, y), l, font=fuente("Inter-Regular.ttf", 40), fill=(220, 225, 235))
         y += 54
-    d.text((0, y + 40), "Gracias por vernos. Mañana, más.", font=fuente("seguisb.ttf", 40), fill=AMARILLO)
+    d.text((0, y + 40), "Gracias por vernos. Mañana, más.", font=fuente("Inter-SemiBold.ttf", 40), fill=AMARILLO)
     pega(fr, tx, 120, 480, suave((t - 0.6) / 0.6))
     return fr
 

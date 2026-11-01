@@ -4,8 +4,8 @@ Canal diario de política española en YouTube (y Shorts/TikTok), presentado por
 
 - **Promesa:** todo lo que aparece es real y está contrastado con medios fiables de líneas distintas; enfoque neutral; cada dato lleva su fuente en pantalla.
 - **Formatos:**
-  - vídeo largo horizontal de 6-8 min cada tarde (`episodio.py`);
-  - 2-3 cortos verticales de 60-90 s en estilo tablero (`corto.py`).
+  - vídeo largo horizontal de 6-8 min cada tarde para YouTube, en estilo tablero (`largo.py`);
+  - 2-3 cortos verticales de 60-90 s en estilo tablero para Shorts y TikTok (`corto.py`).
 - **Todo es propio o de licencia libre:** animaciones, música, logo y presentadora los genera el programa. Las fotos son de archivo, libres y con crédito.
 
 ## Cómo funciona
@@ -20,8 +20,9 @@ Cada fase deja sus ficheros en `dia/AAAA-MM-DD/`, según [`oficina/CONTRATOS.md`
 | `recopila.py` | Noticias de las últimas 24 h de 11 medios |
 | `voz.py`, `pausas.py` | Locución de Urni (edge-tts) con pausas naturales y tiempo por palabra |
 | `musica.py` | Sintonía, fondo y efectos compuestos por el programa |
-| `episodio.py` | Vídeo largo horizontal con escenas animadas y fondos de foto |
-| `corto.py` | Corto vertical estilo tablero |
+| `largo.py` | Vídeo largo horizontal estilo tablero (el que se publica en YouTube) |
+| `corto.py` | Corto vertical estilo tablero; sus piezas las usa también `largo.py` |
+| `episodio.py` | Estilo anterior del largo (escenas animadas y fondos de foto), ya no se usa |
 | `fotos.py` | Búsqueda de fotos libres (Openverse, Wikimedia) con su crédito |
 | `miniatura.py` | Miniatura del episodio; banner y avatar del canal (`--canal`) |
 | `control_calidad.py` | Fotogramas, volumen y sincronía para revisar; copia ligera |
@@ -32,7 +33,7 @@ Cada fase deja sus ficheros en `dia/AAAA-MM-DD/`, según [`oficina/CONTRATOS.md`
 ```
 python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python episodio.py 2026-10-31        # episodio de ejemplo
+.venv\Scripts\python largo.py 2026-10-31           # episodio de ejemplo (--fotogramas: solo un PNG por escena)
 .venv\Scripts\python corto.py 2026-10-31 2         # corto vertical del bloque 2
 ```
 Los vídeos, audios e imágenes de `dia/` se regeneran y no se suben al repositorio.

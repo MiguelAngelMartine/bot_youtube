@@ -47,7 +47,7 @@ Esto NO es asesoramiento jurídico: antes de activar la monetización conviene u
     "foto adaptada" en la descripción, y se prefieren las alternativas CC BY o CC0.
   - **Nunca** fotos de periódicos, agencias (EFE, Europa Press...), Getty ni capturas de televisión.
   - Retratos de políticos: solo en el contexto de la noticia en que aparecen (derecho a la propia imagen).
-- **Fotos de fondo**: solo de licencia libre (Openverse/Wikimedia), con «Foto de archivo», el autor y la licencia en pantalla, y la lista completa en la descripción. Nunca víctimas ni personas ajenas a la noticia.
+- **Fotos** (retratos en polaroid y fotos de escena): solo de licencia libre (Openverse/Wikimedia), con «Foto de archivo», el autor y la licencia en pantalla, y la lista completa en la descripción. Nunca víctimas ni personas ajenas a la noticia.
 - **Música**: compuesta por el propio programa (musica.py), sin muestras ajenas, así que no puede haber reclamaciones de Content ID.
 - **Voz**: edge-tts de Microsoft. **Pendiente**: comprobar si sus condiciones permiten el uso comercial antes de monetizar.
   Si no lo permiten, se pasa a una voz con licencia comercial.

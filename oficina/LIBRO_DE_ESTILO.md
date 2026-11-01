@@ -57,7 +57,8 @@ Cada escena dura desde el paso donde se pide hasta la siguiente. Los objetos apa
 | `breve` | noticia corta | `lugar`, `icono`, `titular`, `sub`, `fuente` | titular ≤ 80 caracteres |
 | `despedida` | cierre de Urni | — | solo en el último paso |
 
-- **Fondo de foto:** las escenas `persona`, `citas`, `claves`, `cronologia`, `cifra` y `breve` admiten `"foto": "sN_M.jpg"`. La elige el editor gráfico; el redactor no la pone. Sale oscurecida, con el color del canal, el rótulo «Foto de archivo» y el crédito.
+- **Foto de la escena:** las escenas `persona`, `citas`, `claves`, `cronologia`, `cifra` y `breve` admiten `"foto": "sN_M.jpg"`. La elige el editor gráfico; el redactor no la pone. En el tablero sale impresa y pegada, con «Foto de archivo» y el crédito (en `citas` y en `persona` con `flujo` no hay sitio y no sale).
+- **Retratos:** las personas de `persona`, `citas` y `posturas` salen en polaroid con el retrato que el editor gráfico marca con `--persona`; si no hay, con sus iniciales.
 - **Iconos:** vela, persona, documento, reloj, escudo, tren, mazo, altavoz, tienda, grafico, urna, alerta.
 - **Partidos y colores definidos:**
   - PSOE, PSC, PP, Vox, Sumar, Frente Amplio, Podemos, PNV, BNG, Junts, ERC, EH Bildu, CC, UPN, SALF, Compromís;

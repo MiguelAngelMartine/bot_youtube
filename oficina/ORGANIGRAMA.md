@@ -24,9 +24,9 @@ Las tareas mecánicas (descargar RSS, renderizar el vídeo, dibujar la miniatura
    Asesor de cumplimiento ──────► revision/cumplimiento.md   (YouTube, derechos, tono en tragedias)
  FASE 5 · CIERRE
    Editor de cierre ────────────► episodio.json      (sumario + bloques + despedida, duración final)
-   Editor gráfico ── fotos.py ──► imagenes/ + creditos.json + campo "foto"  (foto real y libre de fondo en cada escena de texto)
+   Editor gráfico ── fotos.py ──► imagenes/ + creditos.json + campo "foto"  (retratos para las polaroids y foto de cada escena de texto)
  FASE 6 · PRODUCCIÓN
-   Montador ── episodio.py ─────► episodio.mp4, episodio.srt, escenas.json
+   Montador ── largo.py ────────► episodio.mp4, episodio.srt, escenas.json  (horizontal estilo tablero)
    Control de calidad ── control_calidad.py ─► calidad/informe.md   (fotogramas, sonido, sincronía)
    Diseñador gráfico ── miniatura.py ───────► miniatura.png (+ banner y avatar del canal)
  FASE 7 · PUBLICACIÓN

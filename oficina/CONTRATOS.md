@@ -56,10 +56,10 @@ Ordenado de más a menos medios. Solo política española y sus consecuencias (n
 ## Fase 5
 **`episodio.json`** (Editor de cierre): `{fecha, titulo_video, secciones: [sumario, (corrección), bloques..., breves con la despedida]}`.
 
-**Fotos** (Editor gráfico): `imagenes/sN_M.jpg`, `creditos.json` (`{fichero: {titulo, url, autor, licencia, pagina, fuente}}`) y el campo `foto` en las escenas de `episodio.json`.
+**Fotos** (Editor gráfico): `imagenes/sN_M.jpg` y `imagenes/retrato_<apellido>.jpg`, `creditos.json` (`{fichero: {titulo, url, autor, licencia, pagina, fuente, persona?}}`; `persona` marca el retrato de esa persona) y el campo `foto` en las escenas de `episodio.json`.
 
 ## Fase 6
-- **`episodio.mp4`**, **`episodio.srt`**, **`episodio_descripcion.txt`**, **`escenas.json`** (los escribe `episodio.py`); log en `render.log`.
+- **`episodio.mp4`**, **`episodio.srt`**, **`episodio_descripcion.txt`**, **`escenas.json`** (los escribe `largo.py`; `episodio.py`, el estilo anterior, escribe los mismos); log en `render.log`.
 - **`calidad/informe.md`** (Control de calidad): `APTO` o `CORREGIR`, con la lista de problemas y el segundo exacto.
 - **`miniatura.png`** (Diseñador gráfico): 1280x720.
 

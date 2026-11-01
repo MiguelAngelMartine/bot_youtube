@@ -14,7 +14,7 @@ import subprocess
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 import episodio as E
 import genera_video as V1
@@ -29,20 +29,16 @@ VY0, VY1 = 210, 1390                  # zona del tablero en pantalla
 NAVY = (12, 20, 38)
 PAPEL = (246, 243, 234)
 TINTA = (25, 30, 45)
-F = "C:/Windows/Fonts/"
 
 
-def estrecha(tam, peso="Bold"):
-    f = ImageFont.truetype(F + "bahnschrift.ttf", tam)
-    try:
-        f.set_variation_by_name(f"{peso} Condensed")
-    except Exception:
-        pass
-    return f
+def estrecha(tam):
+    """Letra estrecha de pegatinas, sellos y rotulos."""
+    return fuente("BarlowCondensed-Bold.ttf", tam)
 
 
 def mano(tam):
-    return ImageFont.truetype(F + "segoeprb.ttf", tam)
+    """Letra a mano de las notas (Caveat es mas pequena que la Segoe Print de antes: +30 % para el mismo tamano visual)."""
+    return fuente("Caveat-Bold.ttf", int(tam * 1.3))
 
 
 def lineas(txt, fnt, ancho):
@@ -74,12 +70,19 @@ def polaroid(foto, nombre, cargo, partido, credito=None, ancho=420):
     else:
         col = P.PARTIDO.get(partido, (90, 100, 120))
         d.rectangle([28, 32, ancho - 12, alto_f - 8], fill=col + (255,))
-        d.text((ancho / 2 + 8, alto_f / 2 + 12), P.iniciales(nombre), font=fuente("seguibl.ttf", 150), fill=BLANCO, anchor="mm")
-    d.text((ancho / 2 + 8, alto_f + 22), nombre.upper(), font=estrecha(46), fill=TINTA, anchor="mt")
-    d.text((ancho / 2 + 8, alto_f + 76), cargo, font=fuente("segoeui.ttf", 24), fill=(90, 95, 110), anchor="mt")
+        d.text((ancho / 2 + 8, alto_f / 2 + 12), P.iniciales(nombre), font=fuente("Inter-Black.ttf", 150), fill=BLANCO, anchor="mm")
+    tn, tc = 46, 24                                    # nombre y cargo se encogen si no caben en el ancho de la foto
+    while tn > 28 and d.textlength(nombre.upper(), font=estrecha(tn)) > ancho - 16:
+        tn -= 2
+    while tc > 16 and d.textlength(cargo, font=fuente("Inter-Regular.ttf", tc)) > ancho - 16:
+        tc -= 1
+    d.text((ancho / 2 + 8, alto_f + 22), nombre.upper(), font=estrecha(tn), fill=TINTA, anchor="mt")
+    d.text((ancho / 2 + 8, alto_f + 76), cargo, font=fuente("Inter-Regular.ttf", tc), fill=(90, 95, 110), anchor="mt")
     if credito:
-        d.text((ancho / 2 + 8, alto_f + 118), f"Foto: {credito['autor'][:34]} · {credito['licencia']}",
-               font=fuente("segoeui.ttf", 17), fill=(130, 135, 145), anchor="mt")
+        txt, tf = f"Foto: {credito['autor'][:34]} · {credito['licencia']}", 17
+        while tf > 11 and d.textlength(txt, font=fuente("Inter-Regular.ttf", tf)) > ancho - 10:
+            tf -= 1
+        d.text((ancho / 2 + 8, alto_f + 118), txt, font=fuente("Inter-Regular.ttf", tf), fill=(130, 135, 145), anchor="mt")
     celo(im, ancho / 2 - 50, 4)
     return im
 
@@ -95,7 +98,7 @@ def nota(texto, ancho=520, tam=40, fuente_txt=None, color=PAPEL):
     for j, l in enumerate(ls):
         d.text((40, 50 + j * tam * 1.45), l, font=fnt, fill=TINTA)
     if fuente_txt:
-        d.text((40, alto - 24), fuente_txt, font=fuente("segoeui.ttf", 20), fill=(110, 115, 125))
+        d.text((40, alto - 24), fuente_txt, font=fuente("Inter-Regular.ttf", 20), fill=(110, 115, 125))
     celo(im, ancho / 2 - 60, -3)
     return im
 
@@ -138,7 +141,7 @@ def mapa(puntos, ruta, ancho=760):
         x, y = xy[p["nombre"]]
         d.ellipse([x - 14, y - 14, x + 14, y + 14], fill=ROJO + (255,) if p.get("aviso") else TINTA + (255,), outline=BLANCO, width=4)
         tw = d.textlength(p["nombre"], font=estrecha(38))
-        tx = x - tw - 22 if p.get("izq") else x + 22
+        tx = x - tw - 22 if p.get("izq") or x + 22 + tw > ancho + 50 else x + 22     # a la izquierda si no cabe
         d.text((tx, y - 22), p["nombre"], font=estrecha(38), fill=TINTA)
     celo(im, ancho / 2, 2)
     return im
@@ -146,6 +149,29 @@ def mapa(puntos, ruta, ancho=760):
 
 def flecha_img(p0, p1):
     return ("flecha", p0, p1)
+
+
+def personas_de(ve):
+    """Nombres de las personas que salen en polaroid en una escena (para buscarles foto)."""
+    if ve["tipo"] == "persona":
+        return [ve["persona"]["nombre"]] + ([ve["flujo"]["a"]["nombre"]] if ve.get("flujo") else [])
+    if ve["tipo"] == "citas":
+        return [it["nombre"] for it in ve["items"]]
+    if ve["tipo"] == "posturas":
+        return [ve["centro"]["nombre"]]
+    return []
+
+
+def fotos_personas(nombres, cred, carpeta):
+    """Nombre de persona -> foto de imagenes/: la que el editor grafico marco con "persona" o, si no hay, aquella cuyo
+    titulo de Commons lleva su nombre y su ultimo apellido."""
+    fotos = {c["persona"]: carpeta / fich for fich, c in cred.items() if c.get("persona") in nombres}
+    for fich, c in cred.items():
+        for nombre in nombres:
+            pal = nombre.split()
+            if pal[0] in c["titulo"] and pal[-1] in c["titulo"]:
+                fotos.setdefault(nombre, carpeta / fich)
+    return fotos
 
 
 # ------------------------------------------------------------------ de la escena del guion a piezas en el tablero
@@ -234,28 +260,28 @@ def fondo_vertical(t):
     return im.convert("RGBA")
 
 
-def tablero_base(alto):
+def tablero_base(alto, ancho=AN):
     """Pizarra azul con cuadricula tenue: el 'tablero de redaccion' del canal."""
-    im = Image.new("RGBA", (AN, alto), (22, 36, 64, 255))
+    im = Image.new("RGBA", (ancho, alto), (22, 36, 64, 255))
     d = ImageDraw.Draw(im)
-    for x in range(0, AN, 60):
+    for x in range(0, ancho, 60):
         d.line([(x, 0), (x, alto)], fill=(30, 46, 78, 255), width=2)
     for y in range(0, alto, 60):
-        d.line([(0, y), (AN, y)], fill=(30, 46, 78, 255), width=2)
+        d.line([(0, y), (ancho, y)], fill=(30, 46, 78, 255), width=2)
     return im
 
 
 _cache_cap = {}
 
 
-def capa_cap(palabras, clave, activa):
-    k = (tuple(palabras), clave, activa)
+def capa_cap(palabras, clave, activa, escala=1.0, ancho_max=AN - 60):
+    k = (tuple(palabras), clave, activa, escala, ancho_max)
     if k in _cache_cap:
         return _cache_cap[k]
     partes = []
     for j, w in enumerate(palabras):
         es_clave = j == clave
-        fnt = fuente("seguibl.ttf", 112 if es_clave else 92)
+        fnt = fuente("Inter-Black.ttf", int((112 if es_clave else 92) * escala))
         col = AMARILLO if es_clave else BLANCO
         d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
         tw = int(d0.textlength(w, font=fnt)) + 30
@@ -270,8 +296,8 @@ def capa_cap(palabras, clave, activa):
     for p in partes:
         out.alpha_composite(p, (x, (out.height - p.height) // 2))
         x += p.width + 10
-    if out.width > AN - 60:
-        r = (AN - 60) / out.width
+    if out.width > ancho_max:
+        r = ancho_max / out.width
         out = out.resize((int(out.width * r), int(out.height * r)), Image.LANCZOS)
     _cache_cap[k] = out
     return out
@@ -308,11 +334,7 @@ def main(dia_txt, n_sec, gancho=None, cierre=None):
     if cierre:
         sec["pasos"][-1]["di"] = sec["pasos"][-1]["di"] + " " + cierre
     cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
-    fotos = {}                                         # nombre de persona -> foto, por el titulo del fichero de Commons
-    for fich, c in cred.items():
-        for nombre in ("Óscar Puente", "Pedro Sánchez", "Santiago Abascal", "Juan Bravo", "Salvador Illa", "Alberto Núñez Feijóo"):
-            if nombre.split()[-1] in c["titulo"] or nombre in c["titulo"]:
-                fotos.setdefault(nombre, dia / "imagenes" / fich)
+    fotos = fotos_personas({n for p in sec["pasos"] if p.get("ve") for n in personas_de(p["ve"])}, cred, dia / "imagenes")
     tmp = dia / "tmp_corto"
     tmp.mkdir(exist_ok=True)
     texto = " ".join(p["di"] for p in sec["pasos"])
@@ -351,7 +373,7 @@ def main(dia_txt, n_sec, gancho=None, cierre=None):
     d.rectangle([0, 0, AN, 10], fill=ROJO + (255,))
     d.rectangle([0, 10, AN, 16], fill=AMARILLO + (255,))
     cab.alpha_composite(G2.logo(70), (40, 50))
-    d.text((126, 85), G2.MARCA, font=fuente("seguibl.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
+    d.text((126, 85), G2.MARCA, font=fuente("Inter-Black.ttf", 38), fill=AMARILLO + (255,), anchor="lm")
     y_, m_, dd_ = (int(x) for x in dia_txt.split("-")) if dia_txt[:2] == "20" else (2026, 10, 31)
     fe = f"{dd_} {['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][m_ - 1]}"
     d.rounded_rectangle([AN - 190, 58, AN - 40, 112], radius=10, fill=ROJO + (255,))
@@ -375,8 +397,8 @@ def main(dia_txt, n_sec, gancho=None, cierre=None):
             lg = G2.logo(int(260 * max(q, 0.05)))
             pega(fr, lg, AN / 2 - lg.width / 2, 640)
             dd = ImageDraw.Draw(fr)
-            dd.text((AN / 2, 1000), G2.MARCA, font=fuente("seguibl.ttf", 76), fill=BLANCO + (255,), anchor="mm")
-            dd.text((AN / 2, 1090), "Cada tarde, la política del día", font=fuente("seguisb.ttf", 44), fill=AMARILLO + (255,), anchor="mm")
+            dd.text((AN / 2, 1000), G2.MARCA, font=fuente("Inter-Black.ttf", 76), fill=BLANCO + (255,), anchor="mm")
+            dd.text((AN / 2, 1090), "Cada tarde, la política del día", font=fuente("Inter-SemiBold.ttf", 44), fill=AMARILLO + (255,), anchor="mm")
             ff.stdin.write(fr.convert("RGB").tobytes())
             continue
         k = max(j for j, p in enumerate(partes) if p["t0"] <= t + 1e-9)

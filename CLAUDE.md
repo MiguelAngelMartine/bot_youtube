@@ -24,8 +24,9 @@
 ## Decisiones ya tomadas por el usuario (no volver a proponer)
 - **Voz:** edge-tts es-ES-AlvaroNeural, +14 %, +6 Hz, **sin entonación por contexto** (la probó y la descartó), con pausas naturales de 0,40 s entre frases y 0,24 s en comas largas (`voz.py`, modo «plano»). Prefirió optimizar esta voz antes que una voz propia o clonada.
 - **Formatos:**
-  - largo horizontal con fotos de fondo en las escenas de texto (las animaciones, sin foto), para YouTube;
-  - corto vertical estilo tablero, para Shorts y TikTok.
+  - largo horizontal **estilo tablero** (`largo.py`, el mismo lenguaje que el vertical adaptado a 16:9), para YouTube; el estilo anterior con fotos de fondo (`episodio.py`) queda descartado (1-nov-2026);
+  - corto vertical estilo tablero (`corto.py`), para Shorts y TikTok.
+- **Mascota:** Urni tal como está (diseño A de `prototipo_animado.mascota`); se vieron variantes (plana, profe, chibi, reportera, con compañera) y prefirió la actual.
 - **Horario:** se publica por la tarde. La jornada arranca a las 15:00 y el vídeo tiene que estar listo hacia las 16:30.
 - **El usuario revisa y publica.** La oficina nunca sube nada a YouTube.
 

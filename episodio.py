@@ -188,20 +188,20 @@ def icono(nombre, tam=84):
         d.rectangle(U(40, 20, 60, 42), fill=Y)
     elif nombre == "alerta":
         d.polygon(U(50, 20, 80, 76, 20, 76), fill=Y)
-        d.text((50 * u, 60 * u), "!", font=f("seguibl.ttf", tam * 0.34), fill=N, anchor="mm")
+        d.text((50 * u, 60 * u), "!", font=f("Inter-Black.ttf", tam * 0.34), fill=N, anchor="mm")
     return baja(im)
 
 
 def fila_icono(nombre, txt, ancho, tam=36):
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    ls = G2.texto_lineas(d0, txt, fuente("seguisb.ttf", tam), ancho - 150)
+    ls = G2.texto_lineas(d0, txt, fuente("Inter-SemiBold.ttf", tam), ancho - 150)
     alto = max(104, int(len(ls) * tam * 1.32) + 34)
     im, d = lienzo(ancho, alto)
     d.rounded_rectangle([0, 0, ancho * S, alto * S], radius=20 * S, fill=PANEL + (235,))
     ic = icono(nombre, 76)
     y0 = (alto - len(ls) * tam * 1.32) / 2
     for j, l in enumerate(ls):
-        d.text((124 * S, (y0 + j * tam * 1.32) * S), l, font=f("seguisb.ttf", tam), fill=BLANCO)
+        d.text((124 * S, (y0 + j * tam * 1.32) * S), l, font=f("Inter-SemiBold.ttf", tam), fill=BLANCO)
     im = baja(im)
     im.alpha_composite(ic, (26, (alto - 76) // 2))
     return im
@@ -211,11 +211,11 @@ def fila_numero(num, txt, ancho):
     im, d = lienzo(ancho, 100)
     d.rounded_rectangle([0, 0, ancho * S, 100 * S], radius=20 * S, fill=PANEL + (235,))
     d.rounded_rectangle([22 * S, 22 * S, 102 * S, 78 * S], radius=28 * S, fill=ROJO)
-    d.text((62 * S, 50 * S), num, font=f("seguibl.ttf", 30), fill=BLANCO, anchor="mm")
+    d.text((62 * S, 50 * S), num, font=f("Inter-Black.ttf", 30), fill=BLANCO, anchor="mm")
     tam = 38
-    while tam > 26 and d.textlength(txt, font=f("seguisb.ttf", tam)) > (ancho - 150) * S:
+    while tam > 26 and d.textlength(txt, font=f("Inter-SemiBold.ttf", tam)) > (ancho - 150) * S:
         tam -= 2
-    d.text((128 * S, 50 * S), txt, font=f("seguisb.ttf", tam), fill=BLANCO, anchor="lm")
+    d.text((128 * S, 50 * S), txt, font=f("Inter-SemiBold.ttf", tam), fill=BLANCO, anchor="lm")
     return baja(im)
 
 
@@ -259,7 +259,7 @@ def capa_particulas():
 
 
 def capa_teaser(siguiente):
-    f1, f2 = fuente("seguibl.ttf", 26), fuente("seguisb.ttf", 30)
+    f1, f2 = fuente("Inter-Black.ttf", 26), fuente("Inter-SemiBold.ttf", 30)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     w1 = d0.textlength("A CONTINUACIÓN", font=f1)
     w = int(w1 + d0.textlength(siguiente, font=f2)) + 90
@@ -282,9 +282,9 @@ def capa_palabras(palabras, activa, ancho_max=1150):
     txt = " ".join(palabras)
     tam = 78
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    while tam > 48 and d0.textlength(txt, font=fuente("seguibl.ttf", tam)) > ancho_max:
+    while tam > 48 and d0.textlength(txt, font=fuente("Inter-Black.ttf", tam)) > ancho_max:
         tam -= 4
-    fnt = fuente("seguibl.ttf", tam)
+    fnt = fuente("Inter-Black.ttf", tam)
     w = int(d0.textlength(txt, font=fnt)) + 40
     im = Image.new("RGBA", (w, int(tam * 1.5)), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -336,8 +336,8 @@ def esc_mapa(ve, T, c0, X0, X1, t0):
     pts = []
     for p in ve["puntos"]:
         x, y = proy(p["lon"], p["lat"], X0)
-        et = P.texto(p["nombre"], 32, BLANCO, "seguisb.ttf", 400)
-        w = int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(p["nombre"], font=fuente("seguisb.ttf", 32)))
+        et = P.texto(p["nombre"], 32, BLANCO, "Inter-SemiBold.ttf", 400)
+        w = int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(p["nombre"], font=fuente("Inter-SemiBold.ttf", 32)))
         ex = x - w / 2 if p.get("abajo") else (x - w - 26 if p.get("izq") else x + 24)
         ey = y + 18 if p.get("abajo") else y - 24
         t1 = T.cuando(p["cuando"], c0, t0 + 0.4) if p.get("cuando") else t0 + 0.4
@@ -348,7 +348,7 @@ def esc_mapa(ve, T, c0, X0, X1, t0):
     av = P.aviso()
     XT = X0 + 760
     WT = X1 - XT
-    tit = P.texto(ve["titular"], 44, BLANCO, "seguibl.ttf", WT)
+    tit = P.texto(ve["titular"], 44, BLANCO, "Inter-Black.ttf", WT)
     sub = P.texto(ve.get("sub", ""), 30, GRIS, ancho=WT)
     fte = pie("Fuente: " + ve["fuente"])
     largos = [math.dist(a, b) for a, b in zip(ruta, ruta[1:])]
@@ -400,10 +400,10 @@ def esc_mapa(ve, T, c0, X0, X1, t0):
 
 def esc_cifra(ve, T, c0, X0, X1, t0):
     W = X1 - X0
-    fn = fuente("seguibl.ttf", 230)
+    fn = fuente("Inter-Black.ttf", 230)
     d0 = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     wn = d0.textlength(ve["numero"], font=fn)
-    et = P.texto(ve["etiqueta"], 64, BLANCO, "seguibl.ttf", int(W - wn - 60))
+    et = P.texto(ve["etiqueta"], 64, BLANCO, "Inter-Black.ttf", int(W - wn - 60))
     sub = P.texto(ve.get("sub", ""), 38, GRIS, ancho=int(W - wn - 60))
     nota = None
     if ve.get("nota"):
@@ -451,8 +451,8 @@ def esc_cronologia(ve, T, c0, X0, X1, t0):
     rot = P.rotulo(ve["titulo"])
     items = []
     for k, it in enumerate(ve["items"]):
-        h = P.texto(it["hora"], 38, AMARILLO, "seguibl.ttf", W - 90)
-        tx = P.texto(it["texto"], 32, BLANCO, "seguisb.ttf", W - 90)
+        h = P.texto(it["hora"], 38, AMARILLO, "Inter-Black.ttf", W - 90)
+        tx = P.texto(it["texto"], 32, BLANCO, "Inter-SemiBold.ttf", W - 90)
         items.append((h, tx, T.cuando(it["cuando"], c0, t0 + 0.8 + k)))
     fte = pie("Fuente: " + ve["fuente"])
     def dibuja(lay, t):
@@ -526,7 +526,7 @@ def esc_posturas(ve, T, c0, X0, X1, t0):
     c = ve["centro"]
     centro = P.tarjeta(c["nombre"], c["cargo"], c["partido"], 500)
     chips = [(P.chip(it["nombre"], it["partido"], 400), T.cuando(it["cuando"], c0, t0 + 1 + 0.4 * k)) for k, it in enumerate(ve["presionan"])]
-    etq = P.texto(ve["etiqueta"], 30, BLANCO, "seguisb.ttf", 420)
+    etq = P.texto(ve["etiqueta"], 30, BLANCO, "Inter-SemiBold.ttf", 420)
     te = T.cuando(ve["etiqueta_cuando"], c0, t0 + 2)
     ap = ve["aparte"]
     chip_ap = P.chip(ap["nombre"], ap["partido"], 400, apagado=True)
@@ -557,9 +557,9 @@ def hoja_calendario(dia, mes, pie_txt):
     d.rounded_rectangle([0, 0, 340 * S, 380 * S], radius=26 * S, fill=BLANCO)
     d.rounded_rectangle([0, 0, 340 * S, 96 * S], radius=26 * S, fill=ROJO)
     d.rectangle([0, 60 * S, 340 * S, 96 * S], fill=ROJO)
-    d.text((170 * S, 50 * S), mes, font=f("seguibl.ttf", 38), fill=BLANCO, anchor="mm")
-    d.text((170 * S, 210 * S), dia, font=f("seguibl.ttf", 170), fill=NAVY, anchor="mm")
-    d.text((170 * S, 335 * S), pie_txt, font=f("seguisb.ttf", 30), fill=NAVY, anchor="mm")
+    d.text((170 * S, 50 * S), mes, font=f("Inter-Black.ttf", 38), fill=BLANCO, anchor="mm")
+    d.text((170 * S, 210 * S), dia, font=f("Inter-Black.ttf", 170), fill=NAVY, anchor="mm")
+    d.text((170 * S, 335 * S), pie_txt, font=f("Inter-SemiBold.ttf", 30), fill=NAVY, anchor="mm")
     for x in (90, 250):
         d.ellipse([(x - 12) * S, -12 * S, (x + 12) * S, 12 * S], fill=NAVY)
     return baja(im)
@@ -568,7 +568,7 @@ def hoja_calendario(dia, mes, pie_txt):
 def esc_calendario(ve, T, c0, X0, X1, t0):
     hoja = hoja_calendario(ve["dia"], ve["mes"], ve["pie"])
     W = X1 - X0 - 420
-    items = [(P.texto(it["hora"], 36, AMARILLO, "seguibl.ttf", W), P.texto(it["texto"], 32, BLANCO, "seguisb.ttf", W),
+    items = [(P.texto(it["hora"], 36, AMARILLO, "Inter-Black.ttf", W), P.texto(it["texto"], 32, BLANCO, "Inter-SemiBold.ttf", W),
               T.cuando(it["cuando"], c0, t0 + 1 + k)) for k, it in enumerate(ve["items"])]
     fte = pie("Fuentes: " + ve["fuente"])
     def dibuja(lay, t):
@@ -588,8 +588,8 @@ def esc_calendario(ve, T, c0, X0, X1, t0):
 def esc_breve(ve, T, c0, X0, X1, t0):
     W = X1 - X0
     ic = icono(ve["icono"], 130)
-    lugar = P.texto(ve["lugar"], 40, AMARILLO, "seguibl.ttf", W - 170)
-    tit = P.texto(ve["titular"], 54, BLANCO, "seguibl.ttf", W)
+    lugar = P.texto(ve["lugar"], 40, AMARILLO, "Inter-Black.ttf", W - 170)
+    tit = P.texto(ve["titular"], 54, BLANCO, "Inter-Black.ttf", W)
     sub = P.texto(ve["sub"], 34, GRIS, ancho=W)
     fte = pie("Fuente: " + ve["fuente"])
     def dibuja(lay, t):
@@ -604,8 +604,8 @@ def esc_breve(ve, T, c0, X0, X1, t0):
 
 
 def esc_despedida(ve, T, c0, X0, X1, t0):
-    t1 = P.texto("Gracias por vernos.", 72, BLANCO, "seguibl.ttf", X1 - X0)
-    t2 = P.texto("Mañana, más.", 56, AMARILLO, "seguibl.ttf", X1 - X0)
+    t1 = P.texto("Gracias por vernos.", 72, BLANCO, "Inter-Black.ttf", X1 - X0)
+    t2 = P.texto("Mañana, más.", 56, AMARILLO, "Inter-Black.ttf", X1 - X0)
     def dibuja(lay, t):
         aparece(lay, t1, X0, TOP + 160, t, t0 + 0.1)
         aparece(lay, t2, X0, TOP + 280, t, t0 + 0.9)
@@ -637,7 +637,7 @@ def base_foto_marca(ruta):
 
 def capa_credito_foto(c):
     txt = f"Foto de archivo · {c['autor']} · {c['licencia']}"
-    f = fuente("segoeui.ttf", 20)
+    f = fuente("Inter-Regular.ttf", 20)
     w = int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(txt, font=f)) + 24
     im = Image.new("RGBA", (w, 32), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -854,12 +854,20 @@ def main(dia_txt):
     ff.stdin.close()
     ff.wait()
 
-    # subtitulos, capitulos y descripcion
-    srt = "\n".join(f"{j + 1}\n{V1.hms(a)} --> {V1.hms(b)}\n{x}\n" for j, (a, b, _, x) in enumerate(subs))
+    escribe_textos(dia, G, plan, [(a, b, x) for a, b, _, x in subs],
+                   [(i, tipo, a, b) for i, p in enumerate(plan) for a, b, _, tipo in p["escenas"]], total, fin_voz, fotos_usadas)
+    print(f"EPISODIO {total / 60:.1f} min -> {out}")
+
+
+def escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, fotos_usadas):
+    """episodio.srt, escenas.json (para el control de calidad) y episodio_descripcion.txt con capitulos, fuentes y creditos.
+    plan: [{"t0", "sec"}] por bloque; subs: [(a, b, texto)]; escenas: [(n_bloque, tipo, t0, t1)]."""
+    secs = G["secciones"]
+    srt = "\n".join(f"{j + 1}\n{V1.hms(a)} --> {V1.hms(b)}\n{x}\n" for j, (a, b, x) in enumerate(subs))
     (dia / "episodio.srt").write_text(srt, encoding="utf-8")
     # mapa de escenas para el control de calidad: de que segundo a que segundo va cada una
-    escenas = [{"seccion": i, "titulo": p["sec"]["titulo"], "tono": p["sec"]["tono"], "tipo": tipo, "t0": round(a, 2), "t1": round(b, 2)}
-               for i, p in enumerate(plan) for a, b, _, tipo in p["escenas"]]
+    escenas = [{"seccion": i, "titulo": plan[i]["sec"]["titulo"], "tono": plan[i]["sec"]["tono"], "tipo": tipo,
+                "t0": round(a, 2), "t1": round(b, 2)} for i, tipo, a, b in escenas]
     (dia / "escenas.json").write_text(json.dumps({"total": round(total, 2), "fin_voz": round(fin_voz, 2), "escenas": escenas},
                                                  ensure_ascii=False, indent=1), encoding="utf-8")
     capitulos = "0:00 Inicio\n" + "\n".join(f"{int(p['t0'] // 60)}:{int(p['t0'] % 60):02d} {p['sec']['titulo']}" for p in plan)
@@ -873,7 +881,6 @@ def main(dia_txt):
         desc += ("\n\nFotografías de archivo (licencias libres, adaptadas con el color y encuadre del canal):\n"
                  + "\n".join(f"- {c['autor']} ({c['licencia']}): {c['pagina']}" for c in fotos_usadas.values()))
     (dia / "episodio_descripcion.txt").write_text(desc, encoding="utf-8")
-    print(f"EPISODIO {total / 60:.1f} min -> {out}")
 
 
 if __name__ == "__main__":

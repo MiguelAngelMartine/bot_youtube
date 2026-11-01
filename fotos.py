@@ -1,7 +1,9 @@
 """Herramienta del EDITOR GRAFICO: busca fotos de licencia libre (Openverse, que reune Flickr y Wikimedia, y Wikimedia
 Commons directo), baja miniaturas para mirarlas antes de decidir, y guarda la elegida con su credito en creditos.json.
 Uso:  python fotos.py buscar AAAA-MM-DD "consulta" [--n 8]      -> dia/<fecha>/fotos_candidatas/<slug>_<k>.jpg + .json
-      python fotos.py elegir AAAA-MM-DD <slug> <k> <nombre.jpg>  -> dia/<fecha>/imagenes/<nombre.jpg> + credito
+      python fotos.py elegir AAAA-MM-DD <slug> <k> <nombre.jpg> [--persona "Nombre Apellido"]
+                                                                 -> dia/<fecha>/imagenes/<nombre.jpg> + credito
+      (--persona: es el retrato de esa persona; el tablero lo pone en su polaroid)
 Licencias admitidas: CC0, dominio publico, CC BY (preferidas) y CC BY-SA (solo si no hay otra). Nunca NC ni ND."""
 from __future__ import annotations
 
@@ -95,7 +97,7 @@ def buscar(dia_txt, q, n=8):
     print(f"{len(cands)} candidatas -> {dest}/{s}_<k>.jpg  (mira cada una antes de elegir)")
 
 
-def elegir(dia_txt, s, k, nombre):
+def elegir(dia_txt, s, k, nombre, persona=None):
     dia = RAIZ / "dia" / dia_txt
     c = json.loads((dia / "fotos_candidatas" / f"{s}.json").read_text(encoding="utf-8"))[int(k)]
     im = baja(c["url"], 2400)
@@ -107,6 +109,8 @@ def elegir(dia_txt, s, k, nombre):
     cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else {}
     cred[nombre] = {"titulo": c["titulo"], "url": c["url"], "ancho": im.width, "alto": im.height, "autor": c["autor"],
                     "licencia": c["licencia"], "pagina": c["pagina"], "fuente": c["fuente"]}
+    if persona:
+        cred[nombre]["persona"] = persona
     cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"guardada {nombre} ({im.width}x{im.height}, {c['licencia']}, {c['autor']})")
 
@@ -116,6 +120,6 @@ if __name__ == "__main__":
     if a and a[0] == "buscar":
         buscar(a[1], a[2], int(a[a.index("--n") + 1]) if "--n" in a else 8)
     elif a and a[0] == "elegir":
-        elegir(*a[1:5])
+        elegir(*a[1:5], persona=a[a.index("--persona") + 1] if "--persona" in a else None)
     else:
         print(__doc__)
