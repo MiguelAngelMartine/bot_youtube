@@ -15,7 +15,7 @@ Escribe `dia/<fecha>/publicacion.md` con:
 2. **Descripción:** parte de `episodio_descripcion.txt`.
    - Revisa que los capítulos y las fuentes estén bien.
    - Añade 2-3 líneas propias que resuman el episodio con neutralidad.
-   - Al final: «El Hoyformativo: la política española del día, en cinco minutos y con fuentes. Nuevo episodio cada noche.».
+   - Al final: «El Hoyformativo: la política española del día, en claro y con fuentes. Nuevo episodio cada tarde.».
 3. **Etiquetas** (15-25, separadas por comas): temas, personas y partidos citados, «política española», «noticias España», «resumen del día».
 4. **Hashtags** (3, van encima del título en YouTube).
 5. **Comentario fijado:** una pregunta neutral para la comunidad sobre el tema principal, que no tome partido, y la invitación a señalar errores para la fe de erratas.

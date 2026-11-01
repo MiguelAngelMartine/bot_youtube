@@ -7,3 +7,4 @@ numpy
 scipy
 rembg[cpu]   # recorte de personas para la miniatura (descarga un modelo de 176 MB la primera vez)
 opencv-python-headless   # reescalado rapido en el render (si falta, se usa Pillow)
+trafilatura   # texto completo de las noticias (articulos.py)

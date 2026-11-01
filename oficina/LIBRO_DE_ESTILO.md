@@ -3,7 +3,7 @@
 ## Identidad (no cambia nunca)
 - **Canal:** El Hoyformativo. **Presentadora:** Urni, la urna.
 - **Voz (elegida por el usuario el 1-nov):** es-ES Álvaro, +14 % de velocidad, +6 Hz, **sin cambios de entonación** en ningún bloque. Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
-- **Lema:** «La política española del día, en cinco minutos».
+- **Lema:** «La política española del día, en claro» (desde el 1-nov-2026, con el nombre El Hoyformativo).
 - **Colores:**
   - rojo `#C8102E`, amarillo `#F1BF00`, azul noche `#0C1426`;
   - tipografía Segoe UI (Black para titulares, Semibold para textos).
