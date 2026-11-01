@@ -145,15 +145,16 @@ def capa_credito(c):
     return im
 
 
-def capa_cabecera(fecha):
+def capa_cabecera(fecha, con_marca=True):
+    """con_marca=False: sin logo ni nombre (el golpe de marca los trae volando hasta aqui)."""
     im = Image.new("RGBA", (AN, 120), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, AN, 8], fill=ROJO + (255,))
     d.rectangle([0, 8, AN, 13], fill=AMARILLO + (255,))
-    lg = logo(46)
-    im.alpha_composite(lg, (100, 62 - 23))
     fm = fuente("Inter-Black.ttf", 30)
-    d.text((160, 62), MARCA, font=fm, fill=AMARILLO + (255,), anchor="lm")
+    if con_marca:
+        im.alpha_composite(logo(46), (100, 62 - 23))
+        d.text((160, 62), MARCA, font=fm, fill=AMARILLO + (255,), anchor="lm")
     x = 160 + d.textlength(MARCA, font=fm) + 18
     d.text((x, 62), "·  " + fecha, font=fuente("Inter-Regular.ttf", 28), fill=(220, 225, 235, 255), anchor="lm")
     return im

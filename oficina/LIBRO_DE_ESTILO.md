@@ -13,7 +13,7 @@
   - gancho en la forma, literal en el fondo: citas textuales o hechos del vídeo, sin valoraciones; en tragedias, la versión sobria.
 - **Estructura fija:**
   1. **arranque directo (decisión del usuario del 1-nov):** sumario de titulares a pantalla completa con el estilo de la miniatura, sin presentación ni saludo, una frase contundente por bloque y «Vamos con ello.»;
-  2. golpe de marca: logo, nombre del canal, fecha y sintonía (2 s);
+  2. golpe de marca (`marca.py`, 2,6 s): logo, nombre del canal, fecha y sintonía, coreografiados con el sonido y encadenados con el primer bloque;
   3. bloques numerados «NN / TT»;
   4. breves;
   5. despedida («Gracias por vernos. Mañana, más.»);

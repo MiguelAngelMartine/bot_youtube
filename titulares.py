@@ -126,7 +126,3 @@ def _oscuro():
         _osc.append(capa)
     return _osc[0]
 
-
-def golpe_marca(tl, fecha):
-    """Golpe de marca entre el sumario y el primer bloque: logo, nombre y fecha (la animacion de la cabecera)."""
-    return G2.cuadro_intro(tl, fecha)

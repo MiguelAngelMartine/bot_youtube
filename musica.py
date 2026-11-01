@@ -153,7 +153,7 @@ def escribe_wav(ruta, x):
 
 
 def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablando=0.055, calma=(), efectos=(), con_sintonia=True,
-           sintonia_en=0.0, sintonia_dur=None):
+           sintonia_en=0.0, sintonia_dur=None, sin_fondo=()):
     """voz (que empieza en 'intro') + fondo que baja solo cuando se habla + sintonia + barridos en los 'cortes'."""
     voz, sr = lee_wav(voz_wav)
     assert sr == SR
@@ -183,6 +183,9 @@ def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablan
     for c0, c1 in calma:                        # bloques sobrios (tragedias): el fondo baja a menos de la mitad
         dentro = np.clip(np.minimum(tt - c0, c1 - tt) / 1.0, 0, 1)
         fondo_tot *= (1 - 0.6 * dentro)[:, None]
+    for c0, c1 in sin_fondo:                    # el fondo se retira (golpe de marca: la sintonia suena sola)
+        fuera = np.clip(np.minimum(tt - c0, c1 - tt) / 0.35, 0, 1)
+        fondo_tot *= (1 - fuera)[:, None]
     ef = np.zeros_like(v)
     s = sintonia()
     s /= np.abs(s).max()

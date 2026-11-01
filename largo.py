@@ -25,12 +25,13 @@ import genera_video2 as G2
 import musica
 import voz
 import prototipo_animado as P
+import marca
 import titulares as TIT
 from corto import estrecha, nota, pegatina, polaroid, sello
 from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, suave
 
 INTRO = 0.4        # el video entra directo con los titulares (sin cabecera ni presentacion; decision del 1-nov-2026)
-GOLPE = 2.0        # golpe de marca (logo y sintonia) entre el sumario y el primer bloque
+GOLPE = marca.DUR  # golpe de marca (logo y sintonia, marca.py) entre el sumario y el primer bloque
 BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
 AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
 CREMA = (255, 246, 196)
@@ -333,11 +334,15 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         if s["tono"] == "sobrio":
             calma.append((t, t + dur))
         t += dur
-        if tit:                                        # silencio para el golpe de marca
-            golpe0 = t
-            musica.escribe_wav(tmp / "golpe.wav", np.zeros((int(GOLPE * musica.SR), 2)))
+        if tit:                                        # silencio para el golpe de marca, que entra al acabar la frase
+            v0, _ = musica.lee_wav(tmp / f"s{i}.wav")
+            sonido = np.nonzero(np.abs(v0[:, 0]) > 0.01)[0]
+            cola = len(v0) / musica.SR - (sonido[-1] / musica.SR if len(sonido) else 0)
+            adelanta = min(max(0.0, cola - 0.15), GOLPE - 0.5)
+            golpe0 = t - adelanta
+            musica.escribe_wav(tmp / "golpe.wav", np.zeros((int((GOLPE - adelanta) * musica.SR), 2)))
             wavs.append(tmp / "golpe.wav")
-            t += GOLPE
+            t = golpe0 + GOLPE
     fin_voz = t
     lista = tmp / "voz.txt"
     lista.write_text("".join(f"file '{w.name}'\n" for w in wavs), encoding="utf-8")
@@ -349,9 +354,15 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     tarj = [tj for p in plan if p["tit"] for tj in p["tit"]]
     efectos = [(x, "pop") for x in pops] + [(x, "whoosh") for x in cambios]
     efectos += [(tj["t0"] - 0.05, "whoosh") for tj in tarj] + [(tj["t0"] + TIT.ENTRA, "pop") for tj in tarj if not tj["sobrio"]]
-    total = musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", INTRO, G2.OUTRO,
-                          [p["t0"] for p in plan if not p["tit"]] + [fin_voz], calma=calma, efectos=efectos,
-                          sintonia_en=golpe0 if golpe0 is not None else 0.0, sintonia_dur=GOLPE + 0.8 if golpe0 else None)
+    cortes = [p["t0"] for p in plan if not p["tit"]] + [fin_voz]
+    sin_fondo = []
+    if golpe0 is not None:                             # el golpe de marca suena solo: sintonia y sus dos barridos
+        efectos += [(golpe0, "whoosh"), (golpe0 + 2.05, "whoosh")]
+        cortes = [c for c in cortes if abs(c - (golpe0 + GOLPE)) > 0.01]
+        sin_fondo = [(golpe0 - 0.1, golpe0 + GOLPE - 0.1)]
+    total = musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", INTRO, G2.OUTRO, cortes, calma=calma, efectos=efectos,
+                          sintonia_en=golpe0 if golpe0 is not None else 0.0, sintonia_dur=GOLPE + 0.5 if golpe0 else None,
+                          sin_fondo=sin_fondo)
     v, sr = musica.lee_wav(tmp / "voz.wav")
     hop = sr // FPS
     rms = np.sqrt(np.mean(v[: len(v) // hop * hop, 0].reshape(-1, hop) ** 2, axis=1))
@@ -367,20 +378,30 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     def presente(t, i):
         """1 si Urni esta en pantalla (bloques normales), con entrada y salida suaves."""
         dentro = plan[i]["sec"]["tono"] != "sobrio"
-        antes = plan[i - 1]["sec"]["tono"] != "sobrio" if i > 0 else False
+        antes = plan[i - 1]["sec"]["tono"] != "sobrio" and not plan[i - 1]["tit"] if i > 0 else False
         x = suave((t - plan[i]["t0"] - 0.3) / 0.6)
         return (antes + (dentro - antes) * x) if i > 0 else float(dentro) * suave((t - plan[0]["t0"]) / 0.6)
+
+    gm, sin_marca = [], []
+    cab_sin = G2.capa_cabecera(G["fecha"], con_marca=False)
 
     def barra(fr, t):
         ImageDraw.Draw(fr).rectangle([0, AL - 8, int(AN * max(0.0, t - INTRO) / (fin_voz - INTRO)), AL], fill=AMARILLO + (255,))
         return fr
 
     def cuadro(t):
-        if plan[0]["tit"] and t < plan[0]["t0"] + plan[0]["dur"]:      # sumario a pantalla completa
+        if plan[0]["tit"] and t < (golpe0 if golpe0 is not None else plan[0]["t0"] + plan[0]["dur"]):   # sumario
             tj = [x for x in plan[0]["tit"] if x["t0"] <= t + 1e-9] or plan[0]["tit"][:1]
             return barra(TIT.cuadro(tj[-1], max(0.0, t - tj[-1]["t0"]), t), t)
         if golpe0 is not None and golpe0 <= t < golpe0 + GOLPE:
-            return barra(TIT.golpe_marca(t - golpe0, G["fecha"]), t)
+            if not gm:                                 # se preparan una vez: la pieza, el ultimo titular y el tablero
+                ult = plan[0]["tit"][-1]
+                gm.append(marca.Golpe(G["fecha"]))
+                gm.append(TIT.cuadro(ult, golpe0 - ult["t0"], golpe0))
+                sin_marca.append(1)                    # el tablero sin logo, nombre ni titulo: los trae el vuelo
+                gm.append(cuadro(golpe0 + GOLPE + 1e-4).convert("RGBA"))
+                sin_marca.clear()
+            return barra(gm[0].cuadro(t - golpe0, gm[1], gm[2]), t)
         if t < INTRO or t >= fin_voz:
             fr = G2.cuadro_intro(t, G["fecha"]) if t < INTRO else G2.cuadro_cierre(t - fin_voz, G["fecha"])
             q = (t - fin_voz) / G2.CORTINILLA
@@ -398,8 +419,11 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         d = ImageDraw.Draw(fr)
         d.rectangle([BX, BY - 4, BX + BW, BY], fill=AMARILLO + (255,))
         d.rectangle([BX, BY + BH, BX + BW, BY + BH + 4], fill=AMARILLO + (255,))
-        fr.alpha_composite(cab)
-        pega(fr, p["blq"], 100, 108)
+        fr.alpha_composite(cab_sin if sin_marca else cab)
+        tras_golpe = golpe0 is not None and abs(p["t0"] - golpe0 - GOLPE) < 0.01
+        if not sin_marca:
+            pega(fr, p["blq"], 100 - 30 * (1 - suave((t - p["t0"]) / 0.35)) * tras_golpe,
+                 108, suave((t - p["t0"]) / 0.35) if tras_golpe else 1.0)
         if 0 < i < len(plan) - 1:                      # "A continuacion": anuncia el bloque siguiente (retencion)
             falta = plan[i + 1]["t0"] - t
             if falta < 4.5:
@@ -427,7 +451,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         d = ImageDraw.Draw(fr)
         d.rectangle([0, AL - 8, int(AN * (t - INTRO) / (fin_voz - INTRO)), AL], fill=AMARILLO + (255,))
         tl = t - p["t0"]
-        if tl < G2.CORTINILLA:                         # cortinilla roja y amarilla al cambiar de bloque
+        if tl < G2.CORTINILLA and not tras_golpe:
+            # cortinilla roja y amarilla al cambiar de bloque (tras el golpe de marca no: ya trae su transicion)
             x0 = int(AN * (2.2 * tl / G2.CORTINILLA - 1.2))
             d.rectangle([x0, 0, x0 + AN, AL], fill=ROJO + (255,))
             d.rectangle([x0 + AN, 0, x0 + AN + 40, AL], fill=AMARILLO + (255,))
@@ -436,7 +461,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     escenas = [(i, pt["tipo"], pt["t0"], pt["t1"]) for i, p in enumerate(plan) if not p["tit"] for pt in p["partes"]]
     for i, p in enumerate(plan):                       # el control de calidad mira cada tarjeta del sumario y el golpe
         if p["tit"]:
-            fins = [x["t0"] for x in p["tit"][1:]] + [p["t0"] + p["dur"]]
+            fins = [x["t0"] for x in p["tit"][1:]] + [golpe0 if golpe0 is not None else p["t0"] + p["dur"]]
             escenas[0:0] = [(i, f"titular{k + 1}", x["t0"], b) for k, (x, b) in enumerate(zip(p["tit"], fins))]
     if golpe0 is not None:
         escenas.insert(len(plan[0]["tit"]), (0, "golpe_marca", golpe0, golpe0 + GOLPE))
