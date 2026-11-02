@@ -43,4 +43,5 @@
 - **Permisos** de la oficina para trabajar sola: `.claude/settings.json`, aprobado por el usuario el 2-nov-2026 (scripts del proyecto, escribir en `dia/` y `archivo/`, leer noticias; prohibido leer las claves).
 - **Acabado profesional del vídeo** (pedido el 1-nov): repaso hecho y pendientes ordenados en `oficina/REPASO_ACABADO.md`.
 - **Antes de monetizar:** una consulta breve con un abogado de propiedad intelectual (la voz ya tiene licencia comercial con Azure desde el 2-nov).
+- **TikTok, aparcado** (2-nov-2026): primero se asienta YouTube. Cuando funcione como queremos: 1) meter el corto en la jornada y mandarlo por Telegram para subirlo a mano; 2) después, la API oficial de TikTok en modo borrador (registrar la app en developers.tiktok.com; el vídeo llega a la bandeja y lo publica el usuario). Nunca programas no oficiales (riesgo de cierre de la cuenta).
 - **Pendiente de mejorar en el corto vertical:** piezas que se solapan en la escena de posturas; biblioteca de escenarios y personajes genéricos dibujados (lo que más engancha en el vídeo de referencia).
