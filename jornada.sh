@@ -31,11 +31,27 @@ lanza)
     if ! flock -n 9; then echo "[$(date +%FT%T)] Ya hay una jornada en marcha" >> "$LOG"; exit 0; fi
     if [ -f "$DIA/youtube.json" ]; then echo "[$(date +%FT%T)] $FECHA ya está subido; no se repite" >> "$LOG"; exit 0; fi
 
-    echo "[$(date +%FT%T)] Empieza la jornada $FECHA ($(claude --version))" >> "$LOG"
-    # Tope de 3 h para que una jornada atascada no se quede colgada.
-    timeout 3h claude -p "/edicion-diaria $FECHA" --permission-mode auto --output-format text >> "$LOG" 2>&1
-    COD=$?
-    echo "[$(date +%FT%T)] Fin (código $COD)" >> "$LOG"
+    # Hasta 3 intentos: si se agota el límite de uso del plan de Claude (se comparte con las sesiones del día),
+    # espera a que se renueve y retoma (la skill salta las fases ya hechas). Nunca empieza un intento después de las 21:00.
+    for INTENTO in 1 2 3; do
+        echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
+        ANTES=$(wc -l < "$LOG")
+        # Tope de 3 h para que una jornada atascada no se quede colgada.
+        timeout 3h claude -p "/edicion-diaria $FECHA" --permission-mode auto --output-format text >> "$LOG" 2>&1
+        COD=$?
+        echo "[$(date +%FT%T)] Fin (código $COD)" >> "$LOG"
+        [ "$COD" -eq 0 ] && break
+        RESET="$(tail -n +"$ANTES" "$LOG" | grep -io 'limit.*resets [0-9:]*[ap]m' | grep -io '[0-9:]*[ap]m' | tail -n 1)"
+        [ -z "$RESET" ] && break                              # otro error: aviso normal
+        OBJ=$(date -d "$RESET" +%s 2>/dev/null) || break
+        AHORA=$(date +%s)
+        [ "$OBJ" -le "$AHORA" ] && OBJ=$((AHORA + 60))
+        OBJ=$((OBJ + 120))                                      # 2 min de margen tras la renovación
+        if [ "$INTENTO" -eq 3 ] || [ "$(date -d "@$OBJ" +%H)" -ge 21 ]; then break; fi
+        "$PY" notifica.py "$FECHA" --error "la jornada se ha pausado porque se agotó el límite de uso del plan de Claude. Se reanuda sola a las $(date -d "@$OBJ" +%H:%M), donde se quedó." >> "$LOG" 2>&1
+        echo "[$(date +%FT%T)] Límite de uso: espera hasta $(date -d "@$OBJ" +%H:%M)" >> "$LOG"
+        sleep $((OBJ - $(date +%s)))
+    done
     if [ "$COD" -ne 0 ]; then
         if [ "$COD" -eq 124 ]; then MSG="la jornada pasó de 3 horas y se ha cortado"; else MSG="la jornada terminó con un error (código $COD)"; fi
         "$PY" notifica.py "$FECHA" --error "$MSG. Detalles en $LOG" >> "$LOG" 2>&1

@@ -38,7 +38,7 @@
 - Carpeta de trabajo anterior: `../resumen_politico`, se conserva como copia; el proyecto vivo es este.
 - **Servidor** (miguel@192.168.1.129, portátil de 2011, Ubuntu + Docker): el 1-nov se pararon todos los contenedores salvo `allweather-market-recorder` para dedicarlo al canal. Plan:
   1. bots de recogida de noticias cada hora;
-  2. ~~Claude Code en el servidor lanzando `/edicion-diaria`~~: hecho el 2-nov con `jornada.sh` + cron (14:00 Madrid, `claude -p --permission-mode auto`, tope de 3 h, aviso de error por Telegram);
+  2. ~~Claude Code en el servidor lanzando `/edicion-diaria`~~: hecho el 2-nov con `jornada.sh` + cron (14:00 Madrid, `claude -p --permission-mode auto`, tope de 3 h, aviso de error por Telegram); desde el 2-nov, si se agota el límite de 5 h del plan de Claude (compartido con las sesiones del día: el 2-nov cortó la jornada a las 14:12), `jornada.sh` espera a que se renueve y la retoma sola (hasta 3 intentos, nunca después de las 21:00) avisando por Telegram. Conviene no hacer sesiones largas justo antes de las 14:00;
   3. ~~medir si el servidor monta el vídeo a tiempo~~: medido el 1-nov. Al principio tardaba ~31 min por 6 min de vídeo; tras optimizar (4 procesos a la vez, OpenCV, caché de voz y música) tarda **~11 min**.
 - **Permisos** de la oficina para trabajar sola: `.claude/settings.json`, aprobado por el usuario el 2-nov-2026 (scripts del proyecto, escribir en `dia/` y `archivo/`, leer noticias; prohibido leer las claves).
 - **Acabado profesional del vídeo** (pedido el 1-nov): repaso hecho y pendientes ordenados en `oficina/REPASO_ACABADO.md`.
