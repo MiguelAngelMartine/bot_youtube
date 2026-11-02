@@ -2,7 +2,7 @@
 
 ## Identidad (no cambia nunca)
 - **Canal:** El Hoyformativo. **Presentadora:** Urni, la urna.
-- **Voz (elegida por el usuario el 1-nov):** es-ES Álvaro, +14 % de velocidad, +6 Hz, **sin cambios de entonación** en ningún bloque. Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
+- **Voz (elegida por el usuario el 2-nov):** Tristán HD de Azure, velocidad normal, **sin cambios de entonación** en ningún bloque (reserva automática: Álvaro, +14 %, +6 Hz). Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
 - **Lema:** «La política española del día, en claro» (desde el 1-nov-2026, con el nombre El Hoyformativo).
 - **Colores:**
   - rojo `#C8102E`, amarillo `#F1BF00`, azul noche `#0C1426`;
@@ -21,7 +21,7 @@
 - Si hay **corrección** de un episodio anterior, va justo después del sumario con el rótulo «CORRECCIÓN» y en tono sobrio.
 
 ## La voz de Urni
-- Cercana pero informativa. Frases cortas: una idea por frase y 25 palabras como mucho.
+- Cercana pero informativa. Una idea por frase y 30 palabras como mucho, pero **escrita para el oído**, no como un telegrama (ver «Escribir para el oído»).
 - Cada bloque empieza con un **gancho** de 3-8 palabras («¿Qué falló?», «La oposición aprieta», «Y abre otro frente»).
 - Cada bloque tiene, por este orden: qué ha pasado → quién dice qué (todas las partes) → **contexto** (por qué importa, de dónde viene) → **qué pasa ahora** (próximos pasos con fecha si la hay).
 - Los números se escriben **con letras** en el texto que se lee («sesenta y nueve», «dos mil veintitrés»), para que la voz los pronuncie bien. En pantalla van con cifras.
@@ -37,8 +37,22 @@
   - cuando solo lo publica un medio, «según El País» **en el texto de pantalla** de la nota, nunca en la voz (decisión del 1-nov-2026: la voz no nombra medios para no estar citando fuentes continuamente). La voz sí dice quién afirma algo y si no está confirmado («sin confirmación oficial», «está previsto», «hay versiones distintas»);
   - sin atribución solo si está CONTRASTADO (2+ medios de líneas distintas);
   - las acusaciones, siempre atribuidas.
-- **Duración:** el episodio entero, 6-8 min (unas 1.000-1.300 palabras). Un bloque principal, 60-110 s (170-320 palabras). Un breve, 10-20 s.
+- **Duración:** el episodio entero, 7-9 min (unas 1.000-1.300 palabras; con Tristán, ~2,75 palabras por segundo). Un bloque principal, 65-120 s (170-320 palabras). Desde el 2-nov-2026 el usuario prefiere algo más de duración si a cambio el texto fluye: nunca se quitan conectores para ahorrar segundos. Un breve, 10-20 s.
 - **Tono «sobrio»** (muertes, accidentes, atentados): sin Urni en pantalla, sin ganchos llamativos, música baja.
+
+## Escribir para el oído (decisión del usuario del 2-nov-2026)
+El texto se escucha, no se lee: tiene que fluir como lo contaría un buen locutor de radio, sin finales de frase abruptos.
+- **Une las frases con conectores** cuando la relación entre ellas existe: «además», «también», «mientras tanto», «por su parte», «a su vez», «de hecho», «eso sí», «aun así», «por ahora», «hasta ahora», «después», «antes», «al mismo tiempo». Cada paso (`di`) continúa al anterior; no empieza de cero.
+- **Nada de frases sin verbo** ni sueltas: no «Otra ante el Supremo, contra Puente.», sino «y presentó otra ante el Supremo contra Puente». No «Cincuenta y dos por huella y cuatro por ADN.», sino «cincuenta y dos de ellas, por la huella dactilar, y cuatro, por ADN».
+- **Varía la longitud**: alterna frases medias (15-25 palabras) con alguna corta para el golpe. Tres frases cortas seguidas suenan a telegrama.
+- **Sin dos puntos encadenados** («Vox fue primero: Abascal…»): en voz suenan a corte. Mejor «Vox se adelantó, y Abascal lo anunció…».
+- **Listas de personas**, en una frase natural y con «y» al final, sin punto y coma: «También la piden Abascal, Verónica Martínez Barbero, del Frente Amplio, y Míriam Nogueras, de Junts».
+- **Nada que no se pueda leer en voz alta**: ni direcciones web («Moncloa.es»), ni paréntesis, ni barras, ni siglas raras sin explicar la primera vez.
+- **Transiciones entre bloques**: el primer paso de un bloque enlaza con el anterior («Y del luto pasamos a la campaña», «Mientras tanto, en Barcelona…»), sin saludos ni muletillas.
+- **Límite de neutralidad (obligatorio):** un conector no puede añadir lo que la fuente no dice. «Por eso», «así que», «como consecuencia» o «tras» afirman una causa o un orden; «en cambio», «sin embargo» o «pese a» marcan un contraste. Úsalos solo si el dossier lo dice. Si no, usa conectores neutros: «además», «por su parte», «mientras tanto». Prohibidas las muletillas de tertulia («ojo», «y es que», «ni más ni menos», «atentos»).
+- **Ejemplo:**
+  - Telegrama: «Vox fue primero: Santiago Abascal lo anunció en una entrevista, como acusación popular. El PP lo anunció en un vídeo de Alma Ezcurra. Vox ya presentó una querella contra directivos de Adif el día del accidente. Otra ante el Supremo, contra Puente.»
+  - Para el oído: «Vox se adelantó: Santiago Abascal lo contó en una entrevista, y lo hará como acusación popular. El PP, por su parte, lo anunció en un vídeo de Alma Ezcurra. Además, no es el primer paso de Vox en los tribunales, porque el mismo día del accidente ya se querelló contra directivos de Adif, y presentó otra querella ante el Supremo contra Puente.»
 
 ## Equilibrio
 - En cada polémica: versión del Gobierno, de la oposición principal y, si la hay, de los socios. Si una parte no ha hablado, se dice («el Gobierno no ha respondido»).

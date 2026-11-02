@@ -20,6 +20,7 @@ Para cada frase y cada dato en pantalla:
    - un medio nombrado en la voz (`di`): ya no se hace, va en pantalla;
    - un hecho que no está en el dossier;
    - una deducción presentada como hecho (incluidas las sumas o restas que no dé la fuente);
+   - un conector que afirma algo que la fuente no dice: causa («por eso», «así que», «tras») u orden temporal que no consta;
    - un dato ya desmentido.
    - Atención especial a lo que **no se dice**: si el dossier tiene una versión contraria y el bloque solo da una, es un problema.
 3. Escribe `dia/<fecha>/revision/verificacion.md`: una sección por bloque con el veredicto **APTO** o **CORREGIR** y, por cada problema, la frase exacta, qué dice la fuente (con medio) y el cambio propuesto.

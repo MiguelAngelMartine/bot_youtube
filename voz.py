@@ -1,22 +1,35 @@
-"""LOCUCION de Urni: entonacion segun el contexto de cada frase + pausas naturales (opcion B elegida por el usuario).
-edge-tts no admite estilos de locutor, pero si velocidad y tono por trozo: cada frase recibe un registro (gancho,
-pregunta, dato, matiz, sobrio o normal); las frases seguidas con el mismo registro se generan juntas para no perder
-continuidad, y luego se unen con pausas de locutor. Devuelve el wav y el tiempo de cada palabra.
-Un paso del guion puede forzar el registro con "entona": "gancho|pregunta|dato|matiz|sobrio|normal"."""
+"""LOCUCION de Urni. Devuelve el wav y el tiempo de cada palabra (para subtitulos, escenas y pausas).
+Voz principal (elegida por el usuario el 2-nov-2026): Tristan HD de Azure Speech (plan gratuito F0, clave en .env),
+a velocidad normal. Azure HD no da el tiempo de cada palabra: se saca escuchando el audio con Whisper "tiny" y se casa
+con el guion exacto; los huecos se ajustan a los silencios reales para que el recorte de pausas no coma sonido.
+Reserva automatica: si Azure no responde al empezar, se usa la voz anterior (edge-tts Alvaro +14 %, +6 Hz) en todo el
+proceso y se avisa por Telegram (nunca se mezclan dos voces en un video).
+Modos de edge-tts conservados: cada frase puede recibir un registro (gancho, pregunta, dato, matiz, sobrio o normal);
+el usuario eligio el modo "plano" (sin entonacion por contexto)."""
 from __future__ import annotations
 
 import asyncio
+import difflib
 import re
 import subprocess
+import sys
+import time
 from pathlib import Path
 
 import edge_tts
 import numpy as np
+import requests
 
 import genera_video as V1
 import pausas
 
-VOZ = "es-ES-AlvaroNeural"
+RAIZ = Path(__file__).parent
+AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
+AZURE_VEL = "+0%"
+AZURE_MAX = 2500                                   # caracteres por peticion (el plan F0 admite hasta 3.000)
+WHISPER = "tiny"                                   # 4x mas rapido que el audio en el servidor
+SESGO = {"tiny": 0.085, "base": 0.0}               # retraso medio medido contra los tiempos exactos de edge-tts (2-nov)
+VOZ = "es-ES-AlvaroNeural"                         # reserva
 BASE = (14, 6)                                    # +14 % de velocidad, +6 Hz (la muestra 1 elegida)
 REGISTRO = {                                       # (velocidad %, tono Hz)
     "normal": (14, 6),
@@ -65,6 +78,158 @@ async def _sintetiza(texto, reg, mp3):
     return pal
 
 
+def _credenciales_azure():
+    env = RAIZ / ".env"
+    if not env.exists():
+        return None, None
+    kv = dict(l.split("=", 1) for l in env.read_text(encoding="utf-8").splitlines() if "=" in l and not l.startswith("#"))
+    return kv.get("AZURE_SPEECH_KEY", "").strip().strip("\"'"), kv.get("AZURE_SPEECH_REGION", "").strip().strip("\"'")
+
+
+_MOTOR = None
+
+
+def motor():
+    """'azure' o 'edge'. Se decide una vez por proceso, para que todo el video tenga la misma voz."""
+    global _MOTOR
+    if _MOTOR:
+        return _MOTOR
+    clave, region = _credenciales_azure()
+    motivo = "falta la clave de Azure en .env"
+    if clave and region:
+        try:
+            r = requests.post(f"https://{region}.api.cognitive.microsoft.com/sts/v1.0/issueToken", timeout=20,
+                              headers={"Ocp-Apim-Subscription-Key": clave, "Content-Length": "0"})
+            if r.ok:
+                _MOTOR = "azure"
+                return _MOTOR
+            motivo = f"Azure rechaza la clave ({r.status_code})"
+        except requests.RequestException as e:
+            motivo = f"Azure no responde ({type(e).__name__})"
+    _MOTOR = "edge"
+    print(f"  AVISO voz: {motivo}; se usa la voz de reserva (Alvaro)", file=sys.stderr, flush=True)
+    try:
+        import notifica
+        tok, chat = notifica.credenciales()
+        notifica.envia(f"https://api.telegram.org/bot{tok}", "sendMessage", timeout=30, data={"chat_id": chat, "text":
+                       f"⚠️ El Hoyformativo: {motivo}. El vídeo de hoy sale con la voz de reserva (Álvaro), no con Tristán."})
+    except BaseException:
+        pass
+    return _MOTOR
+
+
+def _azure_mp3(texto, mp3):
+    from xml.sax.saxutils import escape
+    clave, region = _credenciales_azure()
+    ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
+            f"<voice name='{AZURE_VOZ}'><prosody rate='{AZURE_VEL}'>{escape(texto)}</prosody></voice></speak>")
+    for intento in range(4):
+        try:
+            r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
+                              timeout=180, headers={"Ocp-Apim-Subscription-Key": clave, "User-Agent": "hoyformativo",
+                                                    "Content-Type": "application/ssml+xml",
+                                                    "X-Microsoft-OutputFormat": "audio-48khz-192kbitrate-mono-mp3"})
+            if r.ok and len(r.content) > 1000:
+                Path(mp3).write_bytes(r.content)
+                return
+            error = f"{r.status_code} {r.text[:120]}"
+        except requests.RequestException as e:
+            error = type(e).__name__
+        time.sleep((2, 5, 15, 0)[intento])
+    raise RuntimeError(f"Azure no ha generado la voz tras 4 intentos: {error}")
+
+
+_MODELO = None
+
+
+def _modelo():
+    global _MODELO
+    if _MODELO is None:
+        from faster_whisper import WhisperModel
+        _MODELO = WhisperModel(WHISPER, device="cpu", compute_type="int8", cpu_threads=4)
+    return _MODELO
+
+
+def _norm(w):
+    return re.sub(r"\W", "", w.lower())
+
+
+def alinea(wav, texto):
+    """Tiempo de cada palabra del guion (con su puntuacion, como la escribe el redactor) escuchando el audio."""
+    segs, _ = _modelo().transcribe(str(wav), language="es", word_timestamps=True, beam_size=1, vad_filter=False,
+                                   condition_on_previous_text=False)
+    s0 = SESGO.get(WHISPER, 0.0)
+    oidas = [(max(0.0, w.start - s0), max(0.0, w.end - s0), _norm(w.word)) for s in segs for w in s.words if _norm(w.word)]
+    toks = texto.split()
+    tt = [None] * len(toks)
+    sm = difflib.SequenceMatcher(None, [_norm(t) for t in toks], [o[2] for o in oidas], autojunk=False)
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            for k in range(i2 - i1):
+                tt[i1 + k] = oidas[j1 + k][:2]
+        elif op == "replace":                       # Whisper oyo otra cosa ("vice secretaria"): se reparte su tramo
+            _reparte(tt, toks, i1, i2, oidas[j1][0], oidas[j2 - 1][1])
+    # palabras que Whisper no oyo: se reparten en el hueco entre sus vecinas
+    k = 0
+    while k < len(toks):
+        if tt[k] is not None:
+            k += 1
+            continue
+        f = k
+        while f < len(toks) and tt[f] is None:
+            f += 1
+        ini = tt[k - 1][1] if k else 0.0
+        fin = tt[f][0] if f < len(toks) else (oidas[-1][1] if oidas else ini + 0.3 * (f - k))
+        _reparte(tt, toks, k, f, ini, max(fin, ini + 0.05 * (f - k)))
+        k = f
+    return [(a, b, w) for (a, b), w in zip(tt, toks)]
+
+
+def _reparte(tt, toks, i1, i2, ini, fin):
+    pesos = [max(1, len(_norm(t))) for t in toks[i1:i2]]
+    paso, t = (fin - ini) / sum(pesos), ini
+    for k, p in zip(range(i1, i2), pesos):
+        tt[k] = (t, t + paso * p)
+        t += paso * p
+
+
+def a_silencios(x, sr, pal, umbral_db=-38):
+    """Protege el recorte de pausas (pausas.naturaliza) cuando los tiempos vienen de Whisper: no toca ningun tiempo
+    salvo en los huecos que se van a recortar, y ahi solo si el tramo que se quitaria tiene sonido. En ese caso encaja
+    el corte en el silencio real mas largo del hueco, o anula el hueco si no hay silencio."""
+    mono = np.abs(x).mean(axis=1) if x.ndim > 1 else np.abs(x)
+    ven = int(0.01 * sr)
+    n = len(mono) // ven
+    rms = np.sqrt((mono[:n * ven].reshape(n, ven) ** 2).mean(axis=1) + 1e-9)
+    silencio = 20 * np.log10(rms / 32768) < umbral_db
+    out = list(pal)
+    for k in range(len(out) - 1):
+        a, b, w = out[k]
+        a2, b2, w2 = out[k + 1]
+        objetivo = PAUSA if w.rstrip()[-1:] in ".?!:" or a2 - b > 0.5 else COMA     # la misma regla que naturaliza
+        if a2 - b <= objetivo + 0.05:
+            continue                                # aqui no se recorta nada
+        c0, c1 = int((b + 0.12) * 100), int((a2 - 0.05) * 100)          # lo que naturaliza podria quitar
+        if c1 <= c0 or silencio[c0:c1].all():
+            continue                                # todo silencio: los tiempos se quedan como estan
+        lo, hi = int(b * 100), int(a2 * 100)
+        mejor, ini_r = (0, 0), None
+        for i, s in enumerate(list(silencio[lo:hi]) + [False]):
+            if s and ini_r is None:
+                ini_r = i
+            elif not s and ini_r is not None:
+                if i - ini_r > mejor[1] - mejor[0]:
+                    mejor = (ini_r, i)
+                ini_r = None
+        if mejor[1] - mejor[0] < 10:                # menos de 0,1 s de silencio: sin hueco, no se corta
+            m = (b + a2) / 2
+            out[k], out[k + 1] = (a, max(a, m), w), (min(b2, m), b2, w2)
+            continue
+        s0, s1 = (lo + mejor[0]) / 100, (lo + mejor[1]) / 100
+        out[k], out[k + 1] = (a, max(a, s0 - 0.12), w), (min(b2, s1 + 0.05), b2, w2)
+    return out
+
+
 CACHE = Path(__file__).parent / "cache" / "voz"
 
 
@@ -75,7 +240,7 @@ def locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     import json
     import shutil
     fuentes = "".join((Path(__file__).parent / m).read_text(encoding="utf-8") for m in ("voz.py", "pausas.py"))
-    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes],
+    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes, motor()],
                                     ensure_ascii=False).encode()).hexdigest()[:20]
     wav_c, meta_c = CACHE / f"{clave}.wav", CACHE / f"{clave}.json"
     if wav_c.exists() and meta_c.exists():
@@ -110,11 +275,29 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
             else:
                 trozos.append((f, r))
             k += 1
+    azure = motor() == "azure"
+    if azure:                                      # la voz HD no usa registros; trozos largos se parten por frases
+        partidos = []
+        for txt, r in trozos:
+            cur = ""
+            for f in frases(txt):
+                if cur and len(cur) + len(f) + 1 > AZURE_MAX:
+                    partidos.append((cur, r))
+                    cur = ""
+                cur = f"{cur} {f}".strip()
+            if cur:
+                partidos.append((cur, r))
+        trozos = partidos
     audio, palabras, t, sr = [], [], 0.0, 48000
     for j, (txt, r) in enumerate(trozos):
         mp3, wav = Path(f"{tmp}_{j}.mp3"), Path(f"{tmp}_{j}.wav")
-        pal = asyncio.run(_sintetiza(txt, r, mp3))
+        if azure:
+            _azure_mp3(txt, mp3)
+        else:
+            pal = asyncio.run(_sintetiza(txt, r, mp3))
         subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
+        if azure:
+            pal = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
         pal, _ = pausas.naturaliza(wav, pal, PAUSA, COMA, sala=False)
         x, _ = pausas.lee(wav)
         # recorta el silencio del principio y del final del trozo y deja la pausa de locutor entre trozos

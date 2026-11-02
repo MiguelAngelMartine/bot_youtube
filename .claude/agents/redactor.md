@@ -18,7 +18,8 @@ Te darán una fecha y un número de bloque (o «breves»).
    - Respeta la atribución del dossier, **pero en pantalla, no en la voz**: el `di` no nombra medios (nada de «según El País», «recoge ABC», «dice en El Mundo»). Lo `ATRIBUIDO` lleva «según <medio>» en el texto de pantalla de su nota o tarjeta, y la escena su `fuente`.
      En la voz sí: quién dice algo («Feijóo asegura…», «según el Gobierno», «según los Mossos») y que algo no está confirmado («sin confirmación oficial», «está previsto», «hay versiones distintas»). Nunca presentes como hecho lo que solo es una previsión o una versión.
    - Estructura: gancho → lo nuevo → quién dice qué (todas las partes del dossier) → contexto → qué pasa ahora.
-   - Ajusta la longitud a los `segundos` de la escaleta (unas 2,9 palabras por segundo).
+   - **Escribe para el oído** (sección «Escribir para el oído» del libro de estilo): frases unidas con conectores, sin frases sin verbo, sin dos puntos encadenados y sin finales abruptos. Cada `di` continúa al anterior. Los conectores de causa o contraste («por eso», «tras», «en cambio»), solo si el dossier lo dice. Antes de entregar, léelo entero como si lo dijeras en voz alta y une lo que suene a telegrama.
+   - Ajusta la longitud a los `segundos` de la escaleta (unas 2,75 palabras por segundo con la voz de Tristán; no recortes conectores para ganar tiempo: el usuario prefiere un vídeo algo más largo y natural).
    - Números con letras en `di`, cifras en pantalla.
    - Escenas: tipos y límites del catálogo, al menos 3 tipos distintos por bloque principal, y nunca el mismo tipo dos veces seguidas.
    - Cada `cuando` debe ser un trozo **literal** de 2-4 palabras del `di` de ese paso o de los siguientes de la misma escena.

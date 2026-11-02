@@ -4,7 +4,7 @@ Canal diario de política española en YouTube (y Shorts/TikTok), presentado por
 
 - **Promesa:** todo lo que aparece es real y está contrastado con medios fiables de líneas distintas; enfoque neutral; cada dato lleva su fuente en pantalla.
 - **Formatos:**
-  - vídeo largo horizontal de 6-8 min cada tarde para YouTube, en estilo tablero (`largo.py`);
+  - vídeo largo horizontal de 7-9 min cada tarde para YouTube, en estilo tablero (`largo.py`);
   - 2-3 cortos verticales de 60-90 s en estilo tablero para Shorts y TikTok (`corto.py`).
 - **Todo es propio o de licencia libre:** animaciones, música, logo y presentadora los genera el programa. Las fotos son de archivo, libres y con crédito.
 

@@ -1,4 +1,6 @@
-edge-tts==7.3.1
+edge-tts==7.3.1   # voz de reserva (Alvaro)
+faster-whisper   # tiempo de cada palabra de la voz de Azure (modelo tiny, se descarga la primera vez)
+msal   # clave_azure.py: guarda la clave de Azure en .env sin copiarla a mano
 feedparser
 requests
 imageio-ffmpeg

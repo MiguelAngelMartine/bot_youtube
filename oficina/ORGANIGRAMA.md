@@ -59,7 +59,7 @@ Lo que pase después de las 15:00 entra en el episodio del día siguiente, y la 
 | 4 | **Verificador** | Comprueba frase a frase contra el dossier y el texto de las noticias: cifras, fechas, cargos, citas literales, atribuciones. | Corregir el estilo | sonnet |
 | 4 | **Defensor de la neutralidad** | Mide el equilibrio: versiones de Gobierno, oposición y socios; tiempo por partido; adjetivos valorativos; encuadres. | Censurar hechos incómodos | sonnet |
 | 4 | **Asesor de cumplimiento** | Revisa YouTube (contenido no auténtico, anuncios en tragedias, elecciones) y la ley: citas breves y atribuidas, sin textos copiados, derecho al honor. | Asesoría jurídica formal | sonnet |
-| 5 | **Editor de cierre** | Monta el episodio final: sumario, bloques corregidos, despedida y corrección si la hay. Comprueba la duración (6-8 min) y la coherencia. | Meter hechos nuevos | opus |
+| 5 | **Editor de cierre** | Monta el episodio final: sumario, bloques corregidos, despedida y corrección si la hay. Comprueba la duración (7-9 min) y la coherencia. | Meter hechos nuevos | opus |
 | 5 | **Editor gráfico** | Elige para cada escena de texto una foto real, de licencia libre, que corresponda a lo que se narra. Mira cada candidata antes de elegirla. | Fotos de víctimas, de medios o agencias, o con personas ajenas a la noticia | sonnet |
 | 6 | **Montador** | Renderiza el vídeo. Si una escena falla (trozo no encontrado, texto largo), lo ajusta y repite. | Cambiar el contenido | sonnet |
 | 6 | **Control de calidad** | Mira los fotogramas de cada escena (textos cortados, solapes, huecos), el volumen y la sincronía voz-escena. Aprueba o devuelve al montador. | Opinar del contenido | sonnet |

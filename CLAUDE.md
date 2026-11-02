@@ -22,7 +22,8 @@
   - música propia (musica.py).
 
 ## Decisiones ya tomadas por el usuario (no volver a proponer)
-- **Voz:** edge-tts es-ES-AlvaroNeural, +14 %, +6 Hz, **sin entonación por contexto** (la probó y la descartó), con pausas naturales de 0,40 s entre frases y 0,24 s en comas largas (`voz.py`, modo «plano»). Prefirió optimizar esta voz antes que una voz propia o clonada.
+- **Voz** (2-nov-2026): **Tristán HD de Azure Speech** (`es-ES-Tristan:DragonHDLatestNeural`, velocidad normal), elegida por el usuario entre muestras por ser la más natural. Plan gratuito F0 (500.000 caracteres al mes; gastamos ~300.000), región Sweden Central (West Europe no admite clientes nuevos), con licencia comercial; clave en `.env` (`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`), que se guarda con `clave_azure.py` sin copiarla a mano. Azure HD no da el tiempo de cada palabra: lo saca Whisper «tiny» escuchando el audio y se casa con el guion (`voz.alinea`). Siguen las pausas de 0,40 s entre frases y 0,24 s en comas largas, **sin entonación por contexto** (la probó y la descartó). Si Azure falla al empezar, todo el vídeo sale con la voz de reserva (edge-tts Álvaro, +14 %, +6 Hz) y avisa por Telegram. No quiere voz propia ni clonada; Tristán no se puede descargar para usarlo sin Microsoft.
+- **Redacción para el oído** (2-nov-2026): los textos que lee Urni fluyen como en la radio, con conectores entre frases y sin estilo telegrama (sección «Escribir para el oído» de `oficina/LIBRO_DE_ESTILO.md`). Los conectores de causa o contraste, solo si la fuente lo dice (lo vigilan el verificador y el defensor de la neutralidad). El usuario prefiere un vídeo algo más largo (7-9 min) si así suena más natural: nunca recortar conectores para ganar segundos.
 - **Formatos:**
   - largo horizontal **estilo tablero** (`largo.py`, el mismo lenguaje que el vertical adaptado a 16:9), para YouTube; el estilo anterior con fotos de fondo (`episodio.py`) queda descartado (1-nov-2026);
   - corto vertical estilo tablero (`corto.py`), para Shorts y TikTok.
@@ -41,5 +42,5 @@
   3. ~~medir si el servidor monta el vídeo a tiempo~~: medido el 1-nov. Al principio tardaba ~31 min por 6 min de vídeo; tras optimizar (4 procesos a la vez, OpenCV, caché de voz y música) tarda **~11 min**.
 - **Permisos** de la oficina para trabajar sola: `.claude/settings.json`, aprobado por el usuario el 2-nov-2026 (scripts del proyecto, escribir en `dia/` y `archivo/`, leer noticias; prohibido leer las claves).
 - **Acabado profesional del vídeo** (pedido el 1-nov): repaso hecho y pendientes ordenados en `oficina/REPASO_ACABADO.md`.
-- **Antes de monetizar:** pasar la voz a una opción con licencia comercial (por ejemplo Azure Speech) y una consulta breve con un abogado de propiedad intelectual.
+- **Antes de monetizar:** una consulta breve con un abogado de propiedad intelectual (la voz ya tiene licencia comercial con Azure desde el 2-nov).
 - **Pendiente de mejorar en el corto vertical:** piezas que se solapan en la escena de posturas; biblioteca de escenarios y personajes genéricos dibujados (lo que más engancha en el vídeo de referencia).

@@ -49,8 +49,8 @@ Esto NO es asesoramiento jurídico: antes de activar la monetización conviene u
   - Retratos de políticos: solo en el contexto de la noticia en que aparecen (derecho a la propia imagen).
 - **Fotos** (retratos en polaroid y fotos de escena): solo de licencia libre (Openverse/Wikimedia), con «Foto de archivo», el autor y la licencia en pantalla, y la lista completa en la descripción. Nunca víctimas ni personas ajenas a la noticia.
 - **Música**: compuesta por el propio programa (musica.py), sin muestras ajenas, así que no puede haber reclamaciones de Content ID.
-- **Voz**: edge-tts de Microsoft. **Pendiente**: comprobar si sus condiciones permiten el uso comercial antes de monetizar.
-  Si no lo permiten, se pasa a una voz con licencia comercial.
+- **Voz**: Tristán HD de Azure Speech (Microsoft), servicio oficial con uso comercial permitido también en el plan gratuito F0 (desde el 2-nov-2026).
+  La reserva automática (edge-tts) solo se usa si Azure falla; si un vídeo sale con ella, no se monetiza sin revisarlo.
 
 ## 5. Revisión humana antes de publicar
 El usuario ve el vídeo completo antes de subirlo y comprueba:
