@@ -288,6 +288,9 @@ def preparar(dia_txt, versiones=2):
     import shutil
     import corto as C
     dia = RAIZ / "dia" / dia_txt
+    if (dia / "SIN_VINETAS").exists():               # decision del director para ese dia: notas con su texto
+        print(f"{dia_txt}: hoy sin viñetas por decisión del director (dia/{dia_txt}/SIN_VINETAS); las notas salen con texto")
+        return
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
     cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
     notas = notas_con_vineta(G)
