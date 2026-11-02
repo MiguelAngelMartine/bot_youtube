@@ -39,7 +39,7 @@
   1. bots de recogida de noticias cada hora;
   2. ~~Claude Code en el servidor lanzando `/edicion-diaria`~~: hecho el 2-nov con `jornada.sh` + cron (14:00 Madrid, `claude -p --permission-mode auto`, tope de 3 h, aviso de error por Telegram);
   3. ~~medir si el servidor monta el vídeo a tiempo~~: medido el 1-nov. Al principio tardaba ~31 min por 6 min de vídeo; tras optimizar (4 procesos a la vez, OpenCV, caché de voz y música) tarda **~11 min**.
-- **Permisos** de la oficina para trabajar sola (`.claude/settings.json`): pendiente de que el usuario lo cree o lo apruebe.
+- **Permisos** de la oficina para trabajar sola: `.claude/settings.json`, aprobado por el usuario el 2-nov-2026 (scripts del proyecto, escribir en `dia/` y `archivo/`, leer noticias; prohibido leer las claves).
 - **Acabado profesional del vídeo** (pedido el 1-nov): repaso hecho y pendientes ordenados en `oficina/REPASO_ACABADO.md`.
 - **Antes de monetizar:** pasar la voz a una opción con licencia comercial (por ejemplo Azure Speech) y una consulta breve con un abogado de propiedad intelectual.
 - **Pendiente de mejorar en el corto vertical:** piezas que se solapan en la escena de posturas; biblioteca de escenarios y personajes genéricos dibujados (lo que más engancha en el vídeo de referencia).

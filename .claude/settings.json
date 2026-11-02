@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "Edit(dia/**)",
+      "Write(dia/**)",
+      "Edit(archivo/**)",
+      "Write(archivo/**)",
+      "Bash(.venv/bin/python:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(ffprobe:*)",
+      "Bash(date:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(../kraken-futures-bot/.env)",
+      "Read(client_secret.json)",
+      "Read(token_youtube.json)"
+    ]
+  }
+}
