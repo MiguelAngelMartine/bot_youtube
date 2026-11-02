@@ -878,6 +878,19 @@ def escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, fotos_usadas):
             f"citas textuales y la fuente de cada información.\n\nCapítulos:\n{capitulos}\n\nFuentes: {', '.join(fuentes)}.\n\n"
             "Resumen informativo elaborado con ayuda de inteligencia artificial a partir de noticias publicadas por los medios citados, "
             "y revisado antes de su publicación. Voz sintética. Gráficos, animaciones y música originales del canal.")
+    vin = sorted((dia / "vinetas").glob("s*.jpg")) if (dia / "vinetas").exists() else []
+    if vin:                                        # viñetas de IA: se declaran siempre (NORMAS.md, 2-nov-2026)
+        origen = (json.loads((dia / "vinetas" / "origen.json").read_text(encoding="utf-8"))
+                  if (dia / "vinetas" / "origen.json").exists() else {})
+        desc += " Las viñetas son ilustraciones generadas con IA (FLUX)."
+        retratos = [d for k, d in origen.items() if d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()]
+        if retratos:
+            vistos = set()
+            desc += "\n\nIlustraciones de personas dibujadas con IA a partir de fotografías de licencia libre:\n" + "\n".join(
+                f"- {d['persona']}, a partir de una foto de {d['autor']} ({d['licencia']}): {d['pagina']}" for d in retratos
+                if not (d["persona"] in vistos or vistos.add(d["persona"])))
+    else:
+        desc += " Este episodio no incluye imágenes generadas por IA."
     if fotos_usadas:
         desc += ("\n\nFotografías de archivo (licencias libres, adaptadas con el color y encuadre del canal):\n"
                  + "\n".join(f"- {c['autor']} ({c['licencia']}): {c['pagina']}" for c in fotos_usadas.values()))
