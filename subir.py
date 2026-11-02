@@ -50,8 +50,11 @@ def autorizar():
 
 def bloque(md, seccion):
     """El primer bloque ``` que sigue al encabezado '## <seccion>'."""
-    m = re.search(r"^##\s*" + re.escape(seccion) + r".*?^```[^\n]*\n(.*?)^```", md, re.S | re.M)
-    return m.group(1).strip() if m else ""
+    tramo = re.search(r"^##\s*" + re.escape(seccion) + r"[^\n]*\n(.*?)(?=^##\s|\Z)", md, re.S | re.M)
+    if not tramo:
+        return ""
+    m = re.search(r"^```[^\n]*\n(.*?)^```", tramo.group(1), re.S | re.M)
+    return (m.group(1) if m else tramo.group(1)).strip()      # sin bloque ```: el texto de la seccion (2-nov)
 
 
 def borra_anterior(yt, dia):
