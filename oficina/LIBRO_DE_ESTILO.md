@@ -2,7 +2,7 @@
 
 ## Identidad (no cambia nunca)
 - **Canal:** El Hoyformativo. **Presentadora:** Urni, la urna.
-- **Voz (elegida por el usuario el 2-nov):** Tristán HD de Azure, velocidad normal, **sin cambios de entonación** en ningún bloque (reserva automática: Álvaro, +14 %, +6 Hz). Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
+- **Voz (elegida por el usuario el 2-nov):** Tristán HD de Azure, velocidad normal, **sin cambios de entonación** en ningún bloque (sin voz de reserva: si Azure falla, no se sube nada, porque todo tiene que ser monetizable). Las pausas entre frases se recortan a 0,40 s y ante comas largas a 0,24 s, con fundido (`voz.py`, modo «plano»).
 - **Lema:** «La política española del día, en claro» (desde el 1-nov-2026, con el nombre El Hoyformativo).
 - **Colores:**
   - rojo `#C8102E`, amarillo `#F1BF00`, azul noche `#0C1426`;

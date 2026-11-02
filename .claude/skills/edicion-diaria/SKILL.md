@@ -44,6 +44,7 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
 ## Reglas
 - Lanza las fases en paralelo cuando no dependen entre sí. Dentro de una fase, un agente por pieza.
 - Antes de pasar de fase, comprueba que el fichero existe y tiene el formato del contrato. Si no, repite el encargo una vez explicando qué falta.
+- **Todo lo que se sube a YouTube tiene que ser monetizable** (norma del usuario del 2-nov-2026). Si la voz de Azure falla, el montaje es fase crítica: no se cambia de voz ni se usa `VOZ_PRUEBA_EDGE`; se avisa con el error y no se sube nada. Lo mismo con cualquier elemento sin licencia comercial (fotos NC/ND, de medios o agencias, música ajena).
 - Si algo falla dos veces, para esa pieza, anótalo en el parte y sigue con el resto. Si falla una fase crítica (recopilación o montaje), avisa con `notifica.py <fecha> --error "<qué ha pasado>"` y termina.
 - **Nunca publiques en YouTube:** la oficina sube el vídeo como privado y el director lo publica después de verlo.
 - Al terminar, responde con el parte del día.

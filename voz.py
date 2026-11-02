@@ -1,9 +1,11 @@
 """LOCUCION de Urni. Devuelve el wav y el tiempo de cada palabra (para subtitulos, escenas y pausas).
 Voz principal (elegida por el usuario el 2-nov-2026): Tristan HD de Azure Speech (plan gratuito F0, clave en .env),
 a velocidad normal. Azure HD no da el tiempo de cada palabra: se saca escuchando el audio con Whisper "tiny" y se casa
-con el guion exacto; los huecos se ajustan a los silencios reales para que el recorte de pausas no coma sonido.
-Reserva automatica: si Azure no responde al empezar, se usa la voz anterior (edge-tts Alvaro +14 %, +6 Hz) en todo el
-proceso y se avisa por Telegram (nunca se mezclan dos voces en un video).
+con el guion exacto; el recorte de pausas se protege para que no coma sonido.
+TODO LO QUE SE SUBE A YOUTUBE TIENE QUE SER MONETIZABLE (norma del usuario, 2-nov-2026): la voz anterior (edge-tts
+Alvaro) no tiene licencia comercial, asi que NO es reserva automatica. Si Azure no responde, se reintenta ~10 min y,
+si sigue fallando, se para con error (la jornada avisa por Telegram y no sube nada). Solo para pruebas a mano:
+VOZ_PRUEBA_EDGE=1 usa Alvaro.
 Modos de edge-tts conservados: cada frase puede recibir un registro (gancho, pregunta, dato, matiz, sobrio o normal);
 el usuario eligio el modo "plano" (sin entonacion por contexto)."""
 from __future__ import annotations
@@ -29,7 +31,7 @@ AZURE_VEL = "+0%"
 AZURE_MAX = 2500                                   # caracteres por peticion (el plan F0 admite hasta 3.000)
 WHISPER = "tiny"                                   # 4x mas rapido que el audio en el servidor
 SESGO = {"tiny": 0.085, "base": 0.0}               # retraso medio medido contra los tiempos exactos de edge-tts (2-nov)
-VOZ = "es-ES-AlvaroNeural"                         # reserva
+VOZ = "es-ES-AlvaroNeural"                         # solo pruebas a mano (sin licencia comercial)
 BASE = (14, 6)                                    # +14 % de velocidad, +6 Hz (la muestra 1 elegida)
 REGISTRO = {                                       # (velocidad %, tono Hz)
     "normal": (14, 6),
@@ -90,13 +92,22 @@ _MOTOR = None
 
 
 def motor():
-    """'azure' o 'edge'. Se decide una vez por proceso, para que todo el video tenga la misma voz."""
+    """'azure' (siempre en produccion) o 'edge' (solo con VOZ_PRUEBA_EDGE=1). Se decide una vez por proceso."""
     global _MOTOR
     if _MOTOR:
         return _MOTOR
+    import os
+    if os.environ.get("VOZ_PRUEBA_EDGE") == "1":
+        print("  AVISO voz: VOZ_PRUEBA_EDGE=1, voz de pruebas (Alvaro, NO monetizable: no subir)", file=sys.stderr, flush=True)
+        _MOTOR = "edge"
+        return _MOTOR
     clave, region = _credenciales_azure()
-    motivo = "falta la clave de Azure en .env"
-    if clave and region:
+    if not (clave and region):
+        raise RuntimeError("Falta la clave de Azure en .env (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION): sin voz con "
+                           "licencia comercial no se hace el video. Se guarda con: .venv/bin/python clave_azure.py")
+    motivo = ""
+    for espera in (0, 30, 60, 120, 180, 240):       # ~10 min en total
+        time.sleep(espera)
         try:
             r = requests.post(f"https://{region}.api.cognitive.microsoft.com/sts/v1.0/issueToken", timeout=20,
                               headers={"Ocp-Apim-Subscription-Key": clave, "Content-Length": "0"})
@@ -104,18 +115,12 @@ def motor():
                 _MOTOR = "azure"
                 return _MOTOR
             motivo = f"Azure rechaza la clave ({r.status_code})"
+            if r.status_code in (401, 403):
+                break                               # clave mala: reintentar no sirve
         except requests.RequestException as e:
             motivo = f"Azure no responde ({type(e).__name__})"
-    _MOTOR = "edge"
-    print(f"  AVISO voz: {motivo}; se usa la voz de reserva (Alvaro)", file=sys.stderr, flush=True)
-    try:
-        import notifica
-        tok, chat = notifica.credenciales()
-        notifica.envia(f"https://api.telegram.org/bot{tok}", "sendMessage", timeout=30, data={"chat_id": chat, "text":
-                       f"⚠️ El Hoyformativo: {motivo}. El vídeo de hoy sale con la voz de reserva (Álvaro), no con Tristán."})
-    except BaseException:
-        pass
-    return _MOTOR
+        print(f"  AVISO voz: {motivo}; reintento", file=sys.stderr, flush=True)
+    raise RuntimeError(f"{motivo}. No se usa voz de reserva porque no seria monetizable: no se sube nada hoy.")
 
 
 def _azure_mp3(texto, mp3):

@@ -50,7 +50,8 @@ Esto NO es asesoramiento jurídico: antes de activar la monetización conviene u
 - **Fotos** (retratos en polaroid y fotos de escena): solo de licencia libre (Openverse/Wikimedia), con «Foto de archivo», el autor y la licencia en pantalla, y la lista completa en la descripción. Nunca víctimas ni personas ajenas a la noticia.
 - **Música**: compuesta por el propio programa (musica.py), sin muestras ajenas, así que no puede haber reclamaciones de Content ID.
 - **Voz**: Tristán HD de Azure Speech (Microsoft), servicio oficial con uso comercial permitido también en el plan gratuito F0 (desde el 2-nov-2026).
-  La reserva automática (edge-tts) solo se usa si Azure falla; si un vídeo sale con ella, no se monetiza sin revisarlo.
+  No hay voz de reserva en producción: edge-tts no tiene licencia comercial, así que si Azure falla no se sube nada ese día.
+- **Todo lo que se sube a YouTube tiene que ser monetizable** (norma del usuario del 2-nov-2026): voz Azure, música propia, fotos CC0/dominio público/CC BY/CC BY-SA, viñetas FLUX (Apache 2.0) y tipografías OFL.
 
 ## 5. Revisión humana antes de publicar
 El usuario ve el vídeo completo antes de subirlo y comprueba:

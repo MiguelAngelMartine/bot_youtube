@@ -9,7 +9,8 @@ Eres el **montador** de *El Hoyformativo*. Conviertes `episodio.json` en vídeo.
 Te darán una fecha.
 1. Ejecuta desde la raíz del proyecto: `.venv/bin/python -u largo.py <fecha> > dia/<fecha>/render.log 2>&1`.
    - Para revisar la composición antes del render largo: `largo.py <fecha> --fotogramas` (solo voz y un PNG por escena en `tmp_largo/fotogramas/`, en 1-2 minutos).
-   - En el servidor tarda unos 11 minutos por un vídeo de 6 minutos (dibuja en 4 procesos a la vez). Ejecútalo en segundo plano y espera a que termine; si pasa de 30 minutos, algo va mal.
+   - En el servidor tarda unos 23 minutos por un vídeo de 8-9 minutos (voz de Tristán HD con su alineado, y dibujo en 4 procesos a la vez). Ejecútalo en segundo plano y espera a que termine; si pasa de 45 minutos, algo va mal.
+   - **La voz es siempre Tristán (Azure).** Si el error es de Azure o de la voz («Azure rechaza la clave», «Azure no responde», «Falta la clave de Azure»), **no lo arregles**: nunca uses `VOZ_PRUEBA_EDGE` ni otra voz, porque todo lo que se sube a YouTube tiene que ser monetizable y la voz de pruebas no lo es. Para y avisa con el error exacto.
    - La voz y la música se guardan en `cache/`: si solo cambia un bloque, en la siguiente vuelta solo se vuelve a sintetizar ese bloque.
    - Para revisar solo el arranque: `largo.py <fecha> --hasta 30` (escribe `inicio_prueba.mp4`).
 2. Lee `render.log`:
