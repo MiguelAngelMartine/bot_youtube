@@ -1,0 +1,667 @@
+[
+ {
+  "id": "congreso_fachada",
+  "escena": "the neoclassical facade of the Spanish parliament building in Madrid with two bronze lions by the stairs, daytime",
+  "claves": "parliament congress deputies building facade lions madrid",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "congreso_hemiciclo",
+  "escena": "a semicircular parliament chamber with rows of red seats and a speaker's podium, wide view",
+  "claves": "parliament chamber plenary session debate seats deputies hemicycle",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "congreso_votacion",
+  "escena": "hands pressing voting buttons on wooden desks in a parliament chamber",
+  "claves": "vote voting parliament deputies law approve reject motion",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "senado_fachada",
+  "escena": "the facade of a classical senate palace in Madrid with stone columns",
+  "claves": "senate senators upper house building",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "moncloa_palacio",
+  "escena": "a low white government palace with a green lawn and iron gates in Madrid",
+  "claves": "government moncloa prime minister palace executive",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "consejo_ministros",
+  "escena": "a long oval table with leather chairs, folders and glasses of water in a government meeting room",
+  "claves": "cabinet council ministers meeting government decree approves",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "rueda_prensa",
+  "escena": "a press conference podium with microphones facing rows of journalists and cameras",
+  "claves": "press conference statement spokesperson journalists announces appearance",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "microfonos",
+  "escena": "a cluster of reporters' microphones pointed at an empty lectern",
+  "claves": "statement declaration microphones press speaks says",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "tribunal_supremo",
+  "escena": "a grand stone courthouse facade with columns in Madrid",
+  "claves": "supreme court tribunal justice judiciary",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "sala_juicio",
+  "escena": "a courtroom with a judge's bench, wooden benches and scales of justice on the wall",
+  "claves": "court trial judge hearing courtroom testimony",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "mazo_juez",
+  "escena": "a judge's wooden gavel on a desk next to thick law books",
+  "claves": "judge ruling sentence verdict court gavel decision",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "expediente",
+  "escena": "a tall stack of legal case files tied with string on a desk",
+  "claves": "case file investigation lawsuit complaint querella indictment documents",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "audiencia_nacional",
+  "escena": "a modern courthouse entrance guarded by police officers",
+  "claves": "national court audiencia investigation judge",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "fiscalia",
+  "escena": "a prosecutor's desk with documents and a green desk lamp",
+  "claves": "prosecutor fiscal investigation accusation",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "constitucion",
+  "escena": "a large closed book on a lectern in a classical hall",
+  "claves": "constitution constitutional court reform",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "urna_votacion",
+  "escena": "a transparent ballot box with envelopes being dropped in at a polling station",
+  "claves": "election vote ballot box polling voters",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "colegio_electoral",
+  "escena": "a school gym used as a polling station with voting booths and a queue of voters",
+  "claves": "election polling station voters vote day",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "papeletas",
+  "escena": "rows of ballot papers stacked on a table at a polling station",
+  "claves": "ballots election candidates lists papers",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "escrutinio",
+  "escena": "election officials counting ballot papers at a table at night",
+  "claves": "count results election night scrutiny votes",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "noche_electoral",
+  "escena": "a party election night stage with balloons and a crowd waving",
+  "claves": "election night celebration results party victory",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "mitin",
+  "escena": "a crowd at a political rally in front of a lit stage",
+  "claves": "rally campaign party meeting supporters",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "carteles_campana",
+  "escena": "rows of blank campaign posters on a street wall",
+  "claves": "campaign posters election start",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "debate_tv",
+  "escena": "a television debate set with lecterns facing each other under studio lights",
+  "claves": "debate television candidates face to face",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "encuesta",
+  "escena": "a hand holding a clipboard with a survey form and checkboxes",
+  "claves": "poll survey opinion voting intention",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "grafico_barras",
+  "escena": "a large wall chart with colored bars in an office",
+  "claves": "data statistics chart figures poll economy growth",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "euros",
+  "escena": "a pile of euro coins and banknotes on a table",
+  "claves": "money euros budget spending funds aid",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "presupuestos",
+  "escena": "a thick bound budget document next to a calculator and euro coins",
+  "claves": "budget presupuestos finance deficit spending",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "impuestos",
+  "escena": "a person filling in tax forms at a kitchen table with a calculator",
+  "claves": "taxes tax hacienda income declaration",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "oficina_empleo",
+  "escena": "a queue of people outside an employment office",
+  "claves": "unemployment jobs employment office labour",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "fabrica",
+  "escena": "workers in a factory with machines and sparks",
+  "claves": "industry factory workers jobs production",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "obras",
+  "escena": "a construction site with cranes and scaffolding",
+  "claves": "housing construction building works infrastructure",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "llaves_casa",
+  "escena": "a hand holding house keys in front of an apartment block",
+  "claves": "housing rent home keys buy",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "balcones_pisos",
+  "escena": "a street of apartment balconies in a Spanish city",
+  "claves": "housing rent apartments flats tenants",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "supermercado",
+  "escena": "a supermarket aisle with a shopping trolley and full shelves",
+  "claves": "prices inflation shopping food basket",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "gasolinera",
+  "escena": "a petrol station pump at dusk",
+  "claves": "fuel prices energy gasoline diesel",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "electricidad",
+  "escena": "an electricity meter on a wall and a glowing light bulb",
+  "claves": "electricity bill energy prices power blackout",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "pensionistas",
+  "escena": "an elderly couple sitting on a bench in a Spanish plaza",
+  "claves": "pensions pensioners elderly retirement",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "hospital_pasillo",
+  "escena": "a quiet hospital corridor with an empty stretcher and soft light",
+  "claves": "health hospital healthcare injured patients",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "centro_salud",
+  "escena": "the waiting room of a health centre with rows of chairs",
+  "claves": "healthcare waiting lists primary care doctors",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "aula",
+  "escena": "an empty school classroom with desks and a blackboard",
+  "claves": "education school teachers students classroom",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "universidad",
+  "escena": "students walking in a university courtyard",
+  "claves": "university students education campus",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "tren_alta_velocidad",
+  "escena": "a white high-speed train crossing a viaduct in a Spanish landscape",
+  "claves": "train high-speed ave railway trains",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "estacion_tren",
+  "escena": "a large railway station hall with a glass roof and platforms",
+  "claves": "station railway trains passengers platform",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "vias_tren",
+  "escena": "empty railway tracks running into the distance at dusk",
+  "claves": "railway tracks infrastructure line signalling",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "aeropuerto",
+  "escena": "an airport terminal with planes behind large windows",
+  "claves": "airport flights aviation travel",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "autopista",
+  "escena": "a motorway with heavy traffic",
+  "claves": "traffic roads motorway transport",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "patrulla_policia",
+  "escena": "a police car with lights on in a city street at night",
+  "claves": "police patrol security officers",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "agentes_policia",
+  "escena": "police officers in uniform standing in a line in a square",
+  "claves": "police officers riot security deployment mossos",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "guardia_civil",
+  "escena": "a green and white police patrol car on a rural road",
+  "claves": "civil guard police rural investigation",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "cinta_policial",
+  "escena": "police tape across an empty street at night",
+  "claves": "investigation crime scene cordon",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "furgon_policial",
+  "escena": "a police van with open doors on a street at night",
+  "claves": "arrest detention detainees police",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "prision",
+  "escena": "a prison wall with a watchtower under a grey sky",
+  "claves": "prison jail sentence detention",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "valla_frontera",
+  "escena": "a high border fence at sunset",
+  "claves": "border fence migration ceuta melilla",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "barca_mar",
+  "escena": "a small boat on the open sea at dawn seen from far away",
+  "claves": "migration boat sea rescue arrivals canary",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "salvamento_maritimo",
+  "escena": "a red rescue boat sailing on the sea",
+  "claves": "rescue maritime migration coast",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "bomberos",
+  "escena": "firefighters with hoses in front of a column of smoke",
+  "claves": "fire firefighters emergency",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "incendio_forestal",
+  "escena": "a forest fire on a hillside at dusk",
+  "claves": "wildfire fire forest burned hectares",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "inundacion",
+  "escena": "a flooded street with water up to the car doors",
+  "claves": "flood dana storm rain floods",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "emergencias_militares",
+  "escena": "military emergency trucks on a muddy road",
+  "claves": "emergency military rescue ume army",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "velas",
+  "escena": "rows of lit candles and white flowers on the ground",
+  "claves": "mourning tribute victims condolences",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "flores_homenaje",
+  "escena": "bouquets of flowers laid against a wall",
+  "claves": "tribute homage memorial victims",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "minuto_silencio",
+  "escena": "people standing in silence in a square with heads bowed",
+  "claves": "silence mourning minute tribute",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "bandera_media_asta",
+  "escena": "a flag at half mast against a grey sky",
+  "claves": "mourning official flag half mast luto",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "cementerio",
+  "escena": "a quiet cemetery with cypress trees",
+  "claves": "cemetery funeral burial",
+  "tono": "sobrio",
+  "intento": 0
+ },
+ {
+  "id": "manifestacion",
+  "escena": "a large street demonstration with blank banners",
+  "claves": "protest demonstration march rally street",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "piquete_huelga",
+  "escena": "workers holding blank signs at a factory gate",
+  "claves": "strike union workers picket",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "asamblea_sindical",
+  "escena": "a union assembly hall full of workers raising their hands",
+  "claves": "unions assembly vote workers",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "pancartas",
+  "escena": "hands holding up blank cardboard signs",
+  "claves": "protest signs demands",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "cacerolada",
+  "escena": "people on balconies banging pots at night",
+  "claves": "protest pots balconies neighbours",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "parlament",
+  "escena": "a grand parliament hall with red carpet and chandeliers in Barcelona",
+  "claves": "catalonia parliament regional parlament",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "calle_barcelona",
+  "escena": "a Barcelona street with modernist balconies",
+  "claves": "barcelona catalonia city street",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "plaza_mayor",
+  "escena": "a crowded Spanish city plaza with arcades",
+  "claves": "city square spain town people",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "pueblo",
+  "escena": "a small Spanish village with white houses and a church tower",
+  "claves": "rural village spain countryside depopulation",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "agricultor",
+  "escena": "a farmer on a tractor in a dry field",
+  "claves": "agriculture farmers countryside tractor",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "embalse_seco",
+  "escena": "a nearly empty reservoir with cracked earth",
+  "claves": "drought water reservoir rain",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "playa",
+  "escena": "a crowded beach with umbrellas",
+  "claves": "tourism beach summer tourists",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "parlamento_europeo",
+  "escena": "a modern glass parliament building with a row of flags",
+  "claves": "european union brussels eu parliament commission",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "cumbre",
+  "escena": "a round table with empty chairs and small flags",
+  "claves": "summit international meeting leaders",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "embajada",
+  "escena": "an embassy building with flags at the entrance",
+  "claves": "diplomacy embassy foreign affairs",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "militares",
+  "escena": "soldiers in formation on a parade ground",
+  "claves": "military defense army nato troops",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "sede_partido",
+  "escena": "a party headquarters building with a lit balcony at night",
+  "claves": "party headquarters leadership",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "reunion_partido",
+  "escena": "an executive meeting around a table with laptops and coffee cups",
+  "claves": "party leadership meeting executive committee",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "escano_vacio",
+  "escena": "an empty leather seat in a parliament chamber under a spotlight",
+  "claves": "resignation vacancy seat leaves dimission",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "carta_firmada",
+  "escena": "a signed letter on a desk with a fountain pen",
+  "claves": "resignation letter dimission request",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "apreton_manos",
+  "escena": "two hands shaking over a table with documents",
+  "claves": "agreement pact deal negotiation coalition",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "firma_documento",
+  "escena": "a pen signing a document on a table",
+  "claves": "agreement signature pact law sign",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "boletin_oficial",
+  "escena": "a thick printed official bulletin on a desk with an ink stamp",
+  "claves": "law decree official bulletin boe regulation",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "calendario",
+  "escena": "a desk calendar with one day circled in red",
+  "claves": "date deadline schedule next week",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "reloj_fachada",
+  "escena": "a large clock on a building facade",
+  "claves": "time deadline countdown",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "documentos_movil",
+  "escena": "a pile of documents being photographed with a smartphone",
+  "claves": "leak documents filtration messages",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "movil_mano",
+  "escena": "a hand holding a smartphone with a dark screen",
+  "claves": "phone messages whatsapp social media post",
+  "tono": "ambos",
+  "intento": 0
+ },
+ {
+  "id": "redes_sociales",
+  "escena": "a person scrolling a smartphone in the dark",
+  "claves": "social networks posts online",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "television_salon",
+  "escena": "a living room with a television showing an empty news studio",
+  "claves": "television interview news broadcast",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "quiosco",
+  "escena": "a newsstand with stacks of newspapers",
+  "claves": "press newspapers media journalism",
+  "tono": "normal",
+  "intento": 0
+ },
+ {
+  "id": "lupa",
+  "escena": "a magnifying glass over a printed page",
+  "claves": "verification fact check investigation analysis",
+  "tono": "ambos",
+  "intento": 0
+ }
+]

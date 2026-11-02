@@ -15,3 +15,5 @@ cache/
 client_secret*.json
 token_youtube.json
 .jornada.lock
+# biblioteca de viñetas: solo se guardan las aceptadas
+canal/biblioteca_vinetas/pendientes/

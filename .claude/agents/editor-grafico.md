@@ -40,6 +40,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
    - algo que no corresponde al dato o que engaña;
    - víctimas, heridos o violencia.
    Si tras 3 intentos sigue mal, `ia_vinetas.py descartar <fecha> <clave>`: la nota sale con su texto.
+   - **Si Cloudflare falla** (cuota agotada u otro error), `preparar` pone en cada escena la viñeta de la **biblioteca propia** (`canal/biblioteca_vinetas/`) que mejor encaja, y lo dice («de la biblioteca: <id>»). Comprueba en la hoja que encaja con su nota; si no, `descartar` (sale con su texto). Las personas nunca vienen de la biblioteca: sin Cloudflare, sus notas salen con texto.
 3. **Personas** (`persona_vineta`): hay 2 candidatas en `vinetas/candidatas/` y la foto real en la hoja. Acepta una **solo si es fiel**: misma cara, pelo, barba o no, gafas o no, edad, y gesto sereno (`ia_vinetas.py elegir <fecha> <clave> <versión>`). Si ninguna lo es, `descartar`. Ante la duda, descartar: nunca puede salir alguien con rasgos que no tiene.
 
 No cambies ningún texto ni dato del episodio: solo añades el campo `foto` y los retratos.
