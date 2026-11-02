@@ -30,17 +30,23 @@ def slug(t):
     return re.sub(r"[^a-z0-9]+", "_", t.lower()).strip("_")[:40]
 
 
+CAIDA = RAIZ / "cache" / "openverse_caido"           # si Openverse falla, se salta 30 min (el 2-nov tardaba 106 s en fallar)
+
+
 def openverse(q, n):
-    for intento in range(2):                          # Openverse a veces tarda: un segundo intento con mas margen
-        try:
-            r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=45 + 30 * intento,
-                             params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": n * 2})
-            break
-        except requests.Timeout:
-            if intento:
-                raise
+    import time
+    if CAIDA.exists() and time.time() - CAIDA.stat().st_mtime < 1800:
+        raise RuntimeError("Openverse falló hace menos de 30 min; se salta")
+    try:
+        r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=15,
+                         params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": n * 2})
+        datos = r.json()
+    except Exception:
+        CAIDA.parent.mkdir(parents=True, exist_ok=True)
+        CAIDA.touch()
+        raise
     out = []
-    for x in r.json().get("results", []):
+    for x in datos.get("results", []):
         if (x.get("width") or 0) < 1000:
             continue
         lic = x["license"]
@@ -78,7 +84,7 @@ def buscar(dia_txt, q, n=8):
     dest = RAIZ / "dia" / dia_txt / "fotos_candidatas"
     dest.mkdir(parents=True, exist_ok=True)
     cands, vistos = [], set()
-    for f in (openverse, wikimedia):
+    for f in (wikimedia, openverse):                  # Wikimedia primero: es la que responde siempre
         try:
             for c in f(q, n):
                 if c["pagina"] not in vistos:
