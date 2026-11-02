@@ -110,9 +110,21 @@ def notas_con_vineta(G):
 
 # ------------------------------------------------------------------ biblioteca propia (plan B si Cloudflare falla)
 # canal/biblioteca_vinetas/: viñetas genericas en el estilo del canal (lugares y objetos que se repiten; nunca personas),
-# generadas poco a poco con la cuota que sobra (de madrugada, maximo 15 por noche) y revisadas antes de aceptarlas.
+# generadas poco a poco con la cuota que SOBRA tras la jornada (decision del usuario del 2-nov-2026: primero el video del
+# dia, despues la biblioteca, sin pasarse nunca del limite) y revisadas antes de aceptarlas.
 BIB = RAIZ / "canal" / "biblioteca_vinetas"
-POR_NOCHE = 15                                       # deja casi toda la cuota diaria para la jornada
+POR_DIA = 15                                         # tope de viñetas de biblioteca por dia
+CUOTA_DIA = 10000                                    # neuronas gratis al dia (se renuevan a las 00:00 UTC)
+TECHO = 8000                                         # nunca se pasa de aqui contando todo lo del dia (20 % de margen)
+NEURONAS_IMAGEN = 330                                # estimacion prudente por imagen (1-nov: 13.950 neuronas, ~45 imagenes)
+
+
+def gastado_hoy():
+    """Neuronas gastadas hoy (dia UTC, como Cloudflare), estimadas por las imagenes nuevas en cache/vinetas/."""
+    from datetime import datetime, timezone
+    hoy = datetime.now(timezone.utc).date()
+    n = sum(1 for f in CACHE.glob("*.jpg") if datetime.fromtimestamp(f.stat().st_mtime, timezone.utc).date() == hoy)
+    return n * NEURONAS_IMAGEN, n
 
 
 def _catalogo():
@@ -125,9 +137,30 @@ def _guarda_catalogo(cat):
     (BIB / "catalogo.json").write_text(json.dumps(cat, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
-def biblioteca_generar(maximo=POR_NOCHE):
-    """Genera las que faltan (ni aceptadas ni pendientes de revisar) en biblioteca_vinetas/pendientes/. Para al primer
-    aviso de cuota: nunca agota la cuota del dia."""
+def jornada_en_marcha():
+    """jornada.sh bloquea .jornada.lock (flock) mientras trabaja; el fichero queda aunque no este en marcha."""
+    import fcntl
+    f = RAIZ / ".jornada.lock"
+    if not f.exists():
+        return False
+    with open(f) as fh:
+        try:
+            fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fh, fcntl.LOCK_UN)
+            return False
+        except OSError:
+            return True
+
+
+def biblioteca_generar(maximo=POR_DIA):
+    """Genera las que faltan (ni aceptadas ni pendientes de revisar) en biblioteca_vinetas/pendientes/, solo con la
+    cuota que sobra hoy por debajo del TECHO, y nunca mientras la jornada esta en marcha. Para al primer aviso de cuota."""
+    if jornada_en_marcha():
+        print("la jornada esta en marcha: la biblioteca espera a otro dia")
+        return
+    gastado, n = gastado_hoy()
+    maximo = min(maximo, max(0, (TECHO - gastado) // NEURONAS_IMAGEN))
+    print(f"hoy (UTC): {n} imagenes, ~{gastado} neuronas de {CUOTA_DIA}; margen para la biblioteca: {maximo} viñetas")
     pend = BIB / "pendientes"
     pend.mkdir(parents=True, exist_ok=True)
     hechas = 0
@@ -368,7 +401,7 @@ if __name__ == "__main__":
     elif a[:1] == ["descartar"]:
         descartar(a[1], a[2])
     elif a[:2] == ["biblioteca", "generar"]:
-        biblioteca_generar(int(a[2]) if len(a) > 2 else POR_NOCHE)
+        biblioteca_generar(int(a[2]) if len(a) > 2 else POR_DIA)
     elif a[:2] == ["biblioteca", "aceptar"]:
         biblioteca_aceptar(a[2:])
     elif a[:2] == ["biblioteca", "rechazar"]:
