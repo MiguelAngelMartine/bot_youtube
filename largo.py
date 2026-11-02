@@ -33,6 +33,7 @@ import cierre as CI
 import marca
 import titulares as TIT
 import vinetas as VIN
+import ia_vinetas as IAV
 from corto import estrecha, nota, pegatina, polaroid, sello
 from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, suave
 
@@ -154,7 +155,8 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             ancho = 660                                # panoramicas: 4 caben en el tablero con la letra legible
             txts = [(it["hora"] + " · " if it.get("hora") else "") + it["texto"] for it in ve["items"]]
         notas = [VIN.vineta(None, tx, ancho, sobrio=ve.get("_sobrio", False), imagen=Image.open(vin[k]),
-                            proporcion=0.40, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4]) if k in vin
+                            proporcion=0.40, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4],
+                            fuente_txt=ve.get("_vin_txt", {}).get(k, "Ilustración IA")) if k in vin
                  else nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
         out += rejilla(notas, 40, 100, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
         if lado:
@@ -181,7 +183,8 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         out.append((pegatina(ve["lugar"], ROJO, BLANCO, 44), 40, 30, t0 + 0.1))
         if 0 in ve.get("_vin", {}):
             out.append((VIN.vineta(None, ve["titular"], 700, sobrio=ve.get("_sobrio", False),
-                                   imagen=Image.open(ve["_vin"][0]), letra=1.2), 40, 110, t0 + 0.3))
+                                   imagen=Image.open(ve["_vin"][0]), letra=1.2,
+                                   fuente_txt=ve.get("_vin_txt", {}).get(0, "Ilustración IA")), 40, 110, t0 + 0.3))
             out.append((nota(ve["sub"], 560, 34, "Fuente: " + ve["fuente"], color=AMARILLA), 800, 160, t0 + 1.2))
         else:
             out.append((nota(ve["titular"], 760, 48), 40, 130, t0 + 0.3))
@@ -342,6 +345,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     nombres |= {it["persona"] for s in secs[:1] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"
                 for it in p["ve"]["items"] if it.get("persona")}
     fotos = C.fotos_personas(nombres, cred, dia / "imagenes")
+    origen = (json.loads((dia / "vinetas" / "origen.json").read_text(encoding="utf-8"))
+              if (dia / "vinetas" / "origen.json").exists() else {})
     tmp = dia / "tmp_largo"
     tmp.mkdir(exist_ok=True)
     t = INTRO
@@ -360,6 +365,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
                 ve = dict(ve)                          # viñetas ya aceptadas de este paso (dia/<fecha>/vinetas/)
                 ve["_vin"] = {k: f for k in range(len(ve.get("items", [])) or 1)
                               if (f := dia / "vinetas" / f"s{i}_{jp}_{k}.jpg").exists()}
+                ve["_vin_txt"] = {k: IAV.credito_vineta(origen, f"s{i}_{jp}_{k}") for k in ve["_vin"]}   # «Ilustración IA»
                 ve["_sobrio"] = s["tono"] == "sobrio"
                 t0 = T.en(c) if partes else t
                 foto, fn = None, ve.get("foto")

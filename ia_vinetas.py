@@ -108,6 +108,31 @@ def notas_con_vineta(G):
     return out
 
 
+def licencia_dibujable(lic):
+    """Fotos que se pueden usar para dibujar a una persona sin heredar obligaciones: CC0, dominio publico o CC BY.
+    Nunca CC BY-SA (la viñeta seria obra derivada y tendria que llevar esa licencia, y con ella el video), NC ni ND."""
+    l = (lic or "").upper().replace("-", " ")
+    if any(x in l.split() for x in ("SA", "NC", "ND")):
+        return False
+    return l.startswith(("CC0", "PDM", "PUBLIC DOMAIN", "DOMINIO", "CC BY"))
+
+
+def guarda_origen(dia, clave, datos):
+    import json
+    f = dia / "vinetas" / "origen.json"
+    o = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    o[clave] = datos
+    f.write_text(json.dumps(o, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def credito_vineta(origen, clave):
+    """Texto pequeño sobre la viñeta: siempre «Ilustración IA»; si dibuja a una persona, de qué foto sale."""
+    d = (origen or {}).get(clave) or {}
+    if d.get("persona"):
+        return f"Ilustración IA a partir de foto de {d['autor'][:40]} ({d['licencia']})"
+    return "Ilustración IA"
+
+
 def preparar(dia_txt, versiones=2):
     import json
     import shutil
@@ -128,6 +153,13 @@ def preparar(dia_txt, versiones=2):
                 if quien not in fotos:
                     print(f"  {clave}: {quien} no tiene retrato en creditos.json; sin viñeta")
                     continue
+                cr = cred.get(fotos[quien].name, {})
+                if not licencia_dibujable(cr.get("licencia")):
+                    print(f"  {clave}: el retrato de {quien} es {cr.get('licencia') or 'sin licencia'}; para dibujarla "
+                          f"solo valen CC0, dominio público o CC BY: sin viñeta (la nota sale con su texto)")
+                    continue
+                guarda_origen(dia, clave, {"persona": quien, "foto": fotos[quien].name, "autor": cr.get("autor", ""),
+                                           "licencia": cr.get("licencia", ""), "pagina": cr.get("pagina", "")})
                 if destino.exists():
                     continue
                 for v in range(versiones):
@@ -177,6 +209,11 @@ def rehacer(dia_txt, clave, intento=1):
     for c, it, sec in notas_con_vineta(G):
         if c == clave:
             ilustra(it["escena"], None, sec.get("tono") == "sobrio", intento=intento).save(dia / "vinetas" / f"{clave}.jpg", quality=92)
+            o = dia / "vinetas" / "origen.json"          # rehecha sin retrato: ya no sale de ninguna foto
+            if o.exists():
+                d = json.loads(o.read_text(encoding="utf-8"))
+                if d.pop(clave, None):
+                    o.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
             print(f"{clave}: rehecha (intento {intento})")
             return
     print(f"{clave}: no existe")

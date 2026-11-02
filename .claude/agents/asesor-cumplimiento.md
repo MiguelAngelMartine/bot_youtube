@@ -20,6 +20,7 @@ Comprueba:
    - el texto, con palabras propias;
    - las citas solo de declaraciones de personas, breves (una frase), entre «» y atribuidas.
    - Revisa que una frase de `di` no reproduzca casi literal un titular o una entradilla de un medio (compáralo con `noticias.json`).
+   - **Viñetas de personas** (`persona_vineta`): solo si la nota cuenta algo que esa persona dijo o hizo, y nunca en una escena que la ridiculice o le atribuya algo que no consta (honor y propia imagen). La `escena` no puede pedir gestos, lugares ni objetos que no estén en el dossier.
 4. **Honor y presunción de inocencia:**
    - «presunto», «investigado» o «detenido», nunca «culpable», si no hay sentencia;
    - los menores, sin datos que los identifiquen;

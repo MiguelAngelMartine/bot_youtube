@@ -32,8 +32,14 @@ Esto NO es asesoramiento jurídico: antes de activar la monetización conviene u
   Limitan ingresos: detalles gráficos de víctimas, cuerpos, choques impactantes, enfrentamientos violentos con la policía.
   Medidas: lenguaje sobrio, sin detalles escabrosos ni imágenes de víctimas o del impacto; miniatura y título sin morbo ni gritos.
 - **Elecciones**: nunca dar como hecho algo falso sobre cómo, cuándo o dónde votar (sin ingresos y posible infracción).
-- **Divulgación de IA**: la voz es sintética y genérica (no imita a nadie), así que la casilla "contenido alterado o sintético" no parece obligatoria.
+- **Divulgación de IA**: la voz es sintética y genérica (no imita a nadie), así que por la voz la casilla "contenido alterado o sintético" no es obligatoria.
   Aun así, la descripción siempre dice: "Resumen elaborado con ayuda de IA... Voz sintética."
+- **Viñetas hechas con IA** (resuelto el 2-nov-2026):
+  - YouTube solo exige declarar lo **realista** que pueda confundirse con algo real; las viñetas son dibujo de novela gráfica, claramente no realista. Aun así, **si una viñeta dibuja a una persona real, `subir.py` marca el vídeo como «contenido alterado o sintético»** (según YouTube, declararlo no limita la audiencia ni los ingresos) y la descripción lo dice. Si la API no lo admite, avisa para marcarlo a mano antes de publicar.
+  - Cada viñeta lleva en pantalla «Ilustración IA» y, si dibuja a una persona, «a partir de foto de <autor> (<licencia>)». Así cumple también el deber europeo de transparencia de la IA.
+  - Las personas solo se dibujan a partir de fotos **CC0, de dominio público o CC BY**: la viñeta es obra derivada de la foto, y una foto **CC BY-SA** obligaría a dar la viñeta (y con ella el vídeo) con esa misma licencia. Si el retrato es SA, NC o ND, `ia_vinetas.py` no la dibuja y la nota sale con su texto.
+  - Solo se dibuja a una persona cuando la nota cuenta algo que dijo o hizo ella (nunca algo inventado ni ridiculizante): protege su derecho al honor y a la propia imagen; es información de interés público sobre un cargo público.
+  - Modelos: FLUX.1 schnell y FLUX.2 klein 4B (Apache 2.0, uso comercial permitido) en Cloudflare Workers AI.
 - Requisitos para entrar en el programa: 1.000 suscriptores + 4.000 horas de visualización en 12 meses
   (o 10 M de visualizaciones de Shorts en 90 días), verificación en dos pasos y cuenta de AdSense.
 

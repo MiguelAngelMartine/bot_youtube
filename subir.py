@@ -74,6 +74,15 @@ def borra_anterior(yt, dia):
     return vid
 
 
+def personas_dibujadas(dia):
+    """Personas reales dibujadas por IA que salen en el video (viñetas aceptadas con retrato, vinetas/origen.json)."""
+    o = dia / "vinetas" / "origen.json"
+    if not o.exists():
+        return []
+    return sorted({d["persona"] for k, d in json.loads(o.read_text(encoding="utf-8")).items()
+                   if d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()})
+
+
 def subir(dia_txt):
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
@@ -110,6 +119,15 @@ def subir(dia_txt):
             yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(mini), mimetype="image/png")).execute()
         except Exception as e:                              # sin verificar el canal con el telefono no se permite
             avisos.append(f"miniatura no puesta ({type(e).__name__}): verifica el canal en youtube.com/verify")
+    if personas_dibujadas(dia):                         # persona real dibujada por IA: se declara (no afecta a ingresos)
+        try:
+            yt.videos().update(part="status", body={"id": vid, "status": {
+                "privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True,
+                "containsSyntheticMedia": True}}).execute()
+            print("declarado como contenido alterado o sintético (personas reales dibujadas por IA)")
+        except Exception as e:
+            avisos.append(f"no se pudo marcar «contenido alterado o sintético» ({type(e).__name__}): márcalo en "
+                          "YouTube Studio antes de publicar, porque el vídeo dibuja con IA a personas reales")
     srt = dia / "episodio.srt"
     if srt.exists():
         try:

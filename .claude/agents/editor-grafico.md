@@ -32,6 +32,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
 6. No repitas la misma foto en dos escenas del episodio. En tono `sobrio`, nada de fotos con gente sonriendo.
 
 **Viñetas** (después de las fotos, porque las personas se dibujan a partir de su retrato):
+0. Para cada `persona_vineta`, su retrato tiene que ser **CC0, dominio público o CC BY** (nunca CC BY-SA, NC ni ND): la viñeta es obra derivada de la foto y una SA obligaría a dar el vídeo con esa licencia. Si el único retrato bueno es SA, busca otro; si no hay, la nota sale sin viñeta (`ia_vinetas.py` ya se niega a dibujarla). La polaroid sí puede usar un retrato CC BY-SA.
 1. `.venv/bin/python ia_vinetas.py preparar <fecha>`: genera las de cada nota con `escena` en `dia/<fecha>/vinetas/` y la hoja de contacto `vinetas/hoja.png` (~5-10 s por viñeta, gratis en Cloudflare).
 2. Mira la hoja con Read y, si hace falta, cada viñeta. Rehaz (`ia_vinetas.py rehacer <fecha> <clave> <intento>`, con intento 1, 2, 3...) las que tengan:
    - letras, firmas, rótulos o matrículas legibles inventadas;
