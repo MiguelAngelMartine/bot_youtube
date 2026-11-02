@@ -95,10 +95,13 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         p = ve["persona"]
         f, c = foto_de(p["nombre"])
         out.append((polaroid(f, p["nombre"], p["cargo"], p["partido"], c, 340), 40, 30, t0 + 0.1))
-        if ve.get("sello"):
-            out.append((sello(ve["sello"]), 90, 190, cuando(ve.get("sello_cuando"), t0 + 1.2)))
+        y_sello = 60
         if p.get("cita"):
-            out.append((nota(p["cita"], 480, 42, "Fuente: " + p.get("medio", "")), 440, 50, cuando(p.get("cita_cuando"), t0 + 2)))
+            nc = nota(p["cita"], 480, 42, "Fuente: " + p.get("medio", ""))
+            out.append((nc, 440, 50, cuando(p.get("cita_cuando"), t0 + 2)))
+            y_sello = 50 + nc.height + 30
+        if ve.get("sello"):                            # junto a la cita, nunca sobre la cara ni el nombre (2-nov)
+            out.append((sello(ve["sello"]), 460, y_sello, cuando(ve.get("sello_cuando"), t0 + 1.2)))
         fl = ve.get("flujo")
         if fl:
             a = fl["a"]
@@ -159,7 +162,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
                             fuente_txt=ve.get("_vin_txt", {}).get(k, "Ilustración IA")) if k in vin
                  else nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
         out += rejilla(notas, 40, 100, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
-        if lado:
+        if lado and not (vin and tipo != "sumario"):   # con viñetas, la foto sobra y quedaba tapada (2-nov)
             out.append((lado, 1140, 110, t0 + 0.6))
     elif tipo == "cifra":
         out.append((pegatina(ve["numero"], ROJO, BLANCO, 200), 60, 40, t0 + 0.1))
