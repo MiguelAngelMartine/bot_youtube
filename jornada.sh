@@ -37,8 +37,31 @@ lanza)
         echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
         ANTES=$(wc -l < "$LOG")
         # Tope de 3 h para que una jornada atascada no se quede colgada.
-        timeout 3h claude -p "/edicion-diaria $FECHA" --permission-mode auto --output-format text >> "$LOG" 2>&1
+        RES="$DIA/claude_resultado_$INTENTO.json"
+        timeout 3h claude -p "/edicion-diaria $FECHA" --permission-mode auto --output-format json > "$RES" 2>> "$LOG"
         COD=$?
+        # el texto final al log y el consumo (coste equivalente y tokens por modelo, agentes incluidos) a archivo/consumo.tsv
+        "$PY" - "$RES" "$FECHA" "$INTENTO" >> "$LOG" 2>&1 <<'PYEOF'
+import json, sys
+from pathlib import Path
+try:
+    d = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+except Exception:
+    print("(sin resultado en json)")
+    sys.exit()
+print(d.get("result", ""))
+u = d.get("modelUsage") or {}
+det = "; ".join(f"{m}: {v.get('inputTokens', 0) + v.get('cacheReadInputTokens', 0) + v.get('cacheCreationInputTokens', 0)} entrada "
+                f"({v.get('cacheReadInputTokens', 0)} de caché), {v.get('outputTokens', 0)} salida" for m, v in u.items())
+linea = f"{d.get('total_cost_usd', 0):.2f} $ equivalentes, {d.get('num_turns', '?')} turnos; {det}"
+print("CONSUMO:", linea)
+f = Path("archivo/consumo.tsv")
+nuevo = not f.exists()
+with f.open("a", encoding="utf-8") as fh:
+    if nuevo:
+        fh.write("fecha\tintento\tcoste_equivalente_usd\tturnos\tdetalle\n")
+    fh.write(f"{sys.argv[2]}\t{sys.argv[3]}\t{d.get('total_cost_usd', 0):.2f}\t{d.get('num_turns', '')}\t{det}\n")
+PYEOF
         echo "[$(date +%FT%T)] Fin (código $COD)" >> "$LOG"
         [ "$COD" -eq 0 ] && break
         RESET="$(tail -n +"$ANTES" "$LOG" | grep -io 'limit.*resets [0-9:]*[ap]m' | grep -io '[0-9:]*[ap]m' | tail -n 1)"
