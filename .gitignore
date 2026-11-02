@@ -14,3 +14,4 @@ dia/**/noticias.json
 cache/
 client_secret*.json
 token_youtube.json
+.jornada.lock
