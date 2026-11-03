@@ -874,7 +874,7 @@ def escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, fotos_usadas):
                                          if p["t0"] >= 10)          # YouTube: capitulos de 10 s o mas, sin repetir el 0:00
     fuentes = sorted({x for s in secs for x in s.get("fuentes", [])})
     desc = (f"{G['titulo_video']}\n\n{G2.MARCA.title().replace(' En ', ' en ')}: lo más relevante de la política española del "
-            f"{G['fecha'].lower()}, contado por {G2.PRESENTADORA} con datos, "
+            f"{G['fecha'].lower()}, con datos, "
             f"citas textuales y la fuente de cada información.\n\nCapítulos:\n{capitulos}\n\nFuentes: {', '.join(fuentes)}.\n\n"
             "Resumen informativo elaborado con ayuda de inteligencia artificial a partir de noticias publicadas por los medios citados, "
             "y revisado antes de su publicación. Voz sintética. Gráficos, animaciones y música originales del canal.")

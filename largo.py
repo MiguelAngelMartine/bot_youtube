@@ -40,6 +40,7 @@ from genera_video2 import AMARILLO, AN, AL, BLANCO, FPS, ROJO, fuente, pega, sua
 INTRO = 0.4        # el video entra directo con los titulares (sin cabecera ni presentacion; decision del 1-nov-2026)
 GOLPE = marca.DUR  # golpe de marca (logo y sintonia, marca.py) entre el sumario y el primer bloque
 CALIENTA = 40      # fotogramas que cada trozo dibuja sin grabar antes de empezar (la camara suaviza con ~0,2 s)
+CON_URNI = False                         # decision del usuario (2-nov-2026): Urni ya no sale en los videos (el logo sigue)
 BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
 AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
 CREMA = (255, 246, 196)
@@ -459,6 +460,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
 
     def presente(t, i):
         """1 si Urni esta en pantalla (bloques normales), con entrada y salida suaves."""
+        if not CON_URNI:
+            return 0.0
         dentro = plan[i]["sec"]["tono"] != "sobrio"
         antes = plan[i - 1]["sec"]["tono"] != "sobrio" and not plan[i - 1]["tit"] if i > 0 else False
         x = suave((t - plan[i]["t0"] - 0.3) / 0.6)
@@ -480,7 +483,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
                 cie.append(CI.Cierre(G["fecha"]))
                 cie.append(cuadro(desp["t0"] - 1e-3).convert("RGBA"))
             urni = None
-            if t < fin_voz + 0.9:
+            if CON_URNI and t < fin_voz + 0.9:
                 k = min(int((t - INTRO) * FPS), len(boca) - 1)
                 m = P.mascota(t, float(boca[k]) if t < fin_voz else 0.0, (t % 3.7) < 0.12, 1.0)
                 urni = m.resize((int(m.width * 1.05), int(m.height * 1.05)), Image.BILINEAR)
