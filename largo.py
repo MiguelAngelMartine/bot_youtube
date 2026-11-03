@@ -77,7 +77,26 @@ def rejilla(notas, x0, y0, ancho, t_de):
     return out
 
 
+def rejilla_vinetas(vins, t_de, y0=130):
+    """Viñetas grandes y con aire (3-nov-2026): 1 centrada; 2 lado a lado; 3, dos arriba y una centrada; 4, de dos en
+    dos. Marcadas como 'foco' para que la camara vaya de una a otra como quien lee un comic."""
+    out, gap = [], 70
+    w = vins[0].width
+    for k, v in enumerate(vins):
+        v.info["foco"] = True
+        fila, col = divmod(k, 2)
+        solo = len(vins) % 2 == 1 and k == len(vins) - 1
+        x = 40 + (w + gap) // 2 if solo and len(vins) > 1 else 40 + col * (w + gap)
+        alto_fila = max(vv.height for vv in vins[fila * 2:fila * 2 + 2])
+        y = y0 + fila * (alto_fila + gap)
+        out.append((v, x, y, t_de(k)))
+    return out
+
+
 # ------------------------------------------------------------------ de la escena del guion a piezas en el tablero
+
+VARIANTES, USOS = {}, {}                              # retratos de cada persona en este video y cuantas veces ha salido
+
 
 def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
     """Lista de (pieza, x, y, t_aparece) sobre un tablero de BW de ancho. foto: (ruta, credito) de la escena o None."""
@@ -85,6 +104,9 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         f = fotos.get(nombre)
         if not f:
             return None, None
+        otras = VARIANTES.get(nombre) or [f]              # 3-nov: si hay varias fotos de la persona, se van turnando
+        f = otras[USOS.get(nombre, 0) % len(otras)]
+        USOS[nombre] = USOS.get(nombre, 0) + 1
         usadas[f.name] = cred[f.name]
         return f, cred[f.name]
 
@@ -163,13 +185,17 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
                 for k, it in enumerate(ve["items"])]
         vin = ve.get("_vin", {})
         if vin and tipo != "sumario":                  # viñetas de novela grafica en vez de notas manuscritas
-            ancho = 660                                # panoramicas: 4 caben en el tablero con la letra legible
+            ancho = 700                                # grandes: la camara se acerca a cada una (3-nov)
             txts = [(it["hora"] + " · " if it.get("hora") else "") + it["texto"] for it in ve["items"]]
         notas = [VIN.vineta(None, tx, ancho, sobrio=ve.get("_sobrio", False), imagen=Image.open(vin[k]),
-                            proporcion=0.40, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4],
+                            proporcion=0.50, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4],
                             fuente_txt=ve.get("_vin_txt", {}).get(k, "Ilustración IA")) if k in vin
                  else nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
-        out += rejilla(notas, 40, 130, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
+        if vin and tipo != "sumario" and len(vin) == len(notas):
+            # la primera entra con la escena (el locutor ya habla de ella); las demas, cuando la voz las nombra
+            out += rejilla_vinetas(notas, lambda k: t0 + 0.4 if k == 0 else cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
+        else:
+            out += rejilla(notas, 40, 130, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
         if lado and not (vin and tipo != "sumario"):   # con viñetas, la foto sobra y quedaba tapada (2-nov)
             out.append((lado, 1140, 110, t0 + 0.6))
     elif tipo == "cifra":
@@ -261,9 +287,16 @@ def vista_tablero(pt, t, cam):
             px, py = (x0 + x1) / 2, (y0 + y1) / 2
         else:
             px, py = x + pc.width / 2, y + pc.height / 2
-        golpe = math.exp(-(t - ta) / 0.7)
-        z = 1.0 + 0.12 * golpe
-        cx, cy = cx + (px - cx) * golpe, cy + (py - cy) * golpe
+        foco = not isinstance(pc, tuple) and pc.info.get("foco")
+        if foco and pt["t1"] - t > 1.3:              # viñeta: la camara se acerca y se queda en ella, con zoom lento
+            zf = min(2.2, max(1.0, min(base.width / (pc.width * 1.25), base.height / (pc.height * 1.25))))
+            z = zf * (1 + 0.025 * min(t - ta, 4.0))
+            cx, cy = px, py
+        elif not foco:                                # el resto de piezas: golpe de camara breve, como hasta ahora
+            golpe = math.exp(-(t - ta) / 0.7)
+            z = 1.0 + 0.12 * golpe
+            cx, cy = cx + (px - cx) * golpe, cy + (py - cy) * golpe
+        # (viñeta en el ultimo segundo y pico de la escena: la camara se aleja y se ven todas juntas)
     if not cam or t - pt["t0"] < 1 / FPS:
         cam[:] = [cx, cy, z]
     else:
@@ -347,7 +380,7 @@ def trabajadores(nf):
     n = int(os.environ.get("RENDER_PROCESOS", os.cpu_count() or 1))
     return max(1, min(n, nf // (FPS * 10)))           # trozos de al menos 10 s
 
-def main(dia_txt, solo_fotogramas=False, hasta=None):
+def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
     dia = Path(__file__).parent / "dia" / dia_txt
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
     secs = G["secciones"]
@@ -356,6 +389,13 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     nombres |= {it["persona"] for s in secs[:1] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"
                 for it in p["ve"]["items"] if it.get("persona")}
     fotos = C.fotos_personas(nombres, cred, dia / "imagenes")
+    # variedad (decision del usuario del 3-nov-2026): todas las fotos marcadas con la misma persona se turnan en el video
+    VARIANTES.clear()
+    USOS.clear()
+    for nombre, principal in fotos.items():
+        extra = sorted(dia / "imagenes" / f for f, cc in cred.items()
+                       if cc.get("persona") == nombre and (dia / "imagenes" / f).exists() and f != principal.name)
+        VARIANTES[nombre] = [principal] + extra
     origen = (json.loads((dia / "vinetas" / "origen.json").read_text(encoding="utf-8"))
               if (dia / "vinetas" / "origen.json").exists() else {})
     tmp = dia / "tmp_largo"
@@ -405,7 +445,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
         tit = None
         vs = next((p["ve"] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"), None) if i == 0 else None
         if vs:                                         # sumario a pantalla completa: una tarjeta por titular
-            tit = TIT.prepara(vs, secs, dia / "imagenes", fotos, cred, usadas)
+            fotos_tit = {n: (VARIANTES.get(n) or [f])[-1] for n, f in fotos.items()}   # el sumario, con otra foto si la hay
+            tit = TIT.prepara(vs, secs, dia / "imagenes", fotos_tit, cred, usadas)
             for k, tj in enumerate(tit):
                 tj["t0"] = t if k == 0 else T.cuando(tj["cuando"], 0, t + 2.0 * k) if tj["cuando"] else t + 2.0 * k
         else:
@@ -581,11 +622,12 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
             cuadro(b - 0.3).convert("RGB").save(sal / f"{k:02d}_b{i}_{tipo}.png")
         print(f"FOTOGRAMAS {len(escenas)} -> {sal}")
         return
-    out = dia / ("inicio_prueba.mp4" if hasta else "episodio.mp4")
-    nf = int(math.ceil((min(total, hasta) if hasta else total) * FPS))
+    out = dia / ("tramo_prueba.mp4" if desde else "inicio_prueba.mp4" if hasta else "episodio.mp4")
+    f0 = int(desde * FPS)                              # --desde: solo un tramo, para revisar una escena
+    nf = int(math.ceil((min(total, hasta) if hasta else total) * FPS)) - f0
     t_ini = time.time()
     n = trabajadores(nf)
-    bordes = [nf * k // n for k in range(n + 1)]
+    bordes = [f0 + nf * k // n for k in range(n + 1)]
 
     def dibuja_trozo(k):
         """Dibuja los fotogramas [bordes[k], bordes[k+1]) en tmp/trozoK.mp4 (solo imagen)."""
@@ -627,13 +669,13 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
     lista_v = tmp / "trozos.txt"
     lista_v.write_text("".join(f"file 'trozo{k}.mp4'\n" for k in range(n)), encoding="utf-8")
     subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista_v),
-                    "-i", str(tmp / "audio.wav"), "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
+                    "-ss", f"{desde:.3f}", "-i", str(tmp / "audio.wav"), "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
                     "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], check=True)
     for k in range(n):
         (tmp / f"trozo{k}.mp4").unlink(missing_ok=True)
     print(f"  render: {(time.time() - t_ini) / 60:.1f} min con {n} proceso(s) para {nf / FPS / 60:.1f} min de video", flush=True)
-    if hasta:
-        print(f"PRUEBA de los primeros {hasta:.0f} s -> {out}")
+    if hasta or desde:
+        print(f"PRUEBA de {desde:.0f} a {hasta or total:.0f} s -> {out}")
         return
     E.escribe_textos(dia, G, plan, subs, escenas, total, fin_voz, usadas)
     print(f"EPISODIO {total / 60:.1f} min -> {out}")
@@ -644,5 +686,6 @@ if __name__ == "__main__":
     ap.add_argument("dia")
     ap.add_argument("--fotogramas", action="store_true")
     ap.add_argument("--hasta", type=float, help="solo los primeros N s, en inicio_prueba.mp4 (para revisar el arranque)")
+    ap.add_argument("--desde", type=float, default=0.0, help="con --hasta: solo ese tramo, en tramo_prueba.mp4")
     a = ap.parse_args()
-    main(a.dia, a.fotogramas, a.hasta)
+    main(a.dia, a.fotogramas, a.hasta, a.desde)

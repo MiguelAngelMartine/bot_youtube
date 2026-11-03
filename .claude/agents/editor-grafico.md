@@ -12,7 +12,8 @@ Las escenas mapa, posturas, calendario y despedida **no llevan foto de escena**.
 
 Te darán una fecha. Primero, **los retratos**: para cada persona que sale en polaroid, busca su retrato (pasos 2 a 4) y guárdalo con
 `.venv/bin/python fotos.py elegir <fecha> <slug> <k> retrato_<apellido>.jpg --persona "<nombre exacto de la escena>"`.
-El nombre de `--persona` tiene que ser idéntico al de `episodio.json`; así el programa lo pone en su polaroid. Un retrato sirve para todas las escenas en que salga esa persona.
+El nombre de `--persona` tiene que ser idéntico al de `episodio.json`; así el programa lo pone en su polaroid.
+**Variedad** (decisión del usuario del 3-nov-2026): en un mismo vídeo no se repite la foto de una persona. Cuenta en cuántas escenas sale (y si sale en el sumario) y elige **una foto distinta por aparición, hasta 3** (otra ocasión, otro gesto, otro encuadre; no la misma foto recortada), todas con el mismo `--persona` y nombres `retrato_<apellido>.jpg`, `retrato_<apellido>_2.jpg`, `retrato_<apellido>_3.jpg`. El montaje las va turnando. Entre vídeos distintos sí se pueden repetir. Si solo hay una foto libre buena, se usa esa (mejor repetir que poner una mala).
 
 Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
 1. Piensa qué foto la ilustra sin engañar:
