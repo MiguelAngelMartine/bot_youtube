@@ -132,7 +132,10 @@ def subir(dia_txt):
             avisos.append(f"no se pudo marcar «contenido alterado o sintético» ({type(e).__name__}): márcalo en "
                           "YouTube Studio antes de publicar, porque el vídeo dibuja con IA a personas reales")
     srt = dia / "episodio.srt"
-    if srt.exists():
+    # Decision del usuario (3-nov-2026): los subtitulos ya van incrustados en la imagen, asi que no se sube pista de
+    # subtitulos a YouTube (si no, se podrian activar encima de los nuestros). SUBIR_SRT=1 solo para probar.
+    import os
+    if srt.exists() and os.environ.get("SUBIR_SRT") == "1":
         try:
             yt.captions().insert(part="snippet", body={"snippet": {"videoId": vid, "language": "es", "name": "Español",
                                                                     "isDraft": False}},

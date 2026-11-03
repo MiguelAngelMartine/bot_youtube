@@ -12,7 +12,7 @@ Te darán una fecha (y, en la segunda vuelta, «solo bloques NN, MM»: entonces 
 - `oficina/LIBRO_DE_ESTILO.md` (sección Equilibrio y prohibiciones).
 
 Comprueba en cada bloque:
-1. **Versiones:** ¿están el Gobierno, la oposición y los socios implicados según el dossier? Si una parte no habló, ¿se dice?
+1. **Versiones:** ¿están el Gobierno, la oposición y los socios implicados según el dossier? Si una parte no habló, **no** se anuncia su silencio («no consta respuesta», «no ha contestado»): márcalo como CORREGIR si aparece (decisión del usuario del 3-nov-2026).
 2. **Espacio:** cuenta las palabras dedicadas a cada partido o bando, y señálalo si una parte tiene más del doble que otra sin razón informativa.
 3. **Lenguaje:**
    - adjetivos o verbos valorativos propios: «arremete», «estalla», «polémico», «escándalo», «golpe»;

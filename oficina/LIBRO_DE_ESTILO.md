@@ -58,7 +58,7 @@ El texto se escucha, no se lee: tiene que fluir como lo contaría un buen locuto
 **El salseo es el eje del canal, no un adorno.** Las declaraciones, la confrontación, las descalificaciones y el debate entre políticos son el día a día de la política y lo que engancha al público de YouTube; de ahí salen las frases gancho del sumario, de la miniatura y del título. Un canal que solo lee noticias no es lo que queremos.
 - **Primeros 30 segundos** (sumario): valen las descalificaciones políticas literales («mentiroso», «corrupto», «traidor», «golpista»…), porque son el gancho; **no** valen tacos ni insultos vejatorios (YouTube quita los anuncios de todo el vídeo si salen al principio). Esos, más adelante en el bloque o contados sin reproducirlos.
 El canal no se limita a leer noticias: cuenta **qué se dicen los protagonistas unos a otros**. Cuando un partido ataca a otro y el otro responde, ese cruce, con sus frases literales, es parte central del bloque. Da ritmo y un tono más desenfadado, sin dejar de ser riguroso y neutral.
-- **Cada ataque, con su respuesta.** «Vox acusa al PSOE de…: «…». El PSOE responde: «…».» Si el atacado no ha respondido, se dice («El PSOE no ha contestado»). Nunca un ataque sin la otra parte.
+- **Cada ataque, con su respuesta si la hay.** «Vox acusa al PSOE de…: «…». El PSOE responde: «…».» Si no hay respuesta, **solo la cita**: nunca «no consta respuesta», «no ha contestado» ni similares (decisión del usuario del 3-nov-2026: repetido queda mal). El equilibrio se consigue con las frases de las otras partes, no anunciando silencios.
 - **Las frases con más gancho, pero literales:** las más directas, irónicas o duras que se hayan dicho, entre comillas en pantalla, atribuidas con nombre y cargo y con la fecha si no es de hoy. Cortas: una frase; como mucho, dos muy breves.
 - **Equilibrio:** el mismo trato para todos. Se elige la frase más fuerte de **cada** parte, no la más fuerte de una y la más floja de otra. Ni la última palabra ni la frase más llamativa pueden ser siempre del mismo lado: si hay varios cruces, se alterna quién abre y quién cierra.
 - **Tono cercano, verbos neutros.** Valen «responde», «contesta», «replica», «le devuelve la acusación», «y la respuesta llegó en horas», «el cruce siguió en redes», «Vox fue más allá». Prohibido todo lo que juzga quién gana: «zasca», «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
@@ -68,7 +68,7 @@ El canal no se limita a leer noticias: cuenta **qué se dicen los protagonistas 
 - **En pantalla:** la escena `citas` con las dos voces enfrentadas (o `persona` con `flujo`) es la natural para un cruce.
 
 ## Equilibrio
-- En cada polémica: versión del Gobierno, de la oposición principal y, si la hay, de los socios. Si una parte no ha hablado, se dice («el Gobierno no ha respondido»).
+- En cada polémica: versión del Gobierno, de la oposición principal y, si la hay, de los socios. Si una parte no ha hablado, no se anuncia su silencio (nada de «no consta respuesta»): se cuenta lo que sí dijeron las demás.
 - Los medios de referencia cubren todo el espectro: El País, elDiario.es, Público, La Vanguardia, RTVE, Europa Press, 20minutos, El Confidencial, El Mundo, ABC, La Razón. Un hecho que solo publica la prensa de una línea va **atribuido**.
 
 ## Catálogo de escenas (lo que el redactor puede pedir en `"ve"`)
