@@ -69,7 +69,7 @@ PYEOF
             # se espera a que acabe cualquier montaje en marcha y se retoma la jornada donde se quedó.
             [ "$INTENTO" -eq 3 ] || [ "$(date +%H)" -ge 21 ] && { COD=3; break; }
             echo "[$(date +%FT%T)] Sin vídeo subido: espera a que termine el montaje y retoma" >> "$LOG"
-            while pgrep -f "largo.py $FECHA" > /dev/null; do sleep 30; done
+            while pgrep -f "[p]ython.*largo.py $FECHA" > /dev/null; do sleep 30; done
             continue
         fi
         RESET="$(tail -n +"$ANTES" "$LOG" | grep -io 'limit.*resets [0-9:]*[ap]m' | grep -io '[0-9:]*[ap]m' | tail -n 1)"
