@@ -23,12 +23,16 @@ Las letras y los colores son llamativos; **el texto es literal**:
 - nada que el vídeo no diga: YouTube penaliza las miniaturas engañosas y el canal promete rigor y neutralidad;
 - una pregunta solo si el vídeo la responde o explica qué se sabe («¿Qué falló en Urda?»).
 
-## Tragedias: `--sobrio`
-Si el tema principal es una tragedia con víctimas, va con `--sobrio`: foto en grises, letra blanca lisa sin relieve ni inclinación, sin marco ni rojo.
-Puede salir una persona con gesto serio (un responsable, nunca una víctima ni un familiar). Nunca imágenes del impacto, heridos ni restos.
+## La miniatura tiene que ser llamativa (decisión del usuario del 3-nov-2026)
+Siempre el **estilo completo**: protagonista recortado, titular enorme con relieve y una palabra en amarillo-oro, etiqueta roja y marco.
+**Si el tema principal es una tragedia con víctimas**, la miniatura no se hace sobre la tragedia en sí, sino sobre **la noticia política con protagonista más fuerte del vídeo**: la respuesta del Gobierno, la oposición, el responsable que comparece, las ayudas… (el 2-nov: Sánchez, «Absolutamente prioritario», etiqueta «Sánchez y las ayudas de Urda», con la Moncloa de fondo). Puede mencionar la tragedia en la etiqueta, con respeto, pero:
+- nunca víctimas, familiares, imágenes del impacto, heridos ni restos, ni cifras de muertos en grande;
+- gesto serio del protagonista;
+- el texto, literal, como siempre.
+`--sobrio` solo queda para cuando **todo** el vídeo es la tragedia y no hay ninguna noticia política con protagonista: foto en grises, letra blanca lisa sin relieve ni inclinación, sin marco ni rojo.
 
 ## Pasos (te darán una fecha)
-1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia principal (el primer bloque, salvo que la escaleta diga otra cosa), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.
+1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia de la miniatura (el primer bloque, salvo que la escaleta diga otra cosa o sea una tragedia: entonces, la noticia política con protagonista más fuerte), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.
 2. **Foto del protagonista** (si la noticia tiene uno claro):
    - busca: `.venv/bin/python fotos.py buscar <fecha> "<nombre>"` (prueba también «<nombre> ministro», «<nombre> Congreso», «<nombre> 2025»...);
    - mira con Read las candidatas y elige una con el **gesto adecuado** y de cintura para arriba, con la cara grande y nítida (mínimo unos 600 px de ancho);
