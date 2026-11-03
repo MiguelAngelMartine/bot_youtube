@@ -63,7 +63,15 @@ with f.open("a", encoding="utf-8") as fh:
     fh.write(f"{sys.argv[2]}\t{sys.argv[3]}\t{d.get('total_cost_usd', 0):.2f}\t{d.get('num_turns', '')}\t{det}\n")
 PYEOF
         echo "[$(date +%FT%T)] Fin (código $COD)" >> "$LOG"
-        [ "$COD" -eq 0 ] && break
+        if [ "$COD" -eq 0 ]; then
+            [ -f "$DIA/youtube.json" ] && break
+            # Claude terminó sin subir el vídeo (el 3-nov dejó un montaje corriendo en segundo plano y cerró su turno):
+            # se espera a que acabe cualquier montaje en marcha y se retoma la jornada donde se quedó.
+            [ "$INTENTO" -eq 3 ] || [ "$(date +%H)" -ge 21 ] && { COD=3; break; }
+            echo "[$(date +%FT%T)] Sin vídeo subido: espera a que termine el montaje y retoma" >> "$LOG"
+            while pgrep -f "largo.py $FECHA" > /dev/null; do sleep 30; done
+            continue
+        fi
         RESET="$(tail -n +"$ANTES" "$LOG" | grep -io 'limit.*resets [0-9:]*[ap]m' | grep -io '[0-9:]*[ap]m' | tail -n 1)"
         [ -z "$RESET" ] && break                              # otro error: aviso normal
         OBJ=$(date -d "$RESET" +%s 2>/dev/null) || break

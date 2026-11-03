@@ -38,6 +38,7 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    Después, `editor-grafico` («fecha <fecha>») añade los retratos de las personas en polaroid, la foto de cada escena de texto (campo `foto` + `imagenes/` + `creditos.json`) y prepara y revisa las viñetas (`dia/<fecha>/vinetas/`). Si Cloudflare no responde, sigue sin viñetas: las notas salen con su texto.
 6. **Producción.**
    - Monta tú directamente, sin agente (tarda ~25 min; ejecútalo en segundo plano y espera): `.venv/bin/python -u largo.py <fecha> > dia/<fecha>/render.log 2>&1` y después `.venv/bin/python control_calidad.py <fecha>`.
+   - **No termines tu respuesta mientras haya un montaje en marcha:** la jornada corre sin nadie delante y, si cierras el turno, se acaba sin subir el vídeo (pasó el 3-nov). Espera en tramos de 9 minutos con `timeout 540 bash -c 'while pgrep -f "largo.py <fecha>" >/dev/null; do sleep 15; done'` y repítelo hasta que termine; igual tras cada vuelta del montador.
    - Mira solo el resumen: `grep -E "AVISO|Traceback|Error|palabras con tiempo|EPISODIO" dia/<fecha>/render.log`. Solo si hay algún `AVISO`, un `Traceback` o un bloque con menos del 95 % de palabras con tiempo, lanza al `montador` («fecha <fecha>, arregla lo de render.log»). Si el error es de la voz de Azure, no hay montador que valga: es fase crítica (ver Reglas).
    - Mientras se monta, lanza `disenador-grafico` (la miniatura no depende del vídeo). Cuando esté el vídeo, `control-calidad`.
    - Si el control dice CORREGIR, vuelve al `montador` con el informe (máximo 2 vueltas).
