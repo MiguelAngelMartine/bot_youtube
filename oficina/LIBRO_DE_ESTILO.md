@@ -61,7 +61,7 @@ El canal no se limita a leer noticias: cuenta **qué se dicen los protagonistas 
 - **Equilibrio:** el mismo trato para todos. Se elige la frase más fuerte de **cada** parte, no la más fuerte de una y la más floja de otra. Ni la última palabra ni la frase más llamativa pueden ser siempre del mismo lado: si hay varios cruces, se alterna quién abre y quién cierra.
 - **Tono cercano, verbos neutros.** Valen «responde», «contesta», «replica», «le devuelve la acusación», «y la respuesta llegó en horas», «el cruce siguió en redes», «Vox fue más allá». Prohibido todo lo que juzga quién gana: «zasca», «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
 - **Insultos y tacos:** si el insulto es la noticia, se cita literal en la voz y en pantalla, pero nunca en la miniatura, el título ni los primeros 30 segundos (YouTube limita los anuncios). Los tacos fuertes, nunca: se cuenta que los hubo («con un insulto que no reproducimos»).
-- **Acusaciones graves** (delitos, corrupción): solo como lo que son, la acusación de alguien («Vox acusa al PSOE de…»), con «sin pruebas aportadas» si es así, y la respuesta del acusado.
+- **Si lo han dicho, se cita** (decisión del usuario del 3-nov-2026): da igual que haya pruebas o no de lo que afirman; la noticia es que lo han dicho. Va siempre como lo que es, la afirmación o la acusación de alguien con nombre («Vox acusa al PSOE de…», «según Abascal…»), nunca como un hecho, y **se busca la respuesta** del aludido. No hace falta añadir «sin pruebas».
 - **En pantalla:** la escena `citas` con las dos voces enfrentadas (o `persona` con `flujo`) es la natural para un cruce.
 
 ## Equilibrio

@@ -25,7 +25,7 @@ Comprueba:
    - «presunto», «investigado» o «detenido», nunca «culpable», si no hay sentencia;
    - los menores, sin datos que los identifiquen;
    - las acusaciones, siempre atribuidas.
-5. **Cruces de declaraciones:** citas literales y atribuidas (con eso, reproducir lo que otro dijo está amparado como información); las acusaciones graves, como acusación de alguien y con la respuesta del acusado; insultos solo si son la noticia y nunca en los primeros 30 segundos ni en la miniatura o el título; tacos fuertes, nunca (se dice que los hubo).
+5. **Cruces de declaraciones:** citas literales y atribuidas (con eso, reproducir lo que otro dijo está amparado como información); las acusaciones, siempre como afirmación de alguien con nombre (nunca como hecho) y con la respuesta del acusado o la constancia de que no ha respondido; no hace falta que haya pruebas ni añadir «sin pruebas» (decisión del usuario del 3-nov-2026); insultos solo si son la noticia y nunca en los primeros 30 segundos ni en la miniatura o el título; tacos fuertes, nunca (se dice que los hubo).
 6. **Contenido no auténtico:** el bloque aporta narrativa propia y contexto, no es una lista de titulares.
 
 Escribe `dia/<fecha>/revision/cumplimiento.md`: por bloque, **APTO** o **CORREGIR**, con la frase exacta, la norma y el cambio propuesto.

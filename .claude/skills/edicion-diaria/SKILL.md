@@ -26,6 +26,7 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - Luego descarga el texto completo de las noticias: `.venv/bin/python articulos.py <fecha>` (→ `articulos/`, unos 20 s).
    - Luego `documentalista` (contexto).
    - Luego **un `investigador` por cada uno de los 8 primeros temas, todos en paralelo** («fecha <fecha>, tema <id>») → `dossier/<id>.md`.
+   - **En campaña electoral (hasta el 29N), uno más en paralelo: «fecha <fecha>, tema frases»** → `dossier/frases.md`, con las frases del día de todos los partidos y sus respuestas (bloque «La campaña en frases»).
 2. **Consejo de redacción.** `jefe-de-edicion` («fecha <fecha>») → `escaleta.json`.
 3. **Redacción.** Un `redactor` por bloque de la escaleta, más uno para los breves, **en paralelo** («fecha <fecha>, bloque NN» / «fecha <fecha>, breves») → `bloques/NN.json`.
 4. **Mesa de control.**
