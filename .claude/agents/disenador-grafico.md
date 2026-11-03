@@ -23,6 +23,14 @@ Las letras y los colores son llamativos; **el texto es literal**:
 - nada que el vídeo no diga: YouTube penaliza las miniaturas engañosas y el canal promete rigor y neutralidad;
 - una pregunta solo si el vídeo la responde o explica qué se sabe («¿Qué falló en Urda?»).
 
+## Impactante y elaborada (decisión del usuario del 3-nov-2026)
+**La noticia de la miniatura es la más polémica o impactante del día**, no necesariamente la primera: el choque entre dos líderes, la frase más dura, la decisión con más consecuencias. Tiene que salir en el vídeo y el texto tiene que ser literal.
+Recursos de `miniatura.py` (además del estilo base):
+- **`--rival <foto>`: enfrentamiento cara a cara** cuando la polémica es entre dos personas (la una responde a la otra, se acusan, compiten): las dos de frente, una a cada lado de una diagonal amarilla, y el titular centrado abajo. La etiqueta dice quién dice qué («Feijóo: que dé la cara»). Las dos tienen que salir en el vídeo con ese asunto; es también lo más neutral, porque se ven las dos partes. Ejemplo del 2-nov: `--persona retrato_feijoo.jpg --rival retrato_sanchez.jpg --titular "Sánchez, no Puente" --etiqueta "Feijóo: que dé la cara"`.
+- **`--inserto <foto>`: foto secundaria en polaroid inclinada** (el lugar, el edificio o el objeto de la noticia) cuando hay un solo protagonista. Da contexto y riqueza.
+- El protagonista sale en plano más cerrado y con más presencia; el fondo lleva un acabado de color más dramático. Sin halos detrás de la persona (decisión del usuario).
+Antes de darla por buena, comprueba con Read que ninguna cara queda tapada por el texto ni cortada, y que se entiende en pequeño (como se ve en el móvil).
+
 ## La miniatura tiene que ser llamativa (decisión del usuario del 3-nov-2026)
 Siempre el **estilo completo**: protagonista recortado, titular enorme con relieve y una palabra en amarillo-oro, etiqueta roja y marco.
 **Si el tema principal es una tragedia con víctimas**, la miniatura no se hace sobre la tragedia en sí, sino sobre **la noticia política con protagonista más fuerte del vídeo**: la respuesta del Gobierno, la oposición, el responsable que comparece, las ayudas… (el 2-nov: Sánchez, «Absolutamente prioritario», etiqueta «Sánchez y las ayudas de Urda», con la Moncloa de fondo). Puede mencionar la tragedia en la etiqueta, con respeto, pero:
@@ -32,7 +40,7 @@ Siempre el **estilo completo**: protagonista recortado, titular enorme con relie
 `--sobrio` solo queda para cuando **todo** el vídeo es la tragedia y no hay ninguna noticia política con protagonista: foto en grises, letra blanca lisa sin relieve ni inclinación, sin marco ni rojo.
 
 ## Pasos (te darán una fecha)
-1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia de la miniatura (el primer bloque, salvo que la escaleta diga otra cosa o sea una tragedia: entonces, la noticia política con protagonista más fuerte), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.
+1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia de la miniatura (**la más polémica o impactante del día** que el vídeo cuenta; si es una tragedia, la noticia política con protagonista más fuerte), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.
 2. **Foto del protagonista** (si la noticia tiene uno claro):
    - busca: `.venv/bin/python fotos.py buscar <fecha> "<nombre>"` (prueba también «<nombre> ministro», «<nombre> Congreso», «<nombre> 2025»...);
    - mira con Read las candidatas y elige una con el **gesto adecuado** y de cintura para arriba, con la cara grande y nítida (mínimo unos 600 px de ancho);

@@ -116,7 +116,7 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96):
     f = fuente("Inter-Black.ttf", tam)
     m = negro + exterior + relieve + 30
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
-    hueco = int(1.2 * (negro + exterior))              # el contorno se come el espacio entre palabras
+    hueco = int(1.6 * (negro + exterior))              # el contorno se come el espacio entre palabras
     ancho = int(max(medir.textlength(" ".join(p for p, _ in l), font=f) + hueco * (len(l) - 1) for l in lineas)) + 2 * m
     alto = int(tam * interlinea * len(lineas) + tam * 0.35) + 2 * m
     relleno = Image.new("RGBA", (ancho, alto))
@@ -206,22 +206,95 @@ def marco(im, col=AMARILLO, grosor=22, radio=46):
     im.alpha_composite(n)
 
 
+def realza(c):
+    """Persona con mas presencia: algo mas de contraste, color y nitidez (sin cambiar sus rasgos)."""
+    rgb = c.convert("RGB")
+    rgb = ImageEnhance.Contrast(rgb).enhance(1.08)     # sin subir el color: exagera las luces de escenario
+    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=2, percent=70, threshold=2))
+    return Image.merge("RGBA", (*rgb.split(), c.getchannel("A")))
+
+
+def encuadre(c, alto):
+    """Plano mas cerrado: de la cabeza al pecho (el 72 % de arriba del recorte), escalado a 'alto' px."""
+    c = c.crop((0, 0, c.width, int(c.height * 0.72)))
+    k = alto / c.height
+    return c.resize((int(c.width * k), alto), Image.LANCZOS)
+
+
+def gradua(im, vs=False):
+    """Acabado dramatico del fondo: azul noche desde el lado del texto y, en enfrentamiento, cada mitad con su tono."""
+    capa = Image.new("RGBA", (W, H))
+    g = Image.linear_gradient("L").rotate(90, expand=True).resize((W, H))      # izquierda opaca -> derecha clara
+    if vs:
+        izq = Image.new("RGBA", (W, H), (120, 10, 25, 255))
+        der = Image.new("RGBA", (W, H), (10, 25, 70, 255))
+        m = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(m).polygon([(0, 0), (W * 0.56, 0), (W * 0.44, H), (0, H)], fill=150)
+        capa.alpha_composite(Image.merge("RGBA", (*izq.convert("RGB").split(), m)))
+        m2 = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(m2).polygon([(W * 0.56, 0), (W, 0), (W, H), (W * 0.44, H)], fill=150)
+        capa.alpha_composite(Image.merge("RGBA", (*der.convert("RGB").split(), m2)))
+    else:
+        azul = Image.new("RGB", (W, H), (8, 18, 48))
+        capa = Image.merge("RGBA", (*azul.split(), g.point(lambda v: int(v * 0.62))))
+    im.alpha_composite(capa)
+
+
+def diagonal(im):
+    """Rayo amarillo del enfrentamiento, con sombra."""
+    for desp, col, ancho in ((10, (0, 0, 0, 150), 30), (0, AMARILLO + (255,), 22)):
+        ImageDraw.Draw(im).line([(W * 0.56 + desp, -20), (W * 0.44 + desp, H + 20)], fill=col, width=ancho)
+
+
+def polaroid_mini(foto: Path, ancho=440, giro=-6):
+    """Foto secundaria en polaroid inclinada, con sombra (contexto de la noticia)."""
+    f = ImageOps.fit(Image.open(foto).convert("RGB"), (ancho, int(ancho * 0.66)), Image.LANCZOS)
+    f = ImageEnhance.Contrast(f).enhance(1.1)
+    b = 18
+    p = Image.new("RGBA", (f.width + 2 * b, f.height + 2 * b + 26), (250, 248, 242, 255))
+    p.paste(f, (b, b))
+    s = Image.new("RGBA", (p.width + 60, p.height + 60))
+    m = Image.new("L", s.size, 0)
+    ImageDraw.Draw(m).rectangle([30, 34, 30 + p.width, 34 + p.height], fill=170)
+    s.putalpha(m.filter(ImageFilter.GaussianBlur(14)))
+    s.alpha_composite(p, (24, 24))
+    return s.rotate(giro, resample=Image.BICUBIC, expand=True)
+
+
 # ---------- miniatura ----------
-def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fondo="", sobrio=False, salida="miniatura.png"):
+def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fondo="", sobrio=False, salida="miniatura.png",
+              rival="", inserto=""):
     dia = RAIZ / "dia" / dia_txt
     img = dia / "imagenes"
-    for nombre in (persona, foto_fondo):
+    for nombre in (persona, foto_fondo, rival, inserto):
         if nombre and not (img / nombre).exists():
             raise SystemExit(f"no existe {img / nombre}: guardala antes con fotos.py elegir")
     im = fondo(img / foto_fondo if foto_fondo else None, sobrio, bool(persona))
+    vs = bool(rival and persona and not sobrio)
+    if not sobrio:
+        gradua(im, vs)
     oscurece_abajo(im, 560 if persona else 700, 210 if persona else 240)
     ancho_texto = 1750
-    if persona:
+    if vs:                                             # enfrentamiento: una persona a cada lado, cara a cara
+        diagonal(im)
+        for nombre, lado in ((rival, "izq"), (persona, "der")):
+            r = recorte(img / nombre)
+            k = min(1000 / r.height, 760 / r.width)
+            cc, pad = silueta(realza(r.resize((int(r.width * k), int(r.height * k)), Image.LANCZOS)))
+            x = -pad + 10 if lado == "izq" else W - cc.width + pad - 10
+            im.alpha_composite(cc, (x, H - cc.height + pad - 10))     # hasta el borde de abajo; el titular, sobre los pechos
+        oscurece_abajo(im, 380, 200)                   # el titular, legible sobre los dos
+        ancho_texto = 1250                             # mas contenido: no puede tapar las caras
+    elif persona:
         c = recorte(img / persona)
         if sobrio:
             c = Image.merge("RGBA", (*ImageOps.grayscale(c.convert("RGB")).convert("RGB").split(), c.getchannel("A")))
-        k = min(1000 / c.height, 1000 / c.width)
-        c, pad = silueta(c.resize((int(c.width * k), int(c.height * k)), Image.LANCZOS))
+        if sobrio:
+            k = min(1000 / c.height, 1000 / c.width)
+            c = c.resize((int(c.width * k), int(c.height * k)), Image.LANCZOS)
+        else:                                          # plano mas cerrado y con mas presencia
+            c = realza(encuadre(c, 960))
+        c, pad = silueta(c)
         x = W - c.width + 150
         im.alpha_composite(c, (x, H - c.height + pad + 30))     # el borde de abajo, fuera de cuadro
         ancho_texto = min(1750, x + pad + 120 - 50)        # el texto puede montar un poco sobre el hombro
@@ -231,12 +304,17 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
     y = H - t.height - 40
-    im.alpha_composite(t, (30 if not sobrio else 70, y))
+    if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
+        pm = polaroid_mini(img / inserto)
+        im.alpha_composite(pm, (150, max(40, y - pm.height - 40)))
+    tx = (W - t.width) // 2 if vs else (30 if not sobrio else 70)
+    im.alpha_composite(t, (tx, y))
     if etiqueta_txt:
         e = etiqueta(etiqueta_txt.upper(), sobrio)
         if inclina:
             e = e.rotate(inclina, resample=Image.BICUBIC, expand=True)
-        im.alpha_composite(e, (80, max(190, y - e.height + 30)))
+        ex = (W - e.width) // 2 if vs else 80
+        im.alpha_composite(e, (ex, max(190, y - e.height + 30)))
     im.alpha_composite(G2.logo(110), (60, 50))
     if not sobrio:
         marco(im)
@@ -298,10 +376,13 @@ if __name__ == "__main__":
     ap.add_argument("--persona", default="")
     ap.add_argument("--fondo", default="")
     ap.add_argument("--sobrio", action="store_true")
+    ap.add_argument("--rival", default="", help="segunda persona: enfrentamiento cara a cara (foto de imagenes/)")
+    ap.add_argument("--inserto", default="", help="foto secundaria en polaroid (lugar u objeto de la noticia)")
     ap.add_argument("--salida", default="miniatura.png")
     ap.add_argument("--canal", action="store_true")
     a = ap.parse_args()
     if a.canal:
         canal()
     else:
-        miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida)
+        miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida,
+                  a.rival, a.inserto)
