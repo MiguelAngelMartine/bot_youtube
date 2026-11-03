@@ -54,6 +54,16 @@ El texto se escucha, no se lee: tiene que fluir como lo contaría un buen locuto
   - Telegrama: «Vox fue primero: Santiago Abascal lo anunció en una entrevista, como acusación popular. El PP lo anunció en un vídeo de Alma Ezcurra. Vox ya presentó una querella contra directivos de Adif el día del accidente. Otra ante el Supremo, contra Puente.»
   - Para el oído: «Vox se adelantó: Santiago Abascal lo contó en una entrevista, y lo hará como acusación popular. El PP, por su parte, lo anunció en un vídeo de Alma Ezcurra. Además, no es el primer paso de Vox en los tribunales, porque el mismo día del accidente ya se querelló contra directivos de Adif, y presentó otra querella ante el Supremo contra Puente.»
 
+## Cruce de declaraciones: el «salseo» (decisión del usuario del 3-nov-2026)
+El canal no se limita a leer noticias: cuenta **qué se dicen los protagonistas unos a otros**. Cuando un partido ataca a otro y el otro responde, ese cruce, con sus frases literales, es parte central del bloque. Da ritmo y un tono más desenfadado, sin dejar de ser riguroso y neutral.
+- **Cada ataque, con su respuesta.** «Vox acusa al PSOE de…: «…». El PSOE responde: «…».» Si el atacado no ha respondido, se dice («El PSOE no ha contestado»). Nunca un ataque sin la otra parte.
+- **Las frases con más gancho, pero literales:** las más directas, irónicas o duras que se hayan dicho, entre comillas en pantalla, atribuidas con nombre y cargo y con la fecha si no es de hoy. Cortas: una frase; como mucho, dos muy breves.
+- **Equilibrio:** el mismo trato para todos. Se elige la frase más fuerte de **cada** parte, no la más fuerte de una y la más floja de otra. Ni la última palabra ni la frase más llamativa pueden ser siempre del mismo lado: si hay varios cruces, se alterna quién abre y quién cierra.
+- **Tono cercano, verbos neutros.** Valen «responde», «contesta», «replica», «le devuelve la acusación», «y la respuesta llegó en horas», «el cruce siguió en redes», «Vox fue más allá». Prohibido todo lo que juzga quién gana: «zasca», «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
+- **Insultos y tacos:** si el insulto es la noticia, se cita literal en la voz y en pantalla, pero nunca en la miniatura, el título ni los primeros 30 segundos (YouTube limita los anuncios). Los tacos fuertes, nunca: se cuenta que los hubo («con un insulto que no reproducimos»).
+- **Acusaciones graves** (delitos, corrupción): solo como lo que son, la acusación de alguien («Vox acusa al PSOE de…»), con «sin pruebas aportadas» si es así, y la respuesta del acusado.
+- **En pantalla:** la escena `citas` con las dos voces enfrentadas (o `persona` con `flujo`) es la natural para un cruce.
+
 ## Equilibrio
 - En cada polémica: versión del Gobierno, de la oposición principal y, si la hay, de los socios. Si una parte no ha hablado, se dice («el Gobierno no ha respondido»).
 - Los medios de referencia cubren todo el espectro: El País, elDiario.es, Público, La Vanguardia, RTVE, Europa Press, 20minutos, El Confidencial, El Mundo, ABC, La Razón. Un hecho que solo publica la prensa de una línea va **atribuido**.

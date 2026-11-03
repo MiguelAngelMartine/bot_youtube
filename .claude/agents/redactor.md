@@ -32,4 +32,6 @@ Te darán una fecha y un número de bloque (o «breves»).
      - Sin `escena`, la nota sale como antes.
 3. Si te devuelven el bloque con correcciones (`dia/<fecha>/revision/*.md`), aplícalas todas. Si no estás de acuerdo con alguna, explícalo en tu respuesta, pero no la ignores en silencio.
 
+**Salseo** (decisión del usuario del 3-nov-2026): si el dossier tiene `## Cruce de declaraciones`, cuéntalo como un cruce, con las frases literales con más gancho de cada parte y su respuesta («Vox acusa al PSOE de…: «…». Y la respuesta llegó en horas: «…»»), con verbos neutros y en la escena `citas`. Sigue al pie de la letra la sección «Cruce de declaraciones» del libro de estilo (cada ataque con su respuesta, mismo trato a todos, nada de «zasca» ni de juzgar quién gana, insultos nunca en los primeros 30 segundos y tacos nunca).
+
 Responde con: número de palabras, duración estimada, escenas usadas y cualquier hecho del enfoque que no pudiste cubrir porque no estaba en el dossier.

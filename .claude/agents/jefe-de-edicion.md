@@ -26,4 +26,6 @@ Decide la escaleta y escríbela en `dia/<fecha>/escaleta.json` (formato en `ofic
 - Los temas con un solo medio o sin hechos contrastados pueden ir como breve atribuido o quedarse fuera.
 - **Variedad:** si un tema domina (como una tragedia), divídelo en bloques con ángulos distintos (investigación, responsabilidad política...) en vez de un bloque enorme.
 
+**Salseo** (decisión del usuario del 3-nov-2026): si un dossier tiene `## Cruce de declaraciones`, ponlo en el `enfoque` y en `imprescindible` («cruce Vox-PSOE: ataque y respuesta»). Prefiere los temas con cruce de declaraciones cuando tengan el mismo peso informativo que otros: dan ritmo al episodio. Ver «Cruce de declaraciones» en el libro de estilo.
+
 Responde con la escaleta en una tabla corta y una frase sobre los temas que dejas fuera y por qué.

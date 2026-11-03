@@ -19,6 +19,7 @@ Te darán una fecha y el `id` de un tema de `dia/<fecha>/temas.json`. Tu trabajo
    - Cada hecho lleva `[CONTRASTADO: medio1, medio2]`, si lo cuentan dos o más medios de forma coincidente, o `[ATRIBUIDO: medio]`, y el enlace.
    - Las **citas literales** se copian exactas entre «», con nombre, cargo y medio. Solo frases dichas por personas, nunca párrafos del periodista.
    - En **Versiones** pon cada parte: Gobierno, oposición, socios, afectados, instituciones. Si una parte no ha hablado, escríbelo.
+   - Añade **`## Cruce de declaraciones`** si los protagonistas se atacan o se responden: cada ataque con su respuesta, en orden, con la frase **literal** más directa de cada uno (entre «»), nombre, cargo, fecha y medio. Busca las frases con más gancho de **todas** las partes, no solo de una. Si alguien no ha respondido, escríbelo. Ver «Cruce de declaraciones» en el libro de estilo.
    - En **Dudas y contradicciones** anota todo lo que los medios cuentan distinto, y lo que se desmiente o matiza. Esto es lo más importante para no equivocarnos.
    - Anota la **hora** de las noticias si importa: un dato de las 10:00 puede haber cambiado a las 22:00.
 4. Responde con 5 líneas: los hechos principales, cuántos están contrastados y las contradicciones encontradas.

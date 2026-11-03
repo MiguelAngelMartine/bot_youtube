@@ -32,6 +32,7 @@ Ordenado de más a menos medios. Solo política española y sus consecuencias (n
 - `## Contexto`: antecedentes, con fuente.
 - `## Qué pasa ahora`: próximos pasos con fecha, con fuente.
 - `## Dudas y contradicciones`: lo que los medios cuentan distinto.
+- `## Cruce de declaraciones` (si lo hay): ataque → respuesta, con citas literales, quién, cargo, fecha y medio.
 
 ## Fase 2
 **`escaleta.json`** (Jefe de edición):
