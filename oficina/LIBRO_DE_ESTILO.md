@@ -64,6 +64,7 @@ El canal no se limita a leer noticias: cuenta **qué se dicen los protagonistas 
 - **Tono cercano, verbos neutros.** Valen «responde», «contesta», «replica», «le devuelve la acusación», «y la respuesta llegó en horas», «el cruce siguió en redes», «Vox fue más allá». Prohibido todo lo que juzga quién gana: «zasca», «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
 - **Insultos y tacos:** las descalificaciones políticas se citan literales en cualquier parte, también en el sumario, la miniatura y el título. Los insultos vejatorios, solo dentro del bloque (nunca en los primeros 30 segundos, la miniatura ni el título). Los tacos fuertes, nunca: se cuenta que los hubo («con un insulto que no reproducimos»).
 - **Si lo han dicho, se cita** (decisión del usuario del 3-nov-2026): da igual que haya pruebas o no de lo que afirman; la noticia es que lo han dicho. Va siempre como lo que es, la afirmación o la acusación de alguien con nombre («Vox acusa al PSOE de…», «según Abascal…»), nunca como un hecho, y **se busca la respuesta** del aludido. No hace falta añadir «sin pruebas».
+- **Redes sociales:** un mensaje en la cuenta oficial de un político es una declaración más. Se cita literal como «<nombre>, en X» (y en la voz, «escribió en X»), tomado del medio que lo recoge. Nunca capturas de pantalla de X ni las fotos de los tuits: la cita va en nuestra tarjeta.
 - **En pantalla:** la escena `citas` con las dos voces enfrentadas (o `persona` con `flujo`) es la natural para un cruce.
 
 ## Equilibrio
