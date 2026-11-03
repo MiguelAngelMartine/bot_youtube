@@ -26,9 +26,14 @@ Las letras y los colores son llamativos; **el texto es literal**:
 ## Impactante y elaborada (decisión del usuario del 3-nov-2026)
 **La noticia de la miniatura es la más polémica o impactante del día**, no necesariamente la primera: el choque entre dos líderes, la frase más dura, la decisión con más consecuencias. Tiene que salir en el vídeo y el texto tiene que ser literal.
 Recursos de `miniatura.py` (además del estilo base):
-- **`--rival <foto>`: enfrentamiento cara a cara** cuando la polémica es entre dos personas (la una responde a la otra, se acusan, compiten): las dos de frente, una a cada lado de una diagonal amarilla, y el titular centrado abajo. La etiqueta dice quién dice qué («Feijóo: que dé la cara»). Las dos tienen que salir en el vídeo con ese asunto; es también lo más neutral, porque se ven las dos partes. Ejemplo del 2-nov: `--persona retrato_feijoo.jpg --rival retrato_sanchez.jpg --titular "Sánchez, no Puente" --etiqueta "Feijóo: que dé la cara"`.
+- **`--rival <foto>`: enfrentamiento cara a cara** cuando la polémica es entre dos personas (la una responde a la otra, se acusan, compiten): las dos de frente, una a cada lado de una diagonal amarilla, y el titular centrado abajo. La etiqueta dice quién habla y de qué («Feijóo, sobre Urda»). Las dos tienen que salir en el vídeo con ese asunto; es también lo más neutral, porque se ven las dos partes. Ejemplo del 2-nov: `--persona retrato_feijoo.jpg --rival retrato_sanchez.jpg --titular "Que dé la cara Sánchez" --destaca "Sánchez" --etiqueta "Feijóo, sobre Urda"`.
 - **`--inserto <foto>`: foto secundaria en polaroid inclinada** (el lugar, el edificio o el objeto de la noticia) cuando hay un solo protagonista. Da contexto y riqueza.
 - El protagonista sale en plano más cerrado y con más presencia; el fondo lleva un acabado de color más dramático. Sin halos detrás de la persona (decisión del usuario).
+**El titular tiene que ser coherente y entenderse solo** (decisión del usuario del 3-nov-2026): alguien que no ha visto el vídeo, leyendo la etiqueta y el titular seguidos, tiene que saber **quién dice o hace qué y sobre qué**, sin poder entenderlo al revés.
+- Etiqueta + titular forman una frase con sentido: «Feijóo, sobre Urda» + «Que dé la cara Sánchez». No fragmentos sueltos que admitan dos lecturas («Sánchez, no Puente» se puede leer como que Sánchez rechaza a Puente).
+- Si el titular es una cita, la etiqueta dice de quién es y de qué habla; si no es cita literal, va sin comillas y es un hecho o una petición que el vídeo cuenta.
+- La imagen acompaña: quien habla sale en la miniatura; en un enfrentamiento, la persona de la que se habla es la otra.
+- Antes de generarla, escribe en una línea cómo se lee entera («Feijóo, sobre Urda: que dé la cara Sánchez») y comprueba que es verdad según el vídeo.
 Antes de darla por buena, comprueba con Read que ninguna cara queda tapada por el texto ni cortada, y que se entiende en pequeño (como se ve en el móvil).
 
 ## La miniatura tiene que ser llamativa (decisión del usuario del 3-nov-2026)
