@@ -143,14 +143,21 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             out.append((pegatina(it["nombre"].upper(), col, BLANCO, 44), 720, y, ti))
             out.append((("flecha", (710, y + 40), (400, 250 + 40 * k)), 0, 0, ti + 0.25))
             y += 100
-        out.append((nota(ve["etiqueta"], 400, 38, color=AMARILLA), 1080, 100, cuando(ve.get("etiqueta_cuando"), t0 + 3)))
+        wmax = max([o[0].width for o in out if isinstance(o[0], Image.Image) and o[1] == 720] + [0])
+        te = cuando(ve.get("etiqueta_cuando"), t0 + 3)
+        if 720 + wmax + 20 <= 1080:
+            out.append((nota(ve["etiqueta"], 400, 38, color=AMARILLA), 1080, 100, te))
+        else:                                          # nombres largos: la nota va debajo, sin pisarlos
+            ne = nota(ve["etiqueta"], 700, 38, color=AMARILLA)
+            out.append((ne, 720, y + 10, te))
+            y += ne.height + 10
         ap = ve["aparte"]
         ta = cuando(ap.get("cuando"), t0 + 6)
         out.append((pegatina(ap["nombre"].upper(), (150, 150, 160), BLANCO, 44), 720, y + 30, ta))
         out.append((nota(ap["texto"], 760, 34, "Fuentes: " + ve.get("fuente", "")), 720, y + 120, ta + 0.5))
     elif tipo in ("claves", "cronologia", "sumario"):
         titulo = "HOY EN EL RESUMEN" if tipo == "sumario" else ve["titulo"]
-        out.append((pegatina(titulo, tam=46), 40, 20, t0 + 0.1))
+        out.append((pegatina(titulo, tam=46), 40, 56, t0 + 0.1))
         ancho = 520 if lado else 680
         txts = [(f"{k + 1:02d} · " if tipo == "sumario" else (it["hora"] + " · " if it.get("hora") else "")) + it["texto"]
                 for k, it in enumerate(ve["items"])]
@@ -162,7 +169,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
                             proporcion=0.40, letra=1.3, giro=(-0.8, 0.7, 0.6, -0.6)[k % 4],
                             fuente_txt=ve.get("_vin_txt", {}).get(k, "Ilustración IA")) if k in vin
                  else nota(tx, ancho, 38, color=CREMA if k % 2 else C.PAPEL) for k, tx in enumerate(txts)]
-        out += rejilla(notas, 40, 100, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
+        out += rejilla(notas, 40, 130, ancho, lambda k: cuando(ve["items"][k].get("cuando"), t0 + 1 + k))
         if lado and not (vin and tipo != "sumario"):   # con viñetas, la foto sobra y quedaba tapada (2-nov)
             out.append((lado, 1140, 110, t0 + 0.6))
     elif tipo == "cifra":
@@ -529,7 +536,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None):
             falta = plan[i + 1]["t0"] - t
             if falta < 4.5:
                 tz = p["teaser"]
-                pega(fr, tz, BX + BW - 16 - tz.width * E.rebote((4.5 - falta) / 0.4), BY + 16, min(1.0, (4.5 - falta) * 3))
+                pega(fr, tz, BX + BW - 16 - tz.width, BY + BH + 12, min(1.0, (4.5 - falta) * 3))
         if pt["fuente"]:
             fr.alpha_composite(tarjeta_fuente(pt["fuente"]), (40, BY))
         pm = presente(t, i)

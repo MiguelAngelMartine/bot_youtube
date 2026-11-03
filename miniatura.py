@@ -108,7 +108,7 @@ def degradado(tam, arriba, medio, abajo):
     return g.resize((w, h))
 
 
-def texto(lineas, tam, sobrio=False, interlinea=0.96):
+def texto(lineas, tam, sobrio=False, interlinea=0.96, espacio=1.0):
     """Letra de miniatura: relleno en degradado, brillo arriba, contorno negro grueso, filo exterior claro
     y relieve 3D hacia abajo-derecha. En sobrio, letra lisa con contorno fino y sombra."""
     negro, exterior, relieve = (6, 0, 0) if sobrio else (18, 7, 16)
@@ -116,7 +116,7 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96):
     f = fuente("Inter-Black.ttf", tam)
     m = negro + exterior + relieve + 30
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
-    hueco = int(1.6 * (negro + exterior))              # el contorno se come el espacio entre palabras
+    hueco = int(0.7 * (negro + exterior))              # el contorno se come el espacio entre palabras
     ancho = int(max(medir.textlength(" ".join(p for p, _ in l), font=f) + hueco * (len(l) - 1) for l in lineas)) + 2 * m
     alto = int(tam * interlinea * len(lineas) + tam * 0.35) + 2 * m
     relleno = Image.new("RGBA", (ancho, alto))
@@ -134,7 +134,7 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96):
             M.paste(255, (0, 0), mk)
             ImageDraw.Draw(S).text((xx, yy), pal, font=f, fill=255, stroke_width=negro, stroke_fill=255)
             ImageDraw.Draw(E).text((xx, yy), pal, font=f, fill=255, stroke_width=negro + exterior, stroke_fill=255)
-            xx += medir.textlength(pal + " ", font=f) + hueco
+            xx += medir.textlength(pal, font=f) + espacio * medir.textlength(" ", font=f) + hueco
         yy += int(tam * interlinea)
     out = Image.new("RGBA", (ancho, alto))
     negra = lambda mascara, col=(0, 0, 0): Image.merge("RGBA", (*Image.new("RGB", (ancho, alto), col).split(), mascara))

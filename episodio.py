@@ -559,7 +559,16 @@ def hoja_calendario(dia, mes, pie_txt):
     d.rectangle([0, 60 * S, 340 * S, 96 * S], fill=ROJO)
     d.text((170 * S, 50 * S), mes, font=f("Inter-Black.ttf", 38), fill=BLANCO, anchor="mm")
     d.text((170 * S, 210 * S), dia, font=f("Inter-Black.ttf", 170), fill=NAVY, anchor="mm")
-    d.text((170 * S, 335 * S), pie_txt, font=f("Inter-SemiBold.ttf", 30), fill=NAVY, anchor="mm")
+    tam = 30
+    while tam > 16 and f("Inter-SemiBold.ttf", tam).getlength(pie_txt) > 312 * S:
+        tam -= 1
+    if f("Inter-SemiBold.ttf", tam).getlength(pie_txt) > 312 * S:  # dos lineas
+        pal = pie_txt.split()
+        mejor = min(range(1, len(pal)), key=lambda i: max(f("Inter-SemiBold.ttf", 24).getlength(" ".join(pal[:i])), f("Inter-SemiBold.ttf", 24).getlength(" ".join(pal[i:]))))
+        for k, ln in enumerate((" ".join(pal[:mejor]), " ".join(pal[mejor:]))):
+            d.text((170 * S, (318 + 34 * k) * S), ln, font=f("Inter-SemiBold.ttf", 24), fill=NAVY, anchor="mm")
+    else:
+        d.text((170 * S, 335 * S), pie_txt, font=f("Inter-SemiBold.ttf", tam), fill=NAVY, anchor="mm")
     for x in (90, 250):
         d.ellipse([(x - 12) * S, -12 * S, (x + 12) * S, 12 * S], fill=NAVY)
     return baja(im)

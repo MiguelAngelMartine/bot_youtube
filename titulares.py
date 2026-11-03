@@ -68,7 +68,7 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
                 usadas[pr.name] = cred[pr.name]
         ancho = 1750 if persona is None else AN - persona[0].width + 150 + persona[1] + 70
         tam, lineas = M.ajusta(it.get("titular") or it["texto"], it.get("destaca", ""), ancho, sobrio)
-        texto = M.texto(lineas, min(tam, 190), sobrio)
+        texto = M.texto(lineas, min(tam, 190), sobrio, espacio=0.55)
         if not sobrio:
             texto = texto.rotate(3, resample=Image.BICUBIC, expand=True)
         eti = M.etiqueta((it.get("etiqueta") or f"{k + 1} de {n}").upper(), sobrio)

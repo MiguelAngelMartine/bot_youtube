@@ -74,10 +74,17 @@ def polaroid(foto, nombre, cargo, partido, credito=None, ancho=420):
     tn, tc = 46, 24                                    # nombre y cargo se encogen si no caben en el ancho de la foto
     while tn > 28 and d.textlength(nombre.upper(), font=estrecha(tn)) > ancho - 16:
         tn -= 2
-    while tc > 16 and d.textlength(cargo, font=fuente("Inter-Regular.ttf", tc)) > ancho - 16:
+    while tc > 20 and d.textlength(cargo, font=fuente("Inter-Regular.ttf", tc)) > ancho - 16:
         tc -= 1
     d.text((ancho / 2 + 8, alto_f + 22), nombre.upper(), font=estrecha(tn), fill=TINTA, anchor="mt")
-    d.text((ancho / 2 + 8, alto_f + 76), cargo, font=fuente("Inter-Regular.ttf", tc), fill=(90, 95, 110), anchor="mt")
+    if d.textlength(cargo, font=fuente("Inter-Regular.ttf", tc)) > ancho - 16 and " " in cargo:   # sigue sin caber: dos lineas
+        pal = cargo.split()
+        fc = fuente("Inter-Regular.ttf", 20)
+        m = min(range(1, len(pal)), key=lambda i: max(d.textlength(" ".join(pal[:i]), font=fc), d.textlength(" ".join(pal[i:]), font=fc)))
+        for k, ln in enumerate((" ".join(pal[:m]), " ".join(pal[m:]))):
+            d.text((ancho / 2 + 8, alto_f + 70 + 22 * k), ln, font=fc, fill=(90, 95, 110), anchor="mt")
+    else:
+        d.text((ancho / 2 + 8, alto_f + 76), cargo, font=fuente("Inter-Regular.ttf", tc), fill=(90, 95, 110), anchor="mt")
     if credito:
         txt, tf = f"Foto: {credito['autor'][:34]} · {credito['licencia']}", 17
         while tf > 11 and d.textlength(txt, font=fuente("Inter-Regular.ttf", tf)) > ancho - 10:
