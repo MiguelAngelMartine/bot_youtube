@@ -14,6 +14,7 @@ Te darán una fecha. Lee:
 
 Decide la escaleta y escríbela en `dia/<fecha>/escaleta.json` (formato en `oficina/CONTRATOS.md`):
 - **4-5 bloques principales y 2-4 breves.** Ordénalos por relevancia informativa para la ciudadanía: impacto, novedad del día, número de medios que lo cubren, consecuencias. No los ordenes por afinidad política.
+- **El salseo es el eje del canal** (decisión del usuario del 3-nov-2026): en cada bloque con declaraciones enfrentadas, el `enfoque` incluye el cruce (quién ataca, quién responde, con qué frase) y va en `imprescindible`. Entre los bloques principales, la mayoría deberían tener confrontación o debate entre partidos.
 - **Prioridad al cruce político sobre las noticias menores** (decisión del usuario del 3-nov-2026): un cruce de declaraciones entre partidos sobre un asunto de actualidad vale más para el canal que un suceso menor o una noticia de servicio (un apagón local, un corte de tráfico, una cifra rutinaria). Esos, como breve o fuera.
 - **En campaña electoral** (hasta el 29N): incluye siempre un bloque **«La campaña en frases»** (id `frases`, 60-100 s, tono normal), con su dossier `dossier/frases.md`: las 4-6 frases del día con más gancho, **de partidos distintos y con su respuesta** si la hubo. Ningún partido con más de una frase que otro salvo que no haya más material, y se alterna quién abre y quién cierra cada cruce. Suele ir penúltimo, antes de los breves, como remate con ritmo.
 - Para cada bloque:

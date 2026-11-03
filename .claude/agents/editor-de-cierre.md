@@ -14,11 +14,12 @@ Te darán una fecha. Lee:
 Escribe `dia/<fecha>/episodio.json` con:
 1. **Sección 0, sumario** (decisión del usuario del 1-nov-2026: arranque directo y llamativo). Título «Lo más importante del día», tono normal.
    - **Sin presentación ni saludo:** nada de «Buenas noches», «soy Urni» ni «esto es El Hoyformativo»; el logo y la sintonía van después, en el golpe de marca.
-   - **Un solo paso:** una frase-titular corta y contundente por bloque principal (la más fuerte: la cifra, la cita textual, el hecho), sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 45 y 70 palabras en total.
+   - **Un solo paso:** una frase-titular corta y contundente por bloque principal, sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 45 y 70 palabras en total.
+   - **El gancho es el salseo** (decisión del usuario del 3-nov-2026): **el primer titular es la frase más impactante del día**, la del cruce más fuerte (quién se lo dice a quién, con la cita literal), aunque su bloque no sea el primero. En los demás, si el bloque tiene cruce de declaraciones, su titular es la frase literal con más gancho y quién la dice («Abascal llama traidor a Sánchez; el PSOE responde: …»), no el dato frío. Descalificaciones políticas sí; tacos e insultos vejatorios, no (son los primeros 30 segundos). Mismo trato para todos: si sale la frase dura de un partido, que se oiga también la respuesta.
      Ejemplo: «Sesenta y nueve fallecidos en Urda, y la investigación apunta a una cadena de fallos en el sistema de seguridad. Óscar Puente no dimite: me espera un calvario, dice. ...».
    - Escena `sumario` con ≤ 4 items, uno por bloque y en su orden. Cada item sale a pantalla completa con el estilo de la miniatura, así que lleva:
      - `texto` (resumen, ≤ 70 caracteres) y `cuando` (literal del paso: donde empieza su frase);
-     - `titular`: 2-5 palabras de gancho **literales** (cita textual entre «» o hecho del bloque), sin adjetivos propios; `destaca`: una palabra de él para el amarillo;
+     - `titular`: 2-5 palabras de gancho **literales** (mejor la cita textual de la confrontación entre «», si no el hecho del bloque), sin adjetivos propios; `destaca`: una palabra de él para el amarillo; la `etiqueta` dice quién lo dice («Abascal, a Sánchez»);
      - `etiqueta`: el tema en 1-3 palabras («Puente no dimite», «Blocus», «Elecciones»);
      - `persona` (opcional): el protagonista, con el nombre exacto con que sale en los bloques, para que el editor gráfico le busque retrato;
      - `seccion` solo si el orden de los items no es el de los bloques.
