@@ -38,7 +38,7 @@ lanza)
         ANTES=$(wc -l < "$LOG")
         # Tope de 3 h para que una jornada atascada no se quede colgada.
         RES="$DIA/claude_resultado_$INTENTO.json"
-        timeout 3h claude -p "/edicion-diaria $FECHA" --permission-mode auto --output-format json > "$RES" 2>> "$LOG"
+        timeout 3h claude -p "/edicion-diaria $FECHA" --model sonnet --permission-mode auto --output-format json > "$RES" 2>> "$LOG"
         COD=$?
         # el texto final al log y el consumo (coste equivalente y tokens por modelo, agentes incluidos) a archivo/consumo.tsv
         "$PY" - "$RES" "$FECHA" "$INTENTO" >> "$LOG" 2>&1 <<'PYEOF'

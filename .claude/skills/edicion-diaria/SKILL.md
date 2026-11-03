@@ -25,11 +25,12 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - `recopilador` («fecha <fecha>») → `noticias.json`, `temas.json`.
    - Luego descarga el texto completo de las noticias: `.venv/bin/python articulos.py <fecha>` (→ `articulos/`, unos 20 s).
    - Luego `documentalista` (contexto).
-   - Luego **un `investigador` por cada uno de los 8 primeros temas, todos en paralelo** («fecha <fecha>, tema <id>») → `dossier/<id>.md`.
+   - Luego **un `investigador` por cada uno de los 6 primeros temas, todos en paralelo** (6 bastan para 4-5 bloques y los breves; ahorro de tokens del 3-nov-2026) («fecha <fecha>, tema <id>») → `dossier/<id>.md`.
    - **En campaña electoral (hasta el 29N), uno más en paralelo: «fecha <fecha>, tema frases»** → `dossier/frases.md`, con las frases del día de todos los partidos y sus respuestas (bloque «La campaña en frases»).
 2. **Consejo de redacción.** `jefe-de-edicion` («fecha <fecha>») → `escaleta.json`.
 3. **Redacción.** Un `redactor` por bloque de la escaleta, más uno para los breves, **en paralelo** («fecha <fecha>, bloque NN» / «fecha <fecha>, breves») → `bloques/NN.json`.
 4. **Mesa de control.**
+   - Antes, comprueba que cada bloque pasa `.venv/bin/python prechequeo.py <fecha> NN` (si no, devuélvelo a su redactor: lo mecánico no llega a la mesa).
    - `verificador`, `defensor-neutralidad` y `asesor-cumplimiento` **en paralelo** («fecha <fecha>»).
    - Por cada bloque con algún CORREGIR: vuelve a lanzar a su `redactor` («fecha <fecha>, bloque NN, aplica las correcciones de revision/»; él lee las revisiones, tú no se las copies).
    - Segunda vuelta, **solo de lo corregido**: el `verificador` revisa los bloques que han cambiado, y `defensor-neutralidad` y `asesor-cumplimiento` solo los bloques que ellos mismos marcaron («fecha <fecha>, solo bloques NN, MM»).
