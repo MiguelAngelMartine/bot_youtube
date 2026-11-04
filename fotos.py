@@ -107,6 +107,72 @@ def commons_categoria(q, n):
     return out
 
 
+MONCLOA = "https://www.lamoncloa.gob.es"
+MONCLOA_INDICES = ["/multimedia/galeriasfotograficas/Paginas/index.aspx",
+                   "/multimedia/galeriasfotograficas/presidente/Paginas/index.aspx",
+                   "/multimedia/galeriasfotograficas/consejoministros/Paginas/index.aspx"]
+
+
+def _texto_html(h):
+    import html as _h
+    import re as _re
+    return _h.unescape(_re.sub(r"\s+", " ", _re.sub(r"<[^>]+>", " ", h)))
+
+
+def moncloa(q, n):
+    """Galerías de Pool Moncloa (4-nov-2026): fotos del presidente y los ministros del mismo día, 2000 px. Su aviso legal
+    dice «Las imágenes firmadas Pool Moncloa son de libre acceso», citando «Origen de los datos: sitio web de
+    lamoncloa.gob.es. Ministerio de la Presidencia» y la fecha, y sin desnaturalizar el contenido."""
+    import re as _re
+    import unicodedata as _u
+    norm = lambda s: _u.normalize("NFKD", s.lower()).encode("ascii", "ignore").decode()
+    claves = [w for w in norm(q).split() if len(w) > 3]
+    if not claves:
+        return []
+    cache = RAIZ / "cache" / "moncloa"
+    cache.mkdir(parents=True, exist_ok=True)
+    enlaces = []
+    for ind in MONCLOA_INDICES:
+        try:
+            h = requests.get(MONCLOA + ind, headers={"User-Agent": "Mozilla/5.0"}, timeout=30).text
+        except requests.RequestException:
+            continue
+        enlaces += [e for e in _re.findall(r'href="(/multimedia/galeriasfotograficas/[^"]+/Paginas/20\d\d/[^"]+\.aspx)"', h) if e not in enlaces]
+    out, vistas = [], set()
+    for e in list(dict.fromkeys(enlaces))[:40]:
+        f = cache / (_re.sub(r"[^a-z0-9]+", "_", e.lower())[-90:] + ".html")
+        if not f.exists():
+            try:
+                f.write_text(requests.get(MONCLOA + e, headers={"User-Agent": "Mozilla/5.0"}, timeout=30).text, encoding="utf-8")
+            except requests.RequestException:
+                continue
+        h = f.read_text(encoding="utf-8")
+        titulo = _texto_html((_re.search(r"<h1[^>]*>(.*?)</h1>", h, _re.S) or _re.search(r"<title>(.*?)</title>", h, _re.S)).group(1)).strip()
+        cuerpo = _texto_html(h)
+        i = cuerpo.find(titulo[:40]) if titulo else -1
+        desc = cuerpo[i:i + 1500] if i >= 0 else ""
+        if not all(k in norm(e + " " + titulo + " " + desc) for k in claves):
+            continue
+        m = _re.search(r"/(\d{2})(\d{2})(\d{2})-", e)
+        fecha = f"{m.group(1)}/{m.group(2)}/20{m.group(3)}" if m else ""
+        fotos_ = []
+        for src in _re.findall(r'src="(/multimedia/fotos/[^"?]+\.jpg)', h, _re.I):
+            if src not in fotos_:
+                fotos_.append(src)
+        for src in fotos_:
+            if src in vistas:
+                continue
+            vistas.add(src)
+            out.append({"fuente": "Pool Moncloa", "orden": 1, "ancho": 2000, "alto": 1333,
+                        "autor": "Pool Moncloa / Ministerio de la Presidencia",
+                        "licencia": f"libre acceso. Origen de los datos: sitio web de lamoncloa.gob.es. Ministerio de la Presidencia ({fecha})",
+                        "titulo": f"{titulo[:100]} ({fecha})", "url": MONCLOA + src, "miniatura": MONCLOA + src + "?RenditionID=24",
+                        "pagina": MONCLOA + e})
+            if len(out) >= n:
+                return out
+    return out
+
+
 def wikimedia(q, n):
     out = []
     for c in imagenes.busca(q, n, ancho=1280):
@@ -133,7 +199,7 @@ def buscar(dia_txt, q, n=8):
     dest = RAIZ / "dia" / dia_txt / "fotos_candidatas"
     dest.mkdir(parents=True, exist_ok=True)
     cands, vistos = [], set()
-    for f in (commons_categoria, wikimedia, openverse):   # 4-nov: primero la categoria de Commons (mas fotos y recientes)
+    for f in (commons_categoria, moncloa, wikimedia, openverse):   # 4-nov: categoria de Commons, Pool Moncloa (del dia), ...
         try:
             for c in f(q, n):
                 if c["pagina"] not in vistos:
@@ -141,7 +207,7 @@ def buscar(dia_txt, q, n=8):
                     cands.append(c)
         except Exception as e:                        # una fuente caida no para la otra
             print(f"  ({f.__name__} no responde: {type(e).__name__})")
-    cat_ = [c for c in cands if c["fuente"] == "Commons (categoría)"]          # las mas recientes primero
+    cat_ = [c for c in cands if c["fuente"] in ("Commons (categoría)", "Pool Moncloa")]   # las mas recientes primero
     cands = (cat_ + sorted([c for c in cands if c not in cat_], key=lambda c: c["orden"]))[:n]
     s = slug(q)
     for k, c in enumerate(cands):
