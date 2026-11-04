@@ -1,5 +1,5 @@
 {
-  "Oscar Puente": {"cargo": "Ministro de Transportes", "partido": "PSOE", "fuente": "20minutos, El Mundo (contexto 1-nov); tarjeta 3-nov (20minutos)", "verificado": "2026-11-01"},
+  "Oscar Puente": {"cargo": "Dimitido como ministro de Transportes (dimision anunciada el 3-nov)", "partido": "PSOE", "fuente": "El Mundo, elDiario.es, La Vanguardia, ABC, 20minutos (episodio 4-nov); antes ministro (contexto 1-nov)", "verificado": "2026-11-04"},
   "Santiago Abascal": {"cargo": "Lider de Vox", "partido": "Vox", "fuente": "20minutos (contexto 1-nov); tarjeta 3-nov (20minutos)", "verificado": "2026-11-01"},
   "Alma Ezcurra": {"cargo": "Vicesecretaria del PP (Coordinacion Sectorial)", "partido": "PP", "fuente": "El Mundo, ABC; 20minutos dice 'Regeneracion Institucional' (discrepancia, se uso El Mundo/ABC)", "verificado": "2026-11-01"},
   "Alberto Nunez Feijoo": {"cargo": "Presidente del PP", "partido": "PP", "fuente": "ABC, El Mundo (contexto 1-nov); tarjetas 3-nov (Europa Press, El Mundo, El Pais)", "verificado": "2026-11-01"},
@@ -26,5 +26,18 @@
   "Elma Saiz": {"cargo": "Ministra portavoz del Gobierno", "partido": "PSOE", "fuente": "Citada en la voz del episodio del 3-nov (elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
   "Aitor Esteban": {"cargo": "Presidente del PNV", "partido": "PNV", "fuente": "Voz y vineta del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
   "Elisenda Alamany": {"cargo": "Portavoz de ERC", "partido": "ERC", "fuente": "Voz del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ivan Picos": {"cargo": "Alcalde de Hoyocasero (Avila)", "partido": "PP", "fuente": "Voz y vineta del episodio del 3-nov (El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"}
+  "Ivan Picos": {"cargo": "Alcalde de Hoyocasero (Avila)", "partido": "PP", "fuente": "Voz y vineta del episodio del 3-nov (El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Carlos Cuerpo": {"cargo": "Vicepresidente primero y ministro de Economia; asume las competencias de Transportes (transitorio)", "partido": "Sin carne del PSOE (segun el episodio 4-nov)", "fuente": "El Pais, ABC, elDiario.es, Europa Press (episodio 4-nov)", "verificado": "2026-11-04"},
+  "Ada Colau": {"cargo": "Candidata del Frente Amplio", "partido": "Frente Amplio", "fuente": "Episodio 4-nov (Europa Press, elDiario.es); La Vanguardia 3-nov la llama candidata a la Presidencia: discrepancia con Veronica Martinez Barbero sin aclarar", "verificado": "2026-11-04"},
+  "Pablo Llarena": {"cargo": "Juez instructor del Supremo", "partido": "Institucion", "fuente": "El Mundo, La Vanguardia, 20minutos, ABC, Europa Press (episodio 4-nov)", "verificado": "2026-11-04"},
+  "Ester Muñoz": {"cargo": "Portavoz del PP en el Congreso", "partido": "PP", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Jose Manuel Albares": {"cargo": "Ministro de Asuntos Exteriores", "partido": "Gobierno", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Pepa Millan": {"cargo": "Portavoz de Vox en el Congreso", "partido": "Vox", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Jose Ramon Gomez Besteiro": {"cargo": "Lider del PSdeG", "partido": "PSOE", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Alfonso Rueda": {"cargo": "Presidente de la Xunta y del PP gallego", "partido": "PP", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Ana Pontón": {"cargo": "Portavoz nacional del BNG", "partido": "BNG", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Monica Sales": {"cargo": "Presidenta del grupo de Junts en el Parlament", "partido": "Junts", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Gabriel Rufian": {"cargo": "Portavoz y cabeza de lista de ERC", "partido": "ERC", "fuente": "Europa Press (vineta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Miguel Tellado": {"cargo": "Secretario general del PP", "partido": "PP", "fuente": "elDiario.es (breve 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Toni Comin": {"cargo": "Junts (cargo SIN VERIFICAR)", "partido": "Junts", "fuente": "Titular de La Razon (tarjeta 4-nov); SIN VERIFICAR", "verificado": "SIN VERIFICAR"}
 }

@@ -1,0 +1,368 @@
+{
+  "fecha": "Miércoles, 4 de noviembre de 2026",
+  "titulo_video": "Feijóo a Sánchez tras la dimisión de Puente: «Aplícatelo» | El Hoyformativo · 4 nov 2026",
+  "secciones": [
+    {
+      "titulo": "Lo más importante del día",
+      "tono": "normal",
+      "fuentes": [],
+      "pasos": [
+        {
+          "di": "Óscar Puente dimite tras acusar a Feijóo de doble vara de medir, y Feijóo dice que es una forma indigna de irse. Sánchez dice que Puente demuestra que no todos somos iguales, y Feijóo responde con una palabra: aplícatelo. Carlos Cuerpo asume Transportes, y Abascal dice que no se subiría a un AVE. Y el juez Llarena deja sin efecto el procesamiento de Puigdemont. Vamos con ello.",
+          "ve": {
+            "tipo": "sumario",
+            "items": [
+              {
+                "texto": "Puente dimite; Feijóo: «Es una forma indigna de irse»",
+                "cuando": "Óscar Puente dimite",
+                "titular": "«Una forma indigna de irse»",
+                "destaca": "indigna",
+                "etiqueta": "Feijóo, a Puente",
+                "persona": "Alberto Núñez Feijóo",
+                "seccion": 1
+              },
+              {
+                "texto": "Sánchez: «no todos somos iguales». Feijóo: «Aplícatelo»",
+                "cuando": "Sánchez dice que Puente",
+                "titular": "«No todos somos iguales»",
+                "destaca": "iguales",
+                "etiqueta": "Sánchez, en X",
+                "persona": "Pedro Sánchez",
+                "seccion": 2
+              },
+              {
+                "texto": "Cuerpo asume Transportes; Abascal no se subiría a un AVE",
+                "cuando": "Carlos Cuerpo asume",
+                "titular": "Cuerpo asume Transportes",
+                "destaca": "Transportes",
+                "etiqueta": "Relevo",
+                "persona": "Carlos Cuerpo",
+                "seccion": 3
+              },
+              {
+                "texto": "Llarena deja sin efecto el procesamiento de Puigdemont",
+                "cuando": "el juez Llarena",
+                "titular": "Sin efecto el procesamiento",
+                "destaca": "procesamiento",
+                "etiqueta": "Amnistía",
+                "persona": "Pablo Llarena",
+                "seccion": 4
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "Puente deja el Gobierno y su puesto en las listas",
+      "tono": "normal",
+      "fuentes": ["El Mundo", "elDiario.es", "La Vanguardia", "ABC", "20minutos"],
+      "pasos": [
+        {
+          "di": "Óscar Puente dimite, y lo hace horas después de que Moncloa asegurase que no iba a dimitir y que no lo iban a cesar.",
+          "ve": {
+            "tipo": "persona",
+            "persona": {"nombre": "Óscar Puente", "cargo": "Dimitido como ministro de Transportes", "partido": "PSOE"},
+            "sello": "DIMITE",
+            "sello_cuando": "Puente dimite"
+          }
+        },
+        {
+          "di": "Lo anunció el martes, pasadas las nueve de la noche, al final de más de cuatro horas en la Diputación Permanente del Congreso.",
+          "ve": {
+            "tipo": "cronologia",
+            "titulo": "La dimisión, paso a paso",
+            "items": [
+              {"hora": "3-nov", "texto": "Pasadas las 21:00 anuncia su dimisión tras más de 4 horas en la Diputación Permanente", "cuando": "pasadas las nueve", "escena": "an empty parliament hemicycle at night with a single lit lectern"},
+              {"hora": "3-nov", "texto": "Renuncia a ir en las listas del 29N, donde era número uno del PSOE por Valladolid", "cuando": "renuncia a ir", "escena": "a ballot box with envelopes on a table, a city skyline behind"}
+            ],
+            "fuente": "El Mundo, elDiario.es, La Vanguardia, ABC"
+          }
+        },
+        {
+          "di": "Además, renuncia a ir en las listas del veintinueve de noviembre, donde era el número uno del PSOE por Valladolid."
+        },
+        {
+          "di": "Dijo que un ministro de Transportes no puede seguir en su cargo con dos accidentes en menos de un año, y que es una cuestión de dignidad política.",
+          "ve": {
+            "tipo": "persona",
+            "persona": {"nombre": "Óscar Puente", "cargo": "Dimitido como ministro de Transportes", "partido": "PSOE", "cita": "«Es una cuestión de dignidad política»", "medio": "elDiario.es", "cita_cuando": "dignidad política"}
+          }
+        },
+        {
+          "di": "En la sesión, casi todos los grupos habían pedido su dimisión, y solo EH Bildu y el PSOE no lo hicieron."
+        },
+        {
+          "di": "Según explicó, lo decidió en los primeros minutos tras el accidente, y se lo comunicó a Sánchez por WhatsApp minutos antes, algo que confirma el Gobierno."
+        },
+        {
+          "di": "Sánchez dice que Puente ha dado la cara y ha dado un paso a un lado, y los diputados socialistas lo aplaudieron en pie.",
+          "ve": {
+            "tipo": "claves",
+            "titulo": "Las reacciones",
+            "items": [
+              {"icono": "persona", "texto": "Sánchez: «Puente ha dado la cara y ha dado un paso a un lado»", "cuando": "ha dado la cara", "escena": "a man in a suit speaking at a lectern in a government palace hall", "persona_vineta": "Pedro Sánchez"},
+              {"icono": "altavoz", "texto": "Los diputados socialistas lo aplaudieron en pie", "cuando": "aplaudieron en pie", "escena": "rows of parliament seats with applauding hands"},
+              {"icono": "documento", "texto": "Junts: «Es lo que tenía que pasar». Colau: «la dignidad de este gesto difícil»", "cuando": "tenía que pasar", "escena": "two speech podiums side by side in a quiet hall"},
+              {"icono": "urna", "texto": "Ana Redondo encabeza la lista de Valladolid (según La Vanguardia); Puente seguirá en la papeleta por los plazos de la Junta Electoral (según 20minutos)", "cuando": "Ana Redondo", "escena": "a ballot box with a list of names pinned beside it"}
+            ],
+            "fuente": "ABC, 20minutos, La Vanguardia, Europa Press"
+          }
+        },
+        {
+          "di": "Junts opina que es lo que tenía que pasar, y Ada Colau, candidata del Frente Amplio, agradece la dignidad de este gesto difícil."
+        },
+        {
+          "di": "Mientras tanto, Ana Redondo encabezará la lista por Valladolid, aunque Puente seguirá en la papeleta por los plazos de la Junta Electoral Central."
+        },
+        {
+          "di": "Y queda el cruce con Feijóo. Antes de dimitir, Puente dijo que no podía entender que se la pidiera Feijóo y que le aplicara su habitual doble vara de medir.",
+          "ve": {
+            "tipo": "citas",
+            "titulo": "Puente y Feijóo",
+            "items": [
+              {"nombre": "Óscar Puente", "cargo": "Dimitido como ministro de Transportes", "partido": "PSOE", "cita": "«Lo que no puedo entender es que me la pida Feijóo, y me aplique su habitual doble vara de medir»", "medio": "3-nov, según La Vanguardia", "cuando": "doble vara de medir"},
+              {"nombre": "Alberto Núñez Feijóo", "cargo": "Presidente del PP", "partido": "PP", "cita": "«Es una forma indigna de irse»", "medio": "4-nov, Antena 3, según ABC", "cuando": "forma indigna de irse"}
+            ]
+          }
+        },
+        {
+          "di": "Feijóo, ya el miércoles, dijo que es una forma indigna de irse, y preguntó por qué mienten tanto. Además, cree que Sánchez sí sabía que iba a dimitir."
+        }
+      ]
+    },
+    {
+      "titulo": "El cruce de reacciones a la dimisión",
+      "tono": "sobrio",
+      "fuentes": ["El Mundo", "elDiario.es", "La Vanguardia", "ABC", "20minutos"],
+      "pasos": [
+        {
+          "di": "Y mientras Puente se marcha, el cruce entre el Gobierno y la oposición no se ha detenido. Pedro Sánchez escribió en X que políticos como Puente demuestran que no todos somos iguales, y añadió que mientras unos solo dan lecciones, otros lo dan todo.",
+          "ve": {
+            "tipo": "citas",
+            "titulo": "Sánchez, Feijóo y su respuesta",
+            "items": [
+              {"nombre": "Pedro Sánchez", "cargo": "Presidente del Gobierno", "partido": "PSOE", "cita": "Mientras unos solo dan lecciones, otros lo dan todo", "medio": "En X, 3-nov", "cuando": "lo dan todo"},
+              {"nombre": "Alberto Núñez Feijóo", "cargo": "Presidente del PP", "partido": "PP", "cita": "Aplícatelo", "medio": "En X, 4-nov", "cuando": "una sola palabra"},
+              {"nombre": "Alberto Núñez Feijóo", "cargo": "Presidente del PP", "partido": "PP", "cita": "A Puente le han dimitido las encuestas. Él se va, pero Sánchez se queda", "medio": "Según Antena 3, 4-nov", "cuando": "le han dimitido"}
+            ],
+            "fuente": "El Mundo, Antena 3"
+          }
+        },
+        {
+          "di": "Feijóo le contestó, también en X, con una sola palabra: aplícatelo. Y en una entrevista televisiva fue más allá. Dijo que a Puente le han dimitido las encuestas y que él se va pero Sánchez se queda. Añadió que a Sánchez le tocaba entregar al soldado Puente."
+        },
+        {
+          "di": "El PP también reaccionó. La portavoz en el Congreso, Ester Muñoz, dijo que la dimisión ha llegado ciento dieciséis muertos tarde.",
+          "ve": {
+            "tipo": "persona",
+            "persona": {"nombre": "Ester Muñoz", "cargo": "Portavoz del PP en el Congreso", "partido": "PP", "cita": "Ha llegado 116 muertos tarde", "medio": "La Vanguardia", "cita_cuando": "ciento dieciséis muertos tarde"}
+          }
+        },
+        {
+          "di": "Desde el Gobierno, el ministro de Exteriores, José Manuel Albares, replicó a Feijóo. Según dijo, no todos encaran estas situaciones con la misma honestidad, ni con la misma transparencia ni con la misma dignidad con la que Puente la ha encarado.",
+          "ve": {
+            "tipo": "citas",
+            "titulo": "Albares replica a Feijóo",
+            "items": [
+              {"nombre": "José Manuel Albares", "cargo": "Ministro de Asuntos Exteriores", "partido": "Gobierno", "cita": "No todos encaran estas situaciones con la misma honestidad, transparencia y dignidad", "medio": "Según La Vanguardia, 4-nov", "cuando": "misma honestidad"}
+            ],
+            "fuente": "La Vanguardia"
+          }
+        },
+        {
+          "di": "Vox, por su parte, fue más allá. Santiago Abascal escribió en X que Sánchez siempre se esconde detrás de sus esbirros y que es el capo de la mafia, y le pidió que dimita para ponerse a disposición judicial.",
+          "ve": {
+            "tipo": "claves",
+            "titulo": "Más reacciones",
+            "items": [
+              {"icono": "altavoz", "texto": "Abascal, en X: Sánchez «es el capo de la mafia» y debe dimitir para «ponerse a disposición judicial»", "cuando": "capo de la mafia", "escena": "a smartphone on a desk with a social media app open, dim evening light", "persona_vineta": "Santiago Abascal"},
+              {"icono": "persona", "texto": "Colau: la dimisión, un paso adelante para recuperar la confianza en el tren", "cuando": "un paso adelante", "escena": "a railway station departure board in soft morning light"},
+              {"icono": "mazo", "texto": "Vox dijo en la sesión del 3-nov que hará lo imposible para que Puente «pague ante un tribunal» (según La Vanguardia)", "cuando": "pague ante un tribunal", "escena": "a judge's wooden gavel on a courtroom bench, scales of justice behind"}
+            ],
+            "fuente": "elDiario.es, El Mundo, La Vanguardia"
+          }
+        },
+        {
+          "di": "En el lado contrario, Ada Colau, candidata del Frente Amplio, dijo que la dimisión es un paso adelante para recuperar la confianza en el tren."
+        },
+        {
+          "di": "Con las elecciones del veintinueve de noviembre ya cerca, Vox dijo en la sesión del Congreso que hará lo imposible para que Puente pague ante un tribunal, aunque sin fecha concreta. Feijóo y Vox exigen ahora la dimisión de Sánchez, mientras el Gobierno sostiene que Puente se fue por voluntad propia."
+        }
+      ]
+    },
+    {
+      "titulo": "Cuerpo asume Transportes hasta el 29N",
+      "tono": "normal",
+      "fuentes": ["El País", "ABC", "elDiario.es", "Europa Press", "La Vanguardia"],
+      "pasos": [
+        {
+          "di": "Y tras la dimisión de Puente, llega el relevo.",
+          "ve": {"tipo": "persona", "persona": {"nombre": "Pedro Sánchez", "cargo": "Presidente del Gobierno", "partido": "PSOE", "cita": "«Vamos a recuperar la confianza en la alta velocidad»", "medio": "El País", "cita_cuando": "recuperar la confianza"}, "sello": "RELEVO", "sello_cuando": "llega el relevo"}
+        },
+        {"di": "Pedro Sánchez anunció este miércoles, en una declaración institucional desde La Moncloa, que el vicepresidente primero y ministro de Economía, Carlos Cuerpo, asume las competencias de Transportes."},
+        {"di": "Será algo transitorio, al menos hasta las elecciones del veintinueve de noviembre, y Sánchez descarta nombrar un nuevo ministro a un mes de las urnas."},
+        {"di": "Sánchez asegura que Cuerpo ha demostrado una enorme capacidad de gestión e integridad, y promete que van a recuperar la confianza en la alta velocidad."},
+        {
+          "di": "Cuerpo, que no tiene carné del PSOE, hereda además varios frentes abiertos. Los maquinistas de Semaf irán a la huelga el diez y el doce de noviembre, y el comité de empresa de Adif acordó otra para el diecisiete, aunque todavía sin convocatoria formal.",
+          "ve": {"tipo": "claves", "titulo": "Lo que hereda Cuerpo", "fuente": "El País, La Vanguardia, El Mundo", "items": [
+            {"icono": "tren", "texto": "Huelga de maquinistas de Semaf los días 10 y 12 de noviembre", "cuando": "maquinistas de Semaf", "escena": "an empty railway platform with a high-speed train waiting and a picket sign leaning on a bench"},
+            {"icono": "alerta", "texto": "El comité de Adif acordó huelga el 17-N, sin convocatoria formal aún", "cuando": "comité de empresa", "escena": "a union meeting table with papers and a calendar page"},
+            {"icono": "escudo", "texto": "Grupos y sindicatos piden cambios en la cúpula de Adif", "cuando": "cambios en la cúpula", "escena": "an office building facade with an empty executive chair seen through a window"},
+            {"icono": "documento", "texto": "Sin decidir qué pasa con las obras de la Madrid-Barcelona", "cuando": "obras de la Madrid-Barcelona", "escena": "railway tracks under construction with a yellow excavator and a map pinned on a board"}]}
+        },
+        {"di": "También hay grupos y sindicatos que reclaman cambios en la cúpula de Adif, y sigue sin decidirse qué ocurrirá con las obras de la Madrid-Barcelona."},
+        {
+          "di": "Entre los socios, Ada Colau, candidata del Frente Amplio, considera lógica la elección de Cuerpo por su perfil técnico.",
+          "ve": {"tipo": "citas", "titulo": "La confianza en el tren", "items": [
+            {"nombre": "Ada Colau", "cargo": "Candidata", "partido": "Frente Amplio", "cita": "La elección de Cuerpo es «lógica» y «comprensible» por ser perfil técnico", "medio": "Europa Press", "cuando": "considera lógica"},
+            {"nombre": "Santiago Abascal", "cargo": "Líder de Vox", "partido": "Vox", "cita": "Ve «irresponsable» decir que el sistema merece confianza", "medio": "La Vanguardia", "cuando": "ve irresponsable"}]}
+        },
+        {"di": "Por su parte, Santiago Abascal dijo en una entrevista radiofónica que por responsabilidad no se subiría a un AVE, y que ve irresponsable decir que el sistema merece confianza."}
+      ]
+    },
+    {
+      "titulo": "Llarena anula el procesamiento de Puigdemont",
+      "tono": "normal",
+      "fuentes": ["El Mundo", "La Vanguardia", "20minutos", "ABC", "Europa Press", "La Razón"],
+      "pasos": [
+        {
+          "di": "Y del relevo en Transportes pasamos a los tribunales. El juez del Supremo Pablo Llarena dejó sin efecto el procesamiento de Puigdemont, Comín y Puig por malversación, y declaró concluso el sumario.",
+          "ve": {"tipo": "cronologia", "titulo": "Amnistía del procés", "fuente": "El Mundo, La Vanguardia, 20minutos, ABC, Europa Press",
+            "items": [
+              {"hora": "3 nov", "texto": "El instructor anula el procesamiento de los tres por malversación", "cuando": "dejó sin efecto", "escena": "a judge's wooden gavel on a courtroom bench, stacks of case files beside it", "persona_vineta": "Pablo Llarena"},
+              {"hora": "4 nov", "texto": "El Constitucional archiva los amparos de Junqueras, Turull y Romeva", "cuando": "el Constitucional", "escena": "the imposing facade of a constitutional court building with stone columns"}
+            ]}
+        },
+        {"di": "Además, remite la causa a la Sala de lo Penal para el posible sobreseimiento libre, de modo que no aplica él la amnistía. Según el propio juez, la doctrina del Constitucional le vincula, aunque subsisten los indicios de participación, algo que no constituye una declaración de culpabilidad.", "ve": null},
+        {"di": "Por otro lado, este miércoles el Constitucional, en pleno y por unanimidad, ha archivado los amparos de Junqueras, Turull y Romeva, porque el Supremo ya les aplicó la amnistía.", "ve": null},
+        {
+          "di": "Además, según un medio, Llarena habría escrito que los adjetivos no convierten en indiscutible lo que ha fracturado al Tribunal.",
+          "ve": {"tipo": "citas", "titulo": "Del Supremo a la calle", "items": [
+            {"nombre": "Pablo Llarena", "cargo": "Juez instructor del Supremo", "partido": "Institución", "cita": "«Los adjetivos no convierten en indiscutible lo que ha fracturado al Tribunal»", "medio": "según El Mundo", "cuando": "los adjetivos no convierten"},
+            {"nombre": "Toni Comín", "cargo": "Junts", "partido": "Junts", "cita": "«Hemos hecho fracasar la represión española»", "medio": "según un titular de La Razón", "cuando": "fracasar la represión"}
+          ]}
+        },
+        {"di": "Por su parte, según un titular, Toni Comín, de Junts, afirma que han hecho fracasar la represión española.", "ve": null},
+        {
+          "di": "Falta ahora que la Sala de lo Penal decida el archivo, sin fecha, y Puigdemont podría volver a España. La ley de amnistía formó parte del acuerdo de investidura de Sánchez con Junts y, además, fue avalada por el Tribunal de Justicia de la Unión Europea y por el Constitucional.",
+          "ve": {"tipo": "claves", "titulo": "Qué pasa ahora", "fuente": "20minutos, El Mundo",
+            "items": [
+              {"icono": "mazo", "texto": "La Sala de lo Penal decidirá el archivo, sin fecha", "cuando": "decida el archivo", "escena": "an empty courtroom with a long wooden bench and a clock on the wall"},
+              {"icono": "persona", "texto": "Puigdemont podría volver a España, según 20minutos", "cuando": "podría volver", "escena": "a suitcase beside an open door at a quiet train platform"},
+              {"icono": "documento", "texto": "La ley fue parte del pacto de investidura con Junts y la avalaron el TJUE y el TC (según 20minutos)", "cuando": "acuerdo de investidura", "escena": "a signed agreement document on a table with two pens"}
+            ]}
+        }
+      ]
+    },
+    {
+      "titulo": "La campaña en frases",
+      "tono": "normal",
+      "fuentes": ["La Vanguardia", "ABC", "Europa Press"],
+      "pasos": [
+        {
+          "di": "Y volvemos a la campaña del veintinueve de noviembre. Pepa Millán, portavoz de Vox en el Congreso, dijo el martes que el Gobierno ha decidido convertir la red ferroviaria española en una ruleta rusa.",
+          "ve": {
+            "tipo": "persona",
+            "persona": {"nombre": "Pepa Millán", "cargo": "Portavoz en el Congreso", "partido": "Vox", "cita": "«Una ruleta rusa»", "medio": "La Vanguardia, 3-nov", "cita_cuando": "una ruleta rusa"},
+            "sello": "VOX",
+            "sello_cuando": "Pepa Millán"
+          }
+        },
+        {
+          "di": "En el Parlamento de Galicia, el líder del PSdeG, José Ramón Gómez Besteiro, se dirigió a Alfonso Rueda. Le dijo que hubo un tiempo en que, cuando decían que PP y Vox eran lo mismo, él se alteraba, y que ahora ya ni disimula.",
+          "ve": {
+            "tipo": "citas",
+            "titulo": "Parlamento de Galicia, 4-nov",
+            "items": [
+              {"nombre": "José Ramón Gómez Besteiro", "cargo": "Líder del PSdeG", "partido": "PSOE", "cita": "«…cuando decíamos que PP y Vox eran lo mismo, usted se alteraba. Ahora ya ni disimula»", "medio": "según ABC", "cuando": "Gómez Besteiro"},
+              {"nombre": "Alfonso Rueda", "cargo": "Presidente de la Xunta", "partido": "PP", "cita": "«Por cierto, gracias al PP de Galicia, aquí no hay Vox»", "medio": "según ABC", "cuando": "gracias al PP"}
+            ]
+          }
+        },
+        {
+          "di": "Rueda, presidente de la Xunta y del PP gallego, le respondió que cómo le gustaría a Besteiro que existiera Vox en Galicia. Y añadió que, por cierto, gracias al PP de Galicia, allí no hay Vox."
+        },
+        {
+          "di": "Por su parte, la portavoz nacional del BNG, Ana Pontón, apuntó a Feijóo. Dijo que el mismo Feijóo que ahora pide la dimisión de Óscar Puente permitió que Ana Pastor siguiera tres años más en su cargo.",
+          "ve": {
+            "tipo": "persona",
+            "persona": {"nombre": "Ana Pontón", "cargo": "Portavoz nacional", "partido": "BNG", "cita": "«permitió que Ana Pastor siguiera tres años más en su cargo»", "medio": "según ABC", "cita_cuando": "Ana Pastor"},
+            "sello": "BNG",
+            "sello_cuando": "Ana Pontón"
+          }
+        },
+        {
+          "di": "En el Parlament de Cataluña, la presidenta del grupo de Junts, Mònica Sales, aseguró que la gestión del PSOE ha sido nefasta, una vergüenza. El president de la Generalitat, el socialista Salvador Illa, le contestó con tres preguntas: ¿y ustedes dónde están? ¿En el medio de qué? ¿De PP y Vox?",
+          "ve": {
+            "tipo": "citas",
+            "titulo": "Parlament de Catalunya, 4-nov",
+            "items": [
+              {"nombre": "Mònica Sales", "cargo": "Presidenta del grupo", "partido": "Junts", "cita": "«La gestión del PSOE ha sido nefasta, una vergüenza»", "medio": "según La Vanguardia", "cuando": "Mònica Sales"},
+              {"nombre": "Salvador Illa", "cargo": "President de la Generalitat", "partido": "PSC", "cita": "«¿Y ustedes dónde están? ¿En el medio de qué? ¿De PP y Vox?»", "medio": "según La Vanguardia", "cuando": "Salvador Illa"}
+            ]
+          }
+        },
+        {
+          "di": "Y cerramos con Gabriel Rufián, portavoz y cabeza de lista de ERC, que opinó sobre la propia dimisión. Creía que Puente era una distracción, porque lo importante es saber si la gente va segura o no en un AVE.",
+          "ve": {
+            "tipo": "claves",
+            "titulo": "ERC y la campaña",
+            "items": [
+              {"icono": "tren", "texto": "Rufián (ERC): «Puente era una distracción», lo importante es si la gente va segura en un AVE", "cuando": "una distracción", "escena": "an empty high-speed train platform at dusk with a sleek train waiting, calm atmosphere", "persona_vineta": "Gabriel Rufián"}
+            ],
+            "fuente": "Europa Press"
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "Breves",
+      "tono": "normal",
+      "fuentes": ["El País", "El Mundo", "elDiario.es", "La Vanguardia", "20minutos"],
+      "pasos": [
+        {
+          "di": "Ya en los breves, sobre Urda, unos audios indican que dos técnicos de Adif intentaron reactivar el sistema de seguridad con un solo ordenador. Además, cargos de Adif que prefieren no dar su nombre denuncian una caza de brujas interna tras la dimisión de Puente.",
+          "ve": {
+            "tipo": "breve",
+            "lugar": "URDA",
+            "icono": "tren",
+            "titular": "Adif: dos técnicos probaron a rearmar el LZB con un único ordenador, según unos audios",
+            "sub": "Según El País. Cargos de Adif denuncian una «caza de brujas», según El Mundo",
+            "fuente": "El País, El Mundo",
+            "escena": "a quiet railway control room with computer racks and dim lights, empty chairs"
+          }
+        },
+        {
+          "di": "Y en la campaña, Miguel Tellado, secretario general del PP, pidió en televisión el voto para Vox al Senado en Gipuzkoa, Tarragona y Girona. Allí el PP no se presenta, por el pacto entre ambos. Por su parte, Sánchez retoma los mítines el viernes en València, el sábado en Tarragona y el domingo en Bilbao.",
+          "ve": {
+            "tipo": "breve",
+            "lugar": "CAMPAÑA",
+            "icono": "urna",
+            "titular": "Tellado: «Pedimos a la gente que vote a Vox, por supuesto que sí»",
+            "sub": "Para el Senado en Gipuzkoa, Tarragona y Girona, según elDiario.es. Sánchez: mítines en València, Tarragona y Bilbao, según La Vanguardia",
+            "fuente": "elDiario.es, La Vanguardia",
+            "escena": "a Senate ballot box on a table with paper ballots beside it and a map of Spain on the wall",
+            "persona_vineta": "Miguel Tellado"
+          }
+        },
+        {
+          "di": "Por último, en el caso Plus Ultra, el juez Calama pidió a la UDEF que identifique al autor del punzón grabado en las joyas incautadas a Zapatero. Un peritaje induce a descartar países árabes y apunta a otros con normas más permisivas, y señala que las marcas son insuficientes para determinar el origen. Por su parte, Zapatero sostiene que fueron un regalo del rey de Arabia Saudí en dos mil siete.",
+          "ve": {
+            "tipo": "breve",
+            "lugar": "AUDIENCIA NACIONAL",
+            "icono": "mazo",
+            "titular": "Plus Ultra: Calama quiere saber quién grabó el punzón de las joyas de Zapatero",
+            "sub": "Zapatero dice que fueron un regalo saudí en 2007. El peritaje ve los contrastes «insuficientes»",
+            "fuente": "El Mundo, elDiario.es, La Vanguardia, 20minutos",
+            "escena": "a gold bracelet with a tiny engraved hallmark under a jeweler's magnifying glass on a desk"
+          }
+        },
+        {
+          "di": "Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.",
+          "ve": {"tipo": "despedida"}
+        }
+      ]
+    }
+  ]
+}

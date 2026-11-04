@@ -3,9 +3,9 @@
     "id": "urda",
     "titulo": "Accidente ferroviario de Urda (Toledo): choque de un AVE y un Iryo",
     "inicio": "2026-10-28",
-    "ultimo_dia": "2026-11-03",
+    "ultimo_dia": "2026-11-04",
     "estado": "Abierta",
-    "resumen": "Sexto dia (3-nov). 69 fallecidos, todos identificados: 40 hombres y 29 mujeres; 54 espanoles y 15 extranjeros (Centro Integrado de Datos, via El Pais y El Mundo). Unos 27 heridos hospitalizados, 7 en UCI (Gobierno de Castilla-La Mancha, via ABC); retirados todos los vagones. Consejo de Ministros aprueba real decreto de ayudas que dobla el seguro obligatorio de viajeros, con anticipo de indemnizaciones e incapacidad temporal (segun sumario de Sanchez, El Pais). Puente presenta medidas: doble validacion por un segundo controlador humano si falla el sistema, menos trenes en la Madrid-Sevilla al reabrir (uno cada 15 min en vez de cada 5) hasta el ERTMS-2 previsto a principios de 2027, auditoria extraordinaria de la agencia de seguridad ferroviaria; no se plantea cortar Madrid-Barcelona. Investigacion: Guardia Civil ha interrogado a una veintena de personas; operador de Adif investigado (no detenido) se acoge a su derecho a no declarar; secreto de sumario, jueza Aristea Ortiz decidira cuando toma declaracion. El Supremo decide si admite la querella de Vox contra Puente por homicidio imprudente (sin respuesta del ministro). Sin causa oficial. Pendiente: comparecencia de Puente 3-nov por la tarde (~17:00) en la Diputacion Permanente; Sanchez habla el jueves 5-nov al cerrar la Cumbre Iberoamericana; huelga SEMAF 10 y 12 de noviembre. Nota: las cifras de hospitalizados (41/16 el 1-nov vs 27/7 hoy) son de ambitos distintos segun el contexto; no se compararon."
+    "resumen": "4-nov (solo en breve): audios indican que dos tecnicos de Adif intentaron rearmar el LZB con un unico ordenador (El Pais); cargos de Adif denuncian 'caza de brujas' tras la dimision de Puente (El Mundo). Cuerpo hereda: huelga SEMAF 10 y 12-nov, comite de Adif acuerda otra el 17-nov sin convocatoria formal. Cifras del 3-nov (sin actualizar el 4-nov): Sexto dia (3-nov). 69 fallecidos, todos identificados: 40 hombres y 29 mujeres; 54 espanoles y 15 extranjeros (Centro Integrado de Datos, via El Pais y El Mundo). Unos 27 heridos hospitalizados, 7 en UCI (Gobierno de Castilla-La Mancha, via ABC); retirados todos los vagones. Consejo de Ministros aprueba real decreto de ayudas que dobla el seguro obligatorio de viajeros, con anticipo de indemnizaciones e incapacidad temporal (segun sumario de Sanchez, El Pais). Puente presenta medidas: doble validacion por un segundo controlador humano si falla el sistema, menos trenes en la Madrid-Sevilla al reabrir (uno cada 15 min en vez de cada 5) hasta el ERTMS-2 previsto a principios de 2027, auditoria extraordinaria de la agencia de seguridad ferroviaria; no se plantea cortar Madrid-Barcelona. Investigacion: Guardia Civil ha interrogado a una veintena de personas; operador de Adif investigado (no detenido) se acoge a su derecho a no declarar; secreto de sumario, jueza Aristea Ortiz decidira cuando toma declaracion. El Supremo decide si admite la querella de Vox contra Puente por homicidio imprudente (sin respuesta del ministro). Sin causa oficial. Pendiente: comparecencia de Puente 3-nov por la tarde (~17:00) en la Diputacion Permanente; Sanchez habla el jueves 5-nov al cerrar la Cumbre Iberoamericana; huelga SEMAF 10 y 12 de noviembre. Nota: las cifras de hospitalizados (41/16 el 1-nov vs 27/7 hoy) son de ambitos distintos segun el contexto; no se compararon."
   },
   {
     "id": "urda_pp_vox_causa",
@@ -19,9 +19,9 @@
     "id": "puente_presion",
     "titulo": "Presion para que dimita Oscar Puente",
     "inicio": "2026-10-28",
-    "ultimo_dia": "2026-11-03",
-    "estado": "Abierta",
-    "resumen": "3-nov: Puente no dimite; puso el cargo a disposicion de Sanchez, que le pidio seguir. Piden su salida PP (Feijoo: actitud 'infame, cruel y ruin', 2-nov, El Mundo y Europa Press), Vox, Junts, Frente Amplio, Podemos y el PNV (que quiere que lo cese Sanchez si no dimite); ERC espera a la comparecencia y EH Bildu a la investigacion tecnica (La Vanguardia). Puente: 'Puedo entender que lo pida Colau, pero no que me la pida Feijoo' (20minutos). Juanma Moreno (PP): 'El fallo humano es de Sanchez por no actuar' (ABC), sin respuesta del Gobierno. Segun contexto, una mayoria de la Diputacion Permanente pide su dimision (El Mundo; no incluida en el episodio). Puente comparece el 3-nov por la tarde a peticion propia; Sanchez habla el jueves 5-nov. La fecha de inicio es la del accidente."
+    "ultimo_dia": "2026-11-04",
+    "estado": "Cerrada",
+    "resumen": "4-nov: CIERRE. Puente dimite el 3-nov pasadas las 21:00 tras mas de 4 h en la Diputacion Permanente (Moncloa habia dicho horas antes que no dimitia); renuncia a ir en las listas del 29N (numero 1 por Valladolid; Ana Redondo encabeza, aunque seguira en la papeleta por plazos de la Junta Electoral). Casi todos los grupos pedian su dimision salvo EH Bildu y PSOE. Cruce: Puente acusa a Feijoo de 'doble vara de medir' (3-nov, La Vanguardia); Feijoo: 'forma indigna de irse' (4-nov, Antena 3 via ABC), 'Aplicatelo' en X tras el mensaje de Sanchez 'no todos somos iguales'; Ester Muñoz (PP): 'ha llegado 116 muertos tarde'; Albares replica; Abascal en X: Sanchez 'capo de la mafia'. Colau (Frente Amplio) y Junts valoran el gesto. Anterior (3-nov): Puente no dimite; puso el cargo a disposicion de Sanchez, que le pidio seguir. Piden su salida PP (Feijoo: actitud 'infame, cruel y ruin', 2-nov, El Mundo y Europa Press), Vox, Junts, Frente Amplio, Podemos y el PNV (que quiere que lo cese Sanchez si no dimite); ERC espera a la comparecencia y EH Bildu a la investigacion tecnica (La Vanguardia). Puente: 'Puedo entender que lo pida Colau, pero no que me la pida Feijoo' (20minutos). Juanma Moreno (PP): 'El fallo humano es de Sanchez por no actuar' (ABC), sin respuesta del Gobierno. Segun contexto, una mayoria de la Diputacion Permanente pide su dimision (El Mundo; no incluida en el episodio). Puente comparece el 3-nov por la tarde a peticion propia; Sanchez habla el jueves 5-nov. La fecha de inicio es la del accidente."
   },
   {
     "id": "blocus",
@@ -32,12 +32,36 @@
     "resumen": "31-oct (Halloween) sin disturbios en Barcelona: 2.264 identificados en Cataluna (Mossos, via El Mundo y elDiario.es), 1.440 en Barcelona ciudad, 181 actas, 10 detenciones (3 Barcelona, 7 resto). Madrid sin incidentes. Collboni defiende la contundencia; la CUP denuncia identificaciones por perfil racial; Parlon lo niega. Saqueos del 24-oct: 133 detenidos, 89 menores (El Pais). El 1-nov un juez de Barcelona envia a prision sin fianza a un joven de 18 anos (20minutos), distinto del presunto fundador detenido en Picanya (tambien en prision, elDiario.es). Joven de 21 anos detenido en Cataluna, pendiente del juez. Sin novedades en el episodio del 3-nov."
   },
   {
+    "id": "cuerpo_transportes",
+    "titulo": "Carlos Cuerpo asume las competencias de Transportes",
+    "inicio": "2026-11-04",
+    "ultimo_dia": "2026-11-04",
+    "estado": "Abierta",
+    "resumen": "4-nov: Sanchez anuncia en declaracion institucional que el vicepresidente primero y ministro de Economia, Carlos Cuerpo, asume Transportes, transitorio al menos hasta el 29N; descarta nuevo ministro (El Pais, ABC, elDiario.es, Europa Press). Colau lo ve logico por su perfil tecnico; Abascal: no se subiria a un AVE (La Vanguardia). Frentes: huelgas SEMAF 10 y 12-nov, comite de Adif 17-nov, cupula de Adif, obras Madrid-Barcelona."
+  },
+  {
+    "id": "amnistia_puigdemont",
+    "titulo": "Llarena deja sin efecto el procesamiento de Puigdemont, Comin y Puig",
+    "inicio": "2026-11-03",
+    "ultimo_dia": "2026-11-04",
+    "estado": "Abierta",
+    "resumen": "3-nov: Llarena anula el procesamiento por malversacion y declara concluso el sumario; remite la causa a la Sala de lo Penal para posible sobreseimiento libre (no aplica el la amnistia; subsisten indicios, no es declaracion de culpabilidad). 4-nov: el Constitucional, en pleno y por unanimidad, archiva los amparos de Junqueras, Turull y Romeva. Pendiente: decision de la Sala de lo Penal, sin fecha; Puigdemont podria volver (20minutos). Comin (Junts): 'Hemos hecho fracasar la represion española' (titular de La Razon)."
+  },
+  {
+    "id": "plus_ultra_zapatero",
+    "titulo": "Plus Ultra: joyas incautadas a Zapatero y punzon",
+    "inicio": "SIN VERIFICAR",
+    "ultimo_dia": "2026-11-04",
+    "estado": "Abierta",
+    "resumen": "Primer dia contado: 4-nov, en breve. El juez Calama pide a la UDEF identificar al autor del punzon grabado en las joyas; peritaje: marcas insuficientes para determinar origen, apunta a paises con normas mas permisivas; Zapatero sostiene que fueron regalo del rey de Arabia Saudi en 2007 (El Mundo, elDiario.es, La Vanguardia, 20minutos)."
+  },
+  {
     "id": "elecciones_29n",
     "titulo": "Elecciones generales del 29 de noviembre: campana y listas",
     "inicio": "SIN VERIFICAR",
-    "ultimo_dia": "2026-11-03",
+    "ultimo_dia": "2026-11-04",
     "estado": "Abierta",
-    "resumen": "3-nov, bloque 'La campana en frases' (sin respuesta del Gobierno/partidos en cada caso): Feijoo (Comite Ejecutivo del PP, 2-nov): 'Dudo que sean buena gente' (El Pais); Abascal (Telecinco, 3-nov): 'Estamos ante un crimen politico y la responsabilidad esta en el Gobierno' (20minutos); Montero (2-nov): 'Cuando se trata de privatizar votan igual' sobre PP y PSOE (La Vanguardia); Puente (3-nov): 'Son tres diferencias radicales respecto del PP' (20minutos); Alamany (ERC) atribuye Urda y Adamuz al colapso del sistema ferroviario, por PP y PSOE (La Vanguardia); Esteban (PNV) sobre Vox: 'ahi nosotros no vamos a estar' (La Vanguardia). Antes (1-nov): PP gira a la gestion, Abascal unico que no suspendio actos, cruce Feijoo-Illa por la amnistia. Campana oficial desde la medianoche del 13-nov; elecciones 29-nov. Segun contexto 3-nov: Sanchez retoma actos (mitin en Valencia el viernes), encuesta de El Mundo (Feijoo puede ganar en 36 provincias), proclamacion de candidaturas (RTVE); no incluidos en el episodio. Fecha de la convocatoria: SIN VERIFICAR."
+    "resumen": "4-nov, 'La campana en frases': Millan (Vox, 3-nov) 'ruleta rusa' (La Vanguardia); Gomez Besteiro (PSdeG) vs Rueda (PP) en el Parlamento de Galicia, 'gracias al PP de Galicia, aqui no hay Vox' (ABC); Pontón (BNG) sobre Feijoo y Ana Pastor (ABC); Sales (Junts) vs Illa en el Parlament (La Vanguardia); Rufian (ERC): Puente 'una distraccion' (Europa Press). Breve: tellado pide voto a Vox al Senado en Gipuzkoa, Tarragona y Girona (elDiario.es); Sanchez retoma mitines: viernes Valencia, sabado Tarragona, domingo Bilbao (La Vanguardia). Anterior 3-nov, bloque 'La campana en frases' (sin respuesta del Gobierno/partidos en cada caso): Feijoo (Comite Ejecutivo del PP, 2-nov): 'Dudo que sean buena gente' (El Pais); Abascal (Telecinco, 3-nov): 'Estamos ante un crimen politico y la responsabilidad esta en el Gobierno' (20minutos); Montero (2-nov): 'Cuando se trata de privatizar votan igual' sobre PP y PSOE (La Vanguardia); Puente (3-nov): 'Son tres diferencias radicales respecto del PP' (20minutos); Alamany (ERC) atribuye Urda y Adamuz al colapso del sistema ferroviario, por PP y PSOE (La Vanguardia); Esteban (PNV) sobre Vox: 'ahi nosotros no vamos a estar' (La Vanguardia). Antes (1-nov): PP gira a la gestion, Abascal unico que no suspendio actos, cruce Feijoo-Illa por la amnistia. Campana oficial desde la medianoche del 13-nov; elecciones 29-nov. Segun contexto 3-nov: Sanchez retoma actos (mitin en Valencia el viernes), encuesta de El Mundo (Feijoo puede ganar en 36 provincias), proclamacion de candidaturas (RTVE); no incluidos en el episodio. Fecha de la convocatoria: SIN VERIFICAR."
   },
   {
     "id": "huelga_11n",

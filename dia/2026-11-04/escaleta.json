@@ -1,0 +1,107 @@
+{
+ "fecha": "Miércoles, 4 de noviembre de 2026",
+ "titulo_video": "Feijóo a Sánchez tras la dimisión de Puente: «Aplícatelo»",
+ "bloques": [
+  {
+   "n": 1,
+   "id": "puente",
+   "titulo": "Puente dimite y renuncia a las listas",
+   "tono": "normal",
+   "segundos": 90,
+   "enfoque": "Lo nuevo: Puente anunció su dimisión el martes 3-nov pasadas las 21:00, al final de más de cuatro horas en la Diputación Permanente, y renuncia a ser número uno del PSOE por Valladolid el 29N. La sorpresa: Moncloa había dicho horas antes que no dimitiría ni lo cesaría, y él se lo comunicó a Sánchez por WhatsApp minutos antes. Cruce del bloque: Puente contra Feijóo («doble vara de medir», 3-nov) y la respuesta de Feijóo hoy («forma indigna de irse», «¿Por qué mienten tanto?»). Abre Puente, cierra Feijóo. Las reacciones de PP y Vox contra Sánchez van en el bloque 2, y el relevo de Cuerpo en el 3: aquí, solo la dimisión. Puente ya no es ministro en presente (sigue en funciones hasta el decreto de cese). Cifras de víctimas: 69 en Urda y 46 en Adamuz; «116» solo como cita.",
+   "imprescindible": [
+    "Hechos: dimisión anunciada el martes 3-nov en la Diputación Permanente tras más de cuatro horas de comparecencia; renuncia también a las listas del 29N, donde era número uno por Valladolid [CONTRASTADO El Mundo, elDiario.es, La Vanguardia, ABC]",
+    "Puente: «Un ministro de transportes de un país como España no puede continuar en su cargo con dos accidentes de esta gravedad en menos de un año» y «Es una cuestión de dignidad política, de coherencia y de empatía con las víctimas»; también hizo suya la frase «La culpa no puede morir soltera»",
+    "Puente dice que lo decidió en los primeros minutos tras el accidente y que esperó a dar explicaciones; Moncloa había dicho ese mismo día que «no va a dimitir y no lo vamos a cesar»; avisó a Sánchez por WhatsApp minutos antes, según él y confirmado por el Gobierno",
+    "Cruce Puente-Feijóo: Puente (3-nov, antes de dimitir): «Lo que no puedo entender es que me la pida Feijóo, y me aplique su habitual doble vara de medir»; Feijóo (Antena 3, 4-nov): «Es una forma indigna de irse» y «¿Por qué mienten tanto? Dice que decidió irse minutos después»; Feijóo cree que Sánchez sí lo sabía: es su afirmación, atribuida",
+    "Versión del Gobierno: Sánchez, declaración institucional del 4-nov: «Puente ha dado la cara y ha dado un paso a un lado»; Patxi López, portavoz del PSOE: «no se despistó, no desapareció ni estaba en el Ventorro»",
+    "Socios: los diputados socialistas lo aplaudieron en pie y Rufián (ERC) le dijo al oído «Has sido un gran ministro» [CONTRASTADO ABC, 20minutos, La Vanguardia]; Colau (Frente Amplio) agradece «la dignidad de este gesto difícil»; Junts: «Es lo que tenía que pasar» (Nogueras); EH Bildu fue el único grupo, además del PSOE, que no pidió su dimisión",
+    "Víctimas: Mario Samper, de la Asociación de Víctimas de Adamuz: la dimisión «llega tardísimo y no reconforta en absoluto» (según La Vanguardia)",
+    "Qué pasa ahora: Ana Redondo encabeza la lista del PSOE por Valladolid (según La Vanguardia), aunque Puente seguirá en la papeleta por los plazos de la Junta Electoral (según 20minutos)"
+   ]
+  },
+  {
+   "n": 2,
+   "id": "reacciones",
+   "titulo": "PP y Vox apuntan ahora a Sánchez",
+   "tono": "normal",
+   "segundos": 90,
+   "enfoque": "El salseo del día: Sánchez convierte la dimisión en lema («no todos somos iguales») y el PP y Vox responden que ahora el que debe irse es él. Tres cruces, alternando quién abre y quién cierra: 1) Sánchez abre en X y Feijóo responde con «Aplícatelo» y «le han dimitido las encuestas»; 2) Muñoz (PP) abre con «116 muertos tarde» y cierra Albares (Gobierno); 3) Abascal (Vox) abre con «el capo de la mafia» y cierra Colau (Frente Amplio). La frase de Abascal es descalificación fuerte: nunca en el sumario ni en el título; dentro del bloque, literal y atribuida. Los insultos de la cuenta de Vox («psicópata», «carnicero») no se usan.",
+   "imprescindible": [
+    "Cruce 1, ataque: Sánchez, en X (3-nov): «Políticos como él dignifican a nuestro país y nos demuestran que no todos somos iguales. Mientras unos solo dan lecciones, otros lo dan todo» [CONTRASTADO ABC, elDiario.es, La Vanguardia]",
+    "Cruce 1, respuesta: Feijóo, en X (4-nov), respondiendo a ese mensaje: «Aplícatelo» [CONTRASTADO La Vanguardia, 20minutos]; y en Antena 3: «A Puente le han dimitido las encuestas. Él se va, pero Sánchez se queda» y «a Sánchez le tocaba entregar al soldado Puente» [CONTRASTADO ABC, 20minutos]",
+    "PP: Tellado, secretario general: la dimisión «era imprescindible, pero no suficiente», y llama a Puente «un tuitero pendenciero» [CONTRASTADO El Mundo, elDiario.es, La Vanguardia]",
+    "Cruce 2: Ester Muñoz, portavoz del PP en el Congreso: la dimisión «ha llegado 116 muertos tarde» (cifra suya; 69 de Urda y 46 de Adamuz suman 115); responde Albares, ministro de Exteriores: la decisión «contrasta mucho» con cómo el PP «ha gestionado en el pasado situaciones similares» (según La Vanguardia)",
+    "Cruce 3: Abascal, en X (3-nov): Sánchez «siempre se esconde detrás de sus esbirros» y «Es el capo de la mafia»; le pide que dimita «para ponerse a disposición judicial»; responde Colau, candidata del Frente Amplio (TVE, 4-nov): Feijóo y Abascal no tienen «escrúpulos» para usar las tragedias electoralmente y «ya vale de intentar utilizar políticamente este accidente» (según Europa Press)",
+    "Izquierda: Mónica García (Más Madrid): «No, no todos los políticos somos iguales»; Maíllo (IU): permite «abrir una nueva etapa en la política ferroviaria» (según El Mundo)",
+    "La acusación de las encuestas (CIS, «Tezanos») es del PP; el Gobierno sostiene que fue «por voluntad propia»: atribuir cada versión"
+   ]
+  },
+  {
+   "n": 3,
+   "id": "cuerpo",
+   "titulo": "Cuerpo asume Transportes hasta el 29N",
+   "tono": "normal",
+   "segundos": 70,
+   "enfoque": "Lo nuevo hoy: Sánchez anuncia en Moncloa que el vicepresidente primero y ministro de Economía, Carlos Cuerpo, asume las competencias de Transportes de forma transitoria, sin nombrar nuevo ministro a un mes de las urnas. Qué hereda: huelgas ferroviarias, la cúpula de Adif y la Madrid-Barcelona. Cruce del bloque sobre la confianza en el tren: Sánchez promete recuperarla, Feijóo dice que él sí subirá al AVE y Abascal se desmarca (Palomares). Abre Sánchez, cierra Abascal. Cuerpo asume «las competencias» o «la gestión», no es ministro titular.",
+   "imprescindible": [
+    "Hechos: declaración institucional de Sánchez el 4-nov; Cuerpo asume Transportes al menos hasta el 29N o hasta el nuevo Gobierno; real decreto en el BOE [CONTRASTADO El País, ABC, elDiario.es, Europa Press, La Vanguardia]",
+    "Sánchez: Cuerpo ha demostrado «una enorme capacidad de gestión e integridad y un talante que nuestra política y nuestro país necesitan» y «Vamos a recuperar la confianza en la alta velocidad»",
+    "Perfil: sin carné del PSOE y no va en las listas (según El País; ABC coincide en el perfil técnico)",
+    "Cruce AVE: Feijóo (Antena 3): «Yo sí subiré. Si mando el mensaje de que nadie suba, estoy apoyando el descrédito de mi país»; Abascal (Onda Cero, 4-nov) se desmarca: «si el señor Feijóo quiere bañarse en Palomares, como hizo el señor Fraga en su momento, pues bueno, él sabrá. Pero yo la verdad que prefiero optar por la prudencia» y ve «irresponsable» decir que el sistema merece confianza [CONTRASTADO El País, Europa Press, La Vanguardia]",
+    "Socios: Colau ve la elección «lógica», por su perfil técnico (según Europa Press); Rufián: «Lo que importa es saber si es seguro coger un tren»",
+    "Retos: huelga de maquinistas de SEMAF el 10 y el 12-nov; el comité de empresa de Adif acordó huelga el 17-nov, aún sin convocatoria formal según La Vanguardia (RTVE y Público hablan de convocatoria: no afirmar que está convocada); presión de grupos y sindicatos sobre la cúpula de Adif; obras de la Madrid-Barcelona, donde Puente dijo el martes que «la decisión no está tomada» sobre cortar la línea (según El Mundo)",
+    "Semaf: «las promesas no cristalizan en realidades» (Diego Martín, según El País)"
+   ]
+  },
+  {
+   "n": 4,
+   "id": "amnistia",
+   "titulo": "Llarena retira el procesamiento a Puigdemont",
+   "tono": "normal",
+   "segundos": 65,
+   "enfoque": "Cambio de tema y de foco. Lo nuevo: el juez Pablo Llarena deja sin efecto el procesamiento de Puigdemont, Comín y Puig por malversación, cierra el sumario y lo envía a la Sala de lo Penal del Supremo para el archivo por la amnistía (autos del 3-nov); y el 4-nov el Constitucional archiva, por unanimidad, los amparos de Junqueras, Turull y Romeva porque el Supremo ya les aplicó la amnistía. Matiz clave: Llarena no aplica él la amnistía, la decidirá la Sala. El choque aquí es institucional (Supremo frente a TC), no entre partidos: contarlo con la frase de Llarena y la de Comín, atribuidas. No hay reacciones de partidos en el dossier: no anunciar silencios.",
+   "imprescindible": [
+    "Llarena deja sin efecto el procesamiento por malversación de Puigdemont, Comín y Puig, declara concluso el sumario y remite a la Sala para el posible sobreseimiento libre [CONTRASTADO El Mundo, La Vanguardia, 20minutos]",
+    "Motivo: la doctrina del TC del 6-oct (amparo de Dolors Bassa) le vincula; aun así, Llarena escribe que «subsisten los indicios de participación», lo que «no constituye una declaración de culpabilidad» [CONTRASTADO El Mundo, La Vanguardia]",
+    "Llarena critica al TC: «Los adjetivos no convierten en indiscutible lo que ha fracturado al Tribunal» (según El Mundo)",
+    "El TC, en Pleno y por unanimidad, declara la pérdida de objeto de los amparos de Junqueras, Turull y Romeva [CONTRASTADO ABC, Europa Press]",
+    "Comín vuelve al Parlament: «Hemos hecho fracasar la represión española» (según La Razón) y «Volvemos vencedores, no indemnes» (según Público); solo por titulares, atribuir",
+    "Qué pasa ahora: la Sala de lo Penal decide el archivo, sin fecha; Puigdemont podría volver a España (según 20minutos). Contexto: la ley de amnistía fue parte del acuerdo de investidura de Sánchez con Junts (según 20minutos)"
+   ]
+  },
+  {
+   "n": 5,
+   "id": "frases",
+   "titulo": "La campaña en frases",
+   "tono": "normal",
+   "segundos": 80,
+   "enfoque": "Remate con ritmo, frases que no salen en los bloques 1 a 3. Cinco momentos de siete partidos, como mucho una frase por partido (PSdeG cuenta como PSOE y el PSC aparte, como en el libro de estilo): abre Vox, sigue el cruce gallego (abre PSOE, cierra PP), Pontón (BNG), el cruce del Parlament (abre Junts, cierra PSC) y cierra ERC. No presentar como respuesta lo que la fuente no da como respuesta. El taco de Rufián no se reproduce.",
+   "imprescindible": [
+    "Vox: Abascal (Telecinco, 3-nov): «Yo creo que la mayor parte de la gente quiere cosas drásticas» y «Si nos dan un mayor respaldo, cambiarán más cosas» (según El Mundo)",
+    "Cruce PSOE-PP en el Parlamento gallego (4-nov): Besteiro, líder del PSdeG: «Hubo un tiempo en el que, cuando decíamos que PP y Vox eran lo mismo, usted se alteraba. Ahora ya ni disimula»; responde Rueda, presidente de la Xunta (PP): «¡Cómo le gustaría a usted que existiera Vox en Galicia! Por cierto, gracias al PP de Galicia, aquí no hay Vox» (según ABC)",
+    "BNG: Ana Pontón, portavoz nacional: «El mismo Feijóo que ahora pide la dimisión de Óscar Puente permitió que Ana Pastor siguiera tres años más en su cargo» (según ABC)",
+    "Cruce Junts-PSC en el Parlament (4-nov): Mònica Sales, presidenta del grupo de Junts: «La gestión del PSOE ha sido nefasta, una vergüenza»; responde Illa, president de la Generalitat: «¿Y ustedes dónde están? ¿En el medio de qué? ¿De PP y Vox?» (según La Vanguardia)",
+    "ERC: Rufián (4-nov): «Creo que Puente era una distracción porque aquí lo importante es saber si la gente va segura o no en un AVE»; cortar ahí, el resto lleva un taco (según Europa Press)"
+   ]
+  }
+ ],
+ "breves": [
+  {
+   "id": "urda",
+   "titular": "Urda: dos técnicos de Adif intentaron rearmar el LZB con un solo ordenador antes del choque (según El País); cargos de Adif denuncian una «caza de brujas» interna (según El Mundo, fuentes anónimas); el funeral será el 12-nov en la catedral de Toledo, con los Reyes y Feijóo, y el PP espera que asista Sánchez. Tono sobrio",
+   "segundos": 20
+  },
+  {
+   "id": "campana",
+   "titular": "Tellado (PP) pide el voto para Vox al Senado en Gipuzkoa, Tarragona y Girona, donde el PP no se presenta por el pacto entre ambos: «Pedimos a la gente que vote a Vox, por supuesto que sí» (según elDiario.es); Sánchez retoma los mítines el viernes en València, el sábado en Tarragona y el domingo en Bilbao",
+   "segundos": 15
+  },
+  {
+   "id": "zapatero",
+   "titular": "Caso Plus Ultra: el juez pide a la Policía identificar al autor del punzón grabado en las joyas de Zapatero [CONTRASTADO El Mundo, elDiario.es, 20minutos]; según La Vanguardia, sospecha que no son de Arabia Saudí. Sin dossier: el redactor comprueba en articulos/103-106 si hay versión de Zapatero y la incluye",
+   "segundos": 15
+  }
+ ],
+ "correccion": false
+}

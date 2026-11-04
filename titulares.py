@@ -52,7 +52,7 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
         sobrio = bool(sec and sec.get("tono") == "sobrio")
         foto = it.get("foto")
         if not foto and sec:                   # la primera foto de su bloque
-            foto = next((p["ve"]["foto"] for p in sec["pasos"] if p.get("ve", {}).get("foto")), None)
+            foto = next((p["ve"]["foto"] for p in sec["pasos"] if (p.get("ve") or {}).get("foto")), None)
         ruta = carpeta / foto if foto else None
         if foto and ruta.exists() and foto in cred:
             usadas[foto] = cred[foto]
