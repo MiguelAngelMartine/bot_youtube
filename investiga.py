@@ -31,29 +31,9 @@ def _clave():
 
 
 def gemini(prompt, temperatura=0.2):
-    """Prueba los modelos gratuitos por orden, con reintentos si están saturados. Devuelve el texto o None."""
-    k = _clave()
-    for modelo in MODELOS:
-        for intento in range(3):
-            try:
-                r = requests.post(f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
-                                  headers={"x-goog-api-key": k}, timeout=300,
-                                  json={"contents": [{"parts": [{"text": prompt}]}],
-                                        "generationConfig": {"temperature": temperatura}})
-            except requests.RequestException:
-                time.sleep(10)
-                continue
-            if r.ok:
-                partes = r.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
-                texto = "".join(p.get("text", "") for p in partes).strip()
-                if texto:
-                    print(f"  (dossier hecho con {modelo})", file=sys.stderr)
-                    return texto
-            if r.status_code in (429, 503, 500):        # saturado o límite: espera y reintenta, luego otro modelo
-                time.sleep(15 * (intento + 1))
-                continue
-            break                                       # otro error (modelo retirado...): siguiente modelo
-    return None
+    """Via gem.pide: modelos gratuitos por orden, espera limitada; None si Gemini esta saturado."""
+    import gem
+    return gem.pide(prompt, temperatura=temperatura)
 
 
 def _norm(s):

@@ -30,7 +30,7 @@ Escribe `dia/<fecha>/episodio.json` con:
 3. **Los bloques** en el orden de la escaleta, copiados de `bloques/` sin cambiar los hechos.
    - Solo puedes retocar transiciones y la primera frase para que el episodio fluya: el primer paso de cada bloque enlaza con el anterior («Y del luto pasamos a la campaña»), según «Escribir para el oído» del libro de estilo, con conectores neutros y sin hechos nuevos.
 4. **Breves**, y como último paso de esa sección la despedida, literal (el cierre anima el botón y la campana con estas palabras): «Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.», con escena `despedida`.
-5. **`titulo_video`:** el de la escaleta + « | El Hoyformativo · <fecha corta>». **`fecha`:** «Domingo, 1 de noviembre de 2026».
+5. **`titulo_video`:** el de la escaleta, sin el nombre del canal ni la fecha (decisión del usuario del 4-nov-2026). **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:
 - el total de palabras (1.000-1.300, unos 7-9 min con la voz de Tristán). **Si pasa de 1.450 palabras (más de 9 min), devuelve al redactor el bloque más largo para que quite datos secundarios** (no conectores ni versiones de las partes) antes de cerrar;

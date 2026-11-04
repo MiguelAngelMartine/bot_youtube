@@ -35,7 +35,7 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
 **Viñetas** (después de las fotos, porque las personas se dibujan a partir de su retrato):
 0. Para cada `persona_vineta`, su retrato tiene que ser **CC0, dominio público o CC BY** (nunca CC BY-SA, NC ni ND): la viñeta es obra derivada de la foto y una SA obligaría a dar el vídeo con esa licencia. Si el único retrato bueno es SA, busca otro; si no hay, la nota sale sin viñeta (`ia_vinetas.py` ya se niega a dibujarla). La polaroid sí puede usar un retrato CC BY-SA.
 1. `.venv/bin/python ia_vinetas.py preparar <fecha>`: genera las de cada nota con `escena` en `dia/<fecha>/vinetas/` y la hoja de contacto `vinetas/hoja.png` (~5-10 s por viñeta, gratis en Cloudflare).
-2. Mira la hoja con Read y, si hace falta, cada viñeta. Rehaz (`ia_vinetas.py rehacer <fecha> <clave> <intento>`, con intento 1, 2, 3...) las que tengan:
+2. **Revisión con Gemini** (decisión del usuario del 4-nov-2026, ahorra mucho uso): `.venv/bin/python revisa_vinetas.py <fecha>` revisa cada viñeta, rehace o descarta las malas, elige la fiel en las de personas y deja el informe en `revision/vinetas.md`. Si sale con código 2 (Gemini no responde), hazlo tú: mira la hoja con Read y, si hace falta, cada viñeta. Rehaz (`ia_vinetas.py rehacer <fecha> <clave> <intento>`, con intento 1, 2, 3...) las que tengan:
    - letras, firmas, rótulos o matrículas legibles inventadas;
    - banderas o símbolos que no son de España (o del país de la noticia);
    - algo que no corresponde al dato o que engaña;
