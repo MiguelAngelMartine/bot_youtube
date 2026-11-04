@@ -23,7 +23,7 @@ Escribe `dia/<fecha>/episodio.json` con:
      - `etiqueta`: el tema en 1-3 palabras («Puente no dimite», «Blocus», «Elecciones»);
      - `persona` (opcional): el protagonista, con el nombre exacto con que sale en los bloques, para que el editor gráfico le busque retrato;
      - `seccion` solo si el orden de los items no es el de los bloques.
-     Los items de bloques `sobrio` se ven en grises y sin golpes: su titular, sobrio («¿Qué falló en Urda?»).
+     Los items de bloques `sobrio` van con letra lisa y sin golpes (las fotos, siempre a color): su titular, sobrio («¿Qué falló en Urda?»).
 2. **Corrección**, si `correcciones.md` trae algo.
    - Sección «Corrección», tono `sobrio`, un paso que empieza «Antes de empezar, una corrección.», con el texto propuesto ya verificado.
    - Escena `claves` con titulo «CORRECCIÓN» y fuente.

@@ -65,7 +65,7 @@ Siempre el **estilo completo**: protagonista recortado, titular enorme con relie
 - nunca víctimas, familiares, imágenes del impacto, heridos ni restos, ni cifras de muertos en grande;
 - gesto serio del protagonista;
 - el texto, literal, como siempre.
-`--sobrio` solo queda para cuando **todo** el vídeo es la tragedia y no hay ninguna noticia política con protagonista: foto en grises, letra blanca lisa sin relieve ni inclinación, sin marco ni rojo.
+`--sobrio` solo queda para cuando **todo** el vídeo es la tragedia y no hay ninguna noticia política con protagonista: foto a color, letra blanca lisa sin relieve ni inclinación, sin marco ni rojo.
 
 ## Pasos (te darán una fecha)
 1. Lee `dia/<fecha>/escaleta.json` y `episodio.json`. Identifica la noticia de la miniatura (**la más polémica o impactante del día** que el vídeo cuenta; si es una tragedia, la noticia política con protagonista más fuerte), su protagonista y la frase o el hecho más fuerte que el vídeo cuenta textualmente.

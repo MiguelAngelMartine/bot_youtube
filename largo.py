@@ -280,20 +280,8 @@ _comic_cache = {}
 
 
 def silueta_suave(c):
-    """Contorno fino y suave (decision del usuario del 4-nov-2026): linea clara tenue, luz de borde difusa y sombra
-    blanda. Resalta a la persona sin el filo blanco grueso de pegatina."""
-    pad = 40
-    a = Image.new("L", (c.width + 2 * pad, c.height + 2 * pad))
-    a.paste(c.getchannel("A"), (pad, pad))
-    base = Image.new("RGBA", a.size)
-    sombra = a.filter(ImageFilter.GaussianBlur(18)).point(lambda v: int(v * 0.6))
-    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size).split(), sombra)), (-10, 12))
-    luz = a.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: int(v * 0.28))
-    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (235, 240, 255)).split(), luz)))
-    linea = a.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1)).point(lambda v: int(v * 0.6))
-    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (255, 255, 255)).split(), linea)))
-    base.alpha_composite(c, (pad, pad))
-    return base, pad
+    import miniatura as MN
+    return MN.silueta_suave(c)
 
 
 def _trama(sobrio):
@@ -356,8 +344,6 @@ def _panel(pn, tl, sobrio):
                 cc = MN.recorte(pn["foto"])
                 kk = (BH * 0.96) / cc.height
                 cc = cc.resize((int(cc.width * kk), int(cc.height * kk)), Image.LANCZOS)
-                if sobrio:
-                    cc = Image.merge("RGBA", (*ImageOps.grayscale(cc.convert("RGB")).convert("RGB").split(), cc.getchannel("A")))
                 _comic_cache[k] = silueta_suave(cc)
             s, pad = _comic_cache[k]
             im.alpha_composite(s, (BW - s.width + pad + 10, BH - s.height + pad + 20))

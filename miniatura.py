@@ -6,7 +6,7 @@ Estilo de las miniaturas (elegido por el usuario el 1-nov-2026, referencia en ca
 - un titular corto y enorme abajo a la izquierda: letras con degradado (blanco y una palabra en amarillo-oro),
   contorno negro grueso, filo claro, relieve 3D y algo inclinado;
 - una etiqueta roja encima con el hecho (por ejemplo «PUENTE NO DIMITE»), el logo arriba a la izquierda y marco amarillo.
---sobrio (tragedias): foto en grises, letra blanca lisa sin relieve ni inclinacion, sin marco ni color de gancho.
+--sobrio (tragedias): foto a color (nunca en grises, 4-nov-2026), letra blanca lisa sin relieve ni inclinacion, sin marco ni color de gancho.
 
 Uso: python miniatura.py AAAA-MM-DD --titular "«Me espera un calvario»" --destaca "calvario" \
          [--etiqueta "Puente no dimite"] [--persona miniatura_puente.jpg] [--fondo s1_2.jpg] [--sobrio]
@@ -61,6 +61,23 @@ def recorte(foto: Path) -> Image.Image:
     return c
 
 
+def silueta_suave(c):
+    """Contorno fino y suave (decision del usuario del 4-nov-2026): linea clara tenue, luz de borde difusa y sombra
+    blanda. Resalta a la persona sin el filo blanco grueso de pegatina."""
+    pad = 40
+    a = Image.new("L", (c.width + 2 * pad, c.height + 2 * pad))
+    a.paste(c.getchannel("A"), (pad, pad))
+    base = Image.new("RGBA", a.size)
+    sombra = a.filter(ImageFilter.GaussianBlur(18)).point(lambda v: int(v * 0.6))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size).split(), sombra)), (-10, 12))
+    luz = a.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: int(v * 0.28))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (235, 240, 255)).split(), luz)))
+    linea = a.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1)).point(lambda v: int(v * 0.6))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (255, 255, 255)).split(), linea)))
+    base.alpha_composite(c, (pad, pad))
+    return base, pad
+
+
 def silueta(c, borde=7):
     """Filo blanco fino y sombra oscura suave: separa a la persona del fondo sin efecto de foco detras."""
     pad = 60
@@ -79,11 +96,8 @@ def fondo(foto: Path | None, sobrio: bool, con_persona: bool):
     if foto is None:
         return G2.fondo_marca(2.0).resize((W, H)).convert("RGBA")
     f = ImageOps.fit(Image.open(foto).convert("RGB"), (W, H), Image.LANCZOS)
-    if sobrio:
-        f = ImageOps.grayscale(f).convert("RGB")
-    if con_persona and not sobrio:                     # fondo profesional: desenfocado y en duotono azul noche del canal
-        gris = ImageOps.grayscale(f.filter(ImageFilter.GaussianBlur(13)))
-        f = ImageOps.colorize(ImageOps.autocontrast(gris, cutoff=2), black=(6, 12, 30), mid=(38, 58, 104), white=(170, 190, 225))
+    if con_persona:                                    # fondo: a color (4-nov-2026), apagado y desenfocado; manda la cara
+        f = ImageEnhance.Color(f.filter(ImageFilter.GaussianBlur(13))).enhance(0.7)
     f = f.filter(ImageFilter.GaussianBlur(4 if con_persona else 1))
     f = ImageEnhance.Brightness(f).enhance(0.6 if sobrio else 0.6 if con_persona else 0.85)
     im = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
@@ -384,9 +398,7 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
         oscurece_abajo(im, 380, 200)                   # el titular, legible sobre los dos
         ancho_texto = 1250                             # mas contenido: no puede tapar las caras
     elif persona:
-        c = recorte(img / persona)
-        if sobrio:
-            c = Image.merge("RGBA", (*ImageOps.grayscale(c.convert("RGB")).convert("RGB").split(), c.getchannel("A")))
+        c = recorte(img / persona)                     # siempre a color (4-nov-2026)
         if sobrio:
             k = min(1000 / c.height, 1000 / c.width)
             c = c.resize((int(c.width * k), int(c.height * k)), Image.LANCZOS)

@@ -20,7 +20,7 @@ Te darán una fecha. `control_calidad.py` ya habrá dejado en `dia/<fecha>/calid
    - que el presentador (Urni) aparezca en tono normal y no salga en los bloques sobrios;
    - en las escenas del tablero, que la cabecera muestre «EL HOYFORMATIVO» y la fecha correcta.
    Y en las piezas de pantalla completa (decisiones del usuario del 1-nov-2026):
-   - **`titularN`** (sumario del arranque, sin presentación): titular enorme entero y legible, sin palabras pegadas; protagonista recortado limpio (sin restos de fondo ni recuadros) y con un gesto acorde con la noticia; foto de fondo del tema; en los bloques sobrios, en grises y sin golpes;
+   - **`titularN`** (sumario del arranque, sin presentación): titular enorme entero y legible, sin palabras pegadas; protagonista recortado limpio (sin restos de fondo ni recuadros) y con un gesto acorde con la noticia; foto de fondo del tema; en los bloques sobrios, con letra lisa (las fotos siempre a color) y sin golpes;
    - **`golpe_marca`**: logo, nombre y fecha completos y centrados, sin nada a medias;
    - **viñetas** (en `claves`, `cronologia` y `breve`): sin letras inventadas en la ilustración, franja de texto entera y legible, personas fieles a su foto;
    - **`despedida`** (cierre): botón «SUSCRITO» y campana encendida tras decirlo, «Gracias por vernos. Mañana, más.» entero; en los últimos 8 s la mitad derecha libre (Urni ya se ha ido) para la pantalla final de YouTube.

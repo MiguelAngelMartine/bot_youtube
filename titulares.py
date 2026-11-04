@@ -7,7 +7,7 @@ Cada item de la escena "sumario" puede llevar:
   "titular": 2-5 palabras de gancho, literales (si falta, se usa "texto"); "destaca": la palabra en amarillo;
   "etiqueta": tema en 1-3 palabras (por defecto, el numero); "persona": nombre con retrato en creditos.json;
   "foto": fichero de imagenes/ para el fondo (si falta, la primera foto de su bloque); "seccion": indice de su bloque.
-Los items cuyo bloque es "sobrio" (tragedias) van en grises, con letra lisa y sin golpes."""
+Los items cuyo bloque es "sobrio" (tragedias) van con letra lisa y sin golpes, y las fotos siempre a color (4-nov-2026)."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -26,8 +26,8 @@ def _fondo(ruta: Path | None, sobrio: bool):
     if ruta is None or not ruta.exists():
         return G2.fondo_marca(1.0).resize((int(AN * 1.08), int(AL * 1.08))).convert("RGBA")
     f = ImageOps.fit(Image.open(ruta).convert("RGB"), (int(AN * 1.08), int(AL * 1.08)), Image.LANCZOS)
-    if sobrio:
-        f = ImageOps.grayscale(f).convert("RGB")
+    if sobrio:  # 4-nov-2026: las fotos siempre a color (decision del usuario); lo sobrio va en la letra, la musica y el ritmo
+        f = ImageEnhance.Color(f).enhance(0.8)
     f = f.filter(ImageFilter.GaussianBlur(3))
     f = ImageEnhance.Brightness(f).enhance(0.55 if sobrio else 0.68)
     f = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
@@ -60,10 +60,8 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
         if it.get("persona") and it["persona"] in fotos and fotos[it["persona"]].exists():
             pr = fotos[it["persona"]]
             c = M.recorte(pr)
-            if sobrio:
-                c = Image.merge("RGBA", (*ImageOps.grayscale(c.convert("RGB")).convert("RGB").split(), c.getchannel("A")))
             esc = min(900 / c.height, 900 / c.width)
-            persona = M.silueta(c.resize((int(c.width * esc), int(c.height * esc)), Image.LANCZOS))
+            persona = M.silueta_suave(c.resize((int(c.width * esc), int(c.height * esc)), Image.LANCZOS))   # contorno suave (4-nov)
             if pr.name in cred:
                 usadas[pr.name] = cred[pr.name]
         ancho = 1750 if persona is None else AN - persona[0].width + 150 + persona[1] + 70
