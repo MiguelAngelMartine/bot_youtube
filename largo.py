@@ -100,10 +100,11 @@ VARIANTES, USOS = {}, {}                              # retratos de cada persona
 
 def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
     """Lista de (pieza, x, y, t_aparece) sobre un tablero de BW de ancho. foto: (ruta, credito) de la escena o None."""
-    def foto_de(nombre):
+    def foto_de(nombre, cargo=""):
         f = fotos.get(nombre)
-        if not f:
-            return None, None
+        if not f:                                         # sin foto libre: ilustracion de su ambito, nunca su cara (4-nov)
+            amb = IAV.ilustracion_ambito(cargo, ve.get("_sobrio", False))
+            return (amb, {"ia": True, "autor": "Ilustración IA", "licencia": "sin foto libre"}) if amb else (None, None)
         otras = VARIANTES.get(nombre) or [f]              # 3-nov: si hay varias fotos de la persona, se van turnando
         f = otras[USOS.get(nombre, 0) % len(otras)]
         USOS[nombre] = USOS.get(nombre, 0) + 1
@@ -116,7 +117,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
     out, tipo = [], ve["tipo"]
     if tipo == "persona":
         p = ve["persona"]
-        f, c = foto_de(p["nombre"])
+        f, c = foto_de(p["nombre"], p.get("cargo", ""))
         out.append((polaroid(f, p["nombre"], p["cargo"], p["partido"], c, 340), 40, 30, t0 + 0.1))
         y_sello = 60
         if p.get("cita"):
@@ -128,7 +129,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         fl = ve.get("flujo")
         if fl:
             a = fl["a"]
-            f2, c2 = foto_de(a["nombre"])
+            f2, c2 = foto_de(a["nombre"], a.get("cargo", ""))
             ta = cuando(fl.get("a_cuando"), t0 + 4)
             tf = cuando(fl.get("cuando"), ta - 1)
             out.append((nota(fl["etiqueta"], 380, 32, color=AMARILLA), 450, 440, tf))
@@ -148,7 +149,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         col = (BW - 60) // n
         ap = min(260, int(col * 0.56))
         for k, it in enumerate(ve["items"]):
-            f, c = foto_de(it["nombre"])
+            f, c = foto_de(it["nombre"], it.get("cargo", ""))
             ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
             x = 30 + col * k
             out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 100, ti))
@@ -156,7 +157,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
     elif tipo == "posturas":
         out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
         cc = ve["centro"]
-        f, c = foto_de(cc["nombre"])
+        f, c = foto_de(cc["nombre"], cc.get("cargo", ""))
         out.append((polaroid(f, cc["nombre"], cc["cargo"], cc["partido"], c, 300), 40, 100, t0 + 0.3))
         y = 100
         for k, it in enumerate(ve["presionan"]):

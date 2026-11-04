@@ -86,7 +86,8 @@ def polaroid(foto, nombre, cargo, partido, credito=None, ancho=420):
     else:
         d.text((ancho / 2 + 8, alto_f + 76), cargo, font=fuente("Inter-Regular.ttf", tc), fill=(90, 95, 110), anchor="mt")
     if credito:
-        txt, tf = f"Foto: {credito['autor'][:34]} · {credito['licencia']}", 17
+        txt, tf = (("Ilustración IA · sin foto libre", 17) if credito.get("ia") else
+                   (f"Foto: {credito['autor'][:34]} · {credito['licencia']}", 17))
         while tf > 11 and d.textlength(txt, font=fuente("Inter-Regular.ttf", tf)) > ancho - 10:
             tf -= 1
         d.text((ancho / 2 + 8, alto_f + 118), txt, font=fuente("Inter-Regular.ttf", tf), fill=(130, 135, 145), anchor="mt")

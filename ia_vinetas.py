@@ -258,6 +258,38 @@ def de_biblioteca(escena, sobrio, usadas=()):
     return (mejor["id"], BIB / f"{mejor['id']}.jpg") if mejor and puntos >= 2 else None
 
 
+AMBITOS = [  # (palabras del cargo, escena sin personas) -- 4-nov-2026: en vez de las iniciales cuando no hay foto libre
+    (("juez", "jueza", "magistrad", "fiscal", "tribunal"), "an empty courtroom bench with a wooden gavel and scales of justice"),
+    (("alcalde", "alcaldesa", "ayuntamiento", "concejal"), "the facade of a Spanish town hall with a balcony and a clock"),
+    (("sindicato", "sindical", "ugt", "ccoo", "semaf"), "a union assembly hall with empty chairs and raised blank placards"),
+    (("ministr", "vicepresident", "gobierno de españa", "presidente del gobierno"),
+     "a long cabinet meeting table with empty leather chairs and folders"),
+    (("senador", "senado"), "an empty red seat in a classical senate chamber"),
+    (("diputad", "congreso", "grupo parlamentario", "parlamentari"), "an empty leather seat in a semicircular parliament chamber"),
+    (("candidat", "campaña", "cabeza de lista"), "an empty rally stage with a lectern under spotlights"),
+    (("president", "consejer", "junta", "generalitat", "xunta", "gobierno de"), "the stately facade of a regional government palace"),
+    (("portavoz", "secretari", "líder", "lider", "coordinador"), "an empty press conference lectern with several microphones"),
+]
+AMBITO_DEFECTO = "an empty press conference lectern with several microphones"
+
+
+def ilustracion_ambito(cargo, sobrio=False):
+    """Ruta de una ilustracion del ambito de una persona sin foto libre (por su cargo), SIN personas: de la biblioteca
+    si encaja y, si no, generada una vez y guardada. None si no se puede (entonces, las iniciales)."""
+    c = (cargo or "").lower()
+    escena = next((e for claves, e in AMBITOS if any(k in c for k in claves)), AMBITO_DEFECTO)
+    b = de_biblioteca(escena, sobrio)
+    if b:
+        return b[1]
+    destino = CACHE / f"ambito_{hashlib.sha1((escena + str(sobrio)).encode()).hexdigest()[:12]}.jpg"
+    if not destino.exists():
+        try:
+            ilustra(escena + ", no people", None, sobrio).save(destino, quality=92)
+        except Exception:
+            return None
+    return destino
+
+
 def licencia_dibujable(lic):
     """Fotos que se pueden usar para dibujar a una persona sin heredar obligaciones: CC0, dominio publico o CC BY.
     Nunca CC BY-SA (la viñeta seria obra derivada y tendria que llevar esa licencia, y con ella el video), NC ni ND."""
