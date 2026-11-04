@@ -21,7 +21,7 @@ from PIL import Image
 import imagenes
 
 RAIZ = Path(__file__).parent
-UA = {"User-Agent": "ElHoyformativo/0.1 (canal informativo; uso con credito)"}
+UA = {"User-Agent": "ElHoyformativo/0.2 (https://github.com/MiguelAngelMartine/bot_youtube) python-requests"}   # Wikimedia exige un contacto; sin el, responde 429
 ORDEN = {"cc0": 0, "pdm": 0, "public domain": 0, "by": 1, "by-sa": 2}
 
 
@@ -103,10 +103,33 @@ def buscar(dia_txt, q, n=8):
     print(f"{len(cands)} candidatas -> {dest}/{s}_<k>.jpg  (mira cada una antes de elegir)")
 
 
+def original(url):
+    """Wikimedia da una miniatura de 1280 px; para retratos y miniaturas hace falta la foto original (3-nov-2026)."""
+    import re as _re
+    m = _re.match(r"https?://[^/]*wikimedia\.org(/wikipedia/commons)/thumb/(.+)/[^/]+$", url.split("?")[0])
+    return f"https://upload.wikimedia.org{m.group(1)}/{m.group(2)}" if m else url
+
+
+def recorta(dia_txt, origen, destino, x0, y0, x1, y1, persona=None):
+    """Recorta una persona de una foto de grupo (fracciones 0-1 del ancho y del alto) conservando el credito."""
+    dia = RAIZ / "dia" / dia_txt
+    im = Image.open(dia / "imagenes" / origen)
+    w, h = im.size
+    im.crop((int(x0 * w), int(y0 * h), int(x1 * w), int(y1 * h))).save(dia / "imagenes" / destino, quality=93)
+    cred_f = dia / "creditos.json"
+    cred = json.loads(cred_f.read_text(encoding="utf-8"))
+    cred[destino] = dict(cred[origen])
+    cred[destino].pop("persona", None)
+    if persona:
+        cred[destino]["persona"] = persona
+    cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"recortada {destino} de {origen} ({int((x1 - x0) * w)}x{int((y1 - y0) * h)} px)")
+
+
 def elegir(dia_txt, s, k, nombre, persona=None):
     dia = RAIZ / "dia" / dia_txt
     c = json.loads((dia / "fotos_candidatas" / f"{s}.json").read_text(encoding="utf-8"))[int(k)]
-    im = baja(c["url"], 2400)
+    im = baja(original(c["url"]), 3200) or baja(c["url"], 3200)   # la original, a maxima resolucion
     if im is None:
         raise SystemExit("no se pudo bajar la foto")
     (dia / "imagenes").mkdir(exist_ok=True)
@@ -127,5 +150,7 @@ if __name__ == "__main__":
         buscar(a[1], a[2], int(a[a.index("--n") + 1]) if "--n" in a else 8)
     elif a and a[0] == "elegir":
         elegir(*a[1:5], persona=a[a.index("--persona") + 1] if "--persona" in a else None)
+    elif a and a[0] == "recorta":                      # recorta <fecha> <origen> <destino> x0 y0 x1 y1 [--persona N]
+        recorta(a[1], a[2], a[3], *map(float, a[4:8]), persona=a[a.index("--persona") + 1] if "--persona" in a else None)
     else:
         print(__doc__)

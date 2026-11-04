@@ -23,6 +23,15 @@ Las letras y los colores son llamativos; **el texto es literal**:
 - nada que el vídeo no diga: YouTube penaliza las miniaturas engañosas y el canal promete rigor y neutralidad;
 - una pregunta solo si el vídeo la responde o explica qué se sabe («¿Qué falló en Urda?»).
 
+## Acabado profesional (decisión del usuario del 4-nov-2026: «que no parezcan mediocres»)
+`miniatura.py` ya hace el acabado de una miniatura profesional: encuadra al protagonista **por su cara** (grande, en el tercio derecho, con la mirada a un tercio de alto), funde el cuerpo con el fondo sin cortes rectos, pone el fondo desenfocado en duotono azul noche, añade luz en diagonal, grano fino y nitidez final. Tu trabajo es darle **material de calidad** y revisar el resultado:
+1. **Foto del protagonista en alta resolución.** `fotos.py elegir` ya baja la original de Wikimedia (hasta 3200 px). Si la persona está en una foto de grupo, recórtala con `.venv/bin/python fotos.py recorta <fecha> <origen> <destino> x0 y0 x1 y1 --persona "<Nombre>"` (fracciones 0-1; deja solo a la persona, de la cabeza a la cintura) y usa el recorte. Si `miniatura.py` avisa de que amplía la foto más de x2,4, busca otra con más resolución.
+2. **Gesto**: tiene que contar la noticia (serio en una dimisión, enfadado en un ataque, satisfecho en una victoria). Una foto oficial sonriente para una mala noticia es un error.
+3. **Fondo**: una foto del lugar o del asunto (`--fondo`), aunque quede desenfocada: da contexto y profundidad.
+4. **Distintivo** `--insignia` («ESPECIAL» en los especiales; «ÚLTIMA HORA» solo si lo es).
+5. **Haz dos versiones** (otra frase, otra foto u otro encuadre, con `--salida miniatura_b.png`), míralas con Read **también en pequeño** (como se ven en el móvil: que el titular y la cara se lean a 320 px de ancho) y quédate con la mejor como `miniatura.png`.
+6. **Lista de comprobación** antes de darla por buena: cara grande y nítida; sin cortes rectos ni restos de otras personas; titular coherente y legible en pequeño; nada tapa la cara; colores del canal; ninguna foto de víctimas.
+
 ## Impactante y elaborada (decisión del usuario del 3-nov-2026)
 **La noticia de la miniatura es la más polémica o impactante del día**, no necesariamente la primera: el choque entre dos líderes, la frase más dura, la decisión con más consecuencias. Tiene que salir en el vídeo y el texto tiene que ser literal.
 Recursos de `miniatura.py` (además del estilo base):

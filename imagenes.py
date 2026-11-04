@@ -13,7 +13,7 @@ from pathlib import Path
 import requests
 
 API = "https://commons.wikimedia.org/w/api.php"
-UA = {"User-Agent": "ResumenPoliticoBot/0.1 (uso personal; miguelzz29 at gmail)"}
+UA = {"User-Agent": "ElHoyformativo/0.2 (https://github.com/MiguelAngelMartine/bot_youtube) python-requests"}   # Wikimedia exige un contacto; sin el, responde 429
 LIBRES = ("cc0", "cc by", "cc-by", "public domain", "dominio público", "pd")
 
 

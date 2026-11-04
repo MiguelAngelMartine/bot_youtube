@@ -81,8 +81,11 @@ def fondo(foto: Path | None, sobrio: bool, con_persona: bool):
     f = ImageOps.fit(Image.open(foto).convert("RGB"), (W, H), Image.LANCZOS)
     if sobrio:
         f = ImageOps.grayscale(f).convert("RGB")
+    if con_persona and not sobrio:                     # fondo profesional: desenfocado y en duotono azul noche del canal
+        gris = ImageOps.grayscale(f.filter(ImageFilter.GaussianBlur(13)))
+        f = ImageOps.colorize(ImageOps.autocontrast(gris, cutoff=2), black=(6, 12, 30), mid=(38, 58, 104), white=(170, 190, 225))
     f = f.filter(ImageFilter.GaussianBlur(4 if con_persona else 1))
-    f = ImageEnhance.Brightness(f).enhance(0.6 if sobrio else 0.72 if con_persona else 0.85)
+    f = ImageEnhance.Brightness(f).enhance(0.6 if sobrio else 0.6 if con_persona else 0.85)
     im = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
     vi = Image.new("L", (W, H), 0)                    # vineta: bordes mas oscuros
     ImageDraw.Draw(vi).ellipse([-300, -500, W + 500, H + 300], fill=255)
@@ -206,6 +209,101 @@ def marco(im, col=AMARILLO, grosor=22, radio=46):
     im.alpha_composite(n)
 
 
+YUNET = RAIZ / "cache" / "modelos" / "yunet.onnx"      # detector de caras de OpenCV (YuNet, licencia MIT)
+YUNET_URL = "https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx"
+
+
+def cara(c):
+    """Caja de la cara (x, y, ancho, alto) en un recorte, o None. Sirve para encuadrar igual que un fotografo."""
+    import cv2
+    if not YUNET.exists():
+        import requests
+        YUNET.parent.mkdir(parents=True, exist_ok=True)
+        YUNET.write_bytes(requests.get(YUNET_URL, timeout=60).content)
+    rgb = np.array(c.convert("RGB"))[:, :, ::-1].copy()
+    k = min(1.0, 900 / max(rgb.shape[:2]))            # el detector va mejor con imagenes medianas
+    if k < 1:
+        rgb = cv2.resize(rgb, (int(rgb.shape[1] * k), int(rgb.shape[0] * k)))
+    det = cv2.FaceDetectorYN.create(str(YUNET), "", (rgb.shape[1], rgb.shape[0]), 0.7)
+    _, caras = det.detect(rgb)
+    if caras is None or not len(caras):
+        return None
+    x, y, w, h = max(caras, key=lambda f: f[2] * f[3])[:4]
+    return tuple(int(v / k) for v in (x, y, w, h))
+
+
+def protagonista(im, c, centro=(0.72, 0.37), alto_cara=0.30):
+    """Encuadre de miniatura profesional: la cara a un tercio de alto y en el tercio derecho, grande (alto_cara del
+    alto del cuadro), con el cuerpo saliendo por abajo. Devuelve la x izquierda de la persona o None si no hay cara."""
+    k = cara(c)
+    if not k:
+        return None
+    fx, fy, fw, fh = k
+    s = alto_cara * H / fh
+    if s > 2.4:
+        print(f"  AVISO miniatura: la foto se amplia x{s:.1f}; busca una de mas resolucion (fotos.py la baja original)")
+    c = realza(c.resize((int(c.width * s), int(c.height * s)), Image.LANCZOS))
+    # el cuerpo se disuelve hacia abajo: sin cortes rectos de recorte a los lados (aspecto profesional)
+    visible = H - (centro[1] * H - (fy + fh / 2) * s)            # cuanto del recorte cae dentro del cuadro
+    ini = int(min(c.height, visible) * 0.5)
+    g = np.ones(c.height, dtype=np.float32)
+    g[ini:] = np.clip(1 - (np.arange(c.height - ini) / max(1, min(c.height, visible) - ini)) ** 1.6, 0, 1)
+    a = np.asarray(c.getchannel("A"), dtype=np.float32) * g[:, None]
+    # si el recorte corta el cuerpo por un lado (borde recto), ese lado tambien se disuelve
+    ancho_f = max(1, int(c.width * 0.2))
+    rampa = np.linspace(0, 1, ancho_f) ** 0.8
+    for lado in (0, -1):
+        if (a[:, lado] > 128).mean() > 0.12:
+            if lado == 0:
+                a[:, :ancho_f] *= rampa[None, :]
+            else:
+                a[:, -ancho_f:] *= rampa[::-1][None, :]
+    c.putalpha(Image.fromarray(a.astype(np.uint8)))
+    cc, pad = silueta(c, borde=6)
+    x = int(centro[0] * W - (fx + fw / 2) * s) - pad
+    y = int(centro[1] * H - (fy + fh / 2) * s) - pad
+    y = max(y, H - cc.height + pad + 10) if y + cc.height - pad < H else y      # el cuerpo siempre sale por abajo
+    im.alpha_composite(cc, (x, y))
+    return x + pad
+
+
+def rayos(im, desde=(0.95, -0.15), color=(255, 214, 140), fuerza=46):
+    """Luz que entra en diagonal por el fondo (no es un halo alrededor de la persona): da profundidad y dramatismo."""
+    capa = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(capa)
+    ox, oy = desde[0] * W, desde[1] * H
+    import math as _m
+    for k in range(7):
+        a = _m.radians(118 + k * 7.5)
+        ancho = _m.radians(1.6 + (k % 3) * 0.9)
+        largo = 2.6 * W
+        d.polygon([(ox, oy), (ox + largo * _m.cos(a - ancho), oy + largo * _m.sin(a - ancho)),
+                   (ox + largo * _m.cos(a + ancho), oy + largo * _m.sin(a + ancho))], fill=fuerza + 10 * (k % 2))
+    capa = capa.filter(ImageFilter.GaussianBlur(28))
+    im.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", (W, H), color).split(), capa)))
+
+
+def grano(im, fuerza=7):
+    """Grano fino de pelicula: quita el aspecto plano de imagen generada."""
+    a = np.asarray(im).astype(np.int16)
+    ruido = np.random.default_rng(7).integers(-fuerza, fuerza + 1, a.shape[:2])[..., None]
+    a[..., :3] = np.clip(a[..., :3] + ruido, 0, 255)
+    return Image.fromarray(a.astype(np.uint8), im.mode)
+
+
+def insignia(im, txt):
+    """Distintivo arriba a la derecha («ESPECIAL», «ÚLTIMA HORA» solo si lo es)."""
+    f = fuente("Inter-Black.ttf", 54)
+    w = int(ImageDraw.Draw(Image.new("L", (1, 1))).textlength(txt, font=f)) + 70
+    e = Image.new("RGBA", (w + 20, 110))
+    d = ImageDraw.Draw(e)
+    d.rounded_rectangle([12, 14, w + 12, 96], radius=14, fill=(0, 0, 0, 150))
+    d.rounded_rectangle([0, 0, w, 82], radius=14, fill=AMARILLO + (255,))
+    d.text((w / 2, 43), txt, font=f, fill=(15, 15, 20, 255), anchor="mm")
+    e = e.rotate(-4, resample=Image.BICUBIC, expand=True)
+    im.alpha_composite(e, (W - e.width - 70, 54))
+
+
 def realza(c):
     """Persona con mas presencia: algo mas de contraste, color y nitidez (sin cambiar sus rasgos)."""
     rgb = c.convert("RGB")
@@ -263,7 +361,7 @@ def polaroid_mini(foto: Path, ancho=440, giro=-6):
 
 # ---------- miniatura ----------
 def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fondo="", sobrio=False, salida="miniatura.png",
-              rival="", inserto=""):
+              rival="", inserto="", insignia_txt=""):
     dia = RAIZ / "dia" / dia_txt
     img = dia / "imagenes"
     for nombre in (persona, foto_fondo, rival, inserto):
@@ -292,12 +390,19 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
         if sobrio:
             k = min(1000 / c.height, 1000 / c.width)
             c = c.resize((int(c.width * k), int(c.height * k)), Image.LANCZOS)
-        else:                                          # plano mas cerrado y con mas presencia
-            c = realza(encuadre(c, 960))
-        c, pad = silueta(c)
-        x = W - c.width + 150
-        im.alpha_composite(c, (x, H - c.height + pad + 30))     # el borde de abajo, fuera de cuadro
-        ancho_texto = min(1750, x + pad + 120 - 50)        # el texto puede montar un poco sobre el hombro
+        x = None
+        if not sobrio:
+            rayos(im)
+            x = protagonista(im, c)                    # encuadre por la cara, como un fotografo
+            if x is not None:
+                ancho_texto = min(1750, x + 170)       # el texto puede montar un poco sobre el hombro
+        if x is None:                                  # sin cara detectable (o sobria): como antes
+            if not sobrio:
+                c = realza(encuadre(c, 960))
+            c, pad = silueta(c)
+            x = W - c.width + 150
+            im.alpha_composite(c, (x, H - c.height + pad + 30))     # el borde de abajo, fuera de cuadro
+            ancho_texto = min(1750, x + pad + 120 - 50)        # el texto puede montar un poco sobre el hombro
     tam, lineas = ajusta(titular, destaca, ancho_texto, sobrio)
     t = texto(lineas, tam, sobrio)
     inclina = 0 if sobrio else 4
@@ -316,10 +421,14 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
         ex = (W - e.width) // 2 if vs else 80
         im.alpha_composite(e, (ex, max(190, y - e.height + 30)))
     im.alpha_composite(G2.logo(110), (60, 50))
+    if insignia_txt and not sobrio:
+        insignia(im, insignia_txt.upper())
     if not sobrio:
+        im = grano(im)
         marco(im)
     out = dia / salida
-    im.convert("RGB").resize((1280, 720), Image.LANCZOS).save(out)
+    fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
+    fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)     # nitidez final
     print(f"miniatura ({tam}px, {len(lineas)} lineas{', sobria' if sobrio else ''}) -> {out}")
 
 
@@ -378,6 +487,7 @@ if __name__ == "__main__":
     ap.add_argument("--sobrio", action="store_true")
     ap.add_argument("--rival", default="", help="segunda persona: enfrentamiento cara a cara (foto de imagenes/)")
     ap.add_argument("--inserto", default="", help="foto secundaria en polaroid (lugar u objeto de la noticia)")
+    ap.add_argument("--insignia", default="", help="distintivo arriba a la derecha («ESPECIAL»)")
     ap.add_argument("--salida", default="miniatura.png")
     ap.add_argument("--canal", action="store_true")
     a = ap.parse_args()
@@ -385,4 +495,4 @@ if __name__ == "__main__":
         canal()
     else:
         miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida,
-                  a.rival, a.inserto)
+                  a.rival, a.inserto, a.insignia)
