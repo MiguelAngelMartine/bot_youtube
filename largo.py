@@ -301,7 +301,7 @@ def _caja_narr(txt, ancho=820):
     k = ("caja", txt, ancho)
     if k not in _comic_cache:
         f = fuente("ComicNeue-Bold.ttf", 38)
-        ls = C.lineas(txt.upper(), f, ancho - 44)[:4]
+        ls = C.lineas(txt.upper(), f, ancho - 44)[:5]
         h = 32 + 46 * len(ls)
         im = Image.new("RGBA", (ancho + 12, h + 12))
         d = ImageDraw.Draw(im)
@@ -360,6 +360,22 @@ def _panel(pn, tl, sobrio):
                 d.text((58, 194 + 84 * j), l, font=f, fill=(255, 255, 255, 255))
     if pn.get("narr"):
         im.alpha_composite(_caja_narr(pn["narr"], 760 if pn["clase"] == "persona" else 900), (40, 30))
+    if pn.get("sub") and tl > 1.0:                     # breves: la explicacion entra despues, abajo a la izquierda
+        sb = _caja_narr(pn["sub"], 860)
+        im.alpha_composite(sb, (40, BH - sb.height - 30))
+    if pn.get("lugar"):                                # breves: el lugar, en etiqueta roja arriba a la derecha
+        k = ("lugar", pn["lugar"])
+        if k not in _comic_cache:
+            f = fuente("Inter-Black.ttf", 40)
+            w = int(ImageDraw.Draw(Image.new("L", (1, 1))).textlength(pn["lugar"].upper(), font=f)) + 50
+            e = Image.new("RGBA", (w + 10, 74))
+            d = ImageDraw.Draw(e)
+            d.rectangle([8, 8, w + 8, 72], fill=(0, 0, 0, 160))
+            d.rectangle([0, 0, w, 64], fill=ROJO + (255,))
+            d.text((25, 32), pn["lugar"].upper(), font=f, fill=BLANCO + (255,), anchor="lm")
+            _comic_cache[k] = e
+        e = _comic_cache[k]
+        im.alpha_composite(e, (BW - e.width - 30, 30))
     return im
 
 
@@ -575,6 +591,16 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                 if ve["tipo"] in ("claves", "cronologia") and (ve["_vin"] or any(it.get("persona_vineta") in fotos
                                                                                   for it in ve.get("items", []))):
                     parte["comic"] = paneles_comic(ve, T, c, t0, fotos)      # opcion A (4-nov-2026)
+                    parte["sobrio"] = ve["_sobrio"]
+                elif ve["tipo"] == "breve":                     # breves, tambien en comic a pantalla completa (4-nov)
+                    sub = ve.get("sub", "")                       # la fuente ya va en el recuadro FUENTES
+                    if 0 in ve["_vin"]:
+                        pn = {"clase": "vineta", "ruta": ve["_vin"][0], "narr": ve["titular"], "sub": sub,
+                              "lugar": ve.get("lugar", ""), "credito": ve["_vin_txt"].get(0, "Ilustración IA")}
+                    else:
+                        pn = {"clase": "texto", "narr": "", "cita": ve["titular"], "sub": sub, "lugar": ve.get("lugar", "")}
+                    pn["t"] = t0
+                    parte["comic"] = [pn]
                     parte["sobrio"] = ve["_sobrio"]
                 partes.append(parte)
             c += len(p["di"]) + 1

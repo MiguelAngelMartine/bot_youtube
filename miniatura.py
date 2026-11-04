@@ -246,39 +246,47 @@ def cara(c):
     return tuple(int(v / k) for v in (x, y, w, h))
 
 
-def protagonista(im, c, centro=(0.72, 0.37), alto_cara=0.30):
-    """Encuadre de miniatura profesional: la cara a un tercio de alto y en el tercio derecho, grande (alto_cara del
-    alto del cuadro), con el cuerpo saliendo por abajo. Devuelve la x izquierda de la persona o None si no hay cara."""
+def encuadre_cara(c, ancho, alto, centro=(0.72, 0.37), alto_cara=0.30, suave=False):
+    """Encuadre profesional por la cara para un lienzo ancho x alto: la cara grande (alto_cara del alto) y centrada en
+    'centro'; el cuerpo sale por abajo y se disuelve sin cortes rectos. Devuelve (imagen, x, y) o None si no hay cara."""
     k = cara(c)
     if not k:
         return None
     fx, fy, fw, fh = k
-    s = alto_cara * H / fh
+    s = alto_cara * alto / fh
     if s > 2.4:
-        print(f"  AVISO miniatura: la foto se amplia x{s:.1f}; busca una de mas resolucion (fotos.py la baja original)")
+        print(f"  AVISO: la foto se amplia x{s:.1f}; busca una de mas resolucion (fotos.py la baja original)")
     c = realza(c.resize((int(c.width * s), int(c.height * s)), Image.LANCZOS))
-    # el cuerpo se disuelve hacia abajo: sin cortes rectos de recorte a los lados (aspecto profesional)
-    visible = H - (centro[1] * H - (fy + fh / 2) * s)            # cuanto del recorte cae dentro del cuadro
+    visible = alto - (centro[1] * alto - (fy + fh / 2) * s)
     ini = int(min(c.height, visible) * 0.5)
     g = np.ones(c.height, dtype=np.float32)
     g[ini:] = np.clip(1 - (np.arange(c.height - ini) / max(1, min(c.height, visible) - ini)) ** 1.6, 0, 1)
     a = np.asarray(c.getchannel("A"), dtype=np.float32) * g[:, None]
-    # si el recorte corta el cuerpo por un lado (borde recto), ese lado tambien se disuelve
     ancho_f = max(1, int(c.width * 0.2))
     rampa = np.linspace(0, 1, ancho_f) ** 0.8
-    for lado in (0, -1):
+    for lado in (0, -1):                               # lados cortados del recorte: tambien se disuelven
         if (a[:, lado] > 128).mean() > 0.12:
             if lado == 0:
                 a[:, :ancho_f] *= rampa[None, :]
             else:
                 a[:, -ancho_f:] *= rampa[::-1][None, :]
     c.putalpha(Image.fromarray(a.astype(np.uint8)))
-    cc, pad = silueta(c, borde=6)
-    x = int(centro[0] * W - (fx + fw / 2) * s) - pad
-    y = int(centro[1] * H - (fy + fh / 2) * s) - pad
-    y = max(y, H - cc.height + pad + 10) if y + cc.height - pad < H else y      # el cuerpo siempre sale por abajo
+    cc, pad = silueta_suave(c) if suave else silueta(c, borde=6)
+    x = int(centro[0] * ancho - (fx + fw / 2) * s) - pad
+    y = int(centro[1] * alto - (fy + fh / 2) * s) - pad
+    if y + cc.height - pad < alto:                     # el cuerpo siempre sale por abajo
+        y = alto - cc.height + pad + 10
+    return cc, x, y
+
+
+def protagonista(im, c, centro=(0.72, 0.37), alto_cara=0.30):
+    """Miniatura: protagonista encuadrado por la cara. Devuelve su x izquierda o None si no hay cara."""
+    r = encuadre_cara(c, W, H, centro, alto_cara)
+    if not r:
+        return None
+    cc, x, y = r
     im.alpha_composite(cc, (x, y))
-    return x + pad
+    return x + 40
 
 
 def rayos(im, desde=(0.95, -0.15), color=(255, 214, 140), fuerza=46):

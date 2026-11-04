@@ -60,11 +60,14 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
         if it.get("persona") and it["persona"] in fotos and fotos[it["persona"]].exists():
             pr = fotos[it["persona"]]
             c = M.recorte(pr)
-            esc = min(900 / c.height, 900 / c.width)
-            persona = M.silueta_suave(c.resize((int(c.width * esc), int(c.height * esc)), Image.LANCZOS))   # contorno suave (4-nov)
+            persona = M.encuadre_cara(c, AN, AL, (0.75, 0.40), 0.30, suave=True)    # encuadre por la cara (4-nov)
+            if persona is None:
+                esc = min(900 / c.height, 900 / c.width)
+                cc, pad = M.silueta_suave(c.resize((int(c.width * esc), int(c.height * esc)), Image.LANCZOS))
+                persona = (cc, AN - cc.width + 150, AL - cc.height + pad + 30)
             if pr.name in cred:
                 usadas[pr.name] = cred[pr.name]
-        ancho = 1750 if persona is None else AN - persona[0].width + 150 + persona[1] + 70
+        ancho = 1750 if persona is None else min(1750, persona[1] + 220)
         tam, lineas = M.ajusta(it.get("titular") or it["texto"], it.get("destaca", ""), ancho, sobrio)
         texto = M.texto(lineas, min(tam, 190), sobrio, espacio=0.55)
         if not sobrio:
@@ -84,9 +87,9 @@ def cuadro(tj, tl, t_abs):
     x0, y0 = (f.width - cw) // 2, (f.height - ch) // 2
     fr = G2.escala(f, (AN, AL), box=(x0, y0, x0 + cw, y0 + ch))
     if tj["persona"]:
-        c, pad = tj["persona"]
+        c, px, py = tj["persona"]
         a = suave(tl / 0.35)
-        G2.pega(fr, c, AN - c.width + 150 + int(160 * (1 - a)), AL - c.height + pad + 30, a)
+        G2.pega(fr, c, px + int(160 * (1 - a)), py, a)
     t = tj["texto"]
     if tj["sobrio"]:
         a = suave(tl / 0.5)
