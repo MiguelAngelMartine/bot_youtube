@@ -58,6 +58,55 @@ def openverse(q, n):
     return out
 
 
+API_COMMONS = "https://commons.wikimedia.org/w/api.php"
+LIC_OK = ("cc0", "public domain", "pdm", "dominio", "cc by", "cc-by", "attribution")
+
+
+def _lic_ok(l):
+    l = (l or "").lower()
+    return any(x in l for x in LIC_OK) and not any(x in l for x in ("nc", "nd", "non-commercial", "noderivs"))
+
+
+def commons_categoria(q, n):
+    """Fotos de la categoria de Commons de una persona o un lugar (4-nov-2026): muchas mas y mas recientes que la busqueda
+    por palabras (importaciones de Pool Moncloa, Parlamento Europeo, gobiernos autonomicos y partidos). Entra en las
+    subcategorias (por año, las mas recientes primero) y devuelve primero las fotos mas nuevas."""
+    import re as _re
+    r = requests.get(API_COMMONS, headers=UA, timeout=30, params={"action": "query", "list": "search", "srsearch": q,
+                     "srnamespace": 14, "format": "json", "srlimit": 5}).json()
+    cats = [c["title"] for c in r.get("query", {}).get("search", [])]
+    if not cats:
+        return []
+    exacta = [c for c in cats if c.lower() == f"category:{q.lower()}"]
+    cat = (exacta or cats)[0]
+    sub = requests.get(API_COMMONS, headers=UA, timeout=30, params={"action": "query", "list": "categorymembers",
+                       "cmtitle": cat, "cmtype": "subcat", "cmlimit": 50, "format": "json"}).json()
+    subs = [s["title"] for s in sub.get("query", {}).get("categorymembers", [])]
+    años = sorted([s for s in subs if _re.search(r"20\d\d", s)], key=lambda s: -int(_re.search(r"20\d\d", s).group()))
+    out, vistos = [], set()
+    for c_ in [cat] + años[:4]:
+        res = requests.get(API_COMMONS, headers=UA, timeout=60, params={
+            "action": "query", "generator": "categorymembers", "gcmtitle": c_, "gcmtype": "file", "gcmlimit": 60,
+            "gcmsort": "timestamp", "gcmdir": "desc", "prop": "imageinfo", "iiprop": "url|size|extmetadata",
+            "iiurlwidth": 1280, "iiextmetadatafilter": "LicenseShortName|Artist|DateTimeOriginal", "format": "json"}).json()
+        for f in res.get("query", {}).get("pages", {}).values():
+            ii = (f.get("imageinfo") or [{}])[0]
+            md = ii.get("extmetadata", {})
+            lic = md.get("LicenseShortName", {}).get("value", "")
+            if not ii or f["title"] in vistos or not _lic_ok(lic) or ii.get("width", 0) < 900 or not f["title"].lower().endswith((".jpg", ".jpeg", ".png")):
+                continue
+            vistos.add(f["title"])
+            autor = _re.sub(r"<[^>]+>", "", md.get("Artist", {}).get("value", "")).strip()[:60] or "Wikimedia Commons"
+            fecha = md.get("DateTimeOriginal", {}).get("value", "")[:10]
+            out.append({"fuente": "Commons (categoría)", "licencia": lic, "orden": 0 if "cc0" in lic.lower() or "public" in lic.lower() else 1,
+                        "ancho": ii["width"], "alto": ii["height"], "autor": autor, "titulo": f["title"][:120] + (f" ({fecha})" if fecha else ""),
+                        "url": ii.get("thumburl") or ii["url"], "miniatura": ii.get("thumburl") or ii["url"],
+                        "pagina": ii.get("descriptionurl", "")})
+            if len(out) >= n:
+                return out
+    return out
+
+
 def wikimedia(q, n):
     out = []
     for c in imagenes.busca(q, n, ancho=1280):
@@ -84,7 +133,7 @@ def buscar(dia_txt, q, n=8):
     dest = RAIZ / "dia" / dia_txt / "fotos_candidatas"
     dest.mkdir(parents=True, exist_ok=True)
     cands, vistos = [], set()
-    for f in (wikimedia, openverse):                  # Wikimedia primero: es la que responde siempre
+    for f in (commons_categoria, wikimedia, openverse):   # 4-nov: primero la categoria de Commons (mas fotos y recientes)
         try:
             for c in f(q, n):
                 if c["pagina"] not in vistos:
@@ -92,7 +141,8 @@ def buscar(dia_txt, q, n=8):
                     cands.append(c)
         except Exception as e:                        # una fuente caida no para la otra
             print(f"  ({f.__name__} no responde: {type(e).__name__})")
-    cands = sorted(cands, key=lambda c: c["orden"])[:n]
+    cat_ = [c for c in cands if c["fuente"] == "Commons (categoría)"]          # las mas recientes primero
+    cands = (cat_ + sorted([c for c in cands if c not in cat_], key=lambda c: c["orden"]))[:n]
     s = slug(q)
     for k, c in enumerate(cands):
         im = baja(c["miniatura"], 640)
