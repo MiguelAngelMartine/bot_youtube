@@ -26,7 +26,8 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - `.venv/bin/python erratas.py <fecha>` → `correcciones.md` (si sale con 2: agente `fe-de-erratas`). Lo que proponga pasa por el verificador.
    - `.venv/bin/python contexto.py <fecha>` → `contexto.md` (si sale con 2: agente `documentalista`, «contexto <fecha>»).
    - Luego **los dossieres de los 6 primeros temas con Gemini** (decisión del usuario del 4-nov-2026: no gasta el plan de Claude), uno tras otro en un solo comando (unos 25 s cada uno):
-     `for t in <id1> <id2> <id3> <id4> <id5> <id6> frases; do .venv/bin/python investiga.py <fecha> $t || echo "FALLA $t"; done`
+     `.venv/bin/python redes.py <fecha>; for t in <id1> <id2> <id3> <id4> <id5> <id6> frases; do .venv/bin/python investiga.py <fecha> $t || echo "FALLA $t"; done`
+     (`redes.py` recoge antes lo que han publicado los partidos y sus líderes en sus webs, Telegram y Bluesky oficiales: lo usa el dossier de frases).
      (`frases`, solo en campaña electoral, hasta el 29N: las frases del día de todos los partidos para el bloque «La campaña en frases»). `investiga.py` comprueba solo que cada cita esté literal en los artículos y marca con ⚠️ las que no.
    - **Solo para los temas que digan `FALLA`** (Gemini saturado o sin cuota), lanza un `investigador` de Claude («fecha <fecha>, tema <id>»), en paralelo.
 2. **Consejo de redacción.** `jefe-de-edicion` («fecha <fecha>») → `escaleta.json`.

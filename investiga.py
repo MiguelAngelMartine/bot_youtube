@@ -112,6 +112,12 @@ def dossier_frases(fecha):
               f"{REGLAS}\n(En este dossier la sección «Cruce de declaraciones» es la principal; añade «## Frases sueltas» "
               f"con las que no tienen respuesta.)\n\nPÁRRAFOS CON DECLARACIONES (cada bloque empieza por medio, titular y "
               f"enlace):\n\n" + "\n\n=====\n\n".join(parrafos[:120]))
+    redes = dia / "redes.md"                            # publicaciones oficiales de los partidos (redes.py, 4-nov-2026)
+    if redes.exists():
+        r = redes.read_text(encoding="utf-8")[:40000]
+        prompt += ("\n\n=====\n\nPUBLICACIONES OFICIALES DE LOS PARTIDOS Y SUS LÍDERES (webs, Telegram, Bluesky; cada una "
+                   "con su enlace; cítalas como «<quién>, en <canal>»):\n" + r)
+        parrafos = parrafos + [r]
     return gemini(prompt), parrafos
 
 
