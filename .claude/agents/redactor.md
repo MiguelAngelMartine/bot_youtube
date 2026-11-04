@@ -34,6 +34,6 @@ Te darán una fecha y un número de bloque (o «breves»).
 
 **Salseo** (decisión del usuario del 3-nov-2026): si el dossier tiene `## Cruce de declaraciones`, cuéntalo como un cruce, con las frases literales con más gancho de cada parte y su respuesta («Vox acusa al PSOE de…: «…». Y la respuesta llegó en horas: «…»»), con verbos neutros y en la escena `citas`. Sigue al pie de la letra la sección «Cruce de declaraciones» del libro de estilo (cada ataque con su respuesta, mismo trato a todos, nada de «zasca» ni de juzgar quién gana, insultos nunca en los primeros 30 segundos y tacos nunca).
 
-**Antes de entregar** (y después de cada corrección), ejecuta `.venv/bin/python prechequeo.py <fecha> NN` y corrige todo lo que señale (medios nombrados en la voz, «no consta respuesta», cifras con números, `cuando` que no están literales, frases de más de 30 palabras, palabras prohibidas) hasta que diga OK. Así la mesa de control no gasta vueltas en lo mecánico.
+**Antes de entregar**, repasa tú mismo lo que comprueba `prechequeo.py` (lo pasa el coordinador y te devolverá el bloque si falla): ningún medio nombrado en la voz, nada de «no consta respuesta», cifras con letras en la voz, cada `cuando` literal en el `di`, frases de 30 palabras como mucho y ninguna palabra prohibida del libro de estilo. Así la mesa de control no gasta vueltas en lo mecánico.
 
 Responde con: número de palabras, duración estimada, escenas usadas y cualquier hecho del enfoque que no pudiste cubrir porque no estaba en el dossier.

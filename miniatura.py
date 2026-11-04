@@ -158,7 +158,7 @@ def ajusta(titular, destaca, ancho, sobrio):
     palabras = [(w.upper(), "amarillo" if w.lower().strip(LIMPIA) in marca else "blanco") for w in titular.split()]
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
     for max_lineas in (2, 3):
-        for tam in range(210, 109, -6):
+        for tam in range(300 if len(palabras) == 1 else 210, 109, -6):   # una sola palabra («DIMITE»), aun mas grande
             f = fuente("Inter-Black.ttf", tam)
             extra = 2 * (6 if sobrio else 25)
             lineas, cur = [], []
