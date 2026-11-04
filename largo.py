@@ -20,7 +20,7 @@ import traceback
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
 import corto as C
 import episodio as E
@@ -274,6 +274,163 @@ def encaja(piezas):
     return [(*mueve(pc, x, y), ta) for pc, x, y, ta in piezas], C.tablero_base(hb, wb)
 
 
+# ------------------------------------------------------------------ comic a pantalla completa (opcion A, 4-nov-2026)
+_comic_cache = {}
+
+
+def silueta_suave(c):
+    """Contorno fino y suave (decision del usuario del 4-nov-2026): linea clara tenue, luz de borde difusa y sombra
+    blanda. Resalta a la persona sin el filo blanco grueso de pegatina."""
+    pad = 40
+    a = Image.new("L", (c.width + 2 * pad, c.height + 2 * pad))
+    a.paste(c.getchannel("A"), (pad, pad))
+    base = Image.new("RGBA", a.size)
+    sombra = a.filter(ImageFilter.GaussianBlur(18)).point(lambda v: int(v * 0.6))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size).split(), sombra)), (-10, 12))
+    luz = a.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: int(v * 0.28))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (235, 240, 255)).split(), luz)))
+    linea = a.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1)).point(lambda v: int(v * 0.6))
+    base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size, (255, 255, 255)).split(), linea)))
+    base.alpha_composite(c, (pad, pad))
+    return base, pad
+
+
+def _trama(sobrio):
+    k = ("trama", sobrio)
+    if k not in _comic_cache:
+        im = Image.new("RGB", (BW, BH), (14, 18, 26) if sobrio else (12, 20, 38))
+        d = ImageDraw.Draw(im)
+        col = (40, 44, 52) if sobrio else (28, 44, 86)
+        for y in range(0, BH, 18):
+            for x in range((y // 18) % 2 * 9, BW, 18):
+                d.ellipse([x, y, x + 6, y + 6], fill=col)
+        _comic_cache[k] = im
+    return _comic_cache[k]
+
+
+def _caja_narr(txt, ancho=820):
+    k = ("caja", txt, ancho)
+    if k not in _comic_cache:
+        f = fuente("ComicNeue-Bold.ttf", 38)
+        ls = C.lineas(txt.upper(), f, ancho - 44)[:4]
+        h = 32 + 46 * len(ls)
+        im = Image.new("RGBA", (ancho + 12, h + 12))
+        d = ImageDraw.Draw(im)
+        d.rectangle([10, 10, ancho + 10, h + 10], fill=(0, 0, 0, 255))
+        d.rectangle([0, 0, ancho, h], fill=(250, 240, 205, 255), outline=(0, 0, 0, 255), width=4)
+        for j, l in enumerate(ls):
+            d.text((22, 16 + 46 * j), l, font=f, fill=(15, 15, 15, 255))
+        _comic_cache[k] = im
+    return _comic_cache[k]
+
+
+def _panel(pn, tl, sobrio):
+    """Un panel del comic en el instante tl (segundos desde que entra)."""
+    if pn["clase"] == "vineta":
+        k = ("ilus", pn["ruta"], sobrio)
+        if k not in _comic_cache:
+            im = ImageOps.fit(Image.open(pn["ruta"]).convert("RGB"), (int(BW * 1.12), int(BH * 1.12)), Image.LANCZOS,
+                              centering=(0.5, 0.4))
+            if sobrio:
+                im = ImageEnhance.Color(im).enhance(0.35)
+            _comic_cache[k] = im
+        base = _comic_cache[k]
+        z = 1.0 + 0.07 * min(tl, 12) / 12               # zoom y desplazamiento lentos (Ken Burns)
+        cw, ch = int(base.width / z), int(base.height / z)
+        x0 = int((base.width - cw) * (0.3 + 0.4 * min(tl, 12) / 12))
+        y0 = int((base.height - ch) * 0.45)
+        im = base.crop((x0, y0, x0 + cw, y0 + ch)).resize((BW, BH), Image.BILINEAR).convert("RGBA")
+        if pn.get("credito"):
+            ff = fuente("Inter-SemiBold.ttf", 22)
+            d = ImageDraw.Draw(im)
+            tw = d.textlength(pn["credito"], font=ff)
+            d.rectangle([BW - tw - 34, BH - 46, BW - 10, BH - 12], fill=(255, 255, 255, 220))
+            d.text((BW - 22, BH - 16), pn["credito"], font=ff, fill=(60, 60, 70, 255), anchor="rb")
+    else:
+        im = _trama(sobrio).copy().convert("RGBA")
+        if pn["clase"] == "persona":
+            k = ("persona", pn["foto"], sobrio)
+            if k not in _comic_cache:
+                import miniatura as MN
+                cc = MN.recorte(pn["foto"])
+                kk = (BH * 0.96) / cc.height
+                cc = cc.resize((int(cc.width * kk), int(cc.height * kk)), Image.LANCZOS)
+                if sobrio:
+                    cc = Image.merge("RGBA", (*ImageOps.grayscale(cc.convert("RGB")).convert("RGB").split(), cc.getchannel("A")))
+                _comic_cache[k] = silueta_suave(cc)
+            s, pad = _comic_cache[k]
+            im.alpha_composite(s, (BW - s.width + pad + 10, BH - s.height + pad + 20))
+            ancho_txt = int(BW * 0.55)
+        else:
+            ancho_txt = BW - 160
+        cita = pn["cita"]
+        n = len(cita) if pn["clase"] != "persona" else max(0, int(len(cita) * min(1.0, (tl - 0.5) / 3.0)))
+        if n:                                            # la cita se va escribiendo (persona) o sale entera (texto)
+            f = fuente("Anton-Regular.ttf", 72 if len(cita) < 90 else 60)
+            d = ImageDraw.Draw(im)
+            for j, l in enumerate(C.lineas(cita[:n], f, ancho_txt)[:6]):
+                d.text((64, 200 + 84 * j), l, font=f, fill=(0, 0, 0, 200))
+                d.text((58, 194 + 84 * j), l, font=f, fill=(255, 255, 255, 255))
+    if pn.get("narr"):
+        im.alpha_composite(_caja_narr(pn["narr"], 760 if pn["clase"] == "persona" else 900), (40, 30))
+    return im
+
+
+def vista_comic(pt, t):
+    """Opcion A: un panel tras otro a pantalla completa; el nuevo entra empujando (o fundido en los bloques sobrios)."""
+    pns, sobrio = pt["comic"], pt.get("sobrio", False)
+    k = max([j for j, pn in enumerate(pns) if pn["t"] <= t] or [0])
+    tl = t - pns[k]["t"]
+    cur = _panel(pns[k], max(0.0, tl), sobrio)
+    dur = 0.6 if sobrio else 0.42
+    if k > 0 and tl < dur:
+        prev = _panel(pns[k - 1], t - pns[k - 1]["t"], sobrio)
+        x = suave(tl / dur)
+        if sobrio:
+            return Image.blend(prev, cur, x)
+        fr = Image.new("RGBA", (BW, BH), (0, 0, 0, 255))
+        fr.paste(prev, (int(-BW * x), 0))
+        fr.paste(cur, (int(BW * (1 - x)), 0))
+        ImageDraw.Draw(fr).rectangle([int(BW * (1 - x)) - 14, 0, int(BW * (1 - x)), BH], fill=(0, 0, 0, 255))
+        return fr
+    return cur
+
+
+def paneles_comic(ve, T, c0, t0, fotos):
+    """Paneles de una escena claves/cronologia: viñeta, persona (foto real + cita) o texto. Cada uno entra cuando
+    empieza la frase que habla de el (no al llegar a la palabra clave); el primero, con la escena."""
+    vin, txt_ia = ve.get("_vin", {}), ve.get("_vin_txt", {})
+    pns, ult = [], t0
+    for k, it in enumerate(ve.get("items", [])):
+        texto = ((it.get("hora") + " · ") if it.get("hora") else "") + it.get("texto", "")
+        quien = it.get("persona_vineta")
+        foto = (VARIANTES.get(quien) or [fotos.get(quien)])[0] if quien else None
+        if k in vin:
+            pn = {"clase": "vineta", "ruta": vin[k], "narr": texto, "credito": txt_ia.get(k, "Ilustración IA")}
+        elif foto:
+            narr, _, cita = texto.partition(":")
+            pn = {"clase": "persona", "foto": foto, "narr": narr if cita else quien, "cita": (cita or texto).strip()}
+        else:
+            pn = {"clase": "texto", "narr": "", "cita": texto}
+        if k == 0:
+            tk = t0 + 0.3
+        else:
+            cw = it.get("cuando") or ""
+            ci = T.texto.find(cw, c0) if cw else -1
+            if ci >= 0:                                   # inicio de la frase que contiene el «cuando»
+                ini = max(T.texto.rfind(s, c0, ci) for s in (". ", "? ", "! ", ": "))
+                tk = T.en(ini + 2 if ini >= c0 else ci)
+            else:
+                tk = ult + 4.0
+            tk = max(tk, ult + 2.2)                       # cada panel, al menos 2,2 s
+        pn["t"] = tk
+        ult = tk
+        pns.append(pn)
+        if k:
+            T.eventos.append(tk)                          # golpe de sonido en cada cambio de panel
+    return pns
+
+
 def vista_tablero(pt, t, cam):
     """Lo que ve la camara del tablero en el instante t (BW x BH). cam: [cx, cy, z] suavizado, se actualiza aqui.
     Se ve el tablero entero; cuando entra una pieza, la camara se acerca un poco hacia ella y vuelve despacio."""
@@ -426,8 +583,13 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                     else:
                         print(f"  AVISO: la foto {fn} no esta en imagenes/ o no tiene credito; la escena va sin foto")
                 pz = sorted(piezas_h(ve, T, c, t0, fotos, cred, foto, usadas), key=lambda z: z[3])
-                partes.append({"k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
-                               "fuente": ve.get("fuente") or " · ".join(s.get("fuentes", [])[:3])})
+                parte = {"k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
+                         "fuente": ve.get("fuente") or " · ".join(s.get("fuentes", [])[:3])}
+                if ve["tipo"] in ("claves", "cronologia") and (ve["_vin"] or any(it.get("persona_vineta") in fotos
+                                                                                  for it in ve.get("items", []))):
+                    parte["comic"] = paneles_comic(ve, T, c, t0, fotos)      # opcion A (4-nov-2026)
+                    parte["sobrio"] = ve["_sobrio"]
+                partes.append(parte)
             c += len(p["di"]) + 1
         if not partes:
             raise ValueError(f"el bloque {i} no tiene ninguna escena")
@@ -564,7 +726,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
         p = plan[i]
         pt = p["partes"][max(j for j, x in enumerate(p["partes"]) if x["t0"] <= t + 1e-9 or j == 0)]
         fr = G2.fondo_marca(t)
-        fr.paste(vista_tablero(pt, t, cam), (BX, BY))  # el tablero es opaco: pegar es mucho mas rapido que componer
+        fr.paste((vista_comic(pt, t) if pt.get("comic") else vista_tablero(pt, t, cam)).convert("RGBA"), (BX, BY))  # el tablero es opaco: pegar es mucho mas rapido que componer
         d = ImageDraw.Draw(fr)
         d.rectangle([BX, BY - 4, BX + BW, BY], fill=AMARILLO + (255,))
         d.rectangle([BX, BY + BH, BX + BW, BY + BH + 4], fill=AMARILLO + (255,))
