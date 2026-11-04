@@ -23,6 +23,19 @@ Las letras y los colores son llamativos; **el texto es literal**:
 - nada que el vídeo no diga: YouTube penaliza las miniaturas engañosas y el canal promete rigor y neutralidad;
 - una pregunta solo si el vídeo la responde o explica qué se sabe («¿Qué falló en Urda?»).
 
+## Plantillas profesionales (4-nov-2026)
+Usa siempre `--plantilla` (salvo `--sobrio` y `--rival`, que tienen su propio diseño):
+- **`informativo`** (por defecto): antetítulo rojo recto (`--etiqueta`, quién o de qué va), titular en tipografía condensada Anton, blanco, recto y sin degradados, con la palabra clave (`--destaca`) en negro sobre franja amarilla; cara grande a la derecha. Titular de 2 a 5 palabras.
+- **`impacto`**: una sola palabra clave gigante («DIMITE», «IMPUTADO», «RUPTURA») con la persona delante tapando solo una esquina, y el antetítulo abajo. Para las noticias de una palabra.
+Comprueba que el titular se lee entero y que la persona no tapa letras clave.
+
+## Si no hay foto de calidad: alternativas (nunca una foto mala)
+Por orden:
+1. Otra foto libre de la misma persona (prueba otras búsquedas: «<nombre> <año>», «<nombre> Congreso», «<nombre> mitin», «<nombre> rueda de prensa»), o recórtala de una foto de grupo de buena resolución (`fotos.py recorta`).
+2. Otro protagonista de la misma noticia del que sí haya buena foto (quien le responde, quien le releva), si el titular sigue siendo coherente.
+3. Sin persona: una foto potente del lugar o del objeto de la noticia (el Congreso, la estación, el tren, la urna) a todo el ancho, con la plantilla `informativo` (el titular manda).
+4. Solo tipografía: fondo del canal con el titular enorme y la cita. Mejor una miniatura limpia de solo texto que una cara borrosa, pixelada, sonriente en una mala noticia o con restos de otras personas.
+
 ## Acabado profesional (decisión del usuario del 4-nov-2026: «que no parezcan mediocres»)
 `miniatura.py` ya hace el acabado de una miniatura profesional: encuadra al protagonista **por su cara** (grande, en el tercio derecho, con la mirada a un tercio de alto), funde el cuerpo con el fondo sin cortes rectos, pone el fondo desenfocado en duotono azul noche, añade luz en diagonal, grano fino y nitidez final. Tu trabajo es darle **material de calidad** y revisar el resultado:
 1. **Foto del protagonista en alta resolución.** `fotos.py elegir` ya baja la original de Wikimedia (hasta 3200 px). Si la persona está en una foto de grupo, recórtala con `.venv/bin/python fotos.py recorta <fecha> <origen> <destino> x0 y0 x1 y1 --persona "<Nombre>"` (fracciones 0-1; deja solo a la persona, de la cabeza a la cintura) y usa el recorte. Si `miniatura.py` avisa de que amplía la foto más de x2,4, busca otra con más resolución.

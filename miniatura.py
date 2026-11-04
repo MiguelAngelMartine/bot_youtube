@@ -432,6 +432,121 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     print(f"miniatura ({tam}px, {len(lineas)} lineas{', sobria' if sobrio else ''}) -> {out}")
 
 
+# ---------- plantillas profesionales (4-nov-2026) ----------
+ANTON = "Anton-Regular.ttf"                            # tipografia condensada de impacto (OFL)
+
+
+def _txt_capa(lineas, f, destaca, interlinea=0.98):
+    """Titular en Anton: blanco con contorno fino y sombra; la palabra clave, en negro sobre franja amarilla."""
+    medir = ImageDraw.Draw(Image.new("L", (1, 1)))
+    alto_l = int(f.size * interlinea) + 14
+    ancho = max(int(medir.textlength(" ".join(l), font=f)) for l in lineas) + 60
+    capa = Image.new("RGBA", (ancho + 40, alto_l * len(lineas) + 60))
+    sombra = Image.new("RGBA", capa.size)
+    d, ds = ImageDraw.Draw(capa), ImageDraw.Draw(sombra)
+    esp = medir.textlength(" ", font=f)
+    for i, l in enumerate(lineas):
+        x, y = 10, 10 + i * alto_l
+        for w in l:
+            tw = medir.textlength(w, font=f)
+            clave = w.lower().strip(LIMPIA) in destaca
+            if clave:                                   # franja amarilla ajustada a la caja real de las letras
+                bx0, by0, bx1, by1 = d.textbbox((x, y), w, font=f)
+                caja = [bx0 - 18, by0 - 14, bx1 + 18, by1 + 14]
+                ds.rectangle([c + 10 for c in caja], fill=(0, 0, 0, 170))
+                d.rectangle(caja, fill=AMARILLO + (255,))
+                d.text((x, y), w, font=f, fill=(12, 12, 16, 255))
+            else:
+                ds.text((x + 8, y + 10), w, font=f, fill=(0, 0, 0, 200))
+                d.text((x, y), w, font=f, fill=(255, 255, 255, 255), stroke_width=3, stroke_fill=(10, 10, 14, 255))
+            x += tw + esp + (12 if clave else 0)
+    sombra = sombra.filter(ImageFilter.GaussianBlur(9))
+    sombra.alpha_composite(capa)
+    return sombra
+
+
+def _kicker(txt, tam=50):
+    """Antetitulo: caja roja recta con texto blanco (quien lo dice o de que va)."""
+    f = fuente("Inter-Black.ttf", tam)
+    w = int(ImageDraw.Draw(Image.new("L", (1, 1))).textlength(txt, font=f)) + 56
+    h = int(tam * 1.5)
+    e = Image.new("RGBA", (w + 12, h + 12))
+    d = ImageDraw.Draw(e)
+    d.rectangle([8, 8, w + 8, h + 8], fill=(0, 0, 0, 140))
+    d.rectangle([0, 0, w, h], fill=ROJO + (255,))
+    d.text((28, h / 2 + 1), txt, font=f, fill=BLANCO + (255,), anchor="lm")
+    return e
+
+
+def miniatura_pro(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fondo="", insignia_txt="",
+                  plantilla="informativo", salida="miniatura.png"):
+    """informativo: titular Anton a la izquierda con la palabra clave en franja amarilla, cara grande a la derecha.
+    impacto: la palabra clave gigante DETRAS de la persona (efecto de profundidad) y el resto, en el antetitulo."""
+    dia = RAIZ / "dia" / dia_txt
+    img = dia / "imagenes"
+    marca_d = {w.lower().strip(LIMPIA) for w in destaca.split()}
+    im = fondo(img / foto_fondo if foto_fondo else None, False, bool(persona))
+    gradua(im)
+    rayos(im)
+    c = recorte(img / persona) if persona else None
+    if plantilla == "impacto":
+        palabra = (destaca or titular).upper()
+        tam = 600
+        while tam > 120 and fuente(ANTON, tam).getlength(palabra) > W * 0.78:
+            tam -= 10
+        f = fuente(ANTON, tam)
+        capa = Image.new("RGBA", (W, H))
+        d = ImageDraw.Draw(capa)
+        y = int(H * 0.16)                              # por debajo del logo y del distintivo
+        cx = W * 0.45                                  # algo a la izquierda: la persona tapa solo el final
+        d.text((cx + 12, y + 16), palabra, font=f, fill=(0, 0, 0, 170), anchor="mt")
+        capa = capa.filter(ImageFilter.GaussianBlur(10))
+        ImageDraw.Draw(capa).text((cx, y), palabra, font=f, fill=AMARILLO + (255,), anchor="mt",
+                                  stroke_width=5, stroke_fill=(10, 10, 14, 255))
+        im.alpha_composite(capa)                       # primero el texto...
+        if c is not None:                              # ...y la persona delante
+            protagonista(im, c, centro=(0.86, 0.64), alto_cara=0.25)
+        oscurece_abajo(im, 300, 170)
+        if etiqueta_txt:
+            k = _kicker(etiqueta_txt.upper(), 58)
+            im.alpha_composite(k, (90, H - k.height - 80))
+    else:
+        oscurece_abajo(im, 620, 200)
+        x_p = protagonista(im, c, centro=(0.73, 0.37), alto_cara=0.31) if c is not None else None
+        ancho = (x_p + 120 - 90) if x_p else 1700
+        lineas, tam = [], 210
+        palabras = titular.upper().split()
+        while tam > 90:
+            f = fuente(ANTON, tam)
+            lineas, cur = [], []
+            for w in palabras:
+                if cur and f.getlength(" ".join(cur + [w])) + 60 > ancho:
+                    lineas.append(cur)
+                    cur = [w]
+                else:
+                    cur.append(w)
+            lineas.append(cur)
+            if len(lineas) <= 3 and all(f.getlength(" ".join(l)) + 60 <= ancho for l in lineas):
+                break
+            tam -= 8
+        tc = _txt_capa(lineas, fuente(ANTON, tam), marca_d)
+        y = H - tc.height - 50
+        if etiqueta_txt:                               # el antetitulo nunca sube hasta el logo
+            k = _kicker(etiqueta_txt.upper())
+            y = max(y, 190 + k.height)
+            im.alpha_composite(k, (90, y - k.height - 4))
+        im.alpha_composite(tc, (80, y))
+    im.alpha_composite(G2.logo(110), (60, 50))
+    if insignia_txt:
+        insignia(im, insignia_txt.upper())
+    im = grano(im)
+    marco(im)
+    out = dia / salida
+    fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
+    fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)
+    print(f"miniatura {plantilla} -> {out}")
+
+
 # ---------- banner y avatar del canal ----------
 def partes_marca():
     """El nombre del canal en trozos con su color: «HOY» en amarillo dentro de «EL HOYFORMATIVO»."""
@@ -488,11 +603,16 @@ if __name__ == "__main__":
     ap.add_argument("--rival", default="", help="segunda persona: enfrentamiento cara a cara (foto de imagenes/)")
     ap.add_argument("--inserto", default="", help="foto secundaria en polaroid (lugar u objeto de la noticia)")
     ap.add_argument("--insignia", default="", help="distintivo arriba a la derecha («ESPECIAL»)")
+    ap.add_argument("--plantilla", default="", help="informativo | impacto (diseño profesional, 4-nov-2026)")
     ap.add_argument("--salida", default="miniatura.png")
     ap.add_argument("--canal", action="store_true")
     a = ap.parse_args()
     if a.canal:
         canal()
     else:
-        miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida,
+        if a.plantilla and not a.sobrio and not a.rival:
+            miniatura_pro(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo,
+                          a.insignia, a.plantilla, a.salida)
+        else:
+          miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida,
                   a.rival, a.inserto, a.insignia)
