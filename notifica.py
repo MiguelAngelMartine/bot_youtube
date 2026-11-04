@@ -96,8 +96,19 @@ def main(dia_txt, error=None, video=None, texto_video=None):
     print("aviso enviado")
 
 
+def aviso(dia_txt, texto):
+    """Mensaje corto informativo (por ejemplo, que empieza la jornada)."""
+    tok, chat = credenciales()
+    envia(f"https://api.telegram.org/bot{tok}", "sendMessage", data={"chat_id": chat, "text": f"🎬 El Hoyformativo · {dia_txt}: {texto}"},
+          timeout=30)
+    print("aviso enviado")
+
+
 if __name__ == "__main__":
     a = sys.argv
+    if "--aviso" in a:
+        aviso(a[1], a[a.index("--aviso") + 1])
+        sys.exit()
     err = a[a.index("--error") + 1] if "--error" in a else None
     vid = a[a.index("--video") + 1] if "--video" in a else None
     txt = a[a.index("--video") + 2] if vid and len(a) > a.index("--video") + 2 and not a[a.index("--video") + 2].startswith("--") else None

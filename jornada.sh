@@ -33,6 +33,8 @@ lanza)
 
     # Hasta 3 intentos: si se agota el límite de uso del plan de Claude (se comparte con las sesiones del día),
     # espera a que se renueve y retoma (la skill salta las fases ya hechas). Nunca empieza un intento después de las 21:00.
+    # Aviso por Telegram de que empieza el vídeo del día (petición del usuario del 4-nov-2026)
+    "$PY" notifica.py "$FECHA" --aviso "empieza la jornada: me pongo con el vídeo de hoy. Te aviso cuando esté subido (unas 2 h)." >> "$LOG" 2>&1
     for INTENTO in 1 2 3; do
         echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
         ANTES=$(wc -l < "$LOG")
