@@ -3,25 +3,25 @@
     "id": "urda",
     "titulo": "Accidente ferroviario de Urda (Toledo): choque de un AVE y un Iryo",
     "inicio": "2026-10-28",
-    "ultimo_dia": "2026-11-01",
+    "ultimo_dia": "2026-11-03",
     "estado": "Abierta",
-    "resumen": "Quinto dia. 69 fallecidos; 56 identificados (52 por huella, 4 por ADN), incluidos todos los espanoles; 13 pendientes, todas extranjeras segun Europa Press, sin plazo (Guardia Civil). 36 fallecidos a disposicion de sus familias. 41 heridos hospitalizados, 16 en UCI (20minutos, RTVE). La jueza instructora de Orgaz exige trabajo ininterrumpido a la empresa de gruas y veta difundir imagenes de victimas; causa bajo secreto de sumario. Sin causa oficial. Renfe ordena no superar 40 km/h con el LZB caido (El Pais); LZB cayo 170 veces en 2026 segun Puente. Pendiente: martes 3-nov Consejo de Ministros (real decreto de ayudas, informe/plan de seguridad de Puente), comparecencia de Puente en Diputacion Permanente (sin hora); huelga SEMAF 10 y 12 de noviembre."
+    "resumen": "Sexto dia (3-nov). 69 fallecidos, todos identificados: 40 hombres y 29 mujeres; 54 espanoles y 15 extranjeros (Centro Integrado de Datos, via El Pais y El Mundo). Unos 27 heridos hospitalizados, 7 en UCI (Gobierno de Castilla-La Mancha, via ABC); retirados todos los vagones. Consejo de Ministros aprueba real decreto de ayudas que dobla el seguro obligatorio de viajeros, con anticipo de indemnizaciones e incapacidad temporal (segun sumario de Sanchez, El Pais). Puente presenta medidas: doble validacion por un segundo controlador humano si falla el sistema, menos trenes en la Madrid-Sevilla al reabrir (uno cada 15 min en vez de cada 5) hasta el ERTMS-2 previsto a principios de 2027, auditoria extraordinaria de la agencia de seguridad ferroviaria; no se plantea cortar Madrid-Barcelona. Investigacion: Guardia Civil ha interrogado a una veintena de personas; operador de Adif investigado (no detenido) se acoge a su derecho a no declarar; secreto de sumario, jueza Aristea Ortiz decidira cuando toma declaracion. El Supremo decide si admite la querella de Vox contra Puente por homicidio imprudente (sin respuesta del ministro). Sin causa oficial. Pendiente: comparecencia de Puente 3-nov por la tarde (~17:00) en la Diputacion Permanente; Sanchez habla el jueves 5-nov al cerrar la Cumbre Iberoamericana; huelga SEMAF 10 y 12 de noviembre. Nota: las cifras de hospitalizados (41/16 el 1-nov vs 27/7 hoy) son de ambitos distintos segun el contexto; no se compararon."
   },
   {
     "id": "urda_pp_vox_causa",
     "titulo": "PP y Vox anuncian que iran a la causa judicial de Urda",
     "inicio": "2026-11-01",
-    "ultimo_dia": "2026-11-01",
+    "ultimo_dia": "2026-11-03",
     "estado": "Abierta",
-    "resumen": "Vox (Abascal, El Mundo) como acusacion popular; PP anuncia en video de Alma Ezcurra. Vox ya habia presentado querella contra directivos de Adif el dia del accidente y otra ante el Supremo contra Puente (ABC, La Vanguardia). Ezcurra acusa al Gobierno de filtrar conversaciones y de hacer encuestas: sin pruebas ni respuesta del Gobierno. Falta formalizar la personacion: sin fecha."
+    "resumen": "Vox (Abascal, El Mundo) como acusacion popular; PP anuncia en video de Alma Ezcurra. Vox ya habia presentado querella contra directivos de Adif el dia del accidente y otra ante el Supremo contra Puente por homicidio imprudente (ABC, La Vanguardia); el 3-nov el Supremo aun decide si la admite (elDiario.es), sin respuesta del ministro. Falta formalizar la personacion: sin fecha. Ezcurra acusa al Gobierno de filtrar conversaciones y de hacer encuestas: sin pruebas ni respuesta del Gobierno (1-nov)."
   },
   {
     "id": "puente_presion",
     "titulo": "Presion para que dimita Oscar Puente",
     "inicio": "2026-10-28",
-    "ultimo_dia": "2026-11-01",
+    "ultimo_dia": "2026-11-03",
     "estado": "Abierta",
-    "resumen": "Puente no dimite; puso el cargo a disposicion de Sanchez, que le pidio seguir. Piden su salida Feijoo, Abascal, Martinez Barbero (Frente Amplio) y Nogueras (Junts); Montero (Podemos) le exige decencia y respeto; BNG no la pide expresamente; PNV espera al martes. Segun ABC, el Gobierno preve relevar al presidente de Adif (sin confirmar ni desmentir). La fecha de inicio es la del accidente; la peticion de dimision desde el primer dia consta en el contexto del 1-nov, no contrastada de nuevo."
+    "resumen": "3-nov: Puente no dimite; puso el cargo a disposicion de Sanchez, que le pidio seguir. Piden su salida PP (Feijoo: actitud 'infame, cruel y ruin', 2-nov, El Mundo y Europa Press), Vox, Junts, Frente Amplio, Podemos y el PNV (que quiere que lo cese Sanchez si no dimite); ERC espera a la comparecencia y EH Bildu a la investigacion tecnica (La Vanguardia). Puente: 'Puedo entender que lo pida Colau, pero no que me la pida Feijoo' (20minutos). Juanma Moreno (PP): 'El fallo humano es de Sanchez por no actuar' (ABC), sin respuesta del Gobierno. Segun contexto, una mayoria de la Diputacion Permanente pide su dimision (El Mundo; no incluida en el episodio). Puente comparece el 3-nov por la tarde a peticion propia; Sanchez habla el jueves 5-nov. La fecha de inicio es la del accidente."
   },
   {
     "id": "blocus",
@@ -29,14 +29,38 @@
     "inicio": "2026-10-24",
     "ultimo_dia": "2026-11-01",
     "estado": "Abierta",
-    "resumen": "31-oct (Halloween) sin disturbios en Barcelona: 2.264 identificados en Cataluna (Mossos, via El Mundo y elDiario.es), 1.440 en Barcelona ciudad, 181 actas, 10 detenciones (3 Barcelona, 7 resto). Madrid sin incidentes. Collboni defiende la contundencia; la CUP denuncia identificaciones por perfil racial; Parlon lo niega. Saqueos del 24-oct: 133 detenidos, 89 menores (El Pais). El 1-nov un juez de Barcelona envia a prision sin fianza a un joven de 18 anos (20minutos), distinto del presunto fundador detenido en Picanya (tambien en prision, elDiario.es). Joven de 21 anos detenido en Cataluna, pendiente del juez."
+    "resumen": "31-oct (Halloween) sin disturbios en Barcelona: 2.264 identificados en Cataluna (Mossos, via El Mundo y elDiario.es), 1.440 en Barcelona ciudad, 181 actas, 10 detenciones (3 Barcelona, 7 resto). Madrid sin incidentes. Collboni defiende la contundencia; la CUP denuncia identificaciones por perfil racial; Parlon lo niega. Saqueos del 24-oct: 133 detenidos, 89 menores (El Pais). El 1-nov un juez de Barcelona envia a prision sin fianza a un joven de 18 anos (20minutos), distinto del presunto fundador detenido en Picanya (tambien en prision, elDiario.es). Joven de 21 anos detenido en Cataluna, pendiente del juez. Sin novedades en el episodio del 3-nov."
   },
   {
     "id": "elecciones_29n",
     "titulo": "Elecciones generales del 29 de noviembre: campana y listas",
     "inicio": "SIN VERIFICAR",
-    "ultimo_dia": "2026-11-01",
+    "ultimo_dia": "2026-11-03",
     "estado": "Abierta",
-    "resumen": "Tras el luto por Urda, el PP gira su campana hacia la gestion y Feijoo propone una revision tecnica independiente de la red ferroviaria (Europa Press); el PSOE aun sin guion nuevo (20minutos); Abascal es el unico candidato que no suspendio actos (El Pais, El Mundo). Cruce Feijoo-Illa por la amnistia; Nogueras: votos de Junts nunca al bloque de derechas. Lunes 2-nov Comite Ejecutivo del PP; campana oficial desde la medianoche del 13-nov; elecciones 29-nov. En breve: casi la mitad de senadores no repite (Europa Press); PSOE repite 22 de 52 cabezas de lista (20minutos); Alvise Perez encabeza SALF por Madrid (elDiario.es). Fecha de la convocatoria: SIN VERIFICAR."
+    "resumen": "3-nov, bloque 'La campana en frases' (sin respuesta del Gobierno/partidos en cada caso): Feijoo (Comite Ejecutivo del PP, 2-nov): 'Dudo que sean buena gente' (El Pais); Abascal (Telecinco, 3-nov): 'Estamos ante un crimen politico y la responsabilidad esta en el Gobierno' (20minutos); Montero (2-nov): 'Cuando se trata de privatizar votan igual' sobre PP y PSOE (La Vanguardia); Puente (3-nov): 'Son tres diferencias radicales respecto del PP' (20minutos); Alamany (ERC) atribuye Urda y Adamuz al colapso del sistema ferroviario, por PP y PSOE (La Vanguardia); Esteban (PNV) sobre Vox: 'ahi nosotros no vamos a estar' (La Vanguardia). Antes (1-nov): PP gira a la gestion, Abascal unico que no suspendio actos, cruce Feijoo-Illa por la amnistia. Campana oficial desde la medianoche del 13-nov; elecciones 29-nov. Segun contexto 3-nov: Sanchez retoma actos (mitin en Valencia el viernes), encuesta de El Mundo (Feijoo puede ganar en 36 provincias), proclamacion de candidaturas (RTVE); no incluidos en el episodio. Fecha de la convocatoria: SIN VERIFICAR."
+  },
+  {
+    "id": "huelga_11n",
+    "titulo": "Huelga general del 11 de noviembre: Feijoo pide desconvocarla tras Urda",
+    "inicio": "SIN VERIFICAR",
+    "ultimo_dia": "2026-11-03",
+    "estado": "Abierta",
+    "resumen": "Primer dia contado: 3-nov (la fecha de convocatoria no figura en el archivo). Feijoo pide a los sindicatos desconvocarla: '69 muertos despues es un grave error' (Europa Press); dice que no cuestiona el derecho de huelga sino el sentido de la oportunidad. Respuestas: Pepe Alvarez (UGT) 'incluso insultante', la huelga es por vivienda y salarios (ABC); Unai Sordo (CCOO) le pide que no gobierne con Vox (elDiario.es); Alicia del Rio (Sindicato de Inquilinas) 'patetico' (elDiario.es); Ibanez (Compromis) 'saque sus sucias manos'; Pisarello (Frente Amplio) 'panico' a las calles (Europa Press); Abascal coincide con Feijoo (elDiario.es); Saiz (Gobierno) pide que 'no se utilice el dolor de las victimas' y recuerda que es un derecho fundamental. Calendario: SEMAF 24 h el 10-nov, huelga general el 11-nov, paros parciales de SEMAF el 12-nov; ferroviarios decidiran si amplian segun lo que anuncie Puente."
+  },
+  {
+    "id": "denuncia_ruesga",
+    "titulo": "Denuncia del delegado del Gobierno en Cantabria contra un edil del PP (Ruesga) y ataud de Hoyocasero",
+    "inicio": "SIN VERIFICAR",
+    "ultimo_dia": "2026-11-03",
+    "estado": "Abierta",
+    "resumen": "Primer dia contado: 3-nov (fecha exacta de la presunta agresion: SIN VERIFICAR, durante una feria ganadera en Arredondo). Pedro Casares (PSOE, delegado del Gobierno) denuncia ante la Guardia Civil a David Setien (portavoz del PP en Ruesga) por una supuesta bofetada tras recriminarle su postura sobre el lobo (version de Casares; La Vanguardia, Europa Press). Ni Setien ni el PP han hecho declaraciones; Feijoo dijo en La Sexta que el edil niega la agresion. Torro (PSOE) pide a Feijoo actuar de inmediato (El Mundo); Feijoo: una agresion es incompatible con ser militante del PP; segun el, Genova abre investigacion interna. El PSOE vincula el caso con un ataud con la foto de Sanchez en el Ayuntamiento de Hoyocasero (Avila, PP), puesto por personas sin identificar y retirado enseguida; el alcalde, Ivan Picos (PP), lo condena y lo ha denunciado a la Guardia Civil. Saiz pide frenar la escalada sin nombrar al PP. Pendiente: la denuncia sigue en la Guardia Civil; investigacion interna del PP."
+  },
+  {
+    "id": "nietos_voto",
+    "titulo": "Voto de los hijos de nacionalizados (ley de nietos y ley de 2007) ante el Supremo",
+    "inicio": "SIN VERIFICAR",
+    "ultimo_dia": "2026-11-03",
+    "estado": "Abierta",
+    "resumen": "Primer dia contado: 3-nov, en breve. La Abogacia del Estado defiende ante el Supremo que puedan votar unos 190.000 hijos de personas que obtuvieron la nacionalidad con la ley de nietos y la de 2007; dice que suspenderlo es 'materialmente imposible' y condicionaria el escrutinio. Vox e Iustitia Europa piden examinar con el mismo rigor la cadena de nacionalidad. El Supremo aun no ha resuelto (El Mundo, elDiario.es, Europa Press)."
   }
 ]
