@@ -492,23 +492,23 @@ def miniatura_pro(dia_txt, titular, destaca="", etiqueta_txt="", persona="", fot
     if plantilla == "impacto":
         palabra = (destaca or titular).upper()
         tam = 600
-        while tam > 120 and fuente(ANTON, tam).getlength(palabra) > W * 0.78:
+        while tam > 120 and fuente(ANTON, tam).getlength(palabra) > W * 0.70:
             tam -= 10
         f = fuente(ANTON, tam)
         capa = Image.new("RGBA", (W, H))
         d = ImageDraw.Draw(capa)
         y = int(H * 0.16)                              # por debajo del logo y del distintivo
-        cx = W * 0.45                                  # algo a la izquierda: la persona tapa solo el final
+        cx = W * 0.40                                  # algo a la izquierda: la persona tapa solo el final
         d.text((cx + 12, y + 16), palabra, font=f, fill=(0, 0, 0, 170), anchor="mt")
         capa = capa.filter(ImageFilter.GaussianBlur(10))
         ImageDraw.Draw(capa).text((cx, y), palabra, font=f, fill=AMARILLO + (255,), anchor="mt",
                                   stroke_width=5, stroke_fill=(10, 10, 14, 255))
         im.alpha_composite(capa)                       # primero el texto...
         if c is not None:                              # ...y la persona delante
-            protagonista(im, c, centro=(0.86, 0.64), alto_cara=0.25)
+            protagonista(im, c, centro=(0.80, 0.60), alto_cara=0.34)
         oscurece_abajo(im, 300, 170)
         if etiqueta_txt:
-            k = _kicker(etiqueta_txt.upper(), 58)
+            k = _kicker(etiqueta_txt.upper(), 84)        # legible en el movil (director de arte, 4-nov)
             im.alpha_composite(k, (90, H - k.height - 80))
     else:
         oscurece_abajo(im, 620, 200)

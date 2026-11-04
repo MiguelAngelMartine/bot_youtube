@@ -43,7 +43,7 @@ Por orden:
 2. **Gesto**: tiene que contar la noticia (serio en una dimisión, enfadado en un ataque, satisfecho en una victoria). Una foto oficial sonriente para una mala noticia es un error.
 3. **Fondo**: una foto del lugar o del asunto (`--fondo`), aunque quede desenfocada: da contexto y profundidad.
 4. **Distintivo** `--insignia` («ESPECIAL» en los especiales; «ÚLTIMA HORA» solo si lo es).
-5. **Haz dos versiones** (otra frase, otra foto u otro encuadre, con `--salida miniatura_b.png`), míralas con Read **también en pequeño** (como se ven en el móvil: que el titular y la cara se lean a 320 px de ancho) y quédate con la mejor como `miniatura.png`.
+5. **Haz tres versiones** con `--salida miniatura_1.png`, `miniatura_2.png` y `miniatura_3.png` (por ejemplo, dos `impacto` con distinta palabra o foto y una `informativo`) y pásaselas al **director de arte** (Gemini, gratis; decisión del usuario del 4-nov-2026): `.venv/bin/python director_arte.py <fecha> miniatura_1.png miniatura_2.png miniatura_3.png`. Puntúa cada una (legible en el móvil, cara, claridad, composición, acabado, veracidad), escribe `revision/miniatura.md` y copia la elegida a `miniatura.png` si llega a 7. Si sale con código 1, aplica sus «Mejora:» y repite (máximo 2 veces). Si sale con código 2 (Gemini no responde), elige tú mirándolas con Read, también en pequeño. No hace falta que mires tú las tres con Read si el director ha elegido: basta con mirar la elegida.
 6. **Lista de comprobación** antes de darla por buena: cara grande y nítida; sin cortes rectos ni restos de otras personas; titular coherente y legible en pequeño; nada tapa la cara; colores del canal; ninguna foto de víctimas.
 
 ## Impactante y elaborada (decisión del usuario del 3-nov-2026)
