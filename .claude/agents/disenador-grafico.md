@@ -25,7 +25,8 @@ Las letras y los colores son llamativos; **el texto es literal**:
 
 ## Plantillas profesionales (4-nov-2026)
 Usa siempre `--plantilla` (salvo `--sobrio` y `--rival`, que tienen su propio diseño):
-- **`informativo`** (por defecto): antetítulo rojo recto (`--etiqueta`, quién o de qué va), titular en tipografía condensada Anton, blanco, recto y sin degradados, con la palabra clave (`--destaca`) en negro sobre franja amarilla; cara grande a la derecha. Titular de 2 a 5 palabras.
+**Preferencia del usuario (4-nov-2026): la plantilla `impacto`.** Úsala siempre que la noticia se pueda contar con una palabra clave literal y fuerte; si no, `informativo`.
+- **`informativo`**: antetítulo rojo recto (`--etiqueta`, quién o de qué va), titular en tipografía condensada Anton, blanco, recto y sin degradados, con la palabra clave (`--destaca`) en negro sobre franja amarilla; cara grande a la derecha. Titular de 2 a 5 palabras.
 - **`impacto`**: una sola palabra clave gigante («DIMITE», «IMPUTADO», «RUPTURA») con la persona delante tapando solo una esquina, y el antetítulo abajo. Para las noticias de una palabra.
 Comprueba que el titular se lee entero y que la persona no tapa letras clave.
 
