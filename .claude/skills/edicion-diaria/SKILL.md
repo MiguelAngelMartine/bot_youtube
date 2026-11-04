@@ -25,8 +25,10 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - `recopilador` («fecha <fecha>») → `noticias.json`, `temas.json`.
    - Luego descarga el texto completo de las noticias: `.venv/bin/python articulos.py <fecha>` (→ `articulos/`, unos 20 s).
    - Luego `documentalista` (contexto).
-   - Luego **un `investigador` por cada uno de los 6 primeros temas, todos en paralelo** (6 bastan para 4-5 bloques y los breves; ahorro de tokens del 3-nov-2026) («fecha <fecha>, tema <id>») → `dossier/<id>.md`.
-   - **En campaña electoral (hasta el 29N), uno más en paralelo: «fecha <fecha>, tema frases»** → `dossier/frases.md`, con las frases del día de todos los partidos y sus respuestas (bloque «La campaña en frases»).
+   - Luego **los dossieres de los 6 primeros temas con Gemini** (decisión del usuario del 4-nov-2026: no gasta el plan de Claude), uno tras otro en un solo comando (unos 25 s cada uno):
+     `for t in <id1> <id2> <id3> <id4> <id5> <id6> frases; do .venv/bin/python investiga.py <fecha> $t || echo "FALLA $t"; done`
+     (`frases`, solo en campaña electoral, hasta el 29N: las frases del día de todos los partidos para el bloque «La campaña en frases»). `investiga.py` comprueba solo que cada cita esté literal en los artículos y marca con ⚠️ las que no.
+   - **Solo para los temas que digan `FALLA`** (Gemini saturado o sin cuota), lanza un `investigador` de Claude («fecha <fecha>, tema <id>»), en paralelo.
 2. **Consejo de redacción.** `jefe-de-edicion` («fecha <fecha>») → `escaleta.json`.
 3. **Redacción.** Un `redactor` por bloque de la escaleta, más uno para los breves, **en paralelo** («fecha <fecha>, bloque NN» / «fecha <fecha>, breves») → `bloques/NN.json`.
 4. **Mesa de control.**

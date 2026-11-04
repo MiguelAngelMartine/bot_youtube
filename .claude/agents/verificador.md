@@ -21,7 +21,8 @@ Para cada frase y cada dato en pantalla:
    - un hecho que no está en el dossier;
    - una deducción presentada como hecho (incluidas las sumas o restas que no dé la fuente);
    - un conector que afirma algo que la fuente no dice: causa («por eso», «así que», «tras») u orden temporal que no consta;
-   - un dato ya desmentido.
+   - un dato ya desmentido;
+   - una cita marcada con ⚠️ en el dossier (no está literal en las fuentes). Los dossieres hechos con Gemini (`investiga.py`) se revisan con el mismo rigor: contrasta con los artículos de `articulos/` cualquier dato que vaya al vídeo.
    - Atención especial a lo que **no se dice**: si el dossier tiene una versión contraria y el bloque solo da una, es un problema.
 3. Escribe `dia/<fecha>/revision/verificacion.md`: una sección por bloque con el veredicto **APTO** o **CORREGIR** y, por cada problema, la frase exacta, qué dice la fuente (con medio) y el cambio propuesto.
 
