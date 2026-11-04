@@ -40,11 +40,11 @@ Las tareas mecánicas (descargar RSS, renderizar el vídeo, dibujar la miniatura
 ## Horario de la jornada
 El vídeo se publica **por la tarde** para que tenga horas de visualizaciones el mismo día:
 - **todo el día, cada hora:** el servidor recoge noticias y textos completos (bots del servidor);
-- **15:00:** arranca la redacción con lo publicado desde la edición anterior (unas 24 h, hasta las 15:00);
+- **12:00:** arranca la redacción con lo publicado desde la edición anterior (unas 24 h, hasta las 12:00);
 - **~16:30:** vídeo, miniatura y textos listos; aviso por Telegram al director;
 - **17:00-18:00:** el director revisa y publica.
 
-Lo que pase después de las 15:00 entra en el episodio del día siguiente, y la fe de erratas recoge cualquier cambio.
+Lo que pase después de las 12:00 entra en el episodio del día siguiente, y la fe de erratas recoge cualquier cambio.
 
 ## Puestos
 
