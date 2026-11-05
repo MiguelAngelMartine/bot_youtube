@@ -12,7 +12,7 @@ RAIZ = Path(__file__).parent
 MEDIOS = ["El País", "elDiario", "Público", "La Vanguardia", "RTVE", "Europa Press", "20minutos", "20 minutos",
           "El Confidencial", "El Mundo", "ABC", "La Razón", "EFE", "Telecinco", "Antena 3", "laSexta", "La Sexta",
           "Cadena SER", "COPE", "Onda Cero", "El Español", "OKdiario", "Vozpópuli", "The Objective"]
-SILENCIO = re.compile(r"no consta (su |ninguna )?respuesta|no ha (respondido|contestado)|sin respuesta (del|de la|de los)", re.I)
+SILENCIO = re.compile(r"no consta (su |ninguna )?(respuesta|réplica)|no ha (respondido|contestado|replicado)|sin (respuesta|réplica)|no hubo (respuesta|réplica)", re.I)
 PROHIBIDAS = ["zasca", "le dio un repaso", "humill", "destroz", "se retrata", "escándalo", "vergonzoso", "histórico",
               "ni más ni menos", "y es que", "ojo,", "atentos"]
 CIFRA = re.compile(r"\d")
