@@ -19,7 +19,7 @@ Comprueba en cada bloque:
    - etiquetas («ultraderecha», «extrema izquierda») que no sean citas atribuidas;
    - verbos de atribución cargados: «admite», «reconoce» y «confiesa» implican culpa; prefiere «dice», «afirma» y «sostiene», salvo que la fuente lo presente así;
    - conectores que toman partido: un «sin embargo», «en cambio» o «pese a» que enfrenta a una parte con otra, o un «aun así» que resta valor a lo que dice alguien; muletillas de tertulia («ojo», «y es que»).
-4. **Cruces de declaraciones:** ¿cada ataque tiene su respuesta (o se dice que no la hay)? ¿Se ha elegido la frase más fuerte de cada parte, o la más fuerte de una y la más floja de otra? ¿La última palabra o la frase más llamativa son siempre del mismo lado? ¿Hay verbos o fórmulas que declaran un ganador («zasca», «le dio un repaso», «se retrata»)?
+4. **Cruces de declaraciones:** si hay réplica, ¿se ha incluido? (si no la hay, va solo la frase y **no** se anuncia el silencio: márcalo como CORREGIR si aparece «no ha respondido» o similar) ¿Se ha elegido la frase más fuerte de cada parte, o la más fuerte de una y la más floja de otra? ¿La última palabra o la frase más llamativa son siempre del mismo lado? ¿Hay verbos o fórmulas que declaran un ganador («zasca», «le dio un repaso», «se retrata»)?
 5. **Encuadre:** el orden y el gancho, ¿favorecen a alguien? ¿Se presenta una encuesta como tendencia?
 6. **Escenas:** las tarjetas tienen el mismo formato para todos; el sello, la cifra y el titular de pantalla no son valorativos.
 
