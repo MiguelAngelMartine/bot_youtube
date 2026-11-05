@@ -28,6 +28,7 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
+AZURE_TEMP = "0.8"                                 # entonacion intermedia (elegida por el usuario el 5-nov-2026)
 AZURE_MAX = 2500                                   # caracteres por peticion (el plan F0 admite hasta 3.000)
 WHISPER = "tiny"                                   # 4x mas rapido que el audio en el servidor
 SESGO = {"tiny": 0.085, "base": 0.0}               # retraso medio medido contra los tiempos exactos de edge-tts (2-nov)
@@ -127,7 +128,7 @@ def _azure_mp3(texto, mp3):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}'><prosody rate='{AZURE_VEL}'>{escape(texto)}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{AZURE_VEL}'>{escape(texto)}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
