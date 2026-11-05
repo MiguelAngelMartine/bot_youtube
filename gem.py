@@ -44,7 +44,10 @@ def pide(partes, como_json=False, temperatura=0.2):
         conf["responseMimeType"] = "application/json"
     k = _clave()
     limite = time.time() + LIMITE_S
-    for modelo in MODELOS:
+    agotados = set()                                    # cuota diaria gastada: ese modelo, fuera hasta mañana
+    for modelo in MODELOS * 3:                          # vueltas por la lista mientras quede tiempo
+        if modelo in agotados:
+            continue
         cfg = dict(conf, thinkingConfig={"thinkingLevel": "low"}) if modelo.startswith("gemini-3") else conf   # mas rapido
         for intento in range(3):
             if time.time() > limite:                    # saturado: mejor que lo haga Claude que esperar
@@ -67,8 +70,13 @@ def pide(partes, como_json=False, temperatura=0.2):
                         return json.loads(txt)
                     except ValueError:
                         break                           # JSON roto: prueba otro modelo
+            if r.status_code == 429 and "quota" in r.text.lower():
+                agotados.add(modelo)                    # sin cuota hoy: al siguiente modelo, sin esperar
+                break
             if r.status_code in (429, 500, 503):
-                time.sleep(10 * (intento + 1))
+                if intento:                             # saturado dos veces: prueba otro modelo y vuelve luego
+                    break
+                time.sleep(8)
                 continue
             if r.status_code == 400 and "thinking" in r.text.lower():
                 cfg = conf                              # este modelo no admite el ajuste: sin el

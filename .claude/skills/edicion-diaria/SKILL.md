@@ -52,6 +52,10 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - Haz una copia ligera para el móvil: `.venv/bin/python control_calidad.py <fecha> --ligero` (deja `episodio_720p.mp4`).
    - Sube el vídeo a YouTube **como privado**: `.venv/bin/python subir.py <fecha>` (título, descripción, etiquetas, miniatura y subtítulos de `publicacion.md`; deja `youtube.json` con el enlace). Si falla, anótalo en el parte y sigue: el director puede subirlo a mano.
    - Avisa al director: `.venv/bin/python notifica.py <fecha>`, que manda por Telegram el parte resumido y el enlace al vídeo privado en YouTube Studio.
+   - **Shorts** (decisión del usuario del 5-nov-2026), siempre **después** de subir el vídeo largo, que va primero:
+     - `.venv/bin/python shorts_dia.py <fecha>`: elige hasta 3 frases con gancho (comprobadas literales, de partidos distintos), renderiza un Short por frase con su portada y deja `dia/<fecha>/shorts/hoja.png` (~3 min). Si sale con 2, hoy no hay Shorts: anótalo en el parte y sigue (no gastes agentes en ello).
+     - Mira `hoja.png` (una fila por Short): foto de la persona correcta, cita legible, nada tapado. Si un Short está mal, borra su `short_N.json` y su `short_N.mp4`.
+     - Sube los buenos como **privados**: `.venv/bin/python subir.py <fecha> shorts` (avisa solo por Telegram con los enlaces, el vídeo y la portada de cada uno). Si falla, anótalo en el parte.
 8. **Archivo.** `documentalista` («archivo <fecha>»).
 
 ## Reglas

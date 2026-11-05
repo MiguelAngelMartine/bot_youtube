@@ -471,11 +471,22 @@ def _txt_capa(lineas, f, destaca, interlinea=0.98):
             tw = medir.textlength(w, font=f)
             clave = w.lower().strip(LIMPIA) in destaca
             if clave:                                   # franja amarilla ajustada a la caja real de las letras
-                bx0, by0, bx1, by1 = d.textbbox((x, y), w, font=f)
-                caja = [bx0 - 18, by0 - 14, bx1 + 18, by1 + 14]
+                nucleo = w.strip(LIMPIA) or w           # la puntuación («, », comas, puntos) queda fuera de la franja
+                ini = w.find(nucleo)
+                pre, post = w[:ini], w[ini + len(nucleo):]
+                xn = x + (medir.textlength(pre, font=f) + 16 if pre else 0)
+                bx0, by0, bx1, by1 = d.textbbox((xn, y), nucleo, font=f)
+                caja = [bx0 - (12 if pre else 18), by0 - 14, bx1 + (12 if post else 18), by1 + 14]
                 ds.rectangle([c + 10 for c in caja], fill=(0, 0, 0, 170))
                 d.rectangle(caja, fill=AMARILLO + (255,))
-                d.text((x, y), w, font=f, fill=(12, 12, 16, 255))
+                d.text((xn, y), nucleo, font=f, fill=(12, 12, 16, 255))
+                xp = caja[2] + 2
+                for trozo, xt in ((pre, x), (post, xp)):
+                    if trozo:
+                        ds.text((xt + 8, y + 10), trozo, font=f, fill=(0, 0, 0, 200))
+                        d.text((xt, y), trozo, font=f, fill=(255, 255, 255, 255), stroke_width=3,
+                               stroke_fill=(10, 10, 14, 255))
+                tw = (xp + medir.textlength(post, font=f) if post else caja[2] - 18) - x
             else:
                 ds.text((x + 8, y + 10), w, font=f, fill=(0, 0, 0, 200))
                 d.text((x, y), w, font=f, fill=(255, 255, 255, 255), stroke_width=3, stroke_fill=(10, 10, 14, 255))

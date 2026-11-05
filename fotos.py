@@ -82,7 +82,12 @@ def commons_categoria(q, n):
     sub = requests.get(API_COMMONS, headers=UA, timeout=30, params={"action": "query", "list": "categorymembers",
                        "cmtitle": cat, "cmtype": "subcat", "cmlimit": 50, "format": "json"}).json()
     subs = [s["title"] for s in sub.get("query", {}).get("categorymembers", [])]
+    for s_ in [s for s in subs if "by year" in s.lower() or "por año" in s.lower()]:   # un nivel más: «X by year»
+        r2 = requests.get(API_COMMONS, headers=UA, timeout=30, params={"action": "query", "list": "categorymembers",
+                          "cmtitle": s_, "cmtype": "subcat", "cmlimit": 50, "format": "json"}).json()
+        subs += [x["title"] for x in r2.get("query", {}).get("categorymembers", [])]
     años = sorted([s for s in subs if _re.search(r"20\d\d", s)], key=lambda s: -int(_re.search(r"20\d\d", s).group()))
+    años = [s for s in subs if "portrait" in s.lower() or "retrato" in s.lower()] + años
     out, vistos = [], set()
     for c_ in [cat] + años[:4]:
         res = requests.get(API_COMMONS, headers=UA, timeout=60, params={
@@ -171,6 +176,44 @@ def moncloa(q, n):
             if len(out) >= n:
                 return out
     return out
+
+
+def retrato_wikidata(nombre):
+    """El retrato principal de la persona en Wikidata (propiedad P18): suele ser un primer plano oficial con licencia
+    libre, en Commons. Devuelve una candidata con el mismo formato que las demás, o None (5-nov-2026)."""
+    import re as _re
+    r = requests.get("https://www.wikidata.org/w/api.php", headers=UA, timeout=30, params={
+        "action": "wbsearchentities", "search": nombre, "language": "es", "type": "item", "limit": 3, "format": "json"}).json()
+    import unicodedata as _u
+
+    def _pal(t):
+        return set(_re.findall(r"\w+", _u.normalize("NFKD", (t or "").lower()).encode("ascii", "ignore").decode()))
+    for ent in r.get("search", []):
+        # la misma persona: todas las palabras del nombre en la etiqueta (o en el alias que ha casado) y que sea humano
+        if not _pal(nombre) <= (_pal(ent.get("label")) | _pal(ent.get("match", {}).get("text"))):
+            continue
+        d = requests.get("https://www.wikidata.org/w/api.php", headers=UA, timeout=30, params={
+            "action": "wbgetclaims", "entity": ent["id"], "format": "json"}).json().get("claims", {})
+        if not any(c["mainsnak"].get("datavalue", {}).get("value", {}).get("id") == "Q5" for c in d.get("P31", [])):
+            continue
+        fs = d.get("P18", [])
+        if not fs:
+            continue
+        fichero = "File:" + fs[0]["mainsnak"]["datavalue"]["value"]
+        ii = requests.get(API_COMMONS, headers=UA, timeout=30, params={
+            "action": "query", "titles": fichero, "prop": "imageinfo", "iiprop": "url|size|extmetadata", "iiurlwidth": 1280,
+            "iiextmetadatafilter": "LicenseShortName|Artist", "format": "json"}).json()
+        pg = next(iter(ii.get("query", {}).get("pages", {}).values()), {})
+        info = (pg.get("imageinfo") or [{}])[0]
+        lic = info.get("extmetadata", {}).get("LicenseShortName", {}).get("value", "")
+        if not info or not _lic_ok(lic):
+            continue
+        autor = _re.sub(r"<[^>]+>", "", info.get("extmetadata", {}).get("Artist", {}).get("value", "")).strip()[:60]
+        return {"fuente": "Wikidata (retrato principal)", "licencia": lic, "orden": 0, "ancho": info["width"],
+                "alto": info["height"], "autor": autor or "Wikimedia Commons", "titulo": fichero[:120],
+                "url": info.get("thumburl") or info["url"], "miniatura": info.get("thumburl") or info["url"],
+                "pagina": info.get("descriptionurl", "")}
+    return None
 
 
 def wikimedia(q, n):

@@ -96,6 +96,26 @@ def main(dia_txt, error=None, video=None, texto_video=None):
     print("aviso enviado")
 
 
+def aviso_shorts(dia_txt, hechos):
+    """Shorts subidos como privados (5-nov-2026): enlaces de Studio y, de cada uno, el vídeo y su portada."""
+    from pathlib import Path
+    tok, chat = credenciales()
+    api = f"https://api.telegram.org/bot{tok}"
+    txt = [f"📱 El Hoyformativo · {dia_txt}: {len(hechos)} Shorts subidos a YouTube como PRIVADOS, para revisar y publicar:"]
+    txt += [f"{k}. {h['titulo']}\n{h['studio']}" + (f"\n({h['aviso']})" if h.get("aviso") else "")
+            for k, h in enumerate(hechos, 1)]
+    envia(api, "sendMessage", data={"chat_id": chat, "text": "\n\n".join(txt)[:4000]}, timeout=30)
+    for k, h in enumerate(hechos, 1):
+        portada = Path(h["portada"])
+        if portada.exists():
+            with open(portada, "rb") as fh:
+                envia(api, "sendPhoto", data={"chat_id": chat, "caption": f"Short {k} · portada"}, files={"photo": fh},
+                      timeout=60)
+        v = portada.with_name(portada.name.replace("_portada.png", ".mp4"))
+        if v.exists():
+            manda_video(api, chat, v, f"Short {k}: {h['titulo']}")
+
+
 def aviso(dia_txt, texto):
     """Mensaje corto informativo (por ejemplo, que empieza la jornada)."""
     tok, chat = credenciales()

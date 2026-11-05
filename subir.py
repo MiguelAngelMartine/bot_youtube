@@ -3,6 +3,7 @@
 Uso:
   python subir.py autorizar            una sola vez: espera en el puerto 8765 la autorizacion del navegador
                                        (desde el PC: ssh -L 8765:localhost:8765 miguel@192.168.1.129 y abrir el enlace)
+  python subir.py AAAA-MM-DD shorts   sube los Shorts del día (dia/<fecha>/shorts/short_N.mp4), privados, con portada
   python subir.py AAAA-MM-DD [--publico-no]   sube dia/<fecha>/episodio.mp4 con los datos de publicacion.md,
                                        la miniatura y los subtitulos; escribe dia/<fecha>/youtube.json con el enlace
 
@@ -154,8 +155,89 @@ def subir(dia_txt):
         print(f"AVISO: no se pudo avisar por Telegram ({e})")
 
 
+def _sube(yt, ruta, cuerpo):
+    from googleapiclient.http import MediaFileUpload
+    pet = yt.videos().insert(part="snippet,status", body=cuerpo,
+                             media_body=MediaFileUpload(str(ruta), mimetype="video/mp4", chunksize=8 * 1024 * 1024,
+                                                        resumable=True))
+    resp = None
+    while resp is None:
+        _, resp = pet.next_chunk()
+    return resp["id"]
+
+
+MAX_SHORTS = 3        # cuota de la API: ~6 subidas al día; el vídeo largo y sus repeticiones van primero
+
+
+def subir_shorts(dia_txt):
+    """Shorts del día (decisión del usuario del 5-nov-2026), PRIVADOS como el vídeo largo: el usuario los revisa y
+    publica. De cada día queda solo la última tanda: los anteriores que sigan privados se borran."""
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaFileUpload
+    dia = RAIZ / "dia" / dia_txt
+    carpeta = dia / "shorts"
+    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))[:MAX_SHORTS]
+    shorts = [f for f in shorts if f.with_suffix(".mp4").exists()]
+    if not shorts:
+        raise SystemExit("no hay Shorts renderizados")
+    yt = build("youtube", "v3", credentials=credenciales())
+    reg = carpeta / "youtube.json"
+    for v in (json.loads(reg.read_text(encoding="utf-8")) if reg.exists() else []):
+        r = yt.videos().list(part="status", id=v["id"]).execute().get("items", [])
+        if r and r[0]["status"]["privacyStatus"] == "private":
+            yt.videos().delete(id=v["id"]).execute()
+            print(f"short anterior {v['id']} (privado) borrado")
+    largo = json.loads((dia / "youtube.json").read_text(encoding="utf-8")) if (dia / "youtube.json").exists() else {}
+    hechos = []
+    for f in shorts:
+        S = json.loads(f.read_text(encoding="utf-8"))
+        titulo = S["titulo"].strip()
+        if "#shorts" not in titulo.lower():
+            titulo = f"{titulo} #Shorts"
+        cita = f"«{S['cita'].strip().rstrip('.')}», {S['quien']}"
+        if S.get("replica"):
+            cita += f"\n«{S['replica']['cita'].strip().rstrip('.')}», responde {S['replica']['quien']}"
+        partes = [cita, "", S["contexto"].strip(), "",
+                  "Todo el cruce y el resto de la política del día, en el vídeo de hoy" +
+                  (f": {largo['url']}" if largo.get("url") else "."),
+                  "", f"Fuente: {S.get('fuente', '')}" + (f" {S['enlace']}" if S.get("enlace") else "")]
+        cr = S.get("creditos") or []
+        if cr:
+            partes += ["", "Imágenes: " + "; ".join(cr)]
+        if any("Ilustración IA" in c for c in cr):
+            partes += ["Ilustración generada con IA en lugar de una foto (no había foto libre de la persona); "
+                       "no representa a nadie en concreto."]
+        partes += ["", "#Shorts #PolíticaEspañola #ElHoyformativo"]
+        cuerpo = {"snippet": {"title": titulo[:100], "description": "\n".join(partes)[:5000], "categoryId": "25",
+                              "tags": ["política", "España", "Shorts", S["quien"]] +
+                                      ([S["replica"]["quien"]] if S.get("replica") else []),
+                              "defaultLanguage": "es", "defaultAudioLanguage": "es"},
+                  "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
+        vid = _sube(yt, f.with_suffix(".mp4"), cuerpo)
+        print(f"short {f.stem} -> {vid} (PRIVADO)")
+        aviso = ""
+        portada = carpeta / f"{f.stem}_portada.png"
+        if portada.exists():                                # YouTube no siempre la muestra en los Shorts; se intenta
+            try:
+                yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(portada), mimetype="image/png")).execute()
+            except Exception as e:
+                aviso = f"miniatura no puesta ({type(e).__name__})"
+        hechos.append({"id": vid, "url": f"https://youtube.com/shorts/{vid}", "titulo": titulo,
+                       "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada)})
+        reg.write_text(json.dumps(hechos, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(json.dumps(hechos, ensure_ascii=False, indent=1))
+    try:
+        import notifica
+        notifica.aviso_shorts(dia_txt, hechos)
+        print("aviso por Telegram enviado")
+    except (SystemExit, Exception) as e:
+        print(f"AVISO: no se pudo avisar por Telegram ({e})")
+
+
 if __name__ == "__main__":
     if sys.argv[1:2] == ["autorizar"]:
         autorizar()
+    elif sys.argv[2:3] == ["shorts"]:
+        subir_shorts(sys.argv[1])
     else:
         subir(sys.argv[1])
