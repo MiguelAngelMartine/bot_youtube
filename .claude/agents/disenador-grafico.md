@@ -47,7 +47,7 @@ Por orden:
 6. **Lista de comprobación** antes de darla por buena: cara grande y nítida; sin cortes rectos ni restos de otras personas; titular coherente y legible en pequeño; nada tapa la cara; colores del canal; ninguna foto de víctimas.
 
 ## Impactante y elaborada (decisión del usuario del 3-nov-2026)
-**La noticia de la miniatura es la más polémica o impactante del día**, no necesariamente la primera: el choque entre dos líderes, la frase más dura, la decisión con más consecuencias. Tiene que salir en el vídeo y el texto tiene que ser literal.
+**La noticia de la miniatura es la más polémica o impactante del día** (las mejores frases suelen estar en las redes oficiales de los políticos: `redes.md` y el dossier `frases`), no necesariamente la primera: el choque entre dos líderes, la frase más dura, la decisión con más consecuencias. Tiene que salir en el vídeo y el texto tiene que ser literal.
 Recursos de `miniatura.py` (además del estilo base):
 - **`--rival <foto>`: enfrentamiento cara a cara** cuando la polémica es entre dos personas (la una responde a la otra, se acusan, compiten): las dos de frente, una a cada lado de una diagonal amarilla, y el titular centrado abajo. La etiqueta dice quién habla y de qué («Feijóo, sobre Urda»). Las dos tienen que salir en el vídeo con ese asunto; es también lo más neutral, porque se ven las dos partes. Ejemplo del 2-nov: `--persona retrato_feijoo.jpg --rival retrato_sanchez.jpg --titular "Que dé la cara Sánchez" --destaca "Sánchez" --etiqueta "Feijóo, sobre Urda"`.
 - **`--inserto <foto>`: foto secundaria en polaroid inclinada** (el lugar, el edificio o el objeto de la noticia) cuando hay un solo protagonista. Da contexto y riqueza.

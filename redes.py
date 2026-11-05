@@ -20,6 +20,8 @@ UA = {"User-Agent": "Mozilla/5.0 (ElHoyformativo; +https://github.com/MiguelAnge
 # (partido o persona, tipo, dirección). Revisadas el 4-nov-2026; las cuentas de Bluesky, por seguidores y descripción.
 FUENTES = [
     ("PP", "web_pp", "https://www.pp.es/actualidad"),
+    ("PP · Isabel Díaz Ayuso / PP de Madrid", "rss", "https://www.ppmadrid.es/feed/"),
+    ("Comunidad de Madrid · Isabel Díaz Ayuso", "rss_ayuso", "https://www.comunidad.madrid/rss.xml"),
     ("PNV", "web_pnv", "https://www.eaj-pnv.eus/es/noticias"),
     ("Vox · Santiago Abascal", "telegram", "santiagoabascal"),
     ("Vox · Jorge Buxadé", "telegram", "Jorgebuxade"),
@@ -92,6 +94,11 @@ def rss(url):
     return out
 
 
+def rss_ayuso(url):
+    """Comunidad de Madrid: solo lo que habla de la presidenta (Ayuso vende mucho: decisión del usuario del 5-nov-2026)."""
+    return [x for x in rss(url) if re.search(r"Ayuso|la presidenta", x[1], re.I)]
+
+
 def _web(url, patron, max_art=14):
     """Lista de noticias de una web de partido: titular (suelen llevar la frase literal) y entradilla de cada una."""
     h = requests.get(url, headers=UA, timeout=25).text
@@ -122,7 +129,7 @@ def main(fecha, horas=30):
     dia = RAIZ / "dia" / fecha
     dia.mkdir(parents=True, exist_ok=True)
     desde = datetime.now(timezone.utc) - timedelta(hours=horas)
-    funcs = {"bluesky": bluesky, "telegram": telegram, "rss": rss, "web_pp": web_pp, "web_pnv": web_pnv}
+    funcs = {"bluesky": bluesky, "telegram": telegram, "rss": rss, "rss_ayuso": rss_ayuso, "web_pp": web_pp, "web_pnv": web_pnv}
     datos, resumen = [], []
     for quien, tipo, dir_ in FUENTES:
         try:

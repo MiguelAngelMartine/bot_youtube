@@ -106,7 +106,7 @@ def dossier_frases(fecha):
         if citas:
             parrafos.append(cab + "\n" + "\n".join(citas[:12]))
     prompt = (f"Eres investigador de un informativo de política española neutral. Del {fecha}, en campaña electoral, "
-              f"recoge LAS FRASES DEL DÍA CON MÁS GANCHO de todos los partidos ({PARTIDOS}): mítines, entrevistas, "
+              f"recoge LAS FRASES DEL DÍA CON MÁS GANCHO de todos los partidos (sobre todo de sus redes oficiales: las publicaciones de abajo; y de Isabel Díaz Ayuso si ha dicho algo) ({PARTIDOS}): mítines, entrevistas, "
               f"ruedas de prensa y mensajes en X o redes que recogen los medios. Para cada ataque, la respuesta del "
               f"aludido si está en los textos. Busca el mismo número de frases por partido; si de alguno no hay, dilo.\n\n"
               f"{REGLAS}\n(En este dossier la sección «Cruce de declaraciones» es la principal; añade «## Frases sueltas» "
