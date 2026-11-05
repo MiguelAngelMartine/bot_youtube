@@ -36,7 +36,8 @@ para hacer un Short de 25-35 segundos con cada una. Reglas:
   intenciones ni añade lo que la persona «considera» si no está en el material.
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
-- "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice. Sin el nombre del canal.
+- "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice, con verbo neutro
+  («dice», «afirma», «responde a»; nunca «sentencia», «zanja», «estalla», «arremete»). Sin el nombre del canal.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "kicker": "...", "entrada": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
@@ -49,7 +50,7 @@ PUBLICACIONES OFICIALES DEL DÍA (redes.md: X, webs, Telegram, Bluesky):
 {redes}"""
 
 
-VALORATIVAS = ["arremete", "carga contra", "estalla", "zasca", "humill", "destroz", "contundente", "dura crítica",
+VALORATIVAS = ["arremet", "carga contra", "cargó contra", "cargan contra", "estall", "provoc", "respuesta", "respondi", "zasca", "humill", "destroz", "contundente", "dura crítica",
                "responde", "réplica", "contesta", "considera que", "polémic", "escándalo", "lapidari"]
 
 
@@ -113,6 +114,7 @@ def main(fecha, n=3):
         if s.get("partido") in partidos:
             print(f"  aviso: {s.get('partido')} repite protagonista (no había más partidos con frase válida)")
         partidos.add(s.get("partido"))
+        s["titulo"] = re.sub(r"\b(sentencia|zanja|estalla|arremete|carga|clama|lanza|suelta)\b", "dice", s.get("titulo", ""))
         buenos += 1
         cita = s["cita"].strip().rstrip(".")
         voz = f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"

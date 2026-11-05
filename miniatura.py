@@ -475,7 +475,8 @@ def _txt_capa(lineas, f, destaca, interlinea=0.98):
                 ini = w.find(nucleo)
                 pre, post = w[:ini], w[ini + len(nucleo):]
                 xn = x + (medir.textlength(pre, font=f) + 16 if pre else 0)
-                bx0, by0, bx1, by1 = d.textbbox((xn, y), nucleo, font=f)
+                bx0, _, bx1, _ = d.textbbox((xn, y), nucleo, font=f)
+                _, by0, _, by1 = d.textbbox((xn, y), "HQ", font=f)   # alto de la letra, sin tildes ni diéresis
                 caja = [bx0 - (12 if pre else 18), by0 - 14, bx1 + (12 if post else 18), by1 + 14]
                 ds.rectangle([c + 10 for c in caja], fill=(0, 0, 0, 170))
                 d.rectangle(caja, fill=AMARILLO + (255,))
