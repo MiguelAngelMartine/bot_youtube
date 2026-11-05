@@ -12,11 +12,16 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import requests
+import re
+
 import trafilatura
 
 RAIZ = Path(__file__).parent
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
       "Accept-Language": "es-ES,es;q=0.9"}
+
+
+TUITS = set()                                          # (cuenta, id, medio) de los tuits que incrustan los medios
 
 
 def baja(noticia):
@@ -27,6 +32,8 @@ def baja(noticia):
         r = requests.get(u, headers=UA, timeout=25)
         if r.status_code != 200:
             return None, f"HTTP {r.status_code}"
+        TUITS.update((u_, i_, noticia["medio"]) for u_, i_ in
+                     re.findall(r"https?://(?:twitter|x)\.com/([A-Za-z0-9_]+)/status(?:es)?/(\d+)", r.text))   # tuits incrustados (5-nov)
         txt = trafilatura.extract(r.text, include_comments=False, include_tables=False, favor_precision=True)
         if not txt or len(txt) < 300:
             return None, "sin texto extraible"
@@ -58,6 +65,7 @@ def main(dia_txt):
         else:
             fallos[n["medio"]] = fallos.get(n["medio"], 0) + 1
     (sal / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, indent=1), encoding="utf-8")
+    (sal / "tuits.json").write_text(json.dumps(sorted(TUITS), ensure_ascii=False, indent=1), encoding="utf-8")
     # cada noticia de temas.json apunta a su texto, para que el investigador lo encuentre sin buscar
     for t in temas:
         for n in t["noticias"]:

@@ -125,6 +125,63 @@ def web_pnv(url):
     return _web(url, r'href="(https://www\.eaj-pnv\.eus/es/noticias/\d+/[^"]+)"')
 
 
+CUENTAS_X = {h.lower() for h in (   # cuentas oficiales de X conocidas; ademas, cualquier autor que este en archivo/personas.json
+    "sanchezcastejon", "NunezFeijoo", "Santi_ABASCAL", "IdiazAyuso", "Yolanda_Diaz_", "gabrielrufian", "oscar_puente_",
+    "PSOE", "ppopular", "vox_es", "Sumar", "PODEMOS", "Esquerra_ERC", "JuntsXCat", "eajpnv", "ehbildu", "BNG_Nacionalista",
+    "mjmonteroc", "salvadorilla", "patxilopez", "avtorresp", "Ione_Belarra", "IreneMontero", "LaMoncloa", "desdelamoncloa",
+    "Congreso_Es", "ComunidadMadrid", "ppmadrid", "ivanedlm", "Jorgebuxade")}
+PARTIDOS = ("psoe", "partido popular", "vox", "sumar", "podemos", "esquerra", "junts", "pnv", "bildu", "bng", "compromís",
+            "más madrid", "gobierno de españa", "moncloa")
+
+
+def _norm(s):
+    import unicodedata
+    return unicodedata.normalize("NFKD", s.lower()).encode("ascii", "ignore").decode()
+
+
+def tuits_oficiales(dia, dias=3):
+    """Tuits que los medios incrustan en sus noticias (articulos.py guarda los enlaces), leídos con oEmbed, el servicio
+    oficial y gratuito de X para mostrar tuits. Solo cuentas de políticos y partidos (5-nov-2026)."""
+    f = dia / "articulos" / "tuits.json"
+    if not f.exists():
+        return []
+    personas = set()
+    pj = RAIZ / "archivo" / "personas.json"
+    if pj.exists():
+        personas = {_norm(n) for n in json.loads(pj.read_text(encoding="utf-8"))}
+    out, vistos = [], set()
+    for cuenta, tid, medio in json.loads(f.read_text(encoding="utf-8"))[:120]:
+        if tid in vistos or cuenta.lower() in ("x", "twitter", "i", "user_id", "intent", "share", "home"):
+            continue
+        vistos.add(tid)
+        try:
+            r = requests.get("https://publish.twitter.com/oembed", headers=UA, timeout=15,
+                             params={"url": f"https://x.com/{cuenta}/status/{tid}", "omit_script": "1"})
+        except requests.RequestException:
+            continue
+        if not r.ok:
+            continue
+        j = r.json()
+        autor = j.get("author_name", "")
+        oficial = (cuenta.lower() in CUENTAS_X or _norm(autor) in personas
+                   or any(p in _norm(autor) for p in PARTIDOS))
+        if not oficial:
+            continue
+        m = re.search(r"<p[^>]*>(.*?)</p>.*?&mdash;.*?</a>", j.get("html", ""), re.S)
+        texto = _limpia(m.group(1) if m else j.get("html", ""))
+        texto = re.sub(r"pic\.twitter\.com/\S+", "", texto).strip()
+        fecha = re.findall(r">([A-Z][a-z]+ \d{1,2}, \d{4})</a>", j.get("html", ""))
+        try:                                            # solo de los ultimos dias (fuera promociones y tuits antiguos)
+            d = datetime.strptime(fecha[-1], "%B %d, %Y").replace(tzinfo=timezone.utc)
+            if d < datetime.now(timezone.utc) - timedelta(days=dias):
+                continue
+        except (IndexError, ValueError):
+            continue
+        out.append({"quien": f"{autor} (@{cuenta})", "canal": f"X, incrustado en {medio}",
+                    "fecha": fecha[-1] if fecha else "", "texto": texto[:900], "enlace": f"https://x.com/{cuenta}/status/{tid}"})
+    return out
+
+
 def main(fecha, horas=30):
     dia = RAIZ / "dia" / fecha
     dia.mkdir(parents=True, exist_ok=True)
@@ -141,6 +198,9 @@ def main(fecha, horas=30):
         resumen.append(f"- {quien} ({tipo}): {len(recientes)} publicaciones")
         for d, t, l in recientes:
             datos.append({"quien": quien, "canal": tipo, "fecha": d.isoformat() if d else "", "texto": t[:900], "enlace": l})
+    tx = tuits_oficiales(dia)
+    resumen.insert(0, f"- X (tuits oficiales que incrustan los medios, vía oEmbed): {len(tx)} mensajes")
+    datos = tx + datos                                  # los tuits, primero: son los que más gancho tienen
     (dia / "redes.json").write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
     md = [f"# Lo que publican los partidos (últimas {horas} h, fuentes oficiales)", "", *resumen, ""]
     for x in datos:
