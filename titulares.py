@@ -21,17 +21,19 @@ from genera_video2 import AN, AL, AMARILLO, ROJO, BLANCO, suave
 ENTRA = 0.28                                  # s que tarda el titular en caer en su sitio
 
 
-def _fondo(ruta: Path | None, sobrio: bool):
+def _fondo(ruta: Path | None, sobrio: bool, blur: int = 3):
     """Fondo un poco mas grande que la pantalla para poder acercarse despacio (Ken Burns)."""
     if ruta is None or not ruta.exists():
         return G2.fondo_marca(1.0).resize((int(AN * 1.08), int(AL * 1.08))).convert("RGBA")
     f = ImageOps.fit(Image.open(ruta).convert("RGB"), (int(AN * 1.08), int(AL * 1.08)), Image.LANCZOS)
     if sobrio:  # 4-nov-2026: las fotos siempre a color (decision del usuario); lo sobrio va en la letra, la musica y el ritmo
         f = ImageEnhance.Color(f).enhance(0.8)
-    f = f.filter(ImageFilter.GaussianBlur(3))
+    f = f.filter(ImageFilter.GaussianBlur(blur))
+    f = ImageEnhance.Color(f).enhance(1.25 if not sobrio else 1.0)   # 6-nov: color con fuerza, nada de fondo apagado
     f = ImageEnhance.Brightness(f).enhance(0.55 if sobrio else 0.68)
     f = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
     f.alpha_composite(_oscuro().resize(f.size, Image.BILINEAR))    # la sombra de abajo va ya en la foto (una vez)
+    f.alpha_composite(_tinte(f.size, sobrio))                      # 6-nov: azul noche a la izquierda (texto) y rojo
     return f
 
 
@@ -56,11 +58,17 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
         ruta = carpeta / foto if foto else None
         if foto and ruta.exists() and foto in cred:
             usadas[foto] = cred[foto]
+        if (ruta is None or not ruta.exists()) and i is not None:   # 6-nov: nunca fondo vacío; la viñeta de su bloque
+            vins = sorted((carpeta.parent / "vinetas").glob(f"s{i}_*.jpg"))
+            ruta = vins[0] if vins else None
+        blur = 3
+        if (ruta is None or not ruta.exists()) and it.get("persona") in fotos:   # o la foto de la persona, desenfocada
+            ruta, blur = fotos[it["persona"]], 16
         persona = None
         if it.get("persona") and it["persona"] in fotos and fotos[it["persona"]].exists():
             pr = fotos[it["persona"]]
             c = M.recorte(pr)
-            persona = M.encuadre_cara(c, AN, AL, (0.75, 0.40), 0.30, suave=True)    # encuadre por la cara (4-nov)
+            persona = M.encuadre_cara(c, AN, AL, (0.76, 0.40), 0.40, suave=True)    # cara grande (6-nov: más impacto)
             if persona is None:
                 esc = min(900 / c.height, 900 / c.width)
                 cc, pad = M.silueta_suave(c.resize((int(c.width * esc), int(c.height * esc)), Image.LANCZOS))
@@ -74,7 +82,7 @@ def prepara(ve, secs, carpeta: Path, fotos: dict, cred: dict, usadas: dict):
             texto = texto.rotate(3, resample=Image.BICUBIC, expand=True)
         eti = M.etiqueta((it.get("etiqueta") or f"{k + 1} de {n}").upper(), sobrio)
         num = M.etiqueta(f"{k + 1}/{n}", sobrio, 44) if it.get("etiqueta") and not sobrio else None
-        tarjetas.append({"fondo": _fondo(ruta, sobrio), "persona": persona, "texto": texto, "eti": eti, "num": num,
+        tarjetas.append({"fondo": _fondo(ruta, sobrio, blur), "persona": persona, "texto": texto, "eti": eti, "num": num,
                          "sobrio": sobrio, "cuando": it.get("cuando")})
     return tarjetas
 
@@ -83,13 +91,20 @@ def cuadro(tj, tl, t_abs):
     """Una tarjeta en el instante tl (s desde que entra)."""
     f = tj["fondo"]
     z = 1.0 + 0.06 * min(tl / 6.0, 1.0)                       # acercamiento lento
+    if not tj["sobrio"]:                                       # golpe de cámara al entrar (6-nov: más impacto)
+        z += 0.07 * (1 - suave(min(1.0, tl / 0.3)))
     cw, ch = int(AN * 1.08 / z), int(AL * 1.08 / z)
     x0, y0 = (f.width - cw) // 2, (f.height - ch) // 2
     fr = G2.escala(f, (AN, AL), box=(x0, y0, x0 + cw, y0 + ch))
     if tj["persona"]:
         c, px, py = tj["persona"]
         a = suave(tl / 0.35)
-        G2.pega(fr, c, px + int(160 * (1 - a)), py, a)
+        if tj["sobrio"]:
+            G2.pega(fr, c, px + int(160 * (1 - a)), py, a)
+        else:                                                  # entra rápido y algo más grande, y se asienta
+            sp = 1.0 + 0.12 * (1 - suave(min(1.0, tl / 0.3)))
+            cc = c.resize((int(c.width * sp), int(c.height * sp)), Image.BILINEAR) if sp > 1.002 else c
+            G2.pega(fr, cc, px + int(220 * (1 - a)) - (cc.width - c.width) // 2, py - (cc.height - c.height) // 3, a)
     t = tj["texto"]
     if tj["sobrio"]:
         a = suave(tl / 0.5)
@@ -111,6 +126,29 @@ def cuadro(tj, tl, t_abs):
         fl = Image.new("RGBA", (AN, AL), (255, 255, 255, int(200 * (1 - tl / 0.12))))
         fr.alpha_composite(fl)
     return fr
+
+
+_tin = {}
+
+
+def _tinte(tam, sobrio):
+    """Luz de marca: azul noche intenso por la izquierda (donde va el titular) y un brillo rojo abajo a la derecha."""
+    k = (tam, sobrio)
+    if k not in _tin:
+        import numpy as np
+        w, h = tam
+        x = np.linspace(0, 1, w)[None, :]
+        y = np.linspace(0, 1, h)[:, None]
+        a_az = np.clip(1 - x / 0.7, 0, 1) ** 1.4 * 190
+        a_rj = np.clip(1 - np.hypot(x - 1.0, y - 1.0) / 0.75, 0, 1) ** 2 * (0 if sobrio else 120)
+        arr = np.zeros((h, w, 4), np.float32)
+        tot = a_az + a_rj + 1e-6
+        arr[..., 0] = (12 * a_az + 200 * a_rj) / tot
+        arr[..., 1] = (20 * a_az + 16 * a_rj) / tot
+        arr[..., 2] = (52 * a_az + 46 * a_rj) / tot
+        arr[..., 3] = np.clip(a_az + a_rj, 0, 215)
+        _tin[k] = Image.fromarray(arr.astype("uint8"), "RGBA")
+    return _tin[k]
 
 
 _osc = []

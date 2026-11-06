@@ -41,7 +41,8 @@ INTRO = 0.4        # el video entra directo con los titulares (sin cabecera ni p
 GOLPE = marca.DUR  # golpe de marca (logo y sintonia, marca.py) entre el sumario y el primer bloque
 CALIENTA = 40      # fotogramas que cada trozo dibuja sin grabar antes de empezar (la camara suaviza con ~0,2 s)
 CON_URNI = False                         # decision del usuario (2-nov-2026): Urni ya no sale en los videos (el logo sigue)
-BX, BY, BW, BH = 370, 200, 1510, 690     # ventana del tablero en pantalla; a la izquierda, la fuente y Urni
+BX, BY, BW, BH = 40, 178, 1840, 762      # ventana del escenario: de lado a lado (6-nov: más grande, sin columna lateral)
+LW = 1510                                 # ancho con el que se colocan las piezas del tablero (luego se amplían)
 AMARILLA = (255, 238, 150)               # nota amarilla (etiquetas y datos de contexto)
 CREMA = (255, 246, 196)
 
@@ -146,14 +147,15 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
     elif tipo == "citas":
         out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
         n = len(ve["items"])
-        col = (BW - 60) // n
-        ap = min(260, int(col * 0.56))
+        col = (LW - 60) // n
+        ap = min(340, int(col * 0.52))                    # 6-nov: polaroids más grandes (con dos, mucho más)
         for k, it in enumerate(ve["items"]):
             f, c = foto_de(it["nombre"], it.get("cargo", ""))
             ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
             x = 30 + col * k
             out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 100, ti))
-            out.append((nota(it["cita"], col - 40, 32, "Fuente: " + it["medio"]), x, 100 + ap + 150, ti + 0.6))
+            out.append((nota(it["cita"], col - 40, 36 if n < 3 else 32, "Fuente: " + it["medio"]), x, 100 + ap + 150,
+                        ti + 0.6))
     elif tipo == "posturas":
         out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
         cc = ve["centro"]
@@ -259,20 +261,72 @@ def tarjeta_fuente(txt):
     return _cache_fte[txt]
 
 
-def encaja(piezas):
-    """Tablero de la escena con la proporcion de la ventana y las piezas centradas en el, para que se vea entero."""
+_fondos = {}
+
+
+def fondo_vivo(ruta, w, h, sobrio=False):
+    """6-nov-2026 (el usuario: «parece un PowerPoint»): detrás de las piezas, la imagen del tema a pantalla completa,
+    desenfocada, oscurecida y con la luz de la marca, en vez del azul liso. Sin imagen, el tablero de siempre."""
+    k = (str(ruta), w, h, sobrio)
+    if k not in _fondos:
+        if ruta is None or not Path(ruta).exists():
+            _fondos[k] = C.tablero_base(h, w)
+        else:
+            im = ImageOps.fit(Image.open(ruta).convert("RGB"), (w, h), Image.LANCZOS, centering=(0.5, 0.35))
+            im = im.filter(ImageFilter.GaussianBlur(max(6, w // 110)))
+            im = ImageEnhance.Color(im).enhance(0.9 if sobrio else 1.3)
+            im = ImageEnhance.Brightness(im).enhance(0.42 if sobrio else 0.5).convert("RGBA")
+            import titulares as TIT
+            im.alpha_composite(TIT._tinte((w, h), sobrio))
+            _fondos[k] = im
+    return _fondos[k]
+
+
+def fondo_de(ve, foto, vin, fotos, bloque_img):
+    """La imagen del tema de una escena: su foto, su viñeta, la foto de alguien que sale en ella o la del bloque."""
+    if foto:
+        return foto[0]
+    if vin:
+        return vin[min(vin)]
+    txt = json.dumps(ve, ensure_ascii=False, default=str)
+    for n, f in fotos.items():
+        if n and n in txt and Path(f).exists():
+            return f
+    return bloque_img
+
+
+def linea_fuente(txt):
+    k = ("linea", txt)
+    if k not in _cache_fte:
+        f1, f2 = estrecha(28), fuente("Inter-Regular.ttf", 22)
+        et = "FUENTES" if any(c_ in txt for c_ in "·,") else "FUENTE"
+        md = ImageDraw.Draw(Image.new("L", (1, 1)))
+        w1 = int(md.textlength(et, font=f1))
+        ls = C.lineas(txt, f2, 560 - w1)[:2]
+        im = Image.new("RGBA", (600, 64))
+        d = ImageDraw.Draw(im)
+        d.text((0, 4), et, font=f1, fill=AMARILLO + (255,))
+        for j, l in enumerate(ls):
+            d.text((w1 + 14, 6 + 27 * j), l, font=f2, fill=(215, 222, 235, 255))
+        _cache_fte[k] = im
+    return _cache_fte[k]
+
+
+def encaja(piezas, fondo=None, sobrio=False):
+    """Tablero de la escena con la proporcion de la ventana y las piezas centradas en el, para que se vea entero.
+    6-nov: la cámara se acerca para que las piezas llenen la pantalla (hasta x1,35) y detrás va el fondo vivo."""
     def caja(pc, x, y):
         if isinstance(pc, tuple):
             return max(pc[1][0], pc[2][0]) + 40, max(pc[1][1], pc[2][1]) + 40
         return x + pc.width, y + pc.height
     ancho = max(caja(pc, x, y)[0] for pc, x, y, _ in piezas) + 40
     alto = max(caja(pc, x, y)[1] for pc, x, y, _ in piezas) + 40
-    wb = max(BW, ancho, math.ceil(alto * BW / BH))
+    wb = max(int(BW / 1.35), ancho, math.ceil(alto * BW / BH))
     hb = math.ceil(wb * BH / BW)
     dx, dy = (wb - ancho) // 2, (hb - alto) // 2
     mueve = lambda pc, x, y: ((("flecha", (pc[1][0] + dx, pc[1][1] + dy), (pc[2][0] + dx, pc[2][1] + dy)), 0, 0)
                               if isinstance(pc, tuple) else (pc, x + dx, y + dy))
-    return [(*mueve(pc, x, y), ta) for pc, x, y, ta in piezas], C.tablero_base(hb, wb)
+    return [(*mueve(pc, x, y), ta) for pc, x, y, ta in piezas], fondo_vivo(fondo, wb, hb, sobrio).copy()
 
 
 # ------------------------------------------------------------------ comic a pantalla completa (opcion A, 4-nov-2026)
@@ -336,7 +390,8 @@ def _panel(pn, tl, sobrio):
             d.rectangle([BW - tw - 34, BH - 46, BW - 10, BH - 12], fill=(255, 255, 255, 220))
             d.text((BW - 22, BH - 16), pn["credito"], font=ff, fill=(60, 60, 70, 255), anchor="rb")
     else:
-        im = _trama(sobrio).copy().convert("RGBA")
+        fondo = pn.get("foto") or pn.get("fondo")       # 6-nov: la foto (o la imagen del tema) desenfocada, no la trama
+        im = fondo_vivo(fondo, BW, BH, sobrio).copy() if fondo else _trama(sobrio).copy().convert("RGBA")
         if pn["clase"] == "persona":
             k = ("persona", pn["foto"], sobrio)
             if k not in _comic_cache:
@@ -570,6 +625,10 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
         T = E.Tiempos(texto, pal, t)
         print(f"  bloque {i}: {dur:5.1f} s, {T.casadas}/{len(T.toks)} palabras con tiempo", flush=True)
         partes, c = [], 0
+        vins_blq = sorted((dia / "vinetas").glob(f"s{i}_*.jpg"))
+        fot_blq = [dia / "imagenes" / p["ve"]["foto"] for p in s["pasos"] if (p.get("ve") or {}).get("foto")
+                   and (dia / "imagenes" / p["ve"]["foto"]).exists()]
+        img_blq = (fot_blq or vins_blq or [None])[0]       # imagen del bloque para el fondo vivo (6-nov)
         for jp, p in enumerate(s["pasos"]):
             ve = p.get("ve")
             if ve:
@@ -587,18 +646,22 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                         print(f"  AVISO: la foto {fn} no esta en imagenes/ o no tiene credito; la escena va sin foto")
                 pz = sorted(piezas_h(ve, T, c, t0, fotos, cred, foto, usadas), key=lambda z: z[3])
                 parte = {"k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
+                         "fondo": fondo_de(ve, foto, ve["_vin"], fotos, img_blq), "sobrio_f": ve["_sobrio"],
                          "fuente": ve.get("fuente") or " · ".join(s.get("fuentes", [])[:3])}
                 if ve["tipo"] in ("claves", "cronologia") and (ve["_vin"] or any(it.get("persona_vineta") in fotos
                                                                                   for it in ve.get("items", []))):
                     parte["comic"] = paneles_comic(ve, T, c, t0, fotos)      # opcion A (4-nov-2026)
                     parte["sobrio"] = ve["_sobrio"]
+                    for pn_ in parte["comic"]:
+                        pn_.setdefault("fondo", parte["fondo"])
                 elif ve["tipo"] == "breve":                     # breves, tambien en comic a pantalla completa (4-nov)
                     sub = ve.get("sub", "")                       # la fuente ya va en el recuadro FUENTES
                     if 0 in ve["_vin"]:
                         pn = {"clase": "vineta", "ruta": ve["_vin"][0], "narr": ve["titular"], "sub": sub,
                               "lugar": ve.get("lugar", ""), "credito": ve["_vin_txt"].get(0, "Ilustración IA")}
                     else:
-                        pn = {"clase": "texto", "narr": "", "cita": ve["titular"], "sub": sub, "lugar": ve.get("lugar", "")}
+                        pn = {"clase": "texto", "narr": "", "cita": ve["titular"], "sub": sub, "lugar": ve.get("lugar", ""),
+                              "fondo": parte["fondo"]}
                     pn["t"] = t0
                     parte["comic"] = [pn]
                     parte["sobrio"] = ve["_sobrio"]
@@ -616,7 +679,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
             a["sin_salida"] = b["tipo"] == "despedida"     # el cierre ya trae su barrida: sin dos transiciones seguidas
         partes[-1]["t1"] = t + dur
         for pt in partes:
-            pt["piezas"], pt["base"] = encaja(pt["piezas"])
+            pt["piezas"], pt["base"] = encaja(pt["piezas"], pt.get("fondo"), pt.get("sobrio_f", False))
         tit = None
         vs = next((p["ve"] for p in s["pasos"] if p.get("ve", {}).get("tipo") == "sumario"), None) if i == 0 else None
         if vs:                                         # sumario a pantalla completa: una tarjeta por titular
@@ -753,8 +816,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
             if falta < 4.5:
                 tz = p["teaser"]
                 pega(fr, tz, BX + BW - 16 - tz.width, BY + BH + 12, min(1.0, (4.5 - falta) * 3))
-        if pt["fuente"]:
-            fr.alpha_composite(tarjeta_fuente(pt["fuente"]), (40, BY))
+        if pt["fuente"]:                               # 6-nov: una línea discreta bajo el escenario, a la izquierda
+            fr.alpha_composite(linea_fuente(pt["fuente"]), (BX, BY + BH + 10))
         pm = presente(t, i)
         if pm > 0.001:                                 # Urni narra abajo a la izquierda y da un saltito con cada pieza
             k = min(int((t - INTRO) * FPS), len(boca) - 1)

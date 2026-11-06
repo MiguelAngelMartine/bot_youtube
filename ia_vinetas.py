@@ -24,7 +24,8 @@ ESCENAS = "@cf/black-forest-labs/flux-1-schnell"       # escenas: el estilo que 
 PERSONAS = "@cf/black-forest-labs/flux-2-klein-4b"     # personas: admite su foto real y la referencia de estilo
 # sin la palabra "comic": con ella el modelo dibuja bocadillos con letras inventadas
 ESTILO = ("wordless graphic novel illustration, flat limited colors, thick black ink outlines, heavy black shadows, "
-          "set in Spain, plain surfaces without writing, silent scene: ")
+          "set in Spain, plain surfaces without writing, every box, screen, paper and sign blank and unlabeled, "
+          "silent scene: ")
 PERSONA = ("Redraw the person from image 0 as a wordless graphic novel illustration, using only the drawing technique of "
            "image 1 (flat limited colors, thick black ink outlines, heavy solid black shadows, simple shapes). Do not copy "
            "anything else from image 1: no train, no objects, no background from it. Keep the likeness of image 0 exactly: "

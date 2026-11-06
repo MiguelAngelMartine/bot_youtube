@@ -1,7 +1,7 @@
-"""SHORT VERTICAL DE UNA FRASE (decisión del usuario del 5-nov-2026). 1080x1920, 25-35 s:
-  1) gancho (desde el fotograma 0, que es también la miniatura): la persona recortada en grande, el antetítulo
-     («SÁNCHEZ, A FEIJÓO») y la frase literal enorme;
-  2) contexto: el porqué, en un recuadro;
+"""SHORT VERTICAL DE UNA FRASE (decisión del usuario del 5-nov-2026). 1080x1920, 40-55 s (6-nov: más largo):
+  1) gancho (desde el fotograma 0, que es también la miniatura): la persona recortada MUY grande sobre la imagen del
+     tema en movimiento, el antetítulo («SÁNCHEZ, A FEIJÓO») y la frase literal enorme;
+  2) contexto: el porqué, con las viñetas y fotos del tema pasando a pantalla completa arriba y el texto abajo;
   3) réplica, si la hay: el aludido y su frase escribiéndose;
   4) cierre: «Todo el cruce, en el vídeo de hoy» y suscribirse.
 Voz de Tristán, subtítulos grandes, música baja y crédito de las fotos. Fotos siempre a color, contorno suave.
@@ -33,6 +33,45 @@ AN, AL, FPS = 1080, 1920, 30
 NAVY = (12, 20, 38)
 
 
+def _fondo_tema(ruta):
+    """6-nov-2026 (el usuario: «el fondo siempre azul parece un PowerPoint»): la imagen del tema a pantalla completa,
+    desenfocada, con color y la luz de la marca, algo mayor que la pantalla para moverla despacio."""
+    if ruta is None or not Path(ruta).exists():
+        return _fondo().resize((int(AN * 1.12), int(AL * 1.12)))
+    from PIL import ImageEnhance, ImageOps
+    import titulares as TIT
+    w, h = int(AN * 1.12), int(AL * 1.12)
+    im = ImageOps.fit(Image.open(ruta).convert("RGB"), (w // 2, h // 2), Image.LANCZOS, centering=(0.5, 0.35))
+    im = im.filter(ImageFilter.GaussianBlur(9))
+    im = ImageEnhance.Color(im).enhance(1.35)
+    im = ImageEnhance.Brightness(im).enhance(0.55).resize((w, h), Image.BILINEAR).convert("RGBA")
+    im.alpha_composite(TIT._tinte((w, h), False))
+    g = Image.linear_gradient("L").resize((w, h)).point(lambda v: int(max(0, v - 110) * 1.4))
+    sombra = Image.new("RGBA", (w, h), (6, 10, 22, 255))
+    sombra.putalpha(g)                                 # abajo, más oscuro: ahí van la frase y los subtítulos
+    im.alpha_composite(sombra)
+    return im
+
+
+def _mueve(base, t, total):
+    """Ken Burns del fondo: se acerca y se desplaza despacio durante todo el Short."""
+    q = min(1.0, t / max(total, 1))
+    z = 1.0 + 0.06 * q
+    cw, ch = int(base.width / 1.12 / z * 1.0), int(base.height / 1.12 / z * 1.0)
+    x0 = int((base.width - cw) * (0.3 + 0.4 * q))
+    y0 = int((base.height - ch) * 0.5)
+    return base.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, AL), Image.BILINEAR)
+
+
+def _panel(ruta):
+    """Viñeta o foto del tema para la parte de arriba durante el contexto (ancho completo, de ZONA[0] a ZONA[1])."""
+    from PIL import ImageOps
+    alto = ZONA[1] - ZONA[0]
+    im = ImageOps.fit(Image.open(ruta).convert("RGB"), (int(AN * 1.1), int(alto * 1.1)), Image.LANCZOS,
+                      centering=(0.5, 0.4))
+    return im
+
+
 def _fondo():
     im = Image.new("RGB", (AN, AL), NAVY)
     d = ImageDraw.Draw(im)
@@ -58,7 +97,7 @@ def _cabecera(fecha):
     return cab
 
 
-ZONA = (150, 940)                                     # la persona vive en la mitad de arriba (y de 150 a 940)
+ZONA = (150, 1050)                                    # la persona vive arriba (y de 150 a 1050): 6-nov, más grande
 
 
 def _busca_foto(dia, nombre):
@@ -132,7 +171,7 @@ def _kicker(txt, tam=56):
     return e
 
 
-ALTO_CITA = 330                                       # la frase ocupa de 1090 a 1420; el contexto, de 1430 a 1640
+ALTO_CITA = 300                                       # la frase ocupa de 1180 a 1480; el contexto, de 1500 a 1690
 
 
 def _cita(txt, destaca, ancho=960, max_tam=118):
@@ -169,6 +208,28 @@ def _caja(txt, ancho=940, tam=46):
     return im
 
 
+def _seccion(dia, cita):
+    """Bloque del episodio donde sale la frase (para usar sus viñetas y fotos)."""
+    import shorts_guion as SG
+    G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    for i, sec in enumerate(G["secciones"]):
+        if i and SG._norm(cita)[:40] in SG._norm(json.dumps(sec, ensure_ascii=False)):
+            return i, sec
+    return None, None
+
+
+def _imagenes_tema(dia, i, sec, quien):
+    """Viñetas y fotos del bloque de la frase (sin la de la persona, que ya sale): el «B-roll» del contexto."""
+    out = []
+    if i is not None:
+        out += sorted((dia / "vinetas").glob(f"s{i}_*.jpg"))
+        for p in sec["pasos"]:
+            f = (p.get("ve") or {}).get("foto")
+            if f and (dia / "imagenes" / f).exists():
+                out.append(dia / "imagenes" / f)
+    return list(dict.fromkeys(out))[:5]
+
+
 def main(fecha, n):
     dia = RAIZ / "dia" / fecha
     S = json.loads((dia / "shorts" / f"short_{n}.json").read_text(encoding="utf-8"))
@@ -177,65 +238,136 @@ def main(fecha, n):
     texto = S["voz"]
     pal, dur = voz.locuta([{"di": texto}], "normal", tmp / "voz.wav", cola=0.4)
     T = E.Tiempos(texto, pal, 0.0)
-    t_ctx = T.en(texto.find("». ") + 3) if "». " in texto else dur * 0.45
-    t_rep = T.en(texto.find(S["replica"]["quien"], 5)) if S.get("replica") else None
+    t_ctx = T.en(texto.find("». ") + 3) if "». " in texto else dur * 0.3
+    k_rep = texto.find(f"{S['replica']['quien']} le responde") if S.get("replica") else -1
+    t_rep = T.en(k_rep) if k_rep >= 0 else None        # (buscar solo el nombre fallaba si el contexto lo nombraba)
     t_fin = T.en(texto.find("Todo el cruce"))
     total = dur + 1.4
 
-    fondo, cab = _fondo(), _cabecera(fecha)
-    p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.27), 0.17)
+    i_sec, sec = _seccion(dia, S["cita"])
+    broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
+    cab = _cabecera(fecha)
+    p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.36), 0.42)
+    fondo_img = broll[0] if broll else None
+    if fondo_img is None and p1 and not p1[3].startswith("Ilustración"):
+        fondo_img = next((f for f, c in json.loads((dia / "creditos.json").read_text(encoding="utf-8")).items()
+                          if c.get("persona") == S["quien"] and (dia / "imagenes" / f).exists()), None)
+        fondo_img = dia / "imagenes" / fondo_img if fondo_img else None
+    fondo = _fondo_tema(fondo_img)
     k1 = _kicker(S["kicker"].upper())
     c1 = _cita(S["cita"], S.get("destaca", ""))
-    ctx = _caja(S["contexto"], tam=38)
+    # 6-nov: el contexto, frase a frase y sincronizado con la voz (entero no cabía y se cortaba)
+    c_ini = texto.find(S["contexto"].strip()[:30])
+    frases_ctx, pos = [], c_ini
+    for fr_ in re.split(r"(?<=[.?!])\s+", S["contexto"].strip()):
+        k_ = texto.find(fr_[:25], pos)
+        if k_ >= 0:
+            frases_ctx.append((T.en(k_), _caja(fr_, tam=52)))
+            pos = k_ + 1
+    if not frases_ctx:
+        frases_ctx = [(t_ctx, _caja(S["contexto"], tam=44))]
+
+    def ctx_en(t):
+        k_ = max([j for j, (tt, _) in enumerate(frases_ctx) if tt <= t + 0.05] or [0])
+        return frases_ctx[k_][1], t - frases_ctx[k_][0]
+    p2 = k2 = None
     if S.get("replica"):
         rp = S["replica"]
-        p2 = _persona(dia, rp["quien"], rp.get("cargo", ""), (0.5, 0.27), 0.15)
+        p2 = _persona(dia, rp["quien"], rp.get("cargo", ""), (0.5, 0.36), 0.42)
         k2 = _kicker(f"{rp['quien'].split()[-1].upper()} RESPONDE")
     fte = fuente("Inter-SemiBold.ttf", 26)
     caps = C.grupos_palabras(T, set())
     ini = [x[0] for x in caps]
+    # contexto: un panel del tema cada ~4,5 s (si no hay imágenes del tema, se queda la persona)
+    fin_ctx = t_rep if t_rep is not None else t_fin
+    paneles = []
+    if broll:
+        nk = max(1, min(len(broll), int((fin_ctx - t_ctx) / 4.5) or 1))
+        paneles = [(t_ctx + k * (fin_ctx - t_ctx) / nk, _panel(broll[k])) for k in range(nk)]
+    golpes = [0.0, t_ctx] + ([t_rep] if t_rep is not None else [])
 
-    def persona_en(fr, p, a=1.0, dy=0):
+    def persona_en(fr, p, t0, t, a=1.0):
+        """La persona, grande, con un golpe de cámara al entrar (se acerca y se asienta)."""
         if not p:
             return
         im, x, y, credito = p
-        G2.pega(fr, im, x, y + dy, a)
-        ImageDraw.Draw(fr).text((AN // 2, 935), credito, font=fte, fill=(200, 205, 215, int(220 * a)), anchor="mm")
+        tl = t - t0
+        s_ = 1.0 + 0.10 * (1 - G2.suave(min(1.0, tl / 0.35))) + 0.03 * min(tl, 8) / 8
+        if abs(s_ - 1) > 0.003:
+            im = im.resize((int(im.width * s_), int(im.height * s_)), Image.BILINEAR)
+        G2.pega(fr, im, x - (im.width - p[0].width) // 2, y - (im.height - p[0].height) // 2, a)
+        ImageDraw.Draw(fr).text((AN - 30, ZONA[1] - 16), credito, font=fte, fill=(225, 230, 240, int(235 * a)), anchor="rd",
+                                stroke_width=2, stroke_fill=(0, 0, 0, int(160 * a)))
+
+    def panel_en(fr, t):
+        k = max(j for j, (tp, _) in enumerate(paneles) if tp <= t + 1e-6) if any(tp <= t for tp, _ in paneles) else 0
+        tp, im = paneles[k]
+        tl = t - tp
+        alto = ZONA[1] - ZONA[0]
+        z = 1.0 + 0.06 * min(tl, 5) / 5
+        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
+        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
+        y0 = (im.height - ch) // 2
+        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        entra = G2.suave(min(1.0, tl / 0.35)) if k > 0 else G2.suave(min(1.0, tl / 0.3))
+        dx = int(AN * (1 - entra))
+        fr.alpha_composite(vista, (dx, ZONA[0]) if dx < AN else (AN - 1, ZONA[0]))
+        d = ImageDraw.Draw(fr)
+        d.rectangle([0, ZONA[0] - 6, AN, ZONA[0]], fill=AMARILLO + (255,))
+        d.rectangle([0, ZONA[1], AN, ZONA[1] + 6], fill=AMARILLO + (255,))
+        ff = fuente("Inter-SemiBold.ttf", 22)
+        et = "Ilustración IA" if "vinetas" in str(broll[k]) else "Foto del tema"
+        d.text((AN - 24, ZONA[1] - 14), et, font=ff, fill=(255, 255, 255, 230), anchor="rd")
 
     def cuadro(t):
-        fr = fondo.copy()
-        if t_rep is not None and t >= t_rep and t < t_fin:          # 3) réplica
+        fr = _mueve(fondo, t, total).convert("RGBA")
+        if t_rep is not None and t_rep <= t < t_fin:                  # 3) réplica
             tl = t - t_rep
-            persona_en(fr, p2, G2.suave(tl / 0.3))
-            fr.alpha_composite(k2, (60, 975))
+            persona_en(fr, p2, t_rep, t, G2.suave(min(1.0, tl / 0.3)))
+            fr.alpha_composite(k2, (60, 1080))
             n_ = max(1, int(len(S["replica"]["cita"]) * min(1.0, (tl - 0.3) / 1.6)))
             cr = _cita_cache(S["replica"]["cita"][:n_] if tl < 1.9 else S["replica"]["cita"], "")
-            fr.alpha_composite(cr, (40, 1075))
+            fr.alpha_composite(cr, (40, 1180))
         elif t >= t_fin:                                             # 4) cierre
-            lg = G2.logo(260)
-            fr.alpha_composite(lg, ((AN - lg.width) // 2, 520))
+            lg = G2.logo(300)
+            tl = t - t_fin
+            s_ = 1.0 + 0.25 * (1 - G2.suave(min(1.0, tl / 0.4)))
+            lg = lg.resize((int(lg.width * s_), int(lg.height * s_)), Image.BILINEAR)
+            fr.alpha_composite(lg, ((AN - lg.width) // 2, 470 - (lg.height - 300) // 2))
             d = ImageDraw.Draw(fr)
-            d.text((AN // 2, 900), "Todo el cruce, en el", font=fuente("Inter-Black.ttf", 62), fill=BLANCO + (255,), anchor="mm")
-            d.text((AN // 2, 985), "vídeo de hoy", font=fuente("Inter-Black.ttf", 62), fill=AMARILLO + (255,), anchor="mm")
-            d.rounded_rectangle([AN // 2 - 250, 1100, AN // 2 + 250, 1210], radius=55, fill=ROJO + (255,))
-            d.text((AN // 2, 1155), "SUSCRÍBETE", font=fuente("Inter-Black.ttf", 54), fill=BLANCO + (255,), anchor="mm")
-        else:                                                        # 1) gancho y 2) contexto
-            z = 1.0 + 0.025 * min(t, 6) / 6
-            persona_en(fr, p1, 1.0, int(-12 * z))
-            fr.alpha_composite(k1, (60, 975))
-            fr.alpha_composite(c1, (40, 1075))
-            if t >= t_ctx:                                           # el contexto entra encima, abajo
-                a = min(1.0, (t - t_ctx) / 0.25)
-                G2.pega(fr, ctx, 60, 1440 + int(40 * (1 - a)), a)
+            d.text((AN // 2, 900), "Todo el cruce, en el", font=fuente("Inter-Black.ttf", 66), fill=BLANCO + (255,), anchor="mm")
+            d.text((AN // 2, 990), "vídeo de hoy", font=fuente("Inter-Black.ttf", 66), fill=AMARILLO + (255,), anchor="mm")
+            pulso = 1.0 + 0.04 * math.sin(tl * 6)
+            w2, h2 = int(260 * pulso), int(58 * pulso)
+            d.rounded_rectangle([AN // 2 - w2, 1110 - h2, AN // 2 + w2, 1110 + h2], radius=h2, fill=ROJO + (255,))
+            d.text((AN // 2, 1110), "SUSCRÍBETE", font=fuente("Inter-Black.ttf", 56), fill=BLANCO + (255,), anchor="mm")
+        elif t >= t_ctx and paneles:                                 # 2) contexto con imágenes del tema
+            panel_en(fr, t)
+            fr.alpha_composite(k1, (60, ZONA[1] + 40))
+            ctx, tc = ctx_en(t)
+            a = G2.suave(min(1.0, tc / 0.25))
+            G2.pega(fr, ctx, 60, ZONA[1] + 150 + int(40 * (1 - a)), a)
+        else:                                                        # 1) gancho (y contexto sin imágenes)
+            persona_en(fr, p1, 0.0, t)
+            fr.alpha_composite(k1, (60, 1080))
+            if t < t_ctx:
+                fr.alpha_composite(c1, (40, 1180))
+            else:                                                    # el contexto ocupa el sitio de la frase
+                ctx, tc = ctx_en(t)
+                a = G2.suave(min(1.0, tc / 0.25))
+                G2.pega(fr, ctx, 60, 1190 + int(40 * (1 - a)), a)
+        for g in golpes:                                             # destello breve en cada cambio de parte
+            if 0 <= t - g < 0.08 and g > 0:
+                fr.alpha_composite(Image.new("RGBA", (AN, AL), (255, 255, 255, int(150 * (1 - (t - g) / 0.08)))))
         fr.alpha_composite(cab, (0, 0))
         ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
         j = max(0, np.searchsorted(ini, t, side="right") - 1)    # subtítulos grandes
         if t < caps[j][1] and t >= caps[j][0]:
             _, _, ws, clave, _ = caps[j]
             cp = C.capa_cap(ws, clave, 0, 0.9, AN - 120)
-            fr.alpha_composite(cp, ((AN - cp.width) // 2, 1745 - cp.height // 2))
+            fr.alpha_composite(cp, ((AN - cp.width) // 2, 1760 - cp.height // 2))
         ImageDraw.Draw(fr).text((AN // 2, AL - 50), f"Fuente: {S.get('fuente', '')}"[:70], font=fte,
-                                fill=(170, 178, 195, 255), anchor="mm")
+                                fill=(190, 198, 215, 255), anchor="mm")
         return fr
 
     _cc = {}
@@ -245,7 +377,7 @@ def main(fecha, n):
             _cc[txt] = _cita(txt, dest, max_tam=104)
         return _cc[txt]
 
-    cortes = [x for x in (t_ctx, t_rep, t_fin) if x]
+    cortes = [x for x in (t_ctx, t_rep, t_fin) if x] + [tp for tp, _ in paneles[1:]]
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
     cuadro(0.6).convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")       # el fotograma 0 = la miniatura
     out = dia / "shorts" / f"short_{n}.mp4"
@@ -258,8 +390,19 @@ def main(fecha, n):
     ff.stdin.close()
     ff.wait()
     # créditos para la descripción de YouTube (los lee subir.py)
-    S["creditos"] = [p[3] + f" ({nom})" for p, nom in ((p1, S["quien"]), (p2 if S.get("replica") else None,
-                     (S.get("replica") or {}).get("quien"))) if p]
+    S["creditos"] = [p[3] + f" ({nom})" for p, nom in ((p1, S["quien"]), (p2, (S.get("replica") or {}).get("quien")))
+                     if p]
+    cred_all = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
+    for f in broll:                                    # las imágenes del tema que salen en el contexto o el fondo
+        if "vinetas" in str(f):
+            continue
+        c_ = cred_all.get(Path(f).name, {})
+        S["creditos"].append(f"Foto: {c_.get('autor', '')[:40]} · {c_.get('licencia', '')} (tema)")
+    if any("vinetas" in str(f) for f in broll):
+        S["creditos"].append("Ilustración IA (viñetas del tema)")
+        org = dia / "vinetas" / "origen.json"
+        org = json.loads(org.read_text(encoding="utf-8")) if org.exists() else {}
+        S["sintetico"] = any(org.get(Path(f).stem, {}).get("persona") for f in broll)   # personas reales dibujadas
     S["duracion"] = round(total, 1)
     (dia / "shorts" / f"short_{n}.json").write_text(json.dumps(S, ensure_ascii=False, indent=1), encoding="utf-8")
     import shutil

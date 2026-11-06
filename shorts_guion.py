@@ -17,7 +17,7 @@ RAIZ = Path(__file__).parent
 
 PROMPT = """Eres el editor de Shorts de «El Hoyformativo», informativo de política española en YouTube: neutral y riguroso,
 pero con gancho (el «salseo»: los cruces de declaraciones entre políticos). Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
-para hacer un Short de 25-35 segundos con cada una. Reglas:
+para hacer un Short de 40-50 segundos con cada una. Reglas:
 - La frase tiene que estar LITERAL en el material de abajo (cópiala letra a letra; un programa lo comprueba) y ser
   ENTERA palabras de quien habla: si el medio solo entrecomilla una palabra suelta («ve "irresponsable" decir...»), esa
   frase no vale (sería atribuirle palabras del periodista). Sin comillas dentro de la cita. Prioriza
@@ -30,8 +30,10 @@ para hacer un Short de 25-35 segundos con cada una. Reglas:
   tema que no contesta a ese ataque NO es una réplica. Si no hay réplica directa: "replica": null (y no se menciona).
 - Descalificaciones políticas literales sí; tacos e insultos vejatorios, no.
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 1-2 frases (≤ 35 palabras) con el porqué, SOLO con hechos del material: qué ha pasado y a qué se
-  refiere. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
+- "contexto": 4-5 frases (70-90 palabras), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
+  APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
+  antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un
+  programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
   «pide», «acusa» si la fuente lo dice). No adelanta la réplica (la voz ya dice «X le responde»), no interpreta
   intenciones ni añade lo que la persona «considera» si no está en el material.
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
@@ -52,6 +54,35 @@ PUBLICACIONES OFICIALES DEL DÍA (redes.md: X, webs, Telegram, Bluesky):
 
 VALORATIVAS = ["arremet", "carga contra", "cargó contra", "cargan contra", "estall", "provoc", "respuesta", "respondi", "zasca", "humill", "destroz", "contundente", "dura crítica",
                "responde", "réplica", "contesta", "considera que", "polémic", "escándalo", "lapidari"]
+
+
+VERIFICA = """Eres verificador de un informativo neutral. Para cada FRASE numerada, di si está respaldada por el MATERIAL
+(los hechos, las cifras, las fechas y las atribuciones tienen que estar en él; una interpretación de intenciones, un
+adjetivo valorativo o un dato que no aparece = NO respaldada). Responde SOLO JSON: {{"respaldadas": [números]}}
+
+FRASES:
+{frases}
+
+MATERIAL:
+{material}"""
+
+
+def verifica_contexto(contexto, guion, redes):
+    """Segunda pasada (6-nov-2026, contexto más largo): solo se quedan las frases respaldadas por el material. Si
+    Gemini no responde, se quedan las dos primeras (lo que antes cabía), que son las más pegadas a la cita."""
+    frases = [f for f in re.split(r"(?<=[.?!])\s+", (contexto or "").strip()) if f]
+    if len(frases) <= 1:
+        return contexto
+    r = gem.pide(VERIFICA.format(frases="\n".join(f"{k + 1}. {f}" for k, f in enumerate(frases)),
+                                 material=(guion + "\n" + redes)[:60000]), como_json=True)
+    if not isinstance(r, dict) or not isinstance(r.get("respaldadas"), list):
+        print("  (verificación del contexto sin respuesta: se dejan las dos primeras frases)")
+        return " ".join(frases[:2])
+    ok = {int(x) for x in r["respaldadas"] if str(x).isdigit()}
+    quitadas = [f for k, f in enumerate(frases) if k + 1 not in ok]
+    for f in quitadas:
+        print(f"  contexto: quitada por no estar respaldada: «{f[:80]}»")
+    return " ".join(f for k, f in enumerate(frases) if k + 1 in ok)
 
 
 def _norm(s):
@@ -114,13 +145,17 @@ def main(fecha, n=3):
         if s.get("partido") in partidos:
             print(f"  aviso: {s.get('partido')} repite protagonista (no había más partidos con frase válida)")
         partidos.add(s.get("partido"))
+        s["contexto"] = verifica_contexto(s["contexto"], guion, redes)
+        if not s["contexto"]:
+            print(f"  descartada: «{s.get('cita', '')[:50]}» se queda sin contexto comprobado")
+            continue
         s["titulo"] = re.sub(r"\b(sentencia|zanja|estalla|arremete|carga|clama|lanza|suelta)\b", "dice", s.get("titulo", ""))
         buenos += 1
         cita = s["cita"].strip().rstrip(".")
         voz = f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
         if s.get("replica"):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
-        voz += " Todo el cruce, en el vídeo de hoy."
+        voz += " Todo el cruce, y el resto de la política del día, en el vídeo de hoy."
         s["voz"] = voz
         (dia / "shorts" / f"short_{buenos}.json").write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_{buenos}: {s['kicker']} · «{s['cita'][:70]}»" + (" · con réplica" if s.get("replica") else ""))

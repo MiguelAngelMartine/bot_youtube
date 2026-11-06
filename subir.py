@@ -204,15 +204,20 @@ def subir_shorts(dia_txt):
         cr = S.get("creditos") or []
         if cr:
             partes += ["", "Imágenes: " + "; ".join(cr)]
-        if any("Ilustración IA" in c for c in cr):
+        if any("sin foto libre" in c for c in cr):
             partes += ["Ilustración generada con IA en lugar de una foto (no había foto libre de la persona); "
                        "no representa a nadie en concreto."]
+        if any("viñetas del tema" in c for c in cr):
+            partes += ["Las viñetas son ilustraciones generadas con IA a partir de los hechos contados; las personas "
+                       "dibujadas salen de fotos con licencia libre."]
         partes += ["", "#Shorts #PolíticaEspañola #ElHoyformativo"]
         cuerpo = {"snippet": {"title": titulo[:100], "description": "\n".join(partes)[:5000], "categoryId": "25",
                               "tags": ["política", "España", "Shorts", S["quien"]] +
                                       ([S["replica"]["quien"]] if S.get("replica") else []),
                               "defaultLanguage": "es", "defaultAudioLanguage": "es"},
                   "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
+        if S.get("sintetico"):                          # persona real dibujada por IA: se declara (no afecta a ingresos)
+            cuerpo["status"]["containsSyntheticMedia"] = True
         vid = _sube(yt, f.with_suffix(".mp4"), cuerpo)
         print(f"short {f.stem} -> {vid} (PRIVADO)")
         aviso = ""
