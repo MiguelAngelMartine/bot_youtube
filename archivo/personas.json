@@ -38,6 +38,18 @@
   "Ana Pontón": {"cargo": "Portavoz nacional del BNG", "partido": "BNG", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
   "Monica Sales": {"cargo": "Presidenta del grupo de Junts en el Parlament", "partido": "Junts", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
   "Gabriel Rufian": {"cargo": "Portavoz y cabeza de lista de ERC", "partido": "ERC", "fuente": "Europa Press (vineta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Miguel Tellado": {"cargo": "Secretario general del PP", "partido": "PP", "fuente": "elDiario.es (breve 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Toni Comin": {"cargo": "Junts (cargo SIN VERIFICAR)", "partido": "Junts", "fuente": "Titular de La Razon (tarjeta 4-nov); SIN VERIFICAR", "verificado": "SIN VERIFICAR"}
+  "Miguel Tellado": {"cargo": "Secretario general del PP (4-nov, elDiario.es); la tarjeta del 6-nov lo llama 'Dirigente del PP' (web del PP)", "partido": "PP", "fuente": "elDiario.es (breve 4-nov); tarjeta 6-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Luis Pedro Marco de la Peña": {"cargo": "Presidente de Adif (dimitido el 4-nov)", "partido": "Institucion", "fuente": "20minutos, RTVE, elDiario.es, El Pais, La Razon (episodio 5-nov)", "verificado": "2026-11-05"},
+  "Ione Belarra": {"cargo": "Podemos (cargo SIN VERIFICAR)", "partido": "Podemos", "fuente": "Voz del episodio 5-nov; cargo no indicado en el episodio", "verificado": "SIN VERIFICAR"},
+  "Ana Redondo": {"cargo": "Cabeza de lista del PSOE por Valladolid (sustituye a Puente)", "partido": "PSOE", "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Mario Samper": {"cargo": "Presidente de la Asociacion de Victimas de Adamuz", "partido": "Institucion", "fuente": "La Vanguardia, 4-nov (tarjeta 5-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Javier Hernandez": {"cargo": "Magistrado del Supremo", "partido": "Institucion", "fuente": "Voz del episodio 5-nov (El Pais, El Mundo, ABC); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Carmen Lamela": {"cargo": "Magistrada (Supremo)", "partido": "Institucion", "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Koldo Garcia": {"cargo": "Exasesor de Abalos", "partido": "Institucion", "fuente": "Tarjeta del episodio 6-nov (audio, segun El Pais); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Isabel Diaz Ayuso": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjeta del episodio 6-nov (ABC); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Javier Milei": {"cargo": "Presidente de Argentina", "partido": "Institucion", "fuente": "Tarjeta del episodio 6-nov (El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Andres Allamand": {"cargo": "Secretario general iberoamericano", "partido": "Institucion", "fuente": "Voz y viñeta del episodio 6-nov (El Pais, El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Ismael Moreno": {"cargo": "Juez de la Audiencia Nacional", "partido": "Institucion", "fuente": "Voz del episodio 6-nov (El Pais); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
+  "Alberto Duran": {"cargo": "Abogado del PP (segun Koldo Garcia)", "partido": "PP", "fuente": "Voz del episodio 6-nov; atribucion de Koldo, SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
+  "Toni Comin":{"cargo": "Junts (cargo SIN VERIFICAR)", "partido": "Junts", "fuente": "Titular de La Razon (tarjeta 4-nov); SIN VERIFICAR", "verificado": "SIN VERIFICAR"}
 }

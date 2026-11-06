@@ -823,6 +823,13 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
 
     if n > 1:                                          # en paralelo: un proceso por hilo del procesador (Linux)
         ctx = mp.get_context("fork")
+        # OpenCV (caras con YuNet, desde el 4-nov) deja su grupo de hilos en marcha; si se hace fork con él vivo,
+        # los hijos se quedan bloqueados para siempre (colgó dos montajes el 6-nov). Un solo hilo ANTES del fork.
+        try:
+            import cv2 as _cv2_padre
+            _cv2_padre.setNumThreads(1)
+        except ImportError:
+            pass
 
         def hijo(k):
             try:

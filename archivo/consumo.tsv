@@ -3,3 +3,5 @@ fecha	intento	coste_equivalente_usd	turnos	detalle
 2026-11-03	2	4.31	3	claude-opus-5-5: 2523952 entrada (2358248 de caché), 48820 salida; claude-sonnet-5-5: 2467388 entrada (2013269 de caché), 47848 salida
 2026-11-03	1	2.07	29	claude-opus-5-5: 1246159 entrada (1193227 de caché), 9901 salida; claude-sonnet-5-5: 1747760 entrada (1400655 de caché), 20525 salida
 2026-11-04	1	9.51	63	claude-sonnet-5-5: 8595380 entrada (6961940 de caché), 202076 salida; claude-opus-5-5: 1155767 entrada (927360 de caché), 61348 salida
+2026-11-04	2	1.18	22	claude-sonnet-5-5: 1908740 entrada (1641448 de caché), 28624 salida
+2026-11-05	1	6.67	40	claude-sonnet-5-5: 9077922 entrada (7939341 de caché), 140423 salida; claude-opus-5-5: 627824 entrada (470934 de caché), 29586 salida
