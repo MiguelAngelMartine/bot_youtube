@@ -1,5 +1,5 @@
 """REDES: lo que los partidos y sus líderes han publicado en las últimas horas, de fuentes OFICIALES, gratuitas y legales
-(decisión del usuario del 4-nov-2026: X no tiene acceso gratuito). Webs y RSS de los partidos, canales públicos de
+(decisión del usuario del 4-nov-2026). X, desde el 7-nov con twscrape y una lista cerrada de cuentas (x_oficiales.py). Webs y RSS de los partidos, canales públicos de
 Telegram y cuentas verificadas de Bluesky (solo las oficiales comprobadas: hay cuentas falsas). Equilibrado entre
 partidos. El resultado lo usa el investigador de «La campaña en frases».
 Uso: python redes.py AAAA-MM-DD [horas=30]    -> dia/<fecha>/redes.md (y redes.json)"""
@@ -14,6 +14,8 @@ from pathlib import Path
 
 import feedparser
 import requests
+
+import x_oficiales
 
 RAIZ = Path(__file__).parent
 UA = {"User-Agent": "Mozilla/5.0 (ElHoyformativo; +https://github.com/MiguelAngelMartine/bot_youtube)"}
@@ -132,6 +134,7 @@ CUENTAS_X = {h.lower() for h in (   # cuentas oficiales de X conocidas; ademas, 
     "Congreso_Es", "ComunidadMadrid", "ppmadrid", "ivanedlm", "Jorgebuxade")}
 PARTIDOS = ("psoe", "partido popular", "vox", "sumar", "podemos", "esquerra", "junts", "pnv", "bildu", "bng", "compromís",
             "más madrid", "gobierno de españa", "moncloa")
+CUENTAS_X |= {h.lower() for h in x_oficiales.CUENTAS.values()}
 
 
 def _norm(s):
@@ -200,7 +203,20 @@ def main(fecha, horas=30):
             datos.append({"quien": quien, "canal": tipo, "fecha": d.isoformat() if d else "", "texto": t[:900], "enlace": l})
     tx = tuits_oficiales(dia)
     resumen.insert(0, f"- X (tuits oficiales que incrustan los medios, vía oEmbed): {len(tx)} mensajes")
-    datos = tx + datos                                  # los tuits, primero: son los que más gancho tienen
+    try:
+        xs, fallos = x_oficiales.recientes(horas)
+    except Exception as e:                              # sin X la jornada sigue con las demás fuentes
+        xs, fallos = [], [f"todas ({type(e).__name__})"]
+    resumen.insert(0, f"- X (cuentas oficiales, twscrape): {len(xs)} tuits" + (f"; fallan: {', '.join(fallos)}" if fallos else ""))
+    if not xs:                                          # lo normal es que haya decenas: la sesión ha caducado o X la bloquea
+        try:
+            import notifica
+            notifica.main(fecha, "X no ha devuelto ningún tuit (¿sesión caducada o bloqueada?). La jornada sigue con las demás fuentes; hay que renovar X_AUTH_TOKEN y X_CT0 en el .env.")
+        except Exception as e:
+            print(f"(no se pudo avisar: {type(e).__name__})")
+    enlaces = {x["enlace"].split("/")[-1] for x in xs}
+    tx = [x for x in tx if x["enlace"].split("/")[-1] not in enlaces]
+    datos = xs + tx + datos                             # los tuits, primero: son los que más gancho tienen
     (dia / "redes.json").write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
     md = [f"# Lo que publican los partidos (últimas {horas} h, fuentes oficiales)", "", *resumen, ""]
     for x in datos:

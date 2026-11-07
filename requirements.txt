@@ -13,3 +13,4 @@ trafilatura   # texto completo de las noticias (articulos.py)
 google-api-python-client   # subida a YouTube (subir.py)
 google-auth-oauthlib
 gradio_client
+twscrape==0.21.0
