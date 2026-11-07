@@ -385,7 +385,7 @@ def polaroid_mini(foto: Path, ancho=440, giro=-6):
 
 # ---------- miniatura ----------
 def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fondo="", sobrio=False, salida="miniatura.png",
-              rival="", inserto="", insignia_txt=""):
+              rival="", inserto="", insignia_txt="", caricatura=False, gestos=("", "")):
     dia = RAIZ / "dia" / dia_txt
     img = dia / "imagenes"
     for nombre in (persona, foto_fondo, rival, inserto):
@@ -399,8 +399,8 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     ancho_texto = 1750
     if vs:                                             # enfrentamiento: una persona a cada lado, cara a cara
         diagonal(im)
-        for nombre, lado in ((rival, "izq"), (persona, "der")):
-            r = recorte(img / nombre)
+        for (nombre, lado), gesto in zip(((rival, "izq"), (persona, "der")), gestos):
+            r = recorte(img / nombre if not caricatura else _caricatura(dia, nombre, lado, gesto))
             k = min(1000 / r.height, 760 / r.width)
             cc, pad = silueta(realza(r.resize((int(r.width * k), int(r.height * k)), Image.LANCZOS)))
             x = -pad + 10 if lado == "izq" else W - cc.width + pad - 10
@@ -427,10 +427,12 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
             ancho_texto = min(1750, x + pad + 120 - 50)        # el texto puede montar un poco sobre el hombro
     tam, lineas = ajusta(titular, destaca, ancho_texto, sobrio)
     t = texto(lineas, tam, sobrio)
+    if caricatura and vs:                              # 7-nov: franja roja de brocha detras del titular (referencia)
+        t = brocha(t)
     inclina = 0 if sobrio else 4
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
-    y = H - t.height - 40
+    y = H - t.height - (10 if caricatura and vs else 40)
     if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
         pm = polaroid_mini(img / inserto)
         im.alpha_composite(pm, (150, max(40, y - pm.height - 40)))
@@ -452,6 +454,46 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
     fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)     # nitidez final
     print(f"miniatura ({tam}px, {len(lineas)} lineas{', sobria' if sobrio else ''}) -> {out}")
+
+
+def _caricatura(dia, nombre, lado, gesto=""):
+    """Caricatura de la foto libre (decision del usuario del 7-nov-2026: miniaturas con caricaturas IA de los dos
+    protagonistas enfrentados). Solo desde fotos CC0, dominio publico o CC BY (como las viñetas). Cada uno mira al otro."""
+    import json
+    import ia_vinetas as IA
+    img = dia / "imagenes"
+    cr = json.loads((dia / "creditos.json").read_text(encoding="utf-8")).get(nombre, {})
+    if not IA.licencia_dibujable(cr.get("licencia", "")):
+        raise SystemExit(f"{nombre}: licencia {cr.get('licencia') or 'desconocida'}; para caricaturizar hace falta "
+                         f"CC0, dominio publico o CC BY (elige otra con fotos.py mejores)")
+    dest = img / f"{Path(nombre).stem}_caricatura.jpg"
+    if not dest.exists():
+        IA.caricatura(img / nombre, "right" if lado == "izq" else "left",
+                      gesto or "serious determined expression").save(dest, quality=94)
+        creds = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
+        creds[dest.name] = dict(cr, ilustracion_ia=True, nota="Caricatura IA a partir de la foto")
+        (dia / "creditos.json").write_text(json.dumps(creds, ensure_ascii=False, indent=1), encoding="utf-8")
+    return dest
+
+
+def brocha(t):
+    """Pone el titular sobre una franja roja de trazo de brocha (bordes irregulares), como en la referencia del usuario."""
+    rng = np.random.default_rng(7)
+    pad_x, pad_y = 30, 4
+    w, h = t.width + 2 * pad_x, t.height + 2 * pad_y
+    m = Image.new("L", (w, h), 0)
+    d = ImageDraw.Draw(m)
+    arriba = [(x, pad_y * 0.5 + rng.uniform(-14, 14)) for x in range(0, w + 1, 24)]
+    abajo = [(x, h - pad_y * 0.5 + rng.uniform(-14, 14)) for x in range(w, -1, -24)]
+    d.polygon([(rng.uniform(0, 30), h / 2)] + arriba + [(w - rng.uniform(0, 30), h / 2)] + abajo, fill=255)
+    m = m.filter(ImageFilter.GaussianBlur(2))
+    capa = Image.new("RGBA", (w, h))
+    sombra = Image.new("RGBA", (w, h), (0, 0, 0, 150))
+    capa.paste(sombra, (10, 12), m)
+    capa = capa.filter(ImageFilter.GaussianBlur(8))
+    capa.paste(Image.new("RGBA", (w, h), ROJO + (255,)), (0, 0), m)
+    capa.alpha_composite(t, (pad_x, pad_y))
+    return capa
 
 
 # ---------- plantillas profesionales (4-nov-2026) ----------
@@ -638,6 +680,9 @@ if __name__ == "__main__":
     ap.add_argument("--inserto", default="", help="foto secundaria en polaroid (lugar u objeto de la noticia)")
     ap.add_argument("--insignia", default="", help="distintivo arriba a la derecha («ESPECIAL»)")
     ap.add_argument("--plantilla", default="", help="informativo | impacto (diseño profesional, 4-nov-2026)")
+    ap.add_argument("--caricatura", action="store_true",
+                    help="con --rival: los dos como caricaturas IA desde su foto libre CC BY (7-nov-2026)")
+    ap.add_argument("--gestos", default="", help="gesto en ingles de rival|persona, p. ej. 'smiling|angry frown'")
     ap.add_argument("--salida", default="miniatura.png")
     ap.add_argument("--canal", action="store_true")
     a = ap.parse_args()
@@ -649,4 +694,4 @@ if __name__ == "__main__":
                           a.insignia, a.plantilla, a.salida)
         else:
           miniatura(a.dia or date.today().isoformat(), a.titular, a.destaca, a.etiqueta, a.persona, a.fondo, a.sobrio, a.salida,
-                  a.rival, a.inserto, a.insignia)
+                  a.rival, a.inserto, a.insignia, a.caricatura, tuple((a.gestos.split("|") + ["", ""])[:2]))

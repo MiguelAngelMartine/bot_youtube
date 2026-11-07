@@ -106,6 +106,38 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     return Image.open(f).convert("RGB")
 
 
+CARICATURA = ("Redraw the person from image 0 as a polished editorial caricature for a political magazine cover: glossy "
+              "semi-realistic 3D cartoon style, slightly bigger head, vivid colors, soft studio light. Keep the likeness of "
+              "image 0 exactly: same face shape, same hair, same age, no glasses or accessories that are not in image 0. "
+              "Chest-up portrait, body turned to the {lado}, looking to the {lado}, {gesto}. Respectful, not grotesque. "
+              "Plain flat light grey background. No text, no letters.")
+
+
+def caricatura(retrato: Path, lado="right", gesto="serious determined expression", intento=0):
+    """Caricatura (no fotorrealista) de una persona real para la miniatura (decision del usuario del 7-nov-2026), dibujada
+    desde su foto libre (CC0, dominio publico o CC BY) con FLUX.2 klein de Cloudflare. Devuelve RGB o lanza RuntimeError."""
+    prompt = CARICATURA.format(lado=lado, gesto=gesto)
+    foto = _jpg(retrato)
+    clave = hashlib.sha1((PERSONAS + prompt + str(intento)).encode() + foto).hexdigest()[:20]
+    f = CACHE / f"car_{clave}.jpg"
+    if f.exists():
+        return Image.open(f).convert("RGB")
+    acc, tok = _claves()
+    r = requests.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{PERSONAS}",
+                      headers={"Authorization": f"Bearer {tok}"}, timeout=180,
+                      files={"prompt": (None, prompt), "width": (None, "768"), "height": (None, "896"),
+                             "seed": (None, str(intento)), "input_image_0": ("img0.jpg", foto, "image/jpeg")})
+    try:
+        img = (r.json().get("result") or {}).get("image")
+    except ValueError:
+        img = None
+    if not img:
+        raise RuntimeError(f"Cloudflare sin caricatura ({r.status_code})")
+    CACHE.mkdir(parents=True, exist_ok=True)
+    f.write_bytes(base64.b64decode(img))
+    return Image.open(f).convert("RGB")
+
+
 def _hoy_utc():
     from datetime import datetime, timezone
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
