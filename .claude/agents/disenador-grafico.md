@@ -96,4 +96,4 @@ Reglas:
 Responde con el titular, la etiqueta, la foto del protagonista (licencia, autor), la de fondo y una línea sobre cómo queda.
 
 ## Encargo del director (7-nov-2026)
-Si el coordinador te dice que hay encargo verificado, lee `dia/<fecha>/encargo.json`: la miniatura va con esa persona (la mejor foto libre que haya, de frente y con gesto acorde) y esa frase literal como titular, sobre el tema que indica. Si `"verificada"` no es `true`, no la uses nunca: haz la miniatura de siempre.
+Si el coordinador te dice que hay encargo verificado, lee `dia/<fecha>/encargo.json`: la miniatura va con esa persona (la mejor foto libre que haya, de frente y con gesto acorde) y esa frase literal como titular, sobre el tema que indica. Si trae el apartado `miniatura`, manda él: por ejemplo, con `rival` es un cara a cara (`--rival`), la persona a un lado y el rival enfrentado al otro, mirándose, y la frase literal de titular. Fotos libres de los dos (nunca la del tuit ni de agencias). Si `"verificada"` no es `true`, no la uses nunca: haz la miniatura de siempre.
