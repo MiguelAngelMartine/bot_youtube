@@ -110,18 +110,23 @@ async def _de_cuenta(api, n, h, desde, por_cuenta):
 async def _recientes(horas, por_cuenta):
     api = await sesion()
     desde = datetime.now(timezone.utc) - timedelta(hours=horas)
-    datos, fallos, seguidas = [], [], 0
+    datos, fallos, sin_respuesta, seguidas = [], [], [], 0
     for n, h in CUENTAS.items():
         try:
             datos += await asyncio.wait_for(_de_cuenta(api, n, h, desde, por_cuenta), TOPE_CUENTA)
             seguidas = 0
-        except asyncio.TimeoutError:             # tres seguidas sin respuesta: la sesión ha caído, no se espera por las demás
-            fallos.append(f"@{h} (sin respuesta)")
+        except asyncio.TimeoutError:
+            sin_respuesta.append((n, h))
             seguidas += 1
-            if seguidas == 3:
-                fallos.append("resto sin consultar")
-                break
+            if seguidas == 3:                    # tres seguidas: la sesión ha caído, no se espera por las demás
+                fallos = [f"@{x} (sin respuesta)" for _, x in sin_respuesta] + ["resto sin consultar"]
+                return datos, fallos
         except Exception as ex:                  # una cuenta que falla no para las demás
+            fallos.append(f"@{h} ({type(ex).__name__})")
+    for n, h in sin_respuesta:                   # segunda pasada: la primera llamada de la sesión puede tardar mucho
+        try:
+            datos += await asyncio.wait_for(_de_cuenta(api, n, h, desde, por_cuenta), TOPE_CUENTA)
+        except Exception as ex:
             fallos.append(f"@{h} ({type(ex).__name__})")
     return datos, fallos
 
