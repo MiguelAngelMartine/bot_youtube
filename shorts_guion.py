@@ -105,8 +105,8 @@ def main(fecha, n=3):
         redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
                 f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes
         obligada = (f"\n\nOBLIGATORIO (lo pide el director y está comprobado): el PRIMER Short es la frase «{enc['frase']}» "
-                    f"de {enc['persona']} sobre «{enc.get('tema', '')}», DEDICADO SOLO A ESA NOTICIA: el contexto habla únicamente de ella """
-       f"""(del guion aprobado sobre ese tema), sin mezclar otros temas.")
+                    f"de {enc['persona']} sobre «{enc.get('tema', '')}», DEDICADO SOLO A ESA NOTICIA: el contexto habla "
+                    f"únicamente de ella (del guion aprobado sobre ese tema), sin mezclar otros temas.")
     r = gem.pide(PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
     if isinstance(r, list):                              # a veces devuelve la lista sin envolver
         r = {"shorts": r}
