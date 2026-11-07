@@ -57,3 +57,11 @@
 - **Antes de monetizar:** una consulta breve con un abogado de propiedad intelectual (la voz ya tiene licencia comercial con Azure desde el 2-nov).
 - **TikTok, aparcado** (2-nov-2026): primero se asienta YouTube. Cuando funcione como queremos: 1) meter el corto en la jornada y mandarlo por Telegram para subirlo a mano; 2) después, la API oficial de TikTok en modo borrador (registrar la app en developers.tiktok.com; el vídeo llega a la bandeja y lo publica el usuario). Nunca programas no oficiales (riesgo de cierre de la cuenta).
 - **Pendiente de mejorar en el corto vertical:** piezas que se solapan en la escena de posturas; biblioteca de escenarios y personajes genéricos dibujados (lo que más engancha en el vídeo de referencia).
+
+## Mejoras pedidas el 7-nov-2026 (para todos los vídeos y Shorts desde el 8-nov)
+- **Corrección al final** del vídeo (tras los breves, antes de la despedida), no al principio (`editor-de-cierre`).
+- **Viñetas fluidas:** la primera entra con el cambio de pantalla y las siguientes se deslizan con suavidad (0,7 s, `largo.desliza`).
+- **Fotos de calidad:** `fotos.py mejores <fecha> "<nombre>" --animo "<gesto>"` reúne muchas candidatas, descarta caras pequeñas y Gemini elige las de más calidad y gesto acorde; el editor gráfico y el diseñador deben usarlo. Miniatura al estilo de la referencia del usuario (dos protagonistas grandes enfrentados, titular enorme), siempre con fotos reales: nunca escenas realistas inventadas con IA de personas reales.
+- **Más etiquetas y hashtags** (vídeo: 35-45 etiquetas y 12-15 hashtags; Shorts: 8-12 hashtags y 15-25 etiquetas), solo de personas y temas que salen; títulos con verbos neutros.
+- **Shorts de ~1 minuto y siempre con su miniatura** (portada vertical propia, también en los primeros 0,4 s del vídeo).
+- Gemini usa las dos claves (`GEMINI_API_KEY` y `GEMINI_IMAGEN_API_KEY`) para tener el doble de cuota gratuita.

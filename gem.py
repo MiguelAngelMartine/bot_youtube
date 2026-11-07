@@ -24,6 +24,13 @@ def _clave():
     return kv["GEMINI_API_KEY"].strip().strip("\"'")
 
 
+def _claves():
+    """Todas las claves de Gemini (7-nov-2026: la segunda es otro proyecto, con su propia cuota gratuita)."""
+    kv = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text(encoding="utf-8").splitlines()
+              if "=" in l and not l.startswith("#"))
+    return [kv[n].strip().strip("\"'") for n in ("GEMINI_API_KEY", "GEMINI_IMAGEN_API_KEY") if kv.get(n, "").strip()]
+
+
 def imagen(im, ancho=None):
     """Parte de imagen para Gemini a partir de una imagen PIL (opcionalmente reducida)."""
     from PIL import Image
@@ -42,11 +49,11 @@ def pide(partes, como_json=False, temperatura=0.2):
     conf = {"temperature": temperatura}
     if como_json:
         conf["responseMimeType"] = "application/json"
-    k = _clave()
+    claves = _claves()
     limite = time.time() + LIMITE_S
-    agotados = set()                                    # cuota diaria gastada: ese modelo, fuera hasta mañana
-    for modelo in MODELOS * 3:                          # vueltas por la lista mientras quede tiempo
-        if modelo in agotados:
+    agotados = set()                                    # cuota diaria gastada: ese modelo con esa clave, fuera hasta mañana
+    for modelo, k in [(m, c) for m in MODELOS for c in claves] * 3:   # vueltas por modelos y claves mientras quede tiempo
+        if (modelo, k) in agotados:
             continue
         cfg = dict(conf, thinkingConfig={"thinkingLevel": "low"}) if modelo.startswith("gemini-3") else conf   # mas rapido
         for intento in range(3):
@@ -71,7 +78,7 @@ def pide(partes, como_json=False, temperatura=0.2):
                     except ValueError:
                         break                           # JSON roto: prueba otro modelo
             if r.status_code == 429 and "quota" in r.text.lower():
-                agotados.add(modelo)                    # sin cuota hoy: al siguiente modelo, sin esperar
+                agotados.add((modelo, k))               # sin cuota hoy: al siguiente modelo o clave, sin esperar
                 break
             if r.status_code in (429, 500, 503):
                 if intento:                             # saturado dos veces: prueba otro modelo y vuelve luego

@@ -303,10 +303,92 @@ def elegir(dia_txt, s, k, nombre, persona=None):
     print(f"guardada {nombre} ({im.width}x{im.height}, {c['licencia']}, {c['autor']})")
 
 
+ELIGE = """Eres editor gráfico de un informativo de YouTube profesional. Estas son fotos candidatas de {nombre}. Hay que
+elegir las {n} MEJORES para usarla recortada y en grande (miniatura y retrato), para una noticia en la que el gesto
+debería ser: {animo}. Puntúa cada una de 1 a 10 valorando, por este orden:
+1) que sea de verdad {nombre} (si dudas, 0) y que la cara se vea grande, nítida, enfocada y bien iluminada;
+2) gesto y expresión acordes con «{animo}» (nada de sonrisa de foto oficial para una mala noticia);
+3) que mire a cámara o de tres cuartos (no de espaldas ni muy de perfil), sin nada delante de la cara;
+4) aspecto profesional: traje o ropa de trabajo habitual, en un acto, tribuna o rueda de prensa; mejor reciente;
+5) que no haya otras caras grandes que compitan.
+Responde SOLO JSON: {{"puntos": [p0, p1, ...]}} con un número por foto, en el mismo orden."""
+
+
+def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
+    """7-nov-2026 (el usuario: «las fotos son muy malas, poco profesional»): reúne muchas candidatas de la persona
+    (Wikidata, su categoría de Commons y subcategorías por año, Pool Moncloa), descarta las de cara pequeña o sin cara
+    (YuNet) y Gemini elige las de más calidad y con el gesto que pide la noticia. Guarda retrato_<apellido>[_k].jpg con
+    su crédito y persona. Devuelve las rutas guardadas."""
+    import gem
+    import miniatura as M
+    dia = RAIZ / "dia" / dia_txt
+    cands, vistos = [], set()
+    fuentes = [lambda: [retrato_wikidata(nombre)], lambda: commons_categoria(nombre, 24), lambda: moncloa(nombre, 10)]
+    if extra_q:
+        fuentes.append(lambda: commons_categoria(extra_q, 12))
+    for f in fuentes:
+        try:
+            for c in f() or []:
+                if c and c["pagina"] not in vistos and _lic_ok(c["licencia"]):
+                    vistos.add(c["pagina"])
+                    cands.append(c)
+        except Exception as e:
+            print(f"  (una fuente no responde: {type(e).__name__})")
+    buenas = []
+    for c in cands[:30]:
+        im = baja(c["miniatura"], 900)
+        if im is None or min(im.size) < 300:
+            continue
+        k = M.cara(im)
+        if not k or k[3] < 0.14 * im.height or k[3] < 70:        # cara pequeña: foto de grupo o de lejos
+            continue
+        buenas.append((c, im))
+    if not buenas:
+        print(f"  {nombre}: ninguna candidata con la cara grande")
+        return []
+    puntos = None
+    for lote in range(0, len(buenas), 10):              # de 10 en 10 para no pasar el tamaño de la petición
+        sub = buenas[lote:lote + 10]
+        partes = [{"text": ELIGE.format(nombre=nombre, n=n, animo=animo)}]
+        for j, (c, im) in enumerate(sub):
+            partes += [{"text": f"Foto {j}:"}, gem.imagen(im, 640)]
+        r = gem.pide(partes, como_json=True)
+        p_ = (r or {}).get("puntos") if isinstance(r, dict) else None
+        if not isinstance(p_, list) or len(p_) != len(sub):
+            p_ = [6] * len(sub)                          # sin Gemini: las de cara grande, en el orden de siempre
+        puntos = (puntos or []) + [float(x) if str(x).replace(".", "", 1).isdigit() else 0 for x in p_]
+    orden = sorted(range(len(buenas)), key=lambda i: -puntos[i])
+    ap = slug(nombre.split()[-1])
+    cred_f = dia / "creditos.json"
+    cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else {}
+    (dia / "imagenes").mkdir(parents=True, exist_ok=True)
+    guardadas = []
+    for i in orden:
+        if len(guardadas) >= n or puntos[i] < 6:
+            break
+        c, _ = buenas[i]
+        im = baja(original(c["url"]), 3200) or baja(c["url"], 3200)
+        if im is None:
+            continue
+        nom = f"retrato_{ap}{'' if not guardadas else '_' + str(len(guardadas) + 1)}.jpg"
+        im.save(dia / "imagenes" / nom, quality=92)
+        cred[nom] = {"titulo": c["titulo"], "url": c["url"], "ancho": im.width, "alto": im.height, "autor": c["autor"],
+                     "licencia": c["licencia"], "pagina": c["pagina"], "fuente": c["fuente"], "persona": nombre,
+                     "puntos_gemini": puntos[i]}
+        guardadas.append(dia / "imagenes" / nom)
+        print(f"  {nom}: {puntos[i]:.0f}/10 · {c['licencia']} · {c['autor'][:30]} · {c['titulo'][:60]}")
+    cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"{nombre}: {len(guardadas)} retratos de {len(buenas)} candidatas con cara grande ({len(cands)} en total)")
+    return guardadas
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a and a[0] == "buscar":
         buscar(a[1], a[2], int(a[a.index("--n") + 1]) if "--n" in a else 8)
+    elif a and a[0] == "mejores":                      # mejores <fecha> "<nombre>" [--animo "enfado"] [--n 3]
+        mejores(a[1], a[2], a[a.index("--animo") + 1] if "--animo" in a else "serio",
+                int(a[a.index("--n") + 1]) if "--n" in a else 3)
     elif a and a[0] == "elegir":
         elegir(*a[1:5], persona=a[a.index("--persona") + 1] if "--persona" in a else None)
     elif a and a[0] == "recorta":                      # recorta <fecha> <origen> <destino> x0 y0 x1 y1 [--persona N]

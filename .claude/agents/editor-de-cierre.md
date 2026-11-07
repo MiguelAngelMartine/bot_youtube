@@ -1,6 +1,6 @@
 ---
 name: editor-de-cierre
-description: Fase 5 de la redacción de El Hoyformativo. Monta el episodio.json final - sumario de titulares, corrección si la hay, bloques aprobados, breves y despedida - y comprueba duración y coherencia.
+description: Fase 5 de la redacción de El Hoyformativo. Monta el episodio.json final - sumario de titulares, bloques aprobados, breves, corrección al final si la hay y despedida - y comprueba duración y coherencia.
 tools: Read, Write, Glob
 model: opus
 ---
@@ -24,12 +24,13 @@ Escribe `dia/<fecha>/episodio.json` con:
      - `persona` (opcional): el protagonista, con el nombre exacto con que sale en los bloques, para que el editor gráfico le busque retrato;
      - `seccion` solo si el orden de los items no es el de los bloques.
      Los items de bloques `sobrio` van con letra lisa y sin golpes (las fotos, siempre a color): su titular, sobrio («¿Qué falló en Urda?»).
-2. **Corrección**, si `correcciones.md` trae algo.
-   - Sección «Corrección», tono `sobrio`, un paso que empieza «Antes de empezar, una corrección.», con el texto propuesto ya verificado.
-   - Escena `claves` con titulo «CORRECCIÓN» y fuente.
+2. *(La corrección ya no va aquí: va al final, punto 4; decisión del usuario del 7-nov-2026.)*
 3. **Los bloques** en el orden de la escaleta, copiados de `bloques/` sin cambiar los hechos.
    - Solo puedes retocar transiciones y la primera frase para que el episodio fluya: el primer paso de cada bloque enlaza con el anterior («Y del luto pasamos a la campaña»), según «Escribir para el oído» del libro de estilo, con conectores neutros y sin hechos nuevos.
-4. **Breves**, y como último paso de esa sección la despedida, literal (el cierre anima el botón y la campana con estas palabras): «Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.», con escena `despedida`.
+4. **Breves**, y después, **si `correcciones.md` trae algo, la Corrección al final** (decisión del usuario del 7-nov-2026: no al principio):
+   - Sección «Corrección», tono `sobrio`, justo después de los breves, con un paso que empieza «Antes de terminar, una corrección.» y el texto propuesto ya verificado; escena `claves` con titulo «CORRECCIÓN» y fuente.
+   - La despedida va entonces como último paso de la sección Corrección (si no hay corrección, como último paso de los breves).
+   La despedida, literal (el cierre anima el botón y la campana con estas palabras): «Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el resumen de mañana. Gracias por vernos. Mañana, más.», con escena `despedida`.
 5. **`titulo_video`:** el de la escaleta, sin el nombre del canal ni la fecha (decisión del usuario del 4-nov-2026). **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:

@@ -55,7 +55,7 @@ Ordenado de más a menos medios. Solo política española y sus consecuencias (n
 **`revision/verificacion.md`**, **`revision/neutralidad.md`** y **`revision/cumplimiento.md`**: una sección por bloque con el veredicto `APTO` o `CORREGIR`. Cada problema va con la frase exacta y el cambio propuesto.
 
 ## Fase 5
-**`episodio.json`** (Editor de cierre): `{fecha, titulo_video, secciones: [sumario, (corrección), bloques..., breves con la despedida]}`.
+**`episodio.json`** (Editor de cierre): `{fecha, titulo_video, secciones: [sumario, bloques..., breves, (corrección al final, desde el 7-nov-2026)]}`; la despedida, último paso de la última sección.
 
 **Fotos** (Editor gráfico): `imagenes/sN_M.jpg` y `imagenes/retrato_<apellido>.jpg`, `creditos.json` (`{fichero: {titulo, url, autor, licencia, pagina, fuente, persona?}}`; `persona` marca el retrato de esa persona) y el campo `foto` en las escenas de `episodio.json`.
 

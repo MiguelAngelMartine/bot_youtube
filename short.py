@@ -227,7 +227,38 @@ def _imagenes_tema(dia, i, sec, quien):
             f = (p.get("ve") or {}).get("foto")
             if f and (dia / "imagenes" / f).exists():
                 out.append(dia / "imagenes" / f)
-    return list(dict.fromkeys(out))[:5]
+    return list(dict.fromkeys(out))[:8]
+
+
+def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
+    """Miniatura vertical del Short (7-nov-2026: «asegurarse de que los Shorts tienen su miniatura»), con el lenguaje de
+    la miniatura del vídeo largo: imagen del tema de fondo, la persona MUY grande y el titular enorme con relieve."""
+    im = fondo.crop(((fondo.width - AN) // 2, (fondo.height - AL) // 2, (fondo.width - AN) // 2 + AN,
+                     (fondo.height - AL) // 2 + AL)).convert("RGBA")
+    if foto_persona:
+        c = M.recorte(foto_persona)
+        r = M.encuadre_cara(c, AN, 1250, (0.5, 0.36), 0.5, suave=True)
+        if r:
+            pi, x, y = r
+            caja = Image.new("RGBA", (AN, 1250))
+            caja.paste(pi, (x, y), pi)
+            im.alpha_composite(caja, (0, 120))
+    g = Image.linear_gradient("L").resize((AN, 900)).point(lambda v: int(min(255, v * 1.3)))
+    sombra = Image.new("RGBA", (AN, 900), (4, 6, 14, 255))
+    sombra.putalpha(g)
+    im.alpha_composite(sombra, (0, AL - 900))
+    tam, lineas = M.ajusta(titular, destaca or "", 1000, False)
+    tx = M.texto(lineas, min(tam, 210), False, espacio=0.55)
+    if tx.width > 1040:
+        k = 1040 / tx.width
+        tx = tx.resize((int(tx.width * k), int(tx.height * k)), Image.LANCZOS)
+    tx = tx.rotate(3, resample=Image.BICUBIC, expand=True)
+    yt = min(AL - tx.height - 170, 1330)
+    k_ = _kicker(kicker.upper(), 60)
+    im.alpha_composite(k_, (50, yt - k_.height + 10))
+    im.alpha_composite(tx, ((AN - tx.width) // 2, yt))
+    im.alpha_composite(_cabecera(fecha), (0, 0))
+    return im
 
 
 def main(fecha, n):
@@ -379,7 +410,28 @@ def main(fecha, n):
 
     cortes = [x for x in (t_ctx, t_rep, t_fin) if x] + [tp for tp, _ in paneles[1:]]
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
-    cuadro(0.6).convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")       # el fotograma 0 = la miniatura
+    foto_p = None                                       # la foto real de la persona (no la ilustración) para la portada
+    if p1 and not p1[3].startswith("Ilustración"):
+        cred_ = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
+        fp = C.fotos_personas({S["quien"]}, cred_, dia / "imagenes").get(S["quien"])
+        foto_p = fp if fp and Path(fp).exists() else None
+        if foto_p is None:
+            foto_p = next((dia / "imagenes" / f for f, c_ in cred_.items() if c_.get("persona") == S["quien"]
+                           and (dia / "imagenes" / f).exists()), None)
+    try:
+        PORT = portada(fecha, fondo, foto_p, S["kicker"], S.get("portada") or S["cita"], S.get("destaca", ""))
+    except Exception as e:                              # sin portada propia, el fotograma del gancho
+        print(f"  AVISO: portada propia no hecha ({type(e).__name__}): se usa el fotograma del gancho")
+        PORT = cuadro(0.6)
+    PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
+    _cuadro_normal = cuadro
+
+    def cuadro(t):                                      # los primeros 0,4 s, la portada (YouTube suele tomarla)
+        if t < 0.4:
+            fr = PORT.copy()
+            ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
+            return fr
+        return _cuadro_normal(t)
     out = dia / "shorts" / f"short_{n}.mp4"
     ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN}x{AL}",
                            "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",

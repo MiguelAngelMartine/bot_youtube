@@ -5,6 +5,7 @@ Uso: python plataforma.py AAAA-MM-DD     (salida 2 si Gemini no responde: entonc
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -18,12 +19,20 @@ A partir del guion del vídeo de abajo, escribe:
 - "titulo": ≤ 70 caracteres, SIN el nombre del canal (decisión del usuario del 4-nov-2026). Mejor si empieza por la frase más impactante del día,
   LITERAL y atribuida, que salga en el guion; si no, los 2-3 temas con el término que la gente buscaría al principio.
   Sin mayúsculas gritonas, sin exclamaciones, sin prometer nada que el vídeo no cuente. Tacos e insultos vejatorios, no.
+  Verbos neutros («dice», «responde a», «critica», «pide»); nunca «carga contra», «arremete», «estalla», «sentencia»,
+  «zanja», «destroza», «humilla».
 - "lineas": 2 frases naturales que resuman las noticias principales con los nombres propios que alguien buscaría
   (son las que se ven en la búsqueda). Neutrales.
-- "etiquetas": 15-25 etiquetas de cosas que SALEN en el vídeo (personas, partidos, instituciones, temas), con
-  variantes de búsqueda, más «política española», «noticias España», «resumen del día», «El Hoyformativo».
-  Nada de relleno ni de temas que no salen (es spam para YouTube).
-- "hashtags": exactamente 3: el del tema principal, uno general (#PolíticaEspaña) y #ElHoyformativo.
+- "etiquetas": 35-45 etiquetas (decisión del usuario del 7-nov-2026: más palabras clave). Todas de cosas que SALEN en
+  el vídeo: cada político con nombre completo y con el nombre por el que se le busca («Isabel Díaz Ayuso», «Ayuso»),
+  su cargo («presidente del Gobierno»), cada partido con sus siglas y nombre, instituciones, lugares y cada tema con
+  sus variantes de búsqueda («caso Koldo», «Koldo García»), más las generales: «política española», «noticias
+  España», «actualidad política», «resumen del día», «noticias de hoy», «El Hoyformativo» (y «elecciones» o «campaña
+  electoral» si el vídeo habla de ellas). Nada de personas ni temas que no salgan (YouTube lo trata como spam).
+- "hashtags": entre 12 y 15 (nunca más de 15: YouTube los ignoraría todos). Los 3 primeros son los que se ven sobre
+  el título: el del tema principal, el del protagonista principal y #PolíticaEspañola. Después, uno por cada político
+  y partido importante que sale (#Sánchez, #Feijóo, #Ayuso, #PSOE, #PP, #Vox…), los de los temas (#CasoKoldo…),
+  #NoticiasDeHoy, #ActualidadPolítica y #ElHoyformativo al final. Sin espacios dentro, sin repetir.
 - "comentario": una pregunta neutral para la comunidad sobre el tema principal que no tome partido, y una frase
   invitando a señalar errores con su fuente para la fe de erratas.
 Responde SOLO con JSON con esas claves.
@@ -50,7 +59,18 @@ def main(fecha):
     etiquetas = [e.strip() for e in r.get("etiquetas", []) if e.strip()]
     while len(", ".join(etiquetas)) > 480:
         etiquetas.pop()
-    hashtags = " ".join(h if h.startswith("#") else "#" + h for h in r.get("hashtags", [])[:3])
+    for mal, bien in ((r"\b(carga|cargan|arremete|arremeten|estalla|estallan) contra\b", "critica a"),
+                      (r"\b(sentencia|zanja|suelta|clama)\b", "dice")):
+        titulo = re.sub(mal, bien, titulo)               # verbos valorativos fuera (libro de estilo)
+    vistos, hs = set(), []
+    for h in r.get("hashtags", []):                    # máximo 15 (con más, YouTube los ignora todos), sin repetir
+        h = "#" + re.sub(r"[\s#]+", "", str(h))
+        if len(h) > 1 and h.lower() not in vistos:
+            vistos.add(h.lower())
+            hs.append(h)
+    if "#elhoyformativo" not in vistos:
+        hs = hs[:14] + ["#ElHoyformativo"]
+    hashtags = " ".join(hs[:15])
     origen = dia / "vinetas" / "origen.json"
     sintetico = origen.exists() and any(d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()
                                         for k, d in json.loads(origen.read_text(encoding="utf-8")).items())

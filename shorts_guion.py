@@ -17,7 +17,7 @@ RAIZ = Path(__file__).parent
 
 PROMPT = """Eres el editor de Shorts de «El Hoyformativo», informativo de política española en YouTube: neutral y riguroso,
 pero con gancho (el «salseo»: los cruces de declaraciones entre políticos). Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
-para hacer un Short de 40-50 segundos con cada una. Reglas:
+para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - La frase tiene que estar LITERAL en el material de abajo (cópiala letra a letra; un programa lo comprueba) y ser
   ENTERA palabras de quien habla: si el medio solo entrecomilla una palabra suelta («ve "irresponsable" decir...»), esa
   frase no vale (sería atribuirle palabras del periodista). Sin comillas dentro de la cita. Prioriza
@@ -30,7 +30,8 @@ para hacer un Short de 40-50 segundos con cada una. Reglas:
   tema que no contesta a ese ataque NO es una réplica. Si no hay réplica directa: "replica": null (y no se menciona).
 - Descalificaciones políticas literales sí; tacos e insultos vejatorios, no.
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 4-5 frases (70-90 palabras), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
+- "contexto": 7-9 frases (120-150 palabras: el Short dura alrededor de 1 minuto, decisión del usuario del
+  7-nov-2026), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
   APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
   antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
@@ -38,12 +39,18 @@ para hacer un Short de 40-50 segundos con cada una. Reglas:
   intenciones ni añade lo que la persona «considera» si no está en el material.
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
+- "portada": 2-5 palabras LITERALES de la cita, las de más gancho, para el titular enorme de la miniatura
+  («HAY QUE SER COBARDE», «PRINGADO HASTA EL CHÓFER»).
+- "hashtags": 8-12 sin repetir: el del protagonista (#Ayuso), el del aludido, sus partidos (#PP, #PSOE), el del tema
+  (#CaraACara), #PolíticaEspañola, #NoticiasDeHoy y #ElHoyformativo. Solo de lo que sale en el Short.
+- "etiquetas": 15-25: nombre completo y corto de cada persona que sale, su cargo, sus partidos, el tema con
+  variantes de búsqueda, «política española», «noticias de hoy», «shorts política». Solo de lo que sale.
 - "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice, con verbo neutro
   («dice», «afirma», «responde a»; nunca «sentencia», «zanja», «estalla», «arremete»). Sin el nombre del canal.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "kicker": "...", "entrada": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
-"titulo": "..."}}]}}
+"portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "..."}}]}}
 
 MATERIAL APROBADO (guion del vídeo de hoy, ya verificado):
 {guion}

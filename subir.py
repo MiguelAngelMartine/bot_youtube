@@ -210,10 +210,21 @@ def subir_shorts(dia_txt):
         if any("viñetas del tema" in c for c in cr):
             partes += ["Las viñetas son ilustraciones generadas con IA a partir de los hechos contados; las personas "
                        "dibujadas salen de fotos con licencia libre."]
-        partes += ["", "#Shorts #PolíticaEspañola #ElHoyformativo"]
+        hs, vistos = [], set()                          # 7-nov: más hashtags (máx. 15: con más, YouTube los ignora)
+        for h in ["#Shorts"] + list(S.get("hashtags") or []) + ["#PolíticaEspañola", "#NoticiasDeHoy", "#ElHoyformativo"]:
+            h = "#" + re.sub(r"[\s#]+", "", str(h))
+            if len(h) > 1 and h.lower() not in vistos:
+                vistos.add(h.lower())
+                hs.append(h)
+        partes += ["", " ".join(hs[:15])]
+        tags = list(dict.fromkeys([t.strip() for t in (S.get("etiquetas") or []) if str(t).strip()] +
+                                  [S["quien"], (S.get("replica") or {}).get("quien", ""), S.get("partido", ""),
+                                   "política española", "noticias de hoy", "Shorts", "El Hoyformativo"]))
+        tags = [t for t in tags if t]
+        while len(", ".join(tags)) > 480:
+            tags.pop(-2)
         cuerpo = {"snippet": {"title": titulo[:100], "description": "\n".join(partes)[:5000], "categoryId": "25",
-                              "tags": ["política", "España", "Shorts", S["quien"]] +
-                                      ([S["replica"]["quien"]] if S.get("replica") else []),
+                              "tags": tags,
                               "defaultLanguage": "es", "defaultAudioLanguage": "es"},
                   "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
         if S.get("sintetico"):                          # persona real dibujada por IA: se declara (no afecta a ingresos)

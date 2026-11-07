@@ -440,18 +440,30 @@ def vista_comic(pt, t):
     k = max([j for j, pn in enumerate(pns) if pn["t"] <= t] or [0])
     tl = t - pns[k]["t"]
     cur = _panel(pns[k], max(0.0, tl), sobrio)
-    dur = 0.6 if sobrio else 0.42
+    dur = 0.8 if sobrio else 0.7                      # 7-nov: más lento y fluido (antes 0,42 s, «muy forzado»)
     if k > 0 and tl < dur:
         prev = _panel(pns[k - 1], t - pns[k - 1]["t"], sobrio)
-        x = suave(tl / dur)
-        if sobrio:
-            return Image.blend(prev, cur, x)
-        fr = Image.new("RGBA", (BW, BH), (0, 0, 0, 255))
-        fr.paste(prev, (int(-BW * x), 0))
-        fr.paste(cur, (int(BW * (1 - x)), 0))
-        ImageDraw.Draw(fr).rectangle([int(BW * (1 - x)) - 14, 0, int(BW * (1 - x)), BH], fill=(0, 0, 0, 255))
-        return fr
+        return desliza(prev, cur, tl / dur, sobrio)
     return cur
+
+
+def desliza(prev, cur, q, sobrio=False):
+    """Paso de una imagen a otra (BW x BH): la nueva entra desde la derecha con suavidad y la anterior se aparta más
+    despacio y se oscurece (profundidad), sin barra negra; en los bloques sobrios, fundido."""
+    x = suave(max(0.0, min(1.0, q)))
+    if sobrio:
+        return Image.blend(prev.convert("RGBA"), cur.convert("RGBA"), x)
+    fr = Image.new("RGBA", (BW, BH), (0, 0, 0, 255))
+    atras = Image.blend(prev.convert("RGBA"), Image.new("RGBA", prev.size, (0, 0, 0, 255)), 0.55 * x)
+    fr.paste(atras, (int(-BW * 0.3 * x), 0))
+    xc = int(BW * (1 - x))
+    fr.paste(cur.convert("RGBA"), (xc, 0))
+    if 0 < xc < BW:                                     # sombra suave en el borde de la que entra
+        sombra = Image.linear_gradient("L").rotate(90, expand=True).resize((40, BH))
+        negro = Image.new("RGBA", (40, BH), (0, 0, 0, 0))
+        negro.putalpha(sombra.point(lambda v: int(v * 0.6)))
+        fr.alpha_composite(negro, (max(0, xc - 40), 0))
+    return fr
 
 
 def paneles_comic(ve, T, c0, t0, fotos):
@@ -471,7 +483,7 @@ def paneles_comic(ve, T, c0, t0, fotos):
         else:
             pn = {"clase": "texto", "narr": "", "cita": texto}
         if k == 0:
-            tk = t0 + 0.3
+            tk = t0                                       # el primero, con el cambio de pantalla (7-nov)
         else:
             cw = it.get("cuando") or ""
             ci = T.texto.find(cw, c0) if cw else -1
@@ -576,7 +588,7 @@ def vista_tablero(pt, t, cam):
     # barrido con desenfoque al cambiar de escena dentro del bloque
     for borde, sentido in ((pt["t0"], 1), (pt["t1"], -1)):
         dt = (t - borde) if sentido == 1 else (borde - t)
-        if 0 <= dt < 0.22 and ((sentido == -1 and not pt.get("sin_salida")) or (sentido == 1 and pt["k"] > 0)):
+        if 0 <= dt < 0.22 and ((sentido == -1 and not pt.get("sin_salida")) or (sentido == 1 and pt["k"] > 0 and not pt.get("sin_entrada"))):
             off = int((1 - dt / 0.22) ** 2 * 900) * sentido
             capas = [vista.transform(vista.size, Image.AFFINE, (1, 0, -(off + j * 50 * sentido), 0, 1, 0),
                                      fillcolor=(22, 36, 64, 255)) for j in range(5)]   # lo que entra: color del tablero
@@ -676,7 +688,8 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                 desp = {"t0": pt["t0"], "ev": {k: (v - pt["t0"] if v is not None else None) for k, v in ev.items()}}
         for a, b in zip(partes, partes[1:]):
             a["t1"] = b["t0"]
-            a["sin_salida"] = b["tipo"] == "despedida"     # el cierre ya trae su barrida: sin dos transiciones seguidas
+            a["sin_salida"] = b["tipo"] == "despedida" or bool(b.get("comic"))   # sin dos transiciones seguidas
+            b["sin_entrada"] = bool(a.get("comic"))
         partes[-1]["t1"] = t + dur
         for pt in partes:
             pt["piezas"], pt["base"] = encaja(pt["piezas"], pt.get("fondo"), pt.get("sobrio_f", False))
@@ -802,7 +815,15 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
         p = plan[i]
         pt = p["partes"][max(j for j, x in enumerate(p["partes"]) if x["t0"] <= t + 1e-9 or j == 0)]
         fr = G2.fondo_marca(t)
-        fr.paste((vista_comic(pt, t) if pt.get("comic") else vista_tablero(pt, t, cam)).convert("RGBA"), (BX, BY))  # el tablero es opaco: pegar es mucho mas rapido que componer
+        jp = max(j for j, x in enumerate(p["partes"]) if x["t0"] <= t + 1e-9 or j == 0)
+        vista = vista_comic(pt, t) if pt.get("comic") else vista_tablero(pt, t, cam)
+        q = (t - pt["t0"]) / 0.7
+        if jp > 0 and q < 1 and (pt.get("comic") or p["partes"][jp - 1].get("comic")):
+            # 7-nov: la escena de cómic entra (o sale) deslizándose con el cambio de pantalla, no de golpe
+            ant = p["partes"][jp - 1]
+            v_ant = vista_comic(ant, t) if ant.get("comic") else vista_tablero(ant, t, [])
+            vista = desliza(v_ant, vista, q, pt.get("sobrio", False))
+        fr.paste(vista.convert("RGBA"), (BX, BY))  # el tablero es opaco: pegar es mucho mas rapido que componer
         d = ImageDraw.Draw(fr)
         d.rectangle([BX, BY - 4, BX + BW, BY], fill=AMARILLO + (255,))
         d.rectangle([BX, BY + BH, BX + BW, BY + BH + 4], fill=AMARILLO + (255,))
