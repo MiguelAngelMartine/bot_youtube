@@ -68,12 +68,16 @@ def main(fecha):
         return 2
     e = json.loads(f.read_text(encoding="utf-8"))
     ok, prueba = (por_enlace(e) if e.get("enlace") else (None, ""))
+    if ok is False and e.get("enlace"):                 # el tuit dice otra cosa o es de otra cuenta: nunca se usa
+        e.pop("comprobada_a_mano", None)
     if not ok:
         ok2, prueba2 = por_noticias(dia, e)
         if ok2:
             ok, prueba = True, prueba2
         else:
             prueba = "; ".join(x for x in (prueba, prueba2) if x)
+    if not ok and e.get("comprobada_a_mano"):           # comprobación hecha a mano con pruebas (p. ej., la vista previa
+        ok, prueba = True, e["comprobada_a_mano"]       # del tuit + su enlace t.co resuelto), si el oEmbed no la contradice
     e["verificada"], e["prueba"] = bool(ok), prueba
     f.write_text(json.dumps(e, ensure_ascii=False, indent=1), encoding="utf-8")
     print(("VERIFICADA: " if ok else "NO VERIFICADA: ") + prueba)
