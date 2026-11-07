@@ -99,7 +99,14 @@ def main(fecha, n=3):
     guion = "\n".join(p.get("di", "") + " " + json.dumps(p.get("ve") or {}, ensure_ascii=False)
                       for s in G["secciones"] for p in s["pasos"])
     redes = (dia / "redes.md").read_text(encoding="utf-8")[:30000] if (dia / "redes.md").exists() else ""
-    r = gem.pide(PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes), como_json=True)
+    enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
+    obligada = ""
+    if enc.get("verificada") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
+        redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
+                f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes
+        obligada = (f"\n\nOBLIGATORIO (lo pide el director y está comprobado): el PRIMER Short es la frase «{enc['frase']}» "
+                    f"de {enc['persona']} sobre «{enc.get('tema', '')}», con el contexto del guion aprobado sobre ese tema.")
+    r = gem.pide(PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
     if isinstance(r, list):                              # a veces devuelve la lista sin envolver
         r = {"shorts": r}
     if not isinstance(r, dict):

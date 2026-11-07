@@ -94,3 +94,6 @@ Reglas:
 - Equilibrio: si la miniatura enfrenta a dos personas, que sean de los dos lados de la noticia y con el mismo trato.
 
 Responde con el titular, la etiqueta, la foto del protagonista (licencia, autor), la de fondo y una línea sobre cómo queda.
+
+## Encargo del director (7-nov-2026)
+Si el coordinador te dice que hay encargo verificado, lee `dia/<fecha>/encargo.json`: la miniatura va con esa persona (la mejor foto libre que haya, de frente y con gesto acorde) y esa frase literal como titular, sobre el tema que indica. Si `"verificada"` no es `true`, no la uses nunca: haz la miniatura de siempre.
