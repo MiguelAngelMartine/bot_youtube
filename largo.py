@@ -815,7 +815,9 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
             falta = plan[i + 1]["t0"] - t
             if falta < 4.5:
                 tz = p["teaser"]
-                pega(fr, tz, BX + BW - 16 - tz.width, BY - 70, min(1.0, (4.5 - falta) * 3))
+                # 7-nov: dentro del escenario, abajo a la derecha (encima del crédito «Ilustración IA»): ni tapa el
+                # título del bloque (arriba) ni choca con los subtítulos (debajo)
+                pega(fr, tz, BX + BW - 16 - tz.width, BY + BH - tz.height - 64, min(1.0, (4.5 - falta) * 3))
         if pt["fuente"]:                               # 6-nov: una línea discreta bajo el escenario, a la izquierda
             fr.alpha_composite(linea_fuente(pt["fuente"]), (BX, BY + BH + 10))
         pm = presente(t, i)
