@@ -67,7 +67,14 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     f = CACHE / f"{clave}.jpg"
     if f.exists():
         return Image.open(f).convert("RGB")
-    acc, tok = _claves()
+    try:
+        acc, tok = _claves()
+    except KeyError:
+        acc = tok = None
+    if acc is None or (not fotos and (RAIZ / "cache" / f"cloudflare_agotado_{_hoy_utc()}").exists()):
+        if not fotos:                                    # sin Cloudflare hoy: la escena, al Space gratuito
+            return _escena_hf(prompt, intento, f)
+        raise RuntimeError("sin claves de Cloudflare")
     url = f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{modelo}"
     cab = {"Authorization": f"Bearer {tok}"}
     if fotos:
@@ -82,12 +89,45 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
     except ValueError:
         raise RuntimeError(f"respuesta no valida ({r.status_code})")
     img = (j.get("result") or {}).get("image")
+    if not img and not fotos:                            # cuota de Cloudflare agotada o fallo: el Space gratuito
+        msg = "; ".join(str(e.get("message")) for e in j.get("errors", []))
+        if r.status_code == 429 or "neuron" in msg.lower() or "limit" in msg.lower():
+            (RAIZ / "cache").mkdir(exist_ok=True)
+            (RAIZ / "cache" / f"cloudflare_agotado_{_hoy_utc()}").touch()
+        try:
+            return _escena_hf(prompt, intento, f)
+        except Exception as e:
+            raise RuntimeError(f"Cloudflare: {msg or r.status_code}; Hugging Face: {type(e).__name__}") from None
     if not img:
         msg = "; ".join(str(e.get("message")) for e in j.get("errors", []))
         raise RuntimeError((msg or f"sin imagen ({r.status_code})").replace(acc, "<cuenta>").replace(tok, "<token>"))
     CACHE.mkdir(parents=True, exist_ok=True)
     f.write_bytes(base64.b64decode(img))
     return Image.open(f).convert("RGB")
+
+
+def _hoy_utc():
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+HF_SPACE = "black-forest-labs/FLUX.1-schnell"           # el mismo modelo de las escenas (licencia Apache 2.0: comercial)
+
+
+def _escena_hf(prompt, intento, destino):
+    """Plan B gratuito (7-nov-2026): el Space público de FLUX.1-schnell en Hugging Face, con la cuota diaria de GPU
+    gratuita de la cuenta del canal (HF_TOKEN en .env). Solo escenas, nunca personas (no admite foto de referencia)."""
+    import shutil
+    from gradio_client import Client
+    env = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text(encoding="utf-8").splitlines()
+               if "=" in l and not l.strip().startswith("#"))
+    c = Client(HF_SPACE, token=env["HF_TOKEN"].strip().strip('"'), verbose=False)
+    r = c.predict(prompt=prompt, seed=intento, randomize_seed=False, width=1344, height=768, num_inference_steps=4,
+                  api_name="/infer")
+    CACHE.mkdir(parents=True, exist_ok=True)
+    Image.open(r[0]).convert("RGB").save(destino, quality=93)
+    print(f"  (viñeta hecha en Hugging Face: {destino.name})")
+    return Image.open(destino).convert("RGB")
 
 
 # ------------------------------------------------------------------ jornada: preparar y elegir las vinetas del dia

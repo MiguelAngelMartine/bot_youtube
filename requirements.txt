@@ -12,3 +12,4 @@ opencv-python-headless   # reescalado rapido en el render (si falta, se usa Pill
 trafilatura   # texto completo de las noticias (articulos.py)
 google-api-python-client   # subida a YouTube (subir.py)
 google-auth-oauthlib
+gradio_client
