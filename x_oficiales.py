@@ -103,7 +103,7 @@ async def _de_cuenta(api, n, h, desde, por_cuenta):
         if t.quotedTweet:                        # si cita otro tuit, sin él no se entiende lo que dice
             texto += f" [cita a @{t.quotedTweet.user.username}: {t.quotedTweet.rawContent}]"
         out.append({"quien": f"{n} (@{u.username})", "canal": "X, cuenta oficial", "fecha": t.date.astimezone(MADRID).isoformat(),
-                    "texto": texto[:900], "enlace": t.url})
+                    "texto": texto[:600], "enlace": t.url})
     return sorted(out, key=lambda x: x["fecha"], reverse=True)[:por_cuenta]
 
 
@@ -131,12 +131,23 @@ async def _recientes(horas, por_cuenta):
     return datos, fallos
 
 
-def recientes(horas=30, por_cuenta=8):
+def por_turnos(datos):
+    """Primero el tuit más reciente de cada cuenta, luego el segundo de cada una...: si el dossier se recorta por
+    el final, el recorte toca a todas por igual y no a las últimas de la lista."""
+    vistos, orden = {}, []
+    for x in datos:
+        vistos[x["quien"]] = vistos.get(x["quien"], 0) + 1
+        orden.append((vistos[x["quien"]], x))
+    return [x for _, x in sorted(orden, key=lambda z: z[0])]
+
+
+def recientes(horas=30, por_cuenta=5):
     """(tuits, cuentas_que_fallan) de las últimas horas de toda la lista; sin retuits y con un tope por cuenta,
     para que ningún partido copie el dossier. Sin sesión en el .env devuelve todas las cuentas como fallo."""
     if "X_AUTH_TOKEN" not in env():
         return [], list(CUENTAS.values())
-    return asyncio.run(_recientes(horas, por_cuenta))
+    datos, fallos = asyncio.run(_recientes(horas, por_cuenta))
+    return por_turnos(datos), fallos
 
 
 if __name__ == "__main__":
