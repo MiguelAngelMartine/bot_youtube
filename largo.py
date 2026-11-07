@@ -145,7 +145,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         out.append((pegatina(ve["titular"].upper(), tam=44), 760, 60, t0 + 1.2))
         out.append((nota(ve.get("sub", ""), 640, 38, "Fuente: " + ve.get("fuente", "")), 760, 180, t0 + 2.0))
     elif tipo == "citas":
-        out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
+        out.append((pegatina(ve["titulo"], tam=46), 40, 60, t0 + 0.1))
         n = len(ve["items"])
         col = (LW - 60) // n
         ap = min(340, int(col * 0.52))                    # 6-nov: polaroids más grandes (con dos, mucho más)
@@ -153,8 +153,8 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             f, c = foto_de(it["nombre"], it.get("cargo", ""))
             ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
             x = 30 + col * k
-            out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 100, ti))
-            out.append((nota(it["cita"], col - 40, 36 if n < 3 else 32, "Fuente: " + it["medio"]), x, 100 + ap + 150,
+            out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 140, ti))
+            out.append((nota(it["cita"], col - 40, 36 if n < 3 else 32, "Fuente: " + it["medio"]), x, 140 + ap + 150,
                         ti + 0.6))
     elif tipo == "posturas":
         out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
@@ -815,7 +815,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
             falta = plan[i + 1]["t0"] - t
             if falta < 4.5:
                 tz = p["teaser"]
-                pega(fr, tz, BX + BW - 16 - tz.width, BY + BH + 12, min(1.0, (4.5 - falta) * 3))
+                pega(fr, tz, BX + BW - 16 - tz.width, BY - 70, min(1.0, (4.5 - falta) * 3))
         if pt["fuente"]:                               # 6-nov: una línea discreta bajo el escenario, a la izquierda
             fr.alpha_composite(linea_fuente(pt["fuente"]), (BX, BY + BH + 10))
         pm = presente(t, i)

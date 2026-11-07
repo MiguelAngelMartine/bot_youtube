@@ -44,7 +44,9 @@ def recorte(foto: Path) -> Image.Image:
     c = remove(im, session=new_session("u2net_human_seg"))
     a = c.getchannel("A").point(lambda v: 255 if v > 100 else 0)
     f = a.copy()
-    ImageDraw.floodfill(f, (0, 0), 128)               # huecos interiores (entre brazo y corbata...) son persona
+    for xy in ((0, 0), (f.width - 1, 0), (0, f.height - 1), (f.width - 1, f.height - 1)):   # 7-nov: desde las 4 esquinas
+        if f.getpixel(xy) == 0:                       # (si el pelo toca el borde, un fondo oscuro quedaba como «hueco»)
+            ImageDraw.floodfill(f, xy, 128)           # huecos interiores (entre brazo y corbata...) son persona
     a = np.array(f.point(lambda v: 0 if v == 128 else 255))
     filas = np.nonzero(a.any(axis=1))[0]
     for y in range(int(filas[0] + 0.7 * (filas[-1] - filas[0])), filas[-1] + 1):   # parte baja: sin muescas
