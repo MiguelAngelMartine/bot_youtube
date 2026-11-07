@@ -170,7 +170,7 @@ def main(fecha, n=3):
         voz = f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
         if s.get("replica"):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
-        voz += " Todo el cruce, y el resto de la política del día, en el vídeo de hoy."
+        voz += " Todo el cruce, y el resto de la política del día, en el vídeo de hoy. Y vosotros, ¿qué opináis? Os leo en comentarios."
         s["voz"] = voz
         (dia / "shorts" / f"short_{buenos}.json").write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_{buenos}: {s['kicker']} · «{s['cita'][:70]}»" + (" · con réplica" if s.get("replica") else ""))

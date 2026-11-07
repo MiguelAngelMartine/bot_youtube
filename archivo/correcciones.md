@@ -11,3 +11,9 @@
   1. Adif: Marco de la Peña no dimitio voluntariamente, fue cesado por el Gobierno (La Razon).
   2. Valladolid: la Junta Electoral permite tachar a mano el nombre de Puente en la papeleta del PSOE (El Pais, 5-nov).
   3. Alvise Perez: el Supremo archiva la causa de la PCR falsa de Illa por aplicacion de la amnistia, no por falta de indicios (El Mundo, 5-nov).
+- 2026-11-07: PUBLICADAS 2 correcciones (episodio del 6-nov):
+  1. Koldo/Okdiario: faltaba la version de Okdiario, que niega haber pagado la defensa de Koldo; amenaza con demandar (elDiario.es).
+  2. Nucleo Nacional: los detenidos, dados como una docena, se elevan a 14 (El Mundo).
+  Propuestas de erratas.py sobre el episodio del 6-nov NO publicadas (pendientes de verificar):
+  3. Fiscalia Europea: investiga tres licitaciones por 136 M (hasta 261 M segun otros contratos), no 111,6 M (El Pais, 7-nov).
+  4. Urda: fallecidos 116 en vez de 69 (ABC, cita de Ester Muñoz). SIN VERIFICAR: contradice la cifra de 69 usada en todos los dias; revisar antes de publicar.
