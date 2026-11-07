@@ -3,7 +3,7 @@
      tema en movimiento, el antetítulo («SÁNCHEZ, A FEIJÓO») y la frase literal enorme;
   2) contexto: el porqué, con las viñetas y fotos del tema pasando a pantalla completa arriba y el texto abajo;
   3) réplica, si la hay: el aludido y su frase escribiéndose;
-  4) cierre: «Todo el cruce, en el vídeo de hoy» y suscribirse.
+  4) cierre: «Más información en el vídeo de hoy», «¿Qué opinas?» y botón de suscribirse (sin logo de Urni, 8-nov).
 Voz de Tristán, subtítulos grandes, música baja y crédito de las fotos. Fotos siempre a color, contorno suave.
 Uso: python short.py AAAA-MM-DD N     -> dia/<fecha>/shorts/short_N.mp4 y short_N_portada.png"""
 from __future__ import annotations
@@ -360,18 +360,34 @@ def main(fecha, n):
             cr = _cita_cache(S["replica"]["cita"][:n_] if tl < 1.9 else S["replica"]["cita"], "")
             fr.alpha_composite(cr, (40, 1180))
         elif t >= t_fin:                                             # 4) cierre
-            lg = G2.logo(300)
-            tl = t - t_fin
-            s_ = 1.0 + 0.25 * (1 - G2.suave(min(1.0, tl / 0.4)))
-            lg = lg.resize((int(lg.width * s_), int(lg.height * s_)), Image.BILINEAR)
-            fr.alpha_composite(lg, ((AN - lg.width) // 2, 470 - (lg.height - 300) // 2))
+            tl = t - t_fin                                           # 8-nov: sin el logo de Urni; botón de suscribirse
             d = ImageDraw.Draw(fr)
-            d.text((AN // 2, 900), "Todo el cruce, en el", font=fuente("Inter-Black.ttf", 66), fill=BLANCO + (255,), anchor="mm")
-            d.text((AN // 2, 990), "vídeo de hoy", font=fuente("Inter-Black.ttf", 66), fill=AMARILLO + (255,), anchor="mm")
-            pulso = 1.0 + 0.04 * math.sin(tl * 6)
-            w2, h2 = int(260 * pulso), int(58 * pulso)
-            d.rounded_rectangle([AN // 2 - w2, 1110 - h2, AN // 2 + w2, 1110 + h2], radius=h2, fill=ROJO + (255,))
-            d.text((AN // 2, 1110), "SUSCRÍBETE", font=fuente("Inter-Black.ttf", 56), fill=BLANCO + (255,), anchor="mm")
+            d.text((AN // 2, 560), "Más información en el", font=fuente("Inter-Black.ttf", 66), fill=BLANCO + (255,), anchor="mm")
+            d.text((AN // 2, 650), "vídeo de hoy", font=fuente("Inter-Black.ttf", 66), fill=AMARILLO + (255,), anchor="mm")
+            d.text((AN // 2, 790), "¿Qué opinas? Te leo en comentarios", font=fuente("Inter-Black.ttf", 46),
+                   fill=BLANCO + (255,), anchor="mm")
+            e = G2.suave(min(1.0, tl / 0.35)) * (1.0 + 0.05 * math.sin(tl * 6))
+            bw, bh = int(400 * e), int(80 * e)
+            if bw > 10:
+                cy, cx0 = 1000, AN // 2 - 60                         # botón + campana, centrados
+                d.rounded_rectangle([cx0 - bw, cy - bh, cx0 + bw, cy + bh], radius=bh, fill=ROJO + (255,))
+                f_ = fuente("Inter-Black.ttf", max(10, int(66 * e)))
+                tw = f_.getlength("SUSCRÍBETE")
+                ix = cx0 - (tw + 90 * e) / 2                       # icono de reproducir + texto, centrados
+                r_ = 34 * e
+                d.rounded_rectangle([ix, cy - r_, ix + 70 * e, cy + r_], radius=int(16 * e), fill=BLANCO + (255,))
+                d.polygon([(ix + 26 * e, cy - 16 * e), (ix + 26 * e, cy + 16 * e), (ix + 52 * e, cy)], fill=ROJO + (255,))
+                d.text((ix + 90 * e, cy), "SUSCRÍBETE", font=f_, fill=BLANCO + (255,), anchor="lm")
+                if tl > 0.6:                                           # la campana, que se balancea
+                    bx, by, ang = cx0 + bw + 75, cy, 18 * math.sin(tl * 9)
+                    cam = Image.new("RGBA", (120, 120))
+                    dc = ImageDraw.Draw(cam)
+                    dc.pieslice([20, 14, 100, 94], 180, 360, fill=BLANCO + (255,))
+                    dc.rectangle([20, 54, 100, 84], fill=BLANCO + (255,))
+                    dc.rectangle([12, 84, 108, 94], fill=BLANCO + (255,))
+                    dc.ellipse([50, 96, 70, 114], fill=BLANCO + (255,))
+                    cam = cam.rotate(ang, resample=Image.BICUBIC, center=(60, 14))
+                    fr.alpha_composite(cam, (int(bx - 60), int(by - 60)))
         elif t >= t_ctx and paneles:                                 # 2) contexto con imágenes del tema
             panel_en(fr, t)
             fr.alpha_composite(k1, (60, ZONA[1] + 40))

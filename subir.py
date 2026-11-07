@@ -197,9 +197,10 @@ def subir_shorts(dia_txt):
         cita = f"«{S['cita'].strip().rstrip('.')}», {S['quien']}"
         if S.get("replica"):
             cita += f"\n«{S['replica']['cita'].strip().rstrip('.')}», responde {S['replica']['quien']}"
-        partes = [cita, "", S["contexto"].strip(), "",
-                  "Todo el cruce y el resto de la política del día, en el vídeo de hoy" +
-                  (f": {largo['url']}" if largo.get("url") else "."),
+        partes = ([f"▶ Más información en el vídeo de hoy: {largo['url']}", ""] if largo.get("url") else []) + \
+                 [cita, "", S["contexto"].strip(), "",
+                  "Más información en el vídeo de hoy" + (f": {largo['url']}" if largo.get("url") else "."),
+                  "¿Qué opinas? Te leo en comentarios.",
                   "", f"Fuente: {S.get('fuente', '')}" + (f" {S['enlace']}" if S.get("enlace") else "")]
         cr = S.get("creditos") or []
         if cr:
