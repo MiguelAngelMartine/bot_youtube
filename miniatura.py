@@ -427,12 +427,12 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
             ancho_texto = min(1750, x + pad + 120 - 50)        # el texto puede montar un poco sobre el hombro
     tam, lineas = ajusta(titular, destaca, ancho_texto, sobrio)
     t = texto(lineas, tam, sobrio)
-    if caricatura and vs:                              # 7-nov: franja roja de brocha detras del titular (referencia)
+    if vs:                                             # 7-nov: franja roja de brocha detras del titular (referencia)
         t = brocha(t)
     inclina = 0 if sobrio else 4
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
-    y = H - t.height - (10 if caricatura and vs else 40)
+    y = H - t.height - (10 if vs else 40)
     if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
         pm = polaroid_mini(img / inserto)
         im.alpha_composite(pm, (150, max(40, y - pm.height - 40)))

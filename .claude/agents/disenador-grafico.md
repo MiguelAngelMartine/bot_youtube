@@ -98,11 +98,8 @@ Responde con el titular, la etiqueta, la foto del protagonista (licencia, autor)
 ## Encargo del director (7-nov-2026)
 Si el coordinador te dice que hay encargo verificado, lee `dia/<fecha>/encargo.json`: la miniatura va con esa persona (la mejor foto libre que haya, de frente y con gesto acorde) y esa frase literal como titular, sobre el tema que indica. Si trae el apartado `miniatura`, manda él: por ejemplo, con `rival` es un cara a cara (`--rival`), la persona a un lado y el rival enfrentado al otro, mirándose, y la frase literal de titular. Fotos libres de los dos (nunca la del tuit ni de agencias). Si `"verificada"` no es `true`, no la uses nunca: haz la miniatura de siempre.
 
-## Miniatura con caricaturas (decisión del usuario del 7-nov-2026, desde el 8-nov)
-Cuando la noticia de la miniatura sea un **cruce entre dos personas** (ataque y respuesta, o la frase de una contra la otra), la miniatura es de **dos caricaturas IA enfrentadas** con el titular en una franja roja de brocha:
-`.venv/bin/python miniatura.py <fecha> --titular "«frase literal»" --destaca "<palabra>" --etiqueta "<Quién a quién>" --persona <foto_que_habla> --rival <foto_del_otro> --caricatura [--gestos "<gesto rival en inglés>|<gesto persona en inglés>"]`
-- Las fotos, de `fotos.py mejores` y con licencia **CC0, dominio público o CC BY** (nunca BY-SA, NC ni ND): si no, el programa se para; busca otra.
-- Caricatura **respetuosa**, estilo dibujo 3D claramente no fotográfico, nunca grotesca; el gesto, acorde con el tono real del cruce (`indignant frown`, `serious tense expression`, `smiling confidently`...). Ningún gesto ni escena que no haya ocurrido (nada de golpes ni contacto físico).
-- La frase, literal y comprobada (como siempre); la etiqueta dice quién se la dice a quién.
-- Mírala antes de entregar: que cada caricatura se parezca a la persona (si no, borra `imagenes/<foto>_caricatura.jpg` y repite) y que la franja no tape los ojos.
-- Si no hay cruce entre dos personas, o la noticia es una tragedia, la miniatura de siempre con fotos reales.
+## Miniatura de enfrentamiento (referencia del usuario del 7-nov-2026, desde el 8-nov)
+Como el ejemplo del usuario: **dos fotos REALES grandes**, una frente a otra, con gesto expresivo (quien ataca hablando o señalando; el otro serio), fondo real del lugar (Congreso, Asamblea...) y la frase literal enorme en amarillo y blanco sobre franja roja de brocha:
+`.venv/bin/python miniatura.py <fecha> --titular "«frase literal»" --destaca "<palabra>" --etiqueta "<Quién a quién>" --persona <foto_del_que_habla> --rival <foto_del_otro> --fondo <foto_del_lugar>`
+- Las fotos, con `fotos.py mejores <fecha> "<nombre>" --animo "hablando con energía, señalando"` (y `--animo "serio"` para el otro): las de más calidad y gesto, nunca de medios ni agencias.
+- **Nunca** caricaturas ni imágenes generadas con IA de personas reales (el usuario no las quiere; `--caricatura` queda sin usar), ni escenas fotorrealistas inventadas: con fotos reales es un montaje honesto y monetizable sin declarar nada.
