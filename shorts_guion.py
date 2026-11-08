@@ -199,6 +199,10 @@ def main(fecha, n=3):
         gancho = (s.get("gancho") or "").strip().rstrip(".")
         if not gancho or _norm(gancho) not in _norm(cita):    # el gancho tiene que ser un trozo literal de la cita
             gancho = cita
+        cond = re.search(r"\b(si|cuando|aunque|salvo que|en caso de que)\b", _norm(cita).split(_norm(gancho))[0])
+        if gancho != cita and cond:                            # 8-nov: recortar una condición cambia el sentido
+            print(f"  gancho «{gancho[:40]}» sin su condición («{cond.group(1)}…»): va la cita entera")
+            gancho = cita
         s["gancho"] = gancho
         voz = (f"«{gancho}». " if gancho != cita else "") + f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
         segs = []
@@ -207,6 +211,9 @@ def main(fecha, n=3):
                 continue
             gg = (g.get("gancho") or "").strip().rstrip(".")
             if not gg or _norm(gg) not in _norm(g["cita"]):
+                gg = g["cita"].strip().rstrip(".")
+            if gg != g["cita"].strip().rstrip(".") and re.search(r"\b(si|cuando|aunque|salvo que|en caso de que)\b",
+                                                                 _norm(g["cita"]).split(_norm(gg))[0]):
                 gg = g["cita"].strip().rstrip(".")
             ctx_g = verifica_contexto(g["contexto"], guion, redes)
             segs.append({"quien": g.get("quien", ""), "cargo": g.get("cargo", ""), "kicker": g.get("kicker", ""),
