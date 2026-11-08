@@ -176,7 +176,12 @@ def subir_shorts(dia_txt):
     from googleapiclient.http import MediaFileUpload
     dia = RAIZ / "dia" / dia_txt
     carpeta = dia / "shorts"
-    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))[:MAX_SHORTS]
+    maximo = MAX_SHORTS
+    try:                                                 # 8-nov: el director puede pedir más (encargo.json → num_shorts)
+        maximo = int(json.loads((dia / "encargo.json").read_text(encoding="utf-8")).get("num_shorts", MAX_SHORTS))
+    except (OSError, ValueError, TypeError):
+        pass
+    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))[:maximo]
     shorts = [f for f in shorts if f.with_suffix(".mp4").exists()]
     if not shorts:
         raise SystemExit("no hay Shorts renderizados")
