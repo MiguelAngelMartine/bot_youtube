@@ -285,7 +285,17 @@ def main(fecha, n):
     pal, dur = voz.locuta([{"di": texto}], "normal", tmp / "voz.wav", cola=0.4)
     T = E.Tiempos(texto, pal, 0.0)
     t_ctx = T.en(texto.find("». ") + 3) if "». " in texto else dur * 0.3
-    k_rep = texto.find(f"{S['replica']['quien']} le responde") if S.get("replica") else -1
+    med = S.get("medio")                                # 8-nov: una segunda voz entre el gancho y el contexto
+    t_med = None
+    if med:
+        k_med = texto.find(med["entrada"][:30])
+        if k_med >= 0 and texto.find("». ", k_med) >= 0:
+            t_med = T.en(k_med)
+            t_ctx = T.en(texto.find("». ", k_med) + 3)
+        else:
+            med = None
+    rp_ = S.get("replica") or {}
+    k_rep = texto.find(rp_.get("entrada") or f"{rp_.get('quien')} le responde") if rp_ else -1
     t_rep = T.en(k_rep) if k_rep >= 0 else None        # (buscar solo el nombre fallaba si el contexto lo nombraba)
     k_fin = next((texto.find(x) for x in ("¿Qué opinas?", "Más información", "Todo el cruce") if x in texto), -1)
     t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0    # 8-nov: el cierre, solo desde la pregunta (3-4 s)
@@ -321,7 +331,11 @@ def main(fecha, n):
     if S.get("replica"):
         rp = S["replica"]
         p2 = _persona(dia, rp["quien"], rp.get("cargo", ""), (0.5, 0.36), 0.42)
-        k2 = _kicker(f"{rp['quien'].split()[-1].upper()} RESPONDE")
+        k2 = _kicker(rp.get("kicker") or f"{rp['quien'].split()[-1].upper()} RESPONDE")
+    p3 = k3 = c3 = None
+    if med:
+        p3 = _persona(dia, med["quien"], med.get("cargo", ""), (0.5, 0.36), 0.42)
+        k3 = _kicker(med.get("kicker") or med["quien"].split()[-1].upper())
     fte = fuente("Inter-SemiBold.ttf", 26)
     caps = C.grupos_palabras(T, set())
     ini = [x[0] for x in caps]
@@ -331,7 +345,7 @@ def main(fecha, n):
     if broll:
         nk = max(1, min(len(broll), int((fin_ctx - t_ctx) / 4.5) or 1))
         paneles = [(t_ctx + k * (fin_ctx - t_ctx) / nk, _panel(broll[k])) for k in range(nk)]
-    golpes = [0.0, t_ctx] + ([t_rep] if t_rep is not None else [])
+    golpes = [0.0, t_ctx] + ([t_rep] if t_rep is not None else []) + ([t_med] if med else [])
 
     def persona_en(fr, p, t0, t, a=1.0):
         """La persona, grande, con un golpe de cámara al entrar (se acerca y se asienta)."""
@@ -406,6 +420,12 @@ def main(fecha, n):
                     dc.ellipse([50, 96, 70, 114], fill=BLANCO + (255,))
                     cam = cam.rotate(ang, resample=Image.BICUBIC, center=(60, 14))
                     fr.alpha_composite(cam, (int(bx - 60), int(by - 60)))
+        elif med and t_med <= t < t_ctx:                             # 1b) la segunda voz (8-nov)
+            tl = t - t_med
+            persona_en(fr, p3, t_med, t, G2.suave(min(1.0, tl / 0.3)))
+            fr.alpha_composite(k3, (60, 1080))
+            n_ = max(1, int(len(med["cita"]) * min(1.0, (tl - 0.3) / 2.2)))
+            fr.alpha_composite(_cita_cache(med["cita"][:n_] if tl < 2.5 else med["cita"], ""), (40, 1180))
         elif t >= t_ctx and paneles:                                 # 2) contexto con imágenes del tema
             panel_en(fr, t)
             fr.alpha_composite(k1, (60, ZONA[1] + 40))
@@ -476,7 +496,7 @@ def main(fecha, n):
     ff.stdin.close()
     ff.wait()
     # créditos para la descripción de YouTube (los lee subir.py)
-    S["creditos"] = [p[3] + f" ({nom})" for p, nom in ((p1, S["quien"]), (p2, (S.get("replica") or {}).get("quien")))
+    S["creditos"] = [p[3] + f" ({nom})" for p, nom in ((p1, S["quien"]), (p2, (S.get("replica") or {}).get("quien")), (p3, (med or {}).get("quien")))
                      if p]
     cred_all = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
     for f in broll:                                    # las imágenes del tema que salen en el contexto o el fondo

@@ -117,9 +117,14 @@ def main(fecha, n=3):
         obligada = (f"\n\nOBLIGATORIO (lo pide el director y está comprobado): el PRIMER Short es la frase «{enc['frase']}» "
                     f"de {enc['persona']} sobre «{enc.get('tema', '')}», DEDICADO SOLO A ESA NOTICIA: el contexto habla "
                     f"únicamente de ella (del guion aprobado sobre ese tema), sin mezclar otros temas.")
+    fijo = enc.get("short_fijo") if enc.get("verificada") else None   # 8-nov: guion del Short escrito y comprobado a mano
+    if fijo:
+        obligada = ""
     r = gem.pide(PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
     if isinstance(r, list):                              # a veces devuelve la lista sin envolver
         r = {"shorts": r}
+    if not isinstance(r, dict) and fijo:
+        r = {"shorts": []}                               # sin Gemini, al menos el del director
     if not isinstance(r, dict):
         print("Gemini no responde: hoy sin Shorts")
         sys.exit(2)
@@ -129,6 +134,14 @@ def main(fecha, n=3):
     for viejo in (dia / "shorts").glob("short_*"):       # los de una vuelta anterior, fuera
         if viejo.is_file():
             viejo.unlink()
+    if fijo:                                             # el del director va primero, tal cual (ya comprobado)
+        buenos = 1
+        for x in (fijo, fijo.get("medio"), fijo.get("replica")):
+            if x:
+                usadas.add(_norm(x["cita"]))
+        partidos.add(fijo.get("partido"))
+        (dia / "shorts" / "short_1.json").write_text(json.dumps(fijo, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"short_1: {fijo['kicker']} · guion fijo del director")
     cands = r.get("shorts", [])
     vistos_p, orden, resto = set(), [], []                # reparto: primero un Short por partido; si faltan, repite
     for s in cands:
