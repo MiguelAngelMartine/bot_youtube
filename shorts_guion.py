@@ -37,6 +37,9 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
   «pide», «acusa» si la fuente lo dice). No adelanta la réplica (la voz ya dice «X le responde»), no interpreta
   intenciones ni añade lo que la persona «considera» si no está en el material.
+- "categoria": el formato, uno de «POLÉMICA» (cruce de declaraciones entre políticos), «ZASCA» (respuesta corta y directa
+  en redes a otro político), «ÚLTIMA HORA» (un hecho noticioso de hoy: decisión, anuncio, dato) o «ANÁLISIS» (explica
+  datos o antecedentes). Que sea verdad: «ÚLTIMA HORA» solo si el hecho es de hoy.
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
 - "portada": 2-5 palabras LITERALES de la cita, las de más gancho, para el titular enorme de la miniatura
@@ -48,7 +51,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice, con verbo neutro
   («dice», «afirma», «responde a»; nunca «sentencia», «zanja», «estalla», «arremete»). Sin el nombre del canal.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
-"kicker": "...", "entrada": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
+"categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
 "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "..."}}]}}
 

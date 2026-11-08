@@ -66,3 +66,11 @@
 - **Más etiquetas y hashtags** (vídeo: 35-45 etiquetas y 12-15 hashtags; Shorts: 8-12 hashtags y 15-25 etiquetas), solo de personas y temas que salen; títulos con verbos neutros.
 - **Shorts de ~1 minuto y siempre con su miniatura** (portada vertical propia, también en los primeros 0,4 s del vídeo).
 - Gemini usa las dos claves (`GEMINI_API_KEY` y `GEMINI_IMAGEN_API_KEY`) para tener el doble de cuota gratuita.
+
+## Identidad visual EH (8-nov-2026, elegida por el usuario: estilo «híbrido profesional y viral», Shorts y largos por igual)
+- **Logo EH:** «EH» blanco en círculo azul noche con aro amarillo (`genera_video2.logo`); sustituye a la cara de Urni en vídeos, Shorts y miniaturas. Nombre «EL HOY FORMATIVO» («FORMATIVO» en amarillo en los Shorts). Lema de la marca: «La actualidad, en un minuto» · «Noticias · Contexto · Opinión».
+- **Paleta:** azul noche `#101C34` (estructura, ~60 %), blanco (texto), amarillo `#FACC15` (palabras clave), rojo `#E52521` (solo alerta y polémica, poco).
+- **Etiqueta de formato** en cada Short (`categoria` de `shorts_guion.py`, arriba a la derecha): ÚLTIMA HORA (rojo, solo hechos de hoy), POLÉMICA y ZASCA (amarillo), ANÁLISIS (azul).
+- **Shorts ~60 s:** gancho 0-4 s, contexto, desarrollo con imágenes que cambian con cada frase, momento fuerte (réplica), y cierre corto (3-4 s, desde «¿Qué opinas?»: pregunta, «Te leo en comentarios», «Más información en el vídeo de hoy», botón SUSCRÍBETE).
+- Pendiente (no hecho aún): avatar y banner del canal con el logo EH (`miniatura.py --canal`, se suben a mano), subtítulos con palabras clave en amarillo en el largo, separador común entre noticias.
+- Siempre imágenes reales y acreditadas; nada de escenas inventadas con IA de personas reales.

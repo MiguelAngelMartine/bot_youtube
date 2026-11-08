@@ -83,17 +83,32 @@ def _fondo():
     return im.convert("RGBA")
 
 
-def _cabecera(fecha):
+CATEGORIAS = {"ÚLTIMA HORA": (ROJO, BLANCO), "POLÉMICA": (AMARILLO, (16, 28, 52)), "ZASCA": (AMARILLO, (16, 28, 52)),
+              "ANÁLISIS": ((30, 64, 140), BLANCO)}          # identidad EH (8-nov-2026)
+
+
+def _cabecera(fecha, categoria=""):
     cab = Image.new("RGBA", (AN, 150))
     d = ImageDraw.Draw(cab)
     d.rectangle([0, 0, AN, 10], fill=ROJO + (255,))
     d.rectangle([0, 10, AN, 16], fill=AMARILLO + (255,))
     cab.alpha_composite(G2.logo(80), (40, 42))
-    d.text((140, 82), "EL HOYFORMATIVO", font=fuente("Inter-Black.ttf", 40), fill=AMARILLO + (255,), anchor="lm")
+    f_ = fuente("Inter-Black.ttf", 40)
+    d.text((140, 82), "EL HOY ", font=f_, fill=BLANCO + (255,), anchor="lm")
+    d.text((140 + f_.getlength("EL HOY "), 82), "FORMATIVO", font=f_, fill=AMARILLO + (255,), anchor="lm")
     y, m, dd = (int(x) for x in fecha[:10].split("-"))
     fe = f"{dd} {['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][m - 1]}"
-    d.rounded_rectangle([AN - 200, 54, AN - 40, 112], radius=10, fill=ROJO + (255,))
-    d.text((AN - 120, 83), fe, font=fuente("Inter-Black.ttf", 36), fill=BLANCO + (255,), anchor="mm")
+    cat = (categoria or "").upper().strip()
+    if cat in CATEGORIAS:                                   # etiqueta de formato (identidad EH, 8-nov-2026)
+        fondo_c, letra_c = CATEGORIAS[cat]
+        fc = fuente("Inter-Black.ttf", 34)
+        w = int(fc.getlength(cat)) + 44
+        d.polygon([(AN - 40 - w + 14, 50), (AN - 40, 50), (AN - 40 - 14, 104), (AN - 40 - w, 104)], fill=fondo_c + (255,))
+        d.text((AN - 40 - w / 2 - 7, 78), cat, font=fc, fill=letra_c + (255,), anchor="mm")
+        d.text((AN - 47, 128), fe, font=fuente("Inter-Bold.ttf", 26), fill=BLANCO + (255,), anchor="rm")
+    else:
+        d.rounded_rectangle([AN - 200, 54, AN - 40, 112], radius=10, fill=ROJO + (255,))
+        d.text((AN - 120, 83), fe, font=fuente("Inter-Black.ttf", 36), fill=BLANCO + (255,), anchor="mm")
     return cab
 
 
@@ -272,12 +287,13 @@ def main(fecha, n):
     t_ctx = T.en(texto.find("». ") + 3) if "». " in texto else dur * 0.3
     k_rep = texto.find(f"{S['replica']['quien']} le responde") if S.get("replica") else -1
     t_rep = T.en(k_rep) if k_rep >= 0 else None        # (buscar solo el nombre fallaba si el contexto lo nombraba)
-    t_fin = T.en(texto.find("Todo el cruce"))
+    k_fin = next((texto.find(x) for x in ("¿Qué opinas?", "Más información", "Todo el cruce") if x in texto), -1)
+    t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0    # 8-nov: el cierre, solo desde la pregunta (3-4 s)
     total = dur + 1.4
 
     i_sec, sec = _seccion(dia, S["cita"])
     broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
-    cab = _cabecera(fecha)
+    cab = _cabecera(fecha, S.get("categoria", ""))
     p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.36), 0.42)
     fondo_img = broll[0] if broll else None
     if fondo_img is None and p1 and not p1[3].startswith("Ilustración"):
@@ -362,10 +378,12 @@ def main(fecha, n):
         elif t >= t_fin:                                             # 4) cierre
             tl = t - t_fin                                           # 8-nov: sin el logo de Urni; botón de suscribirse
             d = ImageDraw.Draw(fr)
-            d.text((AN // 2, 560), "Más información en el", font=fuente("Inter-Black.ttf", 66), fill=BLANCO + (255,), anchor="mm")
-            d.text((AN // 2, 650), "vídeo de hoy", font=fuente("Inter-Black.ttf", 66), fill=AMARILLO + (255,), anchor="mm")
-            d.text((AN // 2, 790), "¿Qué opinas? Te leo en comentarios", font=fuente("Inter-Black.ttf", 46),
-                   fill=BLANCO + (255,), anchor="mm")
+            a_ = G2.suave(min(1.0, tl / 0.25))
+            d.text((AN // 2, 560 + int(30 * (1 - a_))), "¿Qué opinas?", font=fuente("Inter-Black.ttf", 104),
+                   fill=AMARILLO + (int(255 * a_),), anchor="mm")
+            d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
+            d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
+                   fill=BLANCO + (220,), anchor="mm")
             e = G2.suave(min(1.0, tl / 0.35)) * (1.0 + 0.05 * math.sin(tl * 6))
             bw, bh = int(400 * e), int(80 * e)
             if bw > 10:

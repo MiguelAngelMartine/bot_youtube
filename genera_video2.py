@@ -18,7 +18,7 @@ import genera_video as V1
 import musica
 
 # identidad del canal: todo lo de marca en un sitio
-MARCA = "EL HOYFORMATIVO"
+MARCA = "EL HOY FORMATIVO"                  # identidad EH (8-nov-2026)
 PRESENTADORA = "Urni"
 LEMA = "La política española del día, en claro"
 VOZ = ("es-ES-AlvaroNeural", "+14%", "+6Hz")      # elegida por el usuario (muestra 2)
@@ -28,7 +28,8 @@ AN, AL, FPS = 1920, 1080, 25
 ZOOM = 1.14
 FUNDIDO = 0.7                      # s de fundido entre fotos
 CORTINILLA = 0.55                  # s de la barra que barre la pantalla al cambiar de bloque
-ROJO, AMARILLO, BLANCO = (200, 16, 46), (241, 191, 0), (245, 247, 250)
+ROJO, AMARILLO, BLANCO = (229, 37, 33), (250, 204, 21), (245, 247, 250)   # identidad EH (8-nov-2026): #E52521, #FACC15
+NOCHE = (16, 28, 52)                                                        # azul noche #101C34
 F = str(Path(__file__).parent / "fuentes") + "/"     # tipografias libres (OFL) del repositorio: Inter, Barlow Condensed, Caveat
 
 
@@ -199,43 +200,18 @@ _logo_cache = {}
 
 
 def logo_partes(T=1600):
-    """Logo del canal (elegido por el usuario el 1-nov-2026, opcion B): primer plano de Urni en un circulo azul con aro
-    amarillo. Devuelve (sin_sobre, sobre, ranura): el logo sin el sobre, el sobre suelto en su sitio y la altura
-    (fraccion) de la ranura de la tapa, para que el golpe de marca haga caer el sobre dentro de Urni."""
+    """Logo del canal (identidad EH, elegida por el usuario el 8-nov-2026; antes la cara de Urni): «EH» blanco en un
+    círculo azul noche con aro amarillo. Devuelve (logo, sobre, ranura) por compatibilidad con el golpe de marca
+    (marca.py): ya no hay sobre, así que va vacío."""
     if T in _logo_cache:
         return _logo_cache[T]
-    import prototipo_animado as P
-    def urni(con_sobre):
-        P.S, viejo = 4, P.baja
-        P.baja = lambda im: im
-        try:
-            u = P.mascota(0.6, 0.0, False, 0.0, sobre=con_sobre)
-        finally:
-            P.S, P.baja = 2, viejo
-        return u
-    def compone(u, caja):
-        fondo = Image.new("RGBA", (T, T))
-        ImageDraw.Draw(fondo).ellipse([0, 0, T - 1, T - 1], fill=(22, 40, 78, 255))
-        cara = u.crop((caja[0], caja[1], caja[2], caja[1] + int((caja[3] - caja[1]) * 0.80)))
-        k = T * 0.7375 / cara.width
-        cara = cara.resize((int(cara.width * k), int(cara.height * k)), Image.LANCZOS)
-        capa = Image.new("RGBA", (T, T))
-        capa.alpha_composite(cara, ((T - cara.width) // 2, int(T * 0.53 - cara.height / 2)))
-        m = Image.new("L", (T, T))
-        ImageDraw.Draw(m).ellipse([T * 0.056, T * 0.056, T * 0.944, T * 0.944], fill=255)
-        capa.putalpha(ImageChops.multiply(capa.getchannel("A"), m))
-        fondo.alpha_composite(capa)
-        ImageDraw.Draw(fondo).ellipse([T * 0.019, T * 0.019, T * 0.981, T * 0.981], outline=AMARILLO + (255,),
-                                      width=int(T * 0.0375))
-        return fondo
-    con, sin = urni(True), urni(False)
-    caja = con.getchannel("A").getbbox()                 # el mismo encuadre para las dos versiones
-    a, b = compone(con, caja), compone(sin, caja)
-    dif = ImageChops.difference(a.convert("RGB"), b.convert("RGB")).convert("L").point(lambda v: 255 if v > 12 else 0)
-    sobre = a.copy()
-    sobre.putalpha(dif)
-    bb = dif.getbbox()
-    _logo_cache[T] = (b, sobre, bb[3] / T)
+    im = Image.new("RGBA", (T, T))
+    d = ImageDraw.Draw(im)
+    d.ellipse([0, 0, T - 1, T - 1], fill=NOCHE + (255,))
+    d.ellipse([T * 0.03, T * 0.03, T * 0.97, T * 0.97], outline=AMARILLO + (255,), width=int(T * 0.06))
+    f = fuente("Inter-Black.ttf", int(T * 0.42))
+    d.text((T / 2, T * 0.515), "EH", font=f, fill=BLANCO + (255,), anchor="mm")
+    _logo_cache[T] = (im, Image.new("RGBA", (T, T)), 0.5)
     return _logo_cache[T]
 
 
