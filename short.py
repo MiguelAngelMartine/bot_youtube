@@ -276,9 +276,224 @@ def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
     return im
 
 
+def _cierre(fr, tl):
+    """Pantalla final: «¿Qué opinas?», «Te leo en comentarios» y botón de suscribirse con campana."""
+    # 8-nov: sin el logo de Urni; botón de suscribirse
+    d = ImageDraw.Draw(fr)
+    a_ = G2.suave(min(1.0, tl / 0.25))
+    d.text((AN // 2, 560 + int(30 * (1 - a_))), "¿Qué opinas?", font=fuente("Inter-Black.ttf", 104),
+           fill=AMARILLO + (int(255 * a_),), anchor="mm")
+    d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
+    d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
+           fill=BLANCO + (220,), anchor="mm")
+    e = G2.suave(min(1.0, tl / 0.35)) * (1.0 + 0.05 * math.sin(tl * 6))
+    bw, bh = int(400 * e), int(80 * e)
+    if bw > 10:
+        cy, cx0 = 1000, AN // 2 - 60                         # botón + campana, centrados
+        d.rounded_rectangle([cx0 - bw, cy - bh, cx0 + bw, cy + bh], radius=bh, fill=ROJO + (255,))
+        f_ = fuente("Inter-Black.ttf", max(10, int(66 * e)))
+        tw = f_.getlength("SUSCRÍBETE")
+        ix = cx0 - (tw + 90 * e) / 2                       # icono de reproducir + texto, centrados
+        r_ = 34 * e
+        d.rounded_rectangle([ix, cy - r_, ix + 70 * e, cy + r_], radius=int(16 * e), fill=BLANCO + (255,))
+        d.polygon([(ix + 26 * e, cy - 16 * e), (ix + 26 * e, cy + 16 * e), (ix + 52 * e, cy)], fill=ROJO + (255,))
+        d.text((ix + 90 * e, cy), "SUSCRÍBETE", font=f_, fill=BLANCO + (255,), anchor="lm")
+        if tl > 0.6:                                           # la campana, que se balancea
+            bx, by, ang = cx0 + bw + 75, cy, 18 * math.sin(tl * 9)
+            cam = Image.new("RGBA", (120, 120))
+            dc = ImageDraw.Draw(cam)
+            dc.pieslice([20, 14, 100, 94], 180, 360, fill=BLANCO + (255,))
+            dc.rectangle([20, 54, 100, 84], fill=BLANCO + (255,))
+            dc.rectangle([12, 84, 108, 94], fill=BLANCO + (255,))
+            dc.ellipse([50, 96, 70, 114], fill=BLANCO + (255,))
+            cam = cam.rotate(ang, resample=Image.BICUBIC, center=(60, 14))
+            fr.alpha_composite(cam, (int(bx - 60), int(by - 60)))
+
+
+def main_segmentos(fecha, n, S):
+    """8-nov-2026 (petición del usuario): un Short con VARIOS contenidos, cada uno con su frase gancho, unidos con una
+    cortinilla numerada (1/3, 2/3...). S["segmentos"] = [{quien, cargo, kicker, entrada, cita, destaca, contexto,
+    imagenes: [rutas dentro de dia/<fecha>/]}]; S["voz"] lleva todo el texto en orden."""
+    dia = RAIZ / "dia" / fecha
+    tmp = dia / "shorts" / f"tmp_{n}"
+    tmp.mkdir(parents=True, exist_ok=True)
+    texto = S["voz"]
+    pal, dur = voz.locuta([{"di": texto}], "normal", tmp / "voz.wav", cola=0.4)
+    T = E.Tiempos(texto, pal, 0.0)
+    k_fin = texto.find("¿Qué opinas?")
+    t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0
+    total = dur + 1.4
+    SEG = []
+    for i, g in enumerate(S["segmentos"]):
+        k0 = texto.find(g["entrada"][:30])
+        k1 = texto.find("». ", k0)
+        kq = texto.find("«", k0)
+        t0 = 0.0 if i == 0 else T.en(k0)
+        tc = T.en(k1 + 3)
+        imgs = [dia / x for x in g.get("imagenes", []) if (dia / x).exists()]
+        p_ = _persona(dia, g["quien"], g.get("cargo", ""), (0.5, 0.36), 0.42)
+        frases, pos = [], texto.find(g["contexto"].strip()[:30])
+        for fr_ in re.split(r"(?<=[.?!])\s+", g["contexto"].strip()):
+            k_ = texto.find(fr_[:25], pos)
+            if k_ >= 0:
+                frases.append((T.en(k_), _caja(fr_, tam=50)))
+                pos = k_ + 1
+        SEG.append({"g": g, "t0": t0, "tc": tc, "tq": T.en(kq) if kq >= 0 else t0, "p": p_, "k": _kicker(g["kicker"].upper()),
+                    "c": _cita(g["cita"], g.get("destaca", ""), max_tam=104), "frases": frases or [(tc, _caja(g["contexto"], tam=44))],
+                    "fondo": _fondo_tema(imgs[0] if imgs else None), "imgs": imgs,
+                    "paneles": [_panel(x) for x in imgs]})
+    for i, sg in enumerate(SEG):
+        sg["t1"] = SEG[i + 1]["t0"] if i + 1 < len(SEG) else t_fin
+    cab = _cabecera(fecha, S.get("categoria", ""))
+    fte = fuente("Inter-SemiBold.ttf", 26)
+    caps = C.grupos_palabras(T, set())
+    ini = [x[0] for x in caps]
+    NSEG = len(SEG)
+
+    def cortinilla(fr, i, q):
+        """Entre contenidos: una franja diagonal amarilla barre la pantalla con «2/3» y el antetítulo del siguiente."""
+        x = int((2.2 * q - 1.1) * AN)
+        capa = Image.new("RGBA", (AN, AL))
+        d = ImageDraw.Draw(capa)
+        d.polygon([(x - 300, 0), (x + AN, 0), (x + AN - 300, AL), (x - 600, AL)], fill=(16, 28, 52, 255))
+        d.polygon([(x + AN, 0), (x + AN + 70, 0), (x + AN - 230, AL), (x + AN - 300, AL)], fill=AMARILLO + (255,))
+        fr.alpha_composite(capa)
+        if 0.25 < q < 0.8:
+            a = min(1.0, (q - 0.25) / 0.12, (0.8 - q) / 0.12)
+            d = ImageDraw.Draw(fr)
+            d.text((AN // 2, 820), f"{i + 1}/{NSEG}", font=fuente("Anton-Regular.ttf", 260), fill=AMARILLO + (int(255 * a),), anchor="mm")
+            d.text((AN // 2, 1010), SEG[i]["g"]["kicker"].upper(), font=fuente("Inter-Black.ttf", 64),
+                   fill=BLANCO + (int(255 * a),), anchor="mm")
+
+    def persona_en(fr, p, t0, t):
+        if not p:
+            return
+        im, x, y, credito = p
+        tl = t - t0
+        s_ = 1.0 + 0.10 * (1 - G2.suave(min(1.0, tl / 0.35))) + 0.03 * min(tl, 8) / 8
+        if abs(s_ - 1) > 0.003:
+            im = im.resize((int(im.width * s_), int(im.height * s_)), Image.BILINEAR)
+        G2.pega(fr, im, x - (im.width - p[0].width) // 2, y - (im.height - p[0].height) // 2, 1.0)
+        ImageDraw.Draw(fr).text((AN - 30, ZONA[1] - 16), credito, font=fte, fill=(225, 230, 240, 235), anchor="rd",
+                                stroke_width=2, stroke_fill=(0, 0, 0, 160))
+
+    def panel_en(fr, sg, t):
+        pans = sg["paneles"]
+        cada = max(2.5, (sg["t1"] - sg["tc"]) / max(1, len(pans)))
+        k = min(len(pans) - 1, int((t - sg["tc"]) / cada))
+        im, tl = pans[k], t - sg["tc"] - k * cada
+        alto = ZONA[1] - ZONA[0]
+        z = 1.0 + 0.06 * min(tl, 5) / 5
+        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
+        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
+        y0 = (im.height - ch) // 2
+        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        dx = int(AN * (1 - G2.suave(min(1.0, tl / 0.35))))
+        fr.alpha_composite(vista, (min(dx, AN - 1), ZONA[0]))
+        d = ImageDraw.Draw(fr)
+        d.rectangle([0, ZONA[0] - 6, AN, ZONA[0]], fill=AMARILLO + (255,))
+        d.rectangle([0, ZONA[1], AN, ZONA[1] + 6], fill=AMARILLO + (255,))
+        et = "Ilustración IA" if "vinetas" in str(sg["imgs"][k]) else "Foto del tema"
+        d.text((AN - 24, ZONA[1] - 14), et, font=fuente("Inter-SemiBold.ttf", 22), fill=(255, 255, 255, 230), anchor="rd")
+
+    _cc = {}
+
+    def cita_parcial(txt):
+        if txt not in _cc:
+            _cc[txt] = _cita(txt, "", max_tam=104)
+        return _cc[txt]
+
+    def cuadro(t):
+        if t >= t_fin:
+            fr = _mueve(SEG[-1]["fondo"], t, total).convert("RGBA")
+            _cierre(fr, t - t_fin)
+        else:
+            i = max(j for j, sg in enumerate(SEG) if sg["t0"] <= t + 1e-9)
+            sg = SEG[i]
+            fr = _mueve(sg["fondo"], t, total).convert("RGBA")
+            if t < sg["tc"]:                                       # la frase gancho
+                persona_en(fr, sg["p"], sg["t0"], t)
+                fr.alpha_composite(sg["k"], (60, 1080))
+                tl = t - sg["t0"]
+                if i == 0:
+                    fr.alpha_composite(sg["c"], (40, 1180))
+                else:                                              # se escribe mientras la dice
+                    g = sg["g"]
+                    tq = t - sg["tq"]                              # empieza cuando la voz abre la cita
+                    if tq > 0:
+                        n_ = max(1, int(len(g["cita"]) * min(1.0, tq / max(1.0, (sg["tc"] - sg["tq"]) * 0.75))))
+                        fr.alpha_composite(sg["c"] if n_ >= len(g["cita"]) else cita_parcial(g["cita"][:n_]), (40, 1180))
+            else:                                                  # su contexto, con sus imágenes
+                if sg["paneles"]:
+                    panel_en(fr, sg, t)
+                    y_k, y_c = ZONA[1] + 40, ZONA[1] + 150
+                else:
+                    persona_en(fr, sg["p"], sg["t0"], t)
+                    y_k, y_c = 1080, 1190
+                fr.alpha_composite(sg["k"], (60, y_k))
+                kf = max([j for j, (tt, _) in enumerate(sg["frases"]) if tt <= t + 0.05] or [0])
+                caja, tc = sg["frases"][kf][1], t - sg["frases"][kf][0]
+                a = G2.suave(min(1.0, tc / 0.25))
+                G2.pega(fr, caja, 60, y_c + int(40 * (1 - a)), a)
+            if i > 0 and t - sg["t0"] < 0.75:                       # cortinilla al entrar en un contenido nuevo
+                cortinilla(fr, i, (t - sg["t0"]) / 0.75)
+        for g in [sg["tc"] for sg in SEG] + [t_fin]:
+            if 0 <= t - g < 0.08:
+                fr.alpha_composite(Image.new("RGBA", (AN, AL), (255, 255, 255, int(130 * (1 - (t - g) / 0.08)))))
+        fr.alpha_composite(cab, (0, 0))
+        ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
+        j = max(0, np.searchsorted(ini, t, side="right") - 1)
+        if caps and caps[j][0] <= t < caps[j][1]:
+            _, _, ws, clave, _ = caps[j]
+            cp = C.capa_cap(ws, clave, 0, 0.9, AN - 120)
+            fr.alpha_composite(cp, ((AN - cp.width) // 2, 1760 - cp.height // 2))
+        i = max(j for j, sg in enumerate(SEG) if sg["t0"] <= t + 1e-9) if t < t_fin else NSEG - 1
+        ImageDraw.Draw(fr).text((AN // 2, AL - 50), f"Fuente: {SEG[i]['g'].get('fuente', S.get('fuente', ''))}"[:70],
+                                font=fte, fill=(190, 198, 215, 255), anchor="mm")
+        return fr
+
+    cortes = [sg["t0"] for sg in SEG[1:]] + [sg["tc"] for sg in SEG] + [t_fin]
+    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
+    g0 = SEG[0]
+    foto_p = None
+    if g0["p"] and not g0["p"][3].startswith("Ilustración"):
+        cred_ = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
+        foto_p = C.fotos_personas({g0["g"]["quien"]}, cred_, dia / "imagenes").get(g0["g"]["quien"])
+    PORT = portada(fecha, g0["fondo"], foto_p, S.get("kicker") or g0["g"]["kicker"], S.get("portada") or g0["g"]["cita"],
+                   S.get("destaca") or g0["g"].get("destaca", ""))
+    PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
+    out = dia / "shorts" / f"short_{n}.mp4"
+    ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN}x{AL}",
+                           "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
+                           "-crf", "21", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
+                           "-c:a", "aac", "-b:a", "160k", "-shortest", str(out)], stdin=subprocess.PIPE)
+    for fi in range(int(math.ceil(total * FPS))):
+        t = fi / FPS
+        fr = PORT.copy() if t < 0.4 else cuadro(t)
+        ff.stdin.write(fr.tobytes())
+    ff.stdin.close()
+    ff.wait()
+    cred_all = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
+    S["creditos"] = [sg["p"][3] + f" ({sg['g']['quien']})" for sg in SEG if sg["p"]]
+    for sg in SEG:
+        for f in sg["imgs"]:
+            if "vinetas" not in str(f):
+                c_ = cred_all.get(Path(f).name, {})
+                S["creditos"].append(f"Foto: {c_.get('autor', '')[:40]} · {c_.get('licencia', '')} (tema)")
+    if any("vinetas" in str(f) for sg in SEG for f in sg["imgs"]):
+        S["creditos"].append("Ilustración IA (viñetas del tema)")
+    S["duracion"] = round(total, 1)
+    (dia / "shorts" / f"short_{n}.json").write_text(json.dumps(S, ensure_ascii=False, indent=1), encoding="utf-8")
+    import shutil
+    shutil.rmtree(tmp, ignore_errors=True)
+    print(f"SHORT {n} ({len(SEG)} contenidos): {total:.1f} s -> {out}")
+
+
 def main(fecha, n):
     dia = RAIZ / "dia" / fecha
     S = json.loads((dia / "shorts" / f"short_{n}.json").read_text(encoding="utf-8"))
+    if S.get("segmentos"):
+        return main_segmentos(fecha, n, S)
     tmp = dia / "shorts" / f"tmp_{n}"
     tmp.mkdir(parents=True, exist_ok=True)
     texto = S["voz"]
@@ -390,36 +605,7 @@ def main(fecha, n):
             cr = _cita_cache(S["replica"]["cita"][:n_] if tl < 1.9 else S["replica"]["cita"], "")
             fr.alpha_composite(cr, (40, 1180))
         elif t >= t_fin:                                             # 4) cierre
-            tl = t - t_fin                                           # 8-nov: sin el logo de Urni; botón de suscribirse
-            d = ImageDraw.Draw(fr)
-            a_ = G2.suave(min(1.0, tl / 0.25))
-            d.text((AN // 2, 560 + int(30 * (1 - a_))), "¿Qué opinas?", font=fuente("Inter-Black.ttf", 104),
-                   fill=AMARILLO + (int(255 * a_),), anchor="mm")
-            d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
-            d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
-                   fill=BLANCO + (220,), anchor="mm")
-            e = G2.suave(min(1.0, tl / 0.35)) * (1.0 + 0.05 * math.sin(tl * 6))
-            bw, bh = int(400 * e), int(80 * e)
-            if bw > 10:
-                cy, cx0 = 1000, AN // 2 - 60                         # botón + campana, centrados
-                d.rounded_rectangle([cx0 - bw, cy - bh, cx0 + bw, cy + bh], radius=bh, fill=ROJO + (255,))
-                f_ = fuente("Inter-Black.ttf", max(10, int(66 * e)))
-                tw = f_.getlength("SUSCRÍBETE")
-                ix = cx0 - (tw + 90 * e) / 2                       # icono de reproducir + texto, centrados
-                r_ = 34 * e
-                d.rounded_rectangle([ix, cy - r_, ix + 70 * e, cy + r_], radius=int(16 * e), fill=BLANCO + (255,))
-                d.polygon([(ix + 26 * e, cy - 16 * e), (ix + 26 * e, cy + 16 * e), (ix + 52 * e, cy)], fill=ROJO + (255,))
-                d.text((ix + 90 * e, cy), "SUSCRÍBETE", font=f_, fill=BLANCO + (255,), anchor="lm")
-                if tl > 0.6:                                           # la campana, que se balancea
-                    bx, by, ang = cx0 + bw + 75, cy, 18 * math.sin(tl * 9)
-                    cam = Image.new("RGBA", (120, 120))
-                    dc = ImageDraw.Draw(cam)
-                    dc.pieslice([20, 14, 100, 94], 180, 360, fill=BLANCO + (255,))
-                    dc.rectangle([20, 54, 100, 84], fill=BLANCO + (255,))
-                    dc.rectangle([12, 84, 108, 94], fill=BLANCO + (255,))
-                    dc.ellipse([50, 96, 70, 114], fill=BLANCO + (255,))
-                    cam = cam.rotate(ang, resample=Image.BICUBIC, center=(60, 14))
-                    fr.alpha_composite(cam, (int(bx - 60), int(by - 60)))
+            _cierre(fr, t - t_fin)
         elif med and t_med <= t < t_ctx:                             # 1b) la segunda voz (8-nov)
             tl = t - t_med
             persona_en(fr, p3, t_med, t, G2.suave(min(1.0, tl / 0.3)))
