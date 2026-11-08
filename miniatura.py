@@ -638,10 +638,11 @@ def canal():
     dest = RAIZ / "canal"
     dest.mkdir(exist_ok=True)
     W2, H2 = 2560, 1440
-    im = G2.fondo_marca(3.0).resize((W2, H2), Image.LANCZOS).convert("RGBA")
+    fondo_b = G2.fondo_marca(3.0).resize((W2, H2), Image.LANCZOS).convert("RGBA")
     capa = Image.new("RGBA", (W2, H2))                  # luz suave detrás del conjunto
     ImageDraw.Draw(capa).ellipse([W2 // 2 - 900, H2 // 2 - 380, W2 // 2 + 900, H2 // 2 + 380], fill=(60, 90, 160, 70))
-    im.alpha_composite(capa.filter(ImageFilter.GaussianBlur(160)))
+    fondo_b.alpha_composite(capa.filter(ImageFilter.GaussianBlur(160)))
+    im = Image.new("RGBA", (W2, H2))                    # el contenido, aparte: luego se encoge con margen
     d = ImageDraw.Draw(im)
     f1, f3 = fuente("Inter-Black.ttf", 112), fuente("Inter-SemiBold.ttf", 36)
     tl = 330
@@ -666,9 +667,18 @@ def canal():
     d.text((xt, yc - 30), "FORMATIVO", font=f1, fill=AMARILLO + (255,), anchor="lm")
     d.text((xt + 4, yc + 58), G2.SUBLEMA, font=f3, fill=(225, 230, 240, 255), anchor="lm")
     im.alpha_composite(lema, (xt - 20, yc + 92))
-    d.rectangle([0, H2 - 30, W2, H2 - 18], fill=AMARILLO + (255,))
-    d.rectangle([0, H2 - 18, W2, H2], fill=ROJO + (255,))
-    im.convert("RGB").save(dest / "banner.png")
+    # 8-nov: con margen dentro de la zona segura (1546x423): el contenido, al 80 %, centrado
+    K = 0.80
+    caja = im.getbbox()
+    cont = im.crop(caja)
+    cont = cont.resize((int(cont.width * K), int(cont.height * K)), Image.LANCZOS)
+    fondo_b.alpha_composite(cont, ((W2 - cont.width) // 2, (H2 - cont.height) // 2))
+    db = ImageDraw.Draw(fondo_b)
+    db.rectangle([0, H2 - 30, W2, H2 - 18], fill=AMARILLO + (255,))
+    db.rectangle([0, H2 - 18, W2, H2], fill=ROJO + (255,))
+    fondo_b.convert("RGB").save(dest / "banner.png")
+    fondo_b.convert("RGB").resize((2048, 1152), Image.LANCZOS).save(dest / "banner_2048.jpg", quality=92)
+    print(f"contenido del banner: {cont.width}x{cont.height} (zona segura 1546x423)")
     # logo / foto de perfil: YouTube y TikTok lo recortan en círculo; fuera, el mismo azul noche
     for lado_ in (800, 1080):
         av = Image.new("RGBA", (lado_, lado_), G2.NOCHE + (255,))
