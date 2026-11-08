@@ -20,7 +20,8 @@ import musica
 # identidad del canal: todo lo de marca en un sitio
 MARCA = "EL HOY FORMATIVO"                  # identidad EH (8-nov-2026)
 PRESENTADORA = "Urni"
-LEMA = "La política española del día, en claro"
+LEMA = "La actualidad, en un minuto"              # identidad EH (8-nov-2026)
+SUBLEMA = "NOTICIAS · CONTEXTO · OPINIÓN"
 VOZ = ("es-ES-AlvaroNeural", "+14%", "+6Hz")      # elegida por el usuario (muestra 2)
 INTRO, OUTRO = 3.0, 8.0                            # s de cabecera con sintonia y de cierre (pantalla final de YouTube: 5-20 s)
 

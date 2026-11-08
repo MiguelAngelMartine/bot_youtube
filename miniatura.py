@@ -633,38 +633,49 @@ def partes_marca():
     return [(m[:i], BLANCO), ("HOY", AMARILLO), (m[i + 3:], BLANCO)]
 
 def canal():
+    """Banner (2560x1440) y logo del canal con la identidad EH (8-nov-2026; sin Urni). La zona segura del banner, la que
+    se ve en todos los dispositivos, es el centro: 1546x423. El logo sirve de foto de perfil en YouTube y TikTok."""
     dest = RAIZ / "canal"
     dest.mkdir(exist_ok=True)
-    # banner: la zona segura que se ve en todos los dispositivos es el centro, 1546x423
     W2, H2 = 2560, 1440
-    im = Image.new("RGBA", (W2, H2))
-    base = G2.fondo_marca(3.0).resize((W2, H2), Image.LANCZOS)
-    im.alpha_composite(base)
+    im = G2.fondo_marca(3.0).resize((W2, H2), Image.LANCZOS).convert("RGBA")
+    capa = Image.new("RGBA", (W2, H2))                  # luz suave detrás del conjunto
+    ImageDraw.Draw(capa).ellipse([W2 // 2 - 900, H2 // 2 - 380, W2 // 2 + 900, H2 // 2 + 380], fill=(60, 90, 160, 70))
+    im.alpha_composite(capa.filter(ImageFilter.GaussianBlur(160)))
     d = ImageDraw.Draw(im)
-    # logo (Urni) a la izquierda y el texto a su lado, el conjunto centrado en la zona segura
-    fm, fl, fs = fuente("Inter-Black.ttf", 104), fuente("Inter-Regular.ttf", 44), fuente("Inter-SemiBold.ttf", 40)
-    lado = "Cada tarde, con datos y fuentes"
-    ancho_txt = max(d.textlength(G2.MARCA, font=fm), d.textlength(G2.LEMA, font=fl), d.textlength(lado, font=fs))
+    f1, f3 = fuente("Inter-Black.ttf", 112), fuente("Inter-SemiBold.ttf", 36)
     tl = 330
-    x0 = int((W2 - (tl + 50 + ancho_txt)) / 2)
+    ancho_txt = max(d.textlength("FORMATIVO", font=f1), d.textlength(G2.SUBLEMA, font=f3), d.textlength(G2.LEMA, font=fuente("Inter-Black.ttf", 54)) + 100)
+    lema = Image.new("RGBA", (900, 120))                # lema en cursiva sobre trazo amarillo
+    fl = fuente("Inter-Black.ttf", 54)
+    dl = ImageDraw.Draw(lema)
+    wl = int(dl.textlength(G2.LEMA, font=fl))
+    lema = Image.new("RGBA", (wl + 80, 100))
+    dl = ImageDraw.Draw(lema)
+    dl.polygon([(18, 22), (wl + 70, 12), (wl + 60, 86), (6, 92)], fill=AMARILLO + (255,))
+    dl.text((40, 52), G2.LEMA, font=fl, fill=(16, 28, 52, 255), anchor="lm")
+    lema = lema.transform(lema.size, Image.AFFINE, (1, 0.22, -26, 0, 1, 0), resample=Image.BICUBIC)
+    total = tl + 70 + 6 + 70 + ancho_txt
+    x0 = int((W2 - total) / 2)
     yc = H2 // 2
     im.alpha_composite(G2.logo(tl), (x0, yc - tl // 2))
-    xt = x0 + tl + 50
-    x = xt                                             # «HOY» en amarillo: el juego de palabras del nombre
-    for trozo, col in partes_marca():
-        d.text((x, yc - 70), trozo, font=fm, fill=col + (255,), anchor="lm")
-        x += d.textlength(trozo, font=fm)
-    d.rectangle([xt + 4, yc - 8, xt + 4 + int(d.textlength(G2.MARCA, font=fm) * 0.62), yc], fill=AMARILLO + (255,))
-    d.text((xt + 4, yc + 50), G2.LEMA, font=fl, fill=(220, 225, 235, 255), anchor="lm")
-    d.text((xt + 4, yc + 115), lado, font=fs, fill=AMARILLO + (255,), anchor="lm")
+    xl = x0 + tl + 70
+    d.rectangle([xl, yc - 190, xl + 6, yc + 190], fill=(255, 255, 255, 200))
+    xt = xl + 76
+    d.text((xt, yc - 140), "EL HOY", font=f1, fill=BLANCO + (255,), anchor="lm")
+    d.text((xt, yc - 30), "FORMATIVO", font=f1, fill=AMARILLO + (255,), anchor="lm")
+    d.text((xt + 4, yc + 58), G2.SUBLEMA, font=f3, fill=(225, 230, 240, 255), anchor="lm")
+    im.alpha_composite(lema, (xt - 20, yc + 92))
     d.rectangle([0, H2 - 30, W2, H2 - 18], fill=AMARILLO + (255,))
     d.rectangle([0, H2 - 18, W2, H2], fill=ROJO + (255,))
     im.convert("RGB").save(dest / "banner.png")
-    # avatar: YouTube lo recorta en circulo; el logo ocupa el centro sobre rojo liso
-    av = Image.new("RGBA", (800, 800), (22, 40, 78, 255))   # fuera del circulo, el mismo azul (YouTube recorta)
-    av.alpha_composite(G2.logo(800))
-    av.convert("RGB").save(dest / "avatar.png")
-    print(f"banner y avatar -> {dest}")
+    # logo / foto de perfil: YouTube y TikTok lo recortan en círculo; fuera, el mismo azul noche
+    for lado_ in (800, 1080):
+        av = Image.new("RGBA", (lado_, lado_), G2.NOCHE + (255,))
+        av.alpha_composite(G2.logo(lado_))
+        av.convert("RGB").save(dest / ("avatar.png" if lado_ == 800 else "avatar_tiktok.png"))
+    G2.logo(1600).save(dest / "logo_EH.png")            # con fondo transparente, para otros usos
+    print(f"banner, avatar y logo -> {dest}")
 
 
 if __name__ == "__main__":
