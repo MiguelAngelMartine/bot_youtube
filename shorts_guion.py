@@ -18,6 +18,8 @@ RAIZ = Path(__file__).parent
 PROMPT = """Eres el editor de Shorts de «El Hoyformativo», informativo de política española en YouTube: neutral y riguroso,
 pero con gancho (el «salseo»: los cruces de declaraciones entre políticos). Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
 para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
+- Prioriza los de la sección «GANCHOS DEL DÍA» (al principio del material; los «del director», primero): frases cortas
+  con impacto, zascas y cruces con respuesta.
 - La frase tiene que estar LITERAL en el material de abajo (cópiala letra a letra; un programa lo comprueba) y ser
   ENTERA palabras de quien habla: si el medio solo entrecomilla una palabra suelta («ve "irresponsable" decir...»), esa
   frase no vale (sería atribuirle palabras del periodista). Sin comillas dentro de la cita. Prioriza
