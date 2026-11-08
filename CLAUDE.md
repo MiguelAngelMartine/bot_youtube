@@ -86,3 +86,6 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 - **Varios ganchos en un Short**: si hay muchas frases fuertes, uno de los Shorts reúne 2-3 con un hilo común (`segmentos`; `short.py` los une con una cortinilla «2/3»), 90-120 s.
 - **Vídeo largo, todo campaña**: cruces de declaraciones, reproches, acusaciones y enfrentamientos con citas literales; **nada de noticias generalistas** (El Hierro salió dos días seguidos: no). Cada bloque es un enfrentamiento que abre con su gancho. Instrucciones en `jefe-de-edicion` y `redactor`.
 - **Fuentes**: Europa Press y **EFE** (añadida a `recopila.py`), además de X y los diarios.
+
+## Ganchos: aprender del director (8-nov-2026)
+`oficina/EJEMPLOS_GANCHOS.md` reúne los ganchos que eligió el usuario («Les vamos a freír a impuestos», «Solo saben insultar», «Rufián ha venido a Badalona a insultarme»…): el trozo literal de más impacto, primero, y luego se desarrolla. Lo leen `ganchos.py`, `investiga.py frases`, `shorts_guion.py`, el jefe de edición y el redactor. **Shorts:** con un gancho, mínimo 60 s; con varios, mínimo 90 s; entre contenidos, una transición sencilla, **sin numerarlos** (ni en pantalla ni en la voz).

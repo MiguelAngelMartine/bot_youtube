@@ -105,7 +105,10 @@ def dossier_frases(fecha):
         citas = [p for p in txt.split("\n") if re.search(r"[«“\"].{12,}[»”\"]", p)]
         if citas:
             parrafos.append(cab + "\n" + "\n".join(citas[:12]))
-    prompt = (f"Eres investigador de un informativo de política española neutral. Del {fecha}, en campaña electoral, "
+    ej = RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md"           # 8-nov: así elige el director los ganchos
+    ejemplos = ("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo; marca en cada frase su trozo de más impacto como "
+                "**Gancho:**):\n" + ej.read_text(encoding="utf-8")[:5000] + "\n\n") if ej.exists() else ""
+    prompt = ejemplos + (f"Eres investigador de un informativo de política española neutral. Del {fecha}, en campaña electoral, "
               f"recoge LAS FRASES DEL DÍA CON MÁS GANCHO de todos los partidos (sobre todo de sus redes oficiales: las publicaciones de abajo; y de Isabel Díaz Ayuso si ha dicho algo) ({PARTIDOS}): mítines, entrevistas, "
               f"ruedas de prensa y mensajes en X o redes que recogen los medios. Para cada ataque, la respuesta del "
               f"aludido si está en los textos. Busca el mismo número de frases por partido; si de alguno no hay, dilo.\n\n"

@@ -354,19 +354,13 @@ def main_segmentos(fecha, n, S):
     NSEG = len(SEG)
 
     def cortinilla(fr, i, q):
-        """Entre contenidos: una franja diagonal amarilla barre la pantalla con «2/3» y el antetítulo del siguiente."""
+        """Entre contenidos: una franja diagonal azul y amarilla barre la pantalla (8-nov: sin numerar, el director)."""
         x = int((2.2 * q - 1.1) * AN)
         capa = Image.new("RGBA", (AN, AL))
         d = ImageDraw.Draw(capa)
         d.polygon([(x - 300, 0), (x + AN, 0), (x + AN - 300, AL), (x - 600, AL)], fill=(16, 28, 52, 255))
         d.polygon([(x + AN, 0), (x + AN + 70, 0), (x + AN - 230, AL), (x + AN - 300, AL)], fill=AMARILLO + (255,))
         fr.alpha_composite(capa)
-        if 0.25 < q < 0.8:
-            a = min(1.0, (q - 0.25) / 0.12, (0.8 - q) / 0.12)
-            d = ImageDraw.Draw(fr)
-            d.text((AN // 2, 820), f"{i + 1}/{NSEG}", font=fuente("Anton-Regular.ttf", 260), fill=AMARILLO + (int(255 * a),), anchor="mm")
-            d.text((AN // 2, 1010), SEG[i]["g"]["kicker"].upper(), font=fuente("Inter-Black.ttf", 64),
-                   fill=BLANCO + (int(255 * a),), anchor="mm")
 
     def persona_en(fr, p, t0, t):
         if not p:

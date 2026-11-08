@@ -23,6 +23,7 @@ perras del mundo…», «Alí Babá tenía 40 ladrones…») adaptado al largo:
   quién la dice, a quién, la frase entera, el contexto y la respuesta del aludido si la hay (plural y equilibrado: que no
   ataquen siempre los mismos ni al mismo).
 - Un bloque puede reunir **2-3 ganchos con un hilo común** (impuestos, corrupción, el voto útil...), como el Short.
+- **Aprende de los ejemplos del director:** `oficina/EJEMPLOS_GANCHOS.md` (léelo antes de elegir): el gancho es el trozo literal de más impacto, no hace falta la frase entera; los del director del día van en `ganchos_director.md`.
 - Fuentes: `redes.md` con «GANCHOS DEL DÍA» primero, los dossieres y las agencias (**Europa Press y EFE**), además de X y
   los diarios.
 - Breves: también frases de campaña (zascas cortos), no noticias generalistas.

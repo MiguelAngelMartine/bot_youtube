@@ -21,17 +21,18 @@ from pathlib import Path
 import gem
 
 RAIZ = Path(__file__).parent
+EJEMPLOS = (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").read_text(encoding="utf-8") if (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").exists() else ""   # EJEMPLOS_GANCHOS: aprende del director
 MARCA = "<!-- ganchos -->"
 COMILLAS = re.compile(r"[«\"“]([^«»\"“”]{12,220})[»\"”]")
 
 PROMPT = """Eres el editor de redes de un canal de YouTube de política española con tono desenfadado e impactante, pero
 riguroso y plural. De estos titulares del día (cada uno con su medio y su enlace), elige hasta {n} GANCHOS: frases
-literales entre comillas con impacto (ataque, zasca, réplica, descalificación política, promesa llamativa) dichas por
+literales entre comillas con impacto (ataque, zasca, réplica, descalificación política, promesa llamativa), como en los ejemplos del director; si la frase es larga, quédate con su trozo literal de más impacto en "gancho" dichas por
 un político o partido. No valen frases de periodistas ni de expertos, ni tacos o insultos vejatorios.
 Para cada una: quién la dice (nombre y partido), a quién va dirigida (si se ve en el titular), la frase COPIADA LETRA A
 LETRA tal como va entre comillas, el medio y el enlace. Si otro titular trae la respuesta del aludido, ponla en
 "replica" (también literal). Reparte entre partidos: que no sean todas del mismo.
-Responde solo JSON: {{"ganchos": [{{"quien": "...", "partido": "...", "a_quien": "...", "frase": "...", "medio": "...",
+Responde solo JSON: {{"ganchos": [{{"quien": "...", "partido": "...", "a_quien": "...", "frase": "...", "gancho": "...", "medio": "...",
 "enlace": "...", "titular": "...", "replica": {{"quien": "...", "frase": "...", "enlace": "..."}} o null}}]}}
 
 TITULARES:
@@ -56,7 +57,7 @@ def main(fecha, n=12):
         md += ["## Del director (comprobados a mano; tienen prioridad)", dirf.read_text(encoding="utf-8").strip(), ""]
     buenos = []
     if lineas:
-        r = gem.pide(PROMPT.format(n=n, titulares="\n".join(lineas)), como_json=True)
+        r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n, titulares="\n".join(lineas)), como_json=True)
         if isinstance(r, list):
             r = {"ganchos": r}
         if not isinstance(r, dict):

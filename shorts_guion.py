@@ -14,6 +14,7 @@ from pathlib import Path
 import gem
 
 RAIZ = Path(__file__).parent
+EJEMPLOS = (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").read_text(encoding="utf-8") if (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").exists() else ""   # EJEMPLOS_GANCHOS: aprende del director
 
 PROMPT = """Eres el editor de Shorts de «El Hoyformativo», informativo de política española en YouTube: neutral y riguroso,
 pero con gancho (el «salseo»: los cruces de declaraciones entre políticos). Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
@@ -37,11 +38,10 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   la cita entera. Que no cambie el sentido (si la cita es condicional, «si han robado…», el gancho conserva el «si»).
 - VARIOS GANCHOS EN UN SHORT: si el día tiene más frases fuertes que Shorts, UNO de los Shorts puede reunir 2-3 ganchos
   de personas y partidos distintos con un hilo común (impuestos, corrupción, el voto...): ponlos en "segmentos" (cada
-  uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-4 frases) y deja "cita" y
-  "gancho" del Short iguales a los del primero. Dura 90-120 s.
+  uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 4-6 frases) y deja "cita" y
+  "gancho" del Short iguales a los del primero. Con más de un gancho dura COMO MÍNIMO 90 s (hasta 120).
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 7-9 frases (120-150 palabras: el Short dura alrededor de 1 minuto, decisión del usuario del
-  7-nov-2026), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
+- "contexto": 8-11 frases (140-180 palabras: el Short dura COMO MÍNIMO 60 s, decisión del usuario del 8-nov-2026), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
   APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
   antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
@@ -132,7 +132,7 @@ def main(fecha, n=3):
     fijo = enc.get("short_fijo") if enc.get("verificada") else None   # 8-nov: guion del Short escrito y comprobado a mano
     if fijo:
         obligada = ""
-    r = gem.pide(PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
+    r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
     if isinstance(r, list):                              # a veces devuelve la lista sin envolver
         r = {"shorts": r}
     if not isinstance(r, dict) and fijo:
@@ -220,10 +220,9 @@ def main(fecha, n=3):
                          "cita": gg, "destaca": g.get("destaca", ""), "fuente": g.get("fuente", ""),
                          "contexto": f"Es {g.get('quien', '')}: «{g['cita'].strip().rstrip('.')}». " + (ctx_g or "")})
         if len(segs) >= 2:
-            ordinal = ["", "Segunda frase. ", "Y tercera. "]
-            for k_, g in enumerate(segs):
-                g["entrada"] = ordinal[min(k_, 2)] + "«" + g["cita"][:20]
-            voz = " ".join(f"{ordinal[min(k_, 2)]}«{g['cita']}». {g['contexto']}" for k_, g in enumerate(segs))
+            for g in segs:                                    # 8-nov: sin numerar los contenidos (el director)
+                g["entrada"] = "«" + g["cita"][:20]
+            voz = " ".join(f"«{g['cita']}». {g['contexto']}" for g in segs)
             s["segmentos"] = segs
         else:
             s.pop("segmentos", None)
@@ -231,6 +230,10 @@ def main(fecha, n=3):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
         voz += (" Más información en el vídeo de hoy. ¿Qué opinas? Te leo en comentarios. Y dale a suscribirte, "
                 "que he visto que aún no lo has hecho.")
+        palabras = len(voz.split()) + 25                    # + el cierre (~25 palabras); Tristán: ~2,75 palabras/s
+        minimo = 250 if s.get("segmentos") else 165          # 8-nov: mínimo 60 s (90 s con varios ganchos)
+        if palabras < minimo:
+            print(f"  AVISO: «{s['cita'][:40]}» se queda en ~{palabras / 2.75:.0f} s (mínimo {minimo / 2.75:.0f} s)")
         s["voz"] = voz
         (dia / "shorts" / f"short_{buenos}.json").write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_{buenos}: {s['kicker']} · «{s['cita'][:70]}»" + (" · con réplica" if s.get("replica") else ""))
