@@ -31,6 +31,14 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   copia en "prueba" el fragmento literal del material que lo muestra. Una declaración del otro partido sobre el mismo
   tema que no contesta a ese ataque NO es una réplica. Si no hay réplica directa: "replica": null (y no se menciona).
 - Descalificaciones políticas literales sí; tacos e insultos vejatorios, no.
+- "gancho" (8-nov-2026, el usuario: «la frase gancho tiene que tener impacto y después desarrollas»): el trozo LITERAL y
+  seguido de la cita con más impacto, 3-12 palabras («Les vamos a freír a impuestos», «Alí Babá tenía 40 ladrones, y Pedro
+  Sánchez tiene ya 130 imputados»). La voz ABRE el Short con él, sin presentación; si la cita ya es corta, el gancho es
+  la cita entera. Que no cambie el sentido (si la cita es condicional, «si han robado…», el gancho conserva el «si»).
+- VARIOS GANCHOS EN UN SHORT: si el día tiene más frases fuertes que Shorts, UNO de los Shorts puede reunir 2-3 ganchos
+  de personas y partidos distintos con un hilo común (impuestos, corrupción, el voto...): ponlos en "segmentos" (cada
+  uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-4 frases) y deja "cita" y
+  "gancho" del Short iguales a los del primero. Dura 90-120 s.
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
 - "contexto": 7-9 frases (120-150 palabras: el Short dura alrededor de 1 minuto, decisión del usuario del
   7-nov-2026), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
@@ -53,9 +61,11 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice, con verbo neutro
   («dice», «afirma», «responde a»; nunca «sentencia», «zanja», «estalla», «arremete»). Sin el nombre del canal.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
-"categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
+"categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
-"portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "..."}}]}}
+"portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
+"segmentos": null o [{{"quien": "...", "cargo": "...", "partido": "...", "kicker": "...", "gancho": "...", "cita": "...",
+"destaca": "...", "fuente": "...", "contexto": "..."}}]}}]}}
 
 MATERIAL APROBADO (guion del vídeo de hoy, ya verificado):
 {guion}
@@ -186,7 +196,30 @@ def main(fecha, n=3):
         s["titulo"] = re.sub(r"\b(sentencia|zanja|estalla|arremete|carga|clama|lanza|suelta)\b", "dice", s.get("titulo", ""))
         buenos += 1
         cita = s["cita"].strip().rstrip(".")
-        voz = f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
+        gancho = (s.get("gancho") or "").strip().rstrip(".")
+        if not gancho or _norm(gancho) not in _norm(cita):    # el gancho tiene que ser un trozo literal de la cita
+            gancho = cita
+        s["gancho"] = gancho
+        voz = (f"«{gancho}». " if gancho != cita else "") + f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
+        segs = []
+        for g in s.get("segmentos") or []:                     # 8-nov: varios ganchos en un Short
+            if not isinstance(g, dict) or _norm(g.get("cita")) not in base or not g.get("contexto"):
+                continue
+            gg = (g.get("gancho") or "").strip().rstrip(".")
+            if not gg or _norm(gg) not in _norm(g["cita"]):
+                gg = g["cita"].strip().rstrip(".")
+            ctx_g = verifica_contexto(g["contexto"], guion, redes)
+            segs.append({"quien": g.get("quien", ""), "cargo": g.get("cargo", ""), "kicker": g.get("kicker", ""),
+                         "cita": gg, "destaca": g.get("destaca", ""), "fuente": g.get("fuente", ""),
+                         "contexto": f"Es {g.get('quien', '')}: «{g['cita'].strip().rstrip('.')}». " + (ctx_g or "")})
+        if len(segs) >= 2:
+            ordinal = ["", "Segunda frase. ", "Y tercera. "]
+            for k_, g in enumerate(segs):
+                g["entrada"] = ordinal[min(k_, 2)] + "«" + g["cita"][:20]
+            voz = " ".join(f"{ordinal[min(k_, 2)]}«{g['cita']}». {g['contexto']}" for k_, g in enumerate(segs))
+            s["segmentos"] = segs
+        else:
+            s.pop("segmentos", None)
         if s.get("replica"):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
         voz += (" Más información en el vídeo de hoy. ¿Qué opinas? Te leo en comentarios. Y dale a suscribirte, "

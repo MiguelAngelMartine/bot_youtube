@@ -331,6 +331,9 @@ def main_segmentos(fecha, n, S):
         t0 = 0.0 if i == 0 else T.en(k0)
         tc = T.en(k1 + 3)
         imgs = [dia / x for x in g.get("imagenes", []) if (dia / x).exists()]
+        if not g.get("imagenes"):                          # sin imágenes elegidas: las del bloque del vídeo largo
+            i_s, sec_s = _seccion(dia, g.get("cita", ""))
+            imgs = _imagenes_tema(dia, i_s, sec_s, g["quien"])[:3]
         p_ = _persona(dia, g["quien"], g.get("cargo", ""), (0.5, 0.36), 0.42)
         frases, pos = [], texto.find(g["contexto"].strip()[:30])
         for fr_ in re.split(r"(?<=[.?!])\s+", g["contexto"].strip()):
@@ -500,6 +503,10 @@ def main(fecha, n):
     pal, dur = voz.locuta([{"di": texto}], "normal", tmp / "voz.wav", cola=0.4)
     T = E.Tiempos(texto, pal, 0.0)
     t_ctx = T.en(texto.find("». ") + 3) if "». " in texto else dur * 0.3
+    if S.get("gancho") and S["gancho"] != S["cita"]:    # 8-nov: gancho, quién lo dice y la cita entera; luego el contexto
+        k_c = texto.find("«" + S["cita"][:15])
+        if k_c >= 0 and texto.find("». ", k_c) >= 0:
+            t_ctx = T.en(texto.find("». ", k_c) + 3)
     med = S.get("medio")                                # 8-nov: una segunda voz entre el gancho y el contexto
     t_med = None
     if med:

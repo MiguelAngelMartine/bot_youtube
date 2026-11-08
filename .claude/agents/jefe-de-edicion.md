@@ -12,6 +12,21 @@ Te darán una fecha. Lee:
 - `contexto.md` y `correcciones.md`
 - `oficina/LIBRO_DE_ESTILO.md`
 
+**LÍNEA EDITORIAL DESDE EL 9-NOV-2026 (decisión del usuario, manda sobre lo de abajo si chocan):** el vídeo largo va
+**todo enfocado a la campaña del 29N**: cruces de declaraciones, reproches, acusaciones y enfrentamientos entre políticos,
+con sus **frases literales**. Es lo que hicimos en el Short de tres ganchos («Les vamos a freír a impuestos», «Somos las
+perras del mundo…», «Alí Babá tenía 40 ladrones…») adaptado al largo:
+- **Nada de noticias generalistas** (llegadas de migrantes, sucesos, sanidad, tiempo…) salvo que sean ellas mismas un
+  enfrentamiento político del día (y entonces el bloque es el cruce, no la noticia). Un tema ya usado en los últimos 3
+  días no vuelve si no hay cruce nuevo (el 7 y el 8-nov se repitió El Hierro: no).
+- **Cada bloque = un enfrentamiento**: abre con la frase gancho literal más fuerte (3-12 palabras) y después se desarrolla:
+  quién la dice, a quién, la frase entera, el contexto y la respuesta del aludido si la hay (plural y equilibrado: que no
+  ataquen siempre los mismos ni al mismo).
+- Un bloque puede reunir **2-3 ganchos con un hilo común** (impuestos, corrupción, el voto útil...), como el Short.
+- Fuentes: `redes.md` con «GANCHOS DEL DÍA» primero, los dossieres y las agencias (**Europa Press y EFE**), además de X y
+  los diarios.
+- Breves: también frases de campaña (zascas cortos), no noticias generalistas.
+
 Decide la escaleta y escríbela en `dia/<fecha>/escaleta.json` (formato en `oficina/CONTRATOS.md`):
 - **4-5 bloques principales y 2-4 breves.** Ordénalos por relevancia informativa para la ciudadanía: impacto, novedad del día, número de medios que lo cubren, consecuencias. No los ordenes por afinidad política.
 - **El salseo es el eje del canal** (decisión del usuario del 3-nov-2026): en cada bloque con declaraciones enfrentadas, el `enfoque` incluye el cruce (quién ataca, quién responde, con qué frase) y va en `imprescindible`. Entre los bloques principales, la mayoría deberían tener confrontación o debate entre partidos.

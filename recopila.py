@@ -26,6 +26,7 @@ FUENTES = {
     "RTVE": "gnews:rtve.es",
     "La Razón": "gnews:larazon.es",
     "Público": "gnews:publico.es",
+    "EFE": "gnews:efe.com",                 # 8-nov-2026: agencia, buena fuente de declaraciones (petición del usuario)
 }
 UA = {"User-Agent": "Mozilla/5.0 (resumen politico diario; uso personal)"}
 

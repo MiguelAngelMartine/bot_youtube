@@ -80,3 +80,9 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 
 ## Variedad de imágenes (8-nov-2026, para todos los vídeos y Shorts desde el 9-nov)
 «Hay que tener mucha más variedad de imágenes y de viñetas»: **ninguna foto ni viñeta se repite hasta pasados 7 días** (`variedad.py`, registro `archivo/imagenes_usadas.json` que rellena `subir.py` con lo subido; ya cargado con lo del 2 al 8-nov). `fotos.py` descarta las usadas (si de una persona no queda ninguna libre, repite la más antigua y avisa); `ia_vinetas.py` pide otra versión de la viñeta y la biblioteca salta las usadas.
+
+## Línea editorial desde el 9-nov-2026 (decisión del usuario tras el Short de tres ganchos)
+- **Gancho primero, después se desarrolla**: la frase literal con impacto (3-12 palabras) abre cada Short, cada contenido y cada bloque; luego quién la dice, a quién, la frase entera y el contexto. `shorts_guion.py` pide el `gancho` y la voz empieza con él.
+- **Varios ganchos en un Short**: si hay muchas frases fuertes, uno de los Shorts reúne 2-3 con un hilo común (`segmentos`; `short.py` los une con una cortinilla «2/3»), 90-120 s.
+- **Vídeo largo, todo campaña**: cruces de declaraciones, reproches, acusaciones y enfrentamientos con citas literales; **nada de noticias generalistas** (El Hierro salió dos días seguidos: no). Cada bloque es un enfrentamiento que abre con su gancho. Instrucciones en `jefe-de-edicion` y `redactor`.
+- **Fuentes**: Europa Press y **EFE** (añadida a `recopila.py`), además de X y los diarios.
