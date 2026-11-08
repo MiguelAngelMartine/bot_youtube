@@ -251,7 +251,12 @@ def buscar(dia_txt, q, n=8):
         except Exception as e:                        # una fuente caida no para la otra
             print(f"  ({f.__name__} no responde: {type(e).__name__})")
     cat_ = [c for c in cands if c["fuente"] in ("Commons (categoría)", "Pool Moncloa")]   # las mas recientes primero
-    cands = (cat_ + sorted([c for c in cands if c not in cat_], key=lambda c: c["orden"]))[:n]
+    cands = cat_ + sorted([c for c in cands if c not in cat_], key=lambda c: c["orden"])
+    import variedad                                     # 8-nov: nada usado en los últimos 7 días
+    libres = [c for c in cands if not variedad.reciente(variedad.clave_foto(c), dia_txt)]
+    if len(libres) < len(cands):
+        print(f"  ({len(cands) - len(libres)} candidatas fuera: usadas en los últimos 7 días)")
+    cands = (libres or cands)[:n]
     s = slug(q)
     for k, c in enumerate(cands):
         im = baja(c["miniatura"], 640)
@@ -288,6 +293,10 @@ def recorta(dia_txt, origen, destino, x0, y0, x1, y1, persona=None):
 def elegir(dia_txt, s, k, nombre, persona=None):
     dia = RAIZ / "dia" / dia_txt
     c = json.loads((dia / "fotos_candidatas" / f"{s}.json").read_text(encoding="utf-8"))[int(k)]
+    import variedad
+    u = variedad.reciente(variedad.clave_foto(c), dia_txt)
+    if u:                                                # 8-nov: regla de los 7 días (decisión del usuario)
+        raise SystemExit(f"esta foto ya se usó el {u}: no se repite hasta pasados 7 días; elige otra")
     im = baja(original(c["url"]), 3200) or baja(c["url"], 3200)   # la original, a maxima resolucion
     if im is None:
         raise SystemExit("no se pudo bajar la foto")
@@ -334,6 +343,15 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
                     cands.append(c)
         except Exception as e:
             print(f"  (una fuente no responde: {type(e).__name__})")
+    import variedad                                     # 8-nov: nada usado en los últimos 7 días (si queda alguna)
+    libres = [c for c in cands if not variedad.reciente(variedad.clave_foto(c), dia_txt)]
+    if len(libres) < len(cands):
+        print(f"  {nombre}: {len(cands) - len(libres)} candidatas fuera por usadas en los últimos 7 días")
+    if libres:
+        cands = libres
+    else:
+        print(f"  AVISO {nombre}: todas sus fotos libres se usaron esta semana; se repite la más antigua")
+        cands.sort(key=lambda c: variedad.reciente(variedad.clave_foto(c), dia_txt) or "")
     buenas = []
     for c in cands[:30]:
         im = baja(c["miniatura"], 900)

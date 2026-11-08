@@ -146,6 +146,11 @@ def subir(dia_txt):
     info = {"id": vid, "url": f"https://youtu.be/{vid}", "studio": f"https://studio.youtube.com/video/{vid}/edit",
             "estado": "privado", "titulo": titulo, "avisos": avisos, "sustituye_a": anterior}
     (dia / "youtube.json").write_text(json.dumps(info, ensure_ascii=False, indent=1), encoding="utf-8")
+    try:                                                # 8-nov: lo publicado no se repite en 7 días
+        import variedad
+        variedad.registra_dia(dia.name)
+    except Exception as e:
+        print(f"(variedad: {type(e).__name__})")
     print(json.dumps(info, ensure_ascii=False, indent=1))
     try:                                                   # norma: con cada video subido, aviso por Telegram
         import notifica
@@ -248,6 +253,11 @@ def subir_shorts(dia_txt):
                        "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada)})
         reg.write_text(json.dumps(hechos, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(hechos, ensure_ascii=False, indent=1))
+    try:                                                # 8-nov: lo publicado no se repite en 7 días
+        import variedad
+        variedad.registra_dia(dia_txt)
+    except Exception as e:
+        print(f"(variedad: {type(e).__name__})")
     try:
         import notifica
         notifica.aviso_shorts(dia_txt, hechos)

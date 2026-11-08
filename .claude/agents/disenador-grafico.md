@@ -103,3 +103,6 @@ Como el ejemplo del usuario: **dos fotos REALES grandes**, una frente a otra, co
 `.venv/bin/python miniatura.py <fecha> --titular "«frase literal»" --destaca "<palabra>" --etiqueta "<Quién a quién>" --persona <foto_del_que_habla> --rival <foto_del_otro> --fondo <foto_del_lugar>`
 - Las fotos, con `fotos.py mejores <fecha> "<nombre>" --animo "hablando con energía, señalando"` (y `--animo "serio"` para el otro): las de más calidad y gesto, nunca de medios ni agencias.
 - **Nunca** caricaturas ni imágenes generadas con IA de personas reales (el usuario no las quiere; `--caricatura` queda sin usar), ni escenas fotorrealistas inventadas: con fotos reales es un montaje honesto y monetizable sin declarar nada.
+
+## Variedad: nada se repite en 7 días (decisión del usuario del 8-nov-2026)
+Una foto o una viñeta usada en un vídeo o un Short no se vuelve a usar hasta pasados 7 días (registro en `archivo/imagenes_usadas.json`, `variedad.py`; lo apunta `subir.py` al subir). `fotos.py buscar` y `mejores` ya quitan las usadas y `elegir` se niega a guardarlas: busca otras (otra ocasión, otro acto, otra categoría por año de Commons). Las viñetas se vuelven a generar en otra versión si la misma ya salió esa semana. **Más variedad dentro del vídeo:** foto de escena en todas las escenas que la admiten (no solo algunas) y hasta 3 retratos distintos por persona.

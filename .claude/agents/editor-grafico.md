@@ -48,3 +48,6 @@ Después, para cada escena con foto de escena de `dia/<fecha>/episodio.json`:
 
 No cambies ningún texto ni dato del episodio: solo añades el campo `foto` y los retratos.
 Responde con tres tablas (la tercera: viñeta → aceptada, rehecha N veces o descartada, y por qué): persona → retrato (licencia, autor) o «iniciales» y por qué; escena → foto elegida (licencia, autor) o «sin foto» y por qué.
+
+## Variedad: nada se repite en 7 días (decisión del usuario del 8-nov-2026)
+Una foto o una viñeta usada en un vídeo o un Short no se vuelve a usar hasta pasados 7 días (registro en `archivo/imagenes_usadas.json`, `variedad.py`; lo apunta `subir.py` al subir). `fotos.py buscar` y `mejores` ya quitan las usadas y `elegir` se niega a guardarlas: busca otras (otra ocasión, otro acto, otra categoría por año de Commons). Las viñetas se vuelven a generar en otra versión si la misma ya salió esa semana. **Más variedad dentro del vídeo:** foto de escena en todas las escenas que la admiten (no solo algunas) y hasta 3 retratos distintos por persona.

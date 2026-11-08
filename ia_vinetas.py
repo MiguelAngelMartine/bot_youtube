@@ -63,8 +63,14 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
         modelo = ESCENAS
         prompt = ESTILO + escena.strip().rstrip(".") + (SOBRIO if sobrio else "")
         fotos = []
-    clave = hashlib.sha1((modelo + prompt + str(intento)).encode() + b"".join(fotos)).hexdigest()[:20]
-    f = CACHE / f"{clave}.jpg"
+    import variedad                                     # 8-nov: una viñeta no se repite en 7 días: otra versión
+    for _ in range(6):
+        clave = hashlib.sha1((modelo + prompt + str(intento)).encode() + b"".join(fotos)).hexdigest()[:20]
+        f = CACHE / f"{clave}.jpg"
+        if f.exists() and variedad.reciente(variedad.clave_vineta(f)):
+            intento += 7
+            continue
+        break
     if f.exists():
         return Image.open(f).convert("RGB")
     try:
@@ -324,6 +330,9 @@ def de_biblioteca(escena, sobrio, usadas=()):
     for e in _catalogo():
         f = BIB / f"{e['id']}.jpg"
         if not f.exists() or e["id"] in usadas or e["tono"] == ("normal" if sobrio else "sobrio"):
+            continue
+        import variedad
+        if variedad.reciente("bib:" + e["id"]):           # 8-nov: tampoco las de la biblioteca en 7 días
             continue
         p = 2 * len(pal & _palabras(e["claves"])) + len(pal & _palabras(e["escena"]))
         if p > puntos:
