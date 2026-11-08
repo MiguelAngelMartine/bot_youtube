@@ -140,7 +140,7 @@ def main(fecha, n=3):
         buenos = 1
         for x in (fijo, fijo.get("medio"), fijo.get("replica")):
             if x:
-                usadas.add(_norm(x["cita"]))
+                usadas.add(re.sub(r"^(y|e|pero|porque)\s+", "", _norm(x["cita"])))
         partidos.add(fijo.get("partido"))
         (dia / "shorts" / "short_1.json").write_text(json.dumps(fijo, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_1: {fijo['kicker']} · guion fijo del director")
@@ -158,7 +158,8 @@ def main(fecha, n=3):
         if _norm(s.get("cita")) not in base:
             print(f"  descartado: la cita «{s.get('cita', '')[:60]}» no está literal en el material")
             continue
-        if len(s.get("cita", "").split()) < 4 or _norm(s.get("cita")) in usadas:
+        nc = re.sub(r"^(y|e|pero|porque)\s+", "", _norm(s.get("cita")))      # 8-nov: «Y si han...» = «Si han...»
+        if len(s.get("cita", "").split()) < 4 or any(nc in u or u in nc for u in usadas):
             print(f"  descartada: «{s.get('cita', '')[:60]}» es muy corta o ya sale en otro Short")
             continue
         malas = [w for w in VALORATIVAS if w in s.get("contexto", "").lower()]
@@ -172,9 +173,9 @@ def main(fecha, n=3):
         if rep and (_norm(rep.get("cita")) not in base or not rep.get("prueba") or _norm(rep["prueba"]) not in base):
             print(f"  réplica quitada (no literal o sin prueba de que contesta): «{rep.get('cita', '')[:60]}»")
             s["replica"] = None
-        usadas.add(_norm(s["cita"]))
+        usadas.add(re.sub(r"^(y|e|pero|porque)\s+", "", _norm(s["cita"])))
         if s.get("replica"):
-            usadas.add(_norm(s["replica"]["cita"]))
+            usadas.add(re.sub(r"^(y|e|pero|porque)\s+", "", _norm(s["replica"]["cita"])))
         if s.get("partido") in partidos:
             print(f"  aviso: {s.get('partido')} repite protagonista (no había más partidos con frase válida)")
         partidos.add(s.get("partido"))
