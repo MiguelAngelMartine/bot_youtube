@@ -59,8 +59,11 @@ def foto_suelta(ruta, credito, ancho=360):
     f = f.resize((math.ceil(f.width * r), math.ceil(f.height * r)), Image.LANCZOS)
     x0, y0 = (f.width - (ancho - 30)) // 2, (f.height - (alto_f - 30)) // 3
     im.paste(f.crop((x0, y0, x0 + ancho - 30, y0 + alto_f - 30)), (23, 27))
-    d.text((ancho / 2 + 8, alto_f + 24), f"Foto de archivo: {credito['autor'][:34]} · {credito['licencia']}",
-           font=fuente("Inter-Regular.ttf", 17), fill=(130, 135, 145), anchor="mt")
+    txt_c = f"Foto de archivo: {credito['autor'][:34]} · {credito['licencia']}"
+    tam_c = 17
+    while tam_c > 10 and d.textlength(txt_c, font=fuente("Inter-Regular.ttf", tam_c)) > ancho - 20:
+        tam_c -= 1                                    # 8-nov: el credito cabe siempre dentro de la foto
+    d.text((ancho / 2 + 8, alto_f + 24), txt_c, font=fuente("Inter-Regular.ttf", tam_c), fill=(130, 135, 145), anchor="mt")
     C.celo(im, ancho / 2 - 50, -3)
     return im.rotate(-2, expand=True, resample=Image.BICUBIC)
 
@@ -123,7 +126,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         y_sello = 60
         if p.get("cita"):
             nc = nota(p["cita"], 480, 42, "Fuente: " + p.get("medio", ""))
-            out.append((nc, 440, 50, cuando(p.get("cita_cuando"), t0 + 2)))
+            out.append((nc, 440, 50, min(cuando(p.get("cita_cuando"), t0 + 2), t0 + 2.5)))   # 8-nov: sin mitad vacia
             y_sello = 50 + nc.height + 30
         if ve.get("sello"):                            # junto a la cita, nunca sobre la cara ni el nombre (2-nov)
             out.append((sello(ve["sello"]), 460, y_sello, cuando(ve.get("sello_cuando"), t0 + 1.2)))
@@ -149,8 +152,11 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         n = len(ve["items"])
         col = (LW - 60) // n
         ap = min(340, int(col * 0.52))                    # 6-nov: polaroids más grandes (con dos, mucho más)
+        misma = {}                                        # 8-nov: la misma persona repetida usa la misma foto
         for k, it in enumerate(ve["items"]):
-            f, c = foto_de(it["nombre"], it.get("cargo", ""))
+            if it["nombre"] not in misma:
+                misma[it["nombre"]] = foto_de(it["nombre"], it.get("cargo", ""))
+            f, c = misma[it["nombre"]]
             ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
             x = 30 + col * k
             out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 140, ti))
@@ -214,7 +220,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
         out.append((E.hoja_calendario(ve["dia"], ve["mes"], ve["pie"]), 60, 60, t0 + 0.1))
         y = 30
         for k, it in enumerate(ve["items"]):
-            ti = cuando(it.get("cuando"), t0 + 1 + k)
+            ti = min(cuando(it.get("cuando"), t0 + 1 + k), t0 + 1.5 + 2.5 * k)   # 8-nov: sin mitad vacia
             nt = nota(it["texto"], 820, 36)
             out.append((pegatina(it["hora"].upper(), tam=40), 480, y, ti))
             out.append((nt, 480, y + 66, ti + 0.2))
@@ -657,7 +663,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                     else:
                         print(f"  AVISO: la foto {fn} no esta en imagenes/ o no tiene credito; la escena va sin foto")
                 pz = sorted(piezas_h(ve, T, c, t0, fotos, cred, foto, usadas), key=lambda z: z[3])
-                parte = {"k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
+                parte = {"sin_teaser": ve["tipo"] == "citas" and len(ve.get("items", [])) >= 3, "k": len(partes), "t0": t0, "tipo": ve["tipo"], "piezas": pz,
                          "fondo": fondo_de(ve, foto, ve["_vin"], fotos, img_blq), "sobrio_f": ve["_sobrio"],
                          "fuente": ve.get("fuente") or " · ".join(s.get("fuentes", [])[:3])}
                 if ve["tipo"] in ("claves", "cronologia") and (ve["_vin"] or any(it.get("persona_vineta") in fotos
@@ -834,7 +840,7 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                  108, suave((t - p["t0"]) / 0.35) if tras_golpe else 1.0)
         if 0 < i < len(plan) - 1:                      # "A continuacion": anuncia el bloque siguiente (retencion)
             falta = plan[i + 1]["t0"] - t
-            if falta < 4.5:
+            if falta < 4.5 and not pt.get("sin_teaser"):
                 tz = p["teaser"]
                 # 7-nov: dentro del escenario, abajo a la derecha (encima del crédito «Ilustración IA»): ni tapa el
                 # título del bloque (arriba) ni choca con los subtítulos (debajo)

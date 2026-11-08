@@ -17,3 +17,6 @@
   Propuestas de erratas.py sobre el episodio del 6-nov NO publicadas (pendientes de verificar):
   3. Fiscalia Europea: investiga tres licitaciones por 136 M (hasta 261 M segun otros contratos), no 111,6 M (El Pais, 7-nov).
   4. Urda: fallecidos 116 en vez de 69 (ABC, cita de Ester Muñoz). SIN VERIFICAR: contradice la cifra de 69 usada en todos los dias; revisar antes de publicar.
+- 2026-11-08: el episodio no incluye bloque de correcciones; las 2 propuestas de erratas.py sobre el episodio del 7-nov NO estan publicadas (pendientes de verificar):
+  1. Puente: su dimision fue decision personal y no la comunico antes a Sanchez (El Mundo, 8-nov).
+  2. Joyas de Zapatero/PSOE: propuesta de Gemini sobre un inmueble del PSOE registrado por un centimo (La Razon); SIN VERIFICAR y sin relacion con el bloque corregido; descartable.
