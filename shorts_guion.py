@@ -234,6 +234,11 @@ def main(fecha, n=3):
         minimo = 250 if s.get("segmentos") else 165          # 8-nov: mínimo 60 s (90 s con varios ganchos)
         if palabras < minimo:
             print(f"  AVISO: «{s['cita'][:40]}» se queda en ~{palabras / 2.75:.0f} s (mínimo {minimo / 2.75:.0f} s)")
+        if enc.get("verificada") and buenos == 1 and _norm(enc["frase"]) in _norm(s["cita"]):   # 9-nov: la del director
+            s["portada"] = enc["frase"]                          # es la portada y el gancho principal
+            if not s.get("segmentos"):
+                s["gancho"] = enc["frase"]
+                voz = f"«{enc['frase']}». " + voz.split("». ", 1)[1] if voz.startswith("«") else f"«{enc['frase']}». " + voz
         s["voz"] = voz
         (dia / "shorts" / f"short_{buenos}.json").write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_{buenos}: {s['kicker']} · «{s['cita'][:70]}»" + (" · con réplica" if s.get("replica") else ""))
