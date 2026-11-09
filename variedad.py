@@ -19,6 +19,10 @@ REG = RAIZ / "archivo" / "imagenes_usadas.json"
 DIAS = 7
 
 
+# Fotos vetadas para siempre (no son quien dicen: 9-nov-2026, "Santiago Abascal" de aiaraldea.eus era otra persona)
+VETADAS = ("File:Santiago_Abascal_Escuza.jpg", "File:Reuni%C3%B3n_del_CECOPI_por_el_accidente_ferroviario_de_Urda_-_55619911237.jpg", "File:Reuni%C3%B3n_del_CECOPI_en_Toledo_-_55618943296.jpg", "File:Madrid_Gay_Pride_2026_-_Parade_-_260704_192440.jpg",)   # 9-nov: fotos de grupo donde no se ve a la persona
+
+
 def _lee():
     try:
         return json.loads(REG.read_text(encoding="utf-8"))
@@ -34,6 +38,8 @@ def reciente(clave, fecha=None, dias=DIAS):
     """La fecha en que se usó si fue en los `dias` anteriores (sin contar el mismo día); si no, None."""
     if not clave:
         return None
+    if any(v in clave for v in VETADAS):
+        return "9999-12-31"
     u = _lee().get(clave)
     if not u:
         return None

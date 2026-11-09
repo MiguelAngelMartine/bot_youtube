@@ -218,13 +218,13 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
                         cuando(ve.get("cuando_nota"), t0 + 3)))
     elif tipo == "calendario":
         out.append((E.hoja_calendario(ve["dia"], ve["mes"], ve["pie"]), 60, 60, t0 + 0.1))
-        y = 30
+        y = 12                                          # 9-nov: más compacto, para que «A continuación» no tape la última nota
         for k, it in enumerate(ve["items"]):
             ti = min(cuando(it.get("cuando"), t0 + 1 + k), t0 + 1.5 + 2.5 * k)   # 8-nov: sin mitad vacia
-            nt = nota(it["texto"], 820, 36)
-            out.append((pegatina(it["hora"].upper(), tam=40), 480, y, ti))
-            out.append((nt, 480, y + 66, ti + 0.2))
-            y += 66 + nt.height - 6
+            nt = nota(it["texto"], 820, 32)
+            out.append((pegatina(it["hora"].upper(), tam=36), 480, y, ti))
+            out.append((nt, 480, y + 58, ti + 0.2))
+            y += 58 + nt.height - 12
     elif tipo == "breve":
         out.append((pegatina(ve["lugar"], ROJO, BLANCO, 44), 40, 30, t0 + 0.1))
         if 0 in ve.get("_vin", {}):
