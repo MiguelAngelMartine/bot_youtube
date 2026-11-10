@@ -61,12 +61,13 @@ def main(fecha):
     if not hechas:
         return 1
     r = subprocess.run([sys.executable, "director_arte.py", fecha] + [s for _, s in hechas], cwd=RAIZ)
-    if not (dia / "miniatura.png").exists():           # ninguna llegó al 7: la primera, y se avisa en el parte
+    floja = not (dia / "miniatura.png").exists()        # ninguna llegó al 7 del director de arte
+    if floja:
         shutil.copy(dia / hechas[0][1], dia / "miniatura.png")
     elegida = next((e for e, s in hechas if (dia / s).read_bytes() == (dia / "miniatura.png").read_bytes()), hechas[0][0])
     REG.write_text(json.dumps((usados + [elegida])[-20:]), encoding="utf-8")
     print(f"miniatura: estilo {elegida} · «{titular}» · {persona}" + (f" vs {rival}" if rival else ""))
-    return 0
+    return 3 if floja else 0                            # 3: no llega al nivel; jornada.py llama al diseñador de Claude
 
 
 if __name__ == "__main__":

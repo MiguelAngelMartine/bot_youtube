@@ -44,13 +44,13 @@ class Jornada:
         except subprocess.TimeoutExpired:
             return 124
 
-    def claude(self, puesto, encargo, salida):
-        """Respaldo: el agente de Claude de siempre, solo para este puesto (Sonnet)."""
-        self.parte(f"{puesto}: Gemini no responde, lo hace Claude")
+    def claude(self, puesto, encargo, salida, modelo="sonnet", motivo="Gemini no responde"):
+        """Respaldo: el agente de Claude de siempre, solo para este puesto."""
+        self.parte(f"{puesto}: {motivo}, lo hace Claude")
         prompt = (f"Eres el agente «{puesto}» de El Hoyformativo: lee y sigue .claude/agents/{puesto}.md. Fecha {self.f}. "
                   f"{encargo} Escribe {salida}. Responde en una línea.")
         try:
-            subprocess.run(["claude", "-p", prompt, "--model", "sonnet", "--permission-mode", "auto"], cwd=RAIZ,
+            subprocess.run(["claude", "-p", prompt, "--model", modelo, "--permission-mode", "auto"], cwd=RAIZ,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=CLAUDE_MIN)
         except subprocess.TimeoutExpired:
             pass
@@ -107,8 +107,12 @@ class Jornada:
         if self.json("escaleta.json"):
             return True
         fs = [self.dia / "temas.json", self.dia / "redes.md"] + sorted((self.dia / "dossier").glob("*.md")) + self.comunes()
-        ok = self.puesto("jefe-de-edicion", "Haz el consejo de redacción y escribe escaleta.json.", fs,
-                         self.dia / "escaleta.json", valida=lambda r: isinstance(r, dict) and r.get("bloques"))
+        # 10-nov (calidad): elegir las noticias es la decisión que más pesa; la hace Claude Opus (una sola llamada)
+        ok = self.claude("jefe-de-edicion", "Haz el consejo de redacción.", (self.dia / "escaleta.json").relative_to(RAIZ),
+                         modelo="opus", motivo="consejo de redacción (decisión editorial clave)") and bool(self.json("escaleta.json"))
+        if not ok:
+            ok = self.puesto("jefe-de-edicion", "Haz el consejo de redacción y escribe escaleta.json.", fs,
+                             self.dia / "escaleta.json", valida=lambda r: isinstance(r, dict) and r.get("bloques"))
         if ok:
             e = self.json("escaleta.json")
             self.parte(f"escaleta: {len(e['bloques'])} bloques y {len(e.get('breves', []))} breves")
@@ -132,17 +136,67 @@ class Jornada:
         self.parte(f"redacción: {len(piezas)} piezas escritas y prechequeadas")
         return True
 
+    def _corpus(self):
+        if not hasattr(self, "_corp"):
+            import unicodedata, re as _re
+            txt = " ".join(f.read_text(encoding="utf-8", errors="ignore") for f in
+                           [*(self.dia / "dossier").glob("*.md"), *(self.dia / "articulos").glob("*.txt"), self.dia / "redes.md",
+                            self.dia / "ganchos_director.md"] if f.exists())
+            self._corp = self._n(txt)
+        return self._corp
+
+    @staticmethod
+    def _n(t):
+        import unicodedata, re as _re
+        t = unicodedata.normalize("NFKC", t or "").lower()
+        t = _re.sub(r"[«»“”\"'‘’]", " ", t)
+        return _re.sub(r"\s+", " ", _re.sub(r"[^\w\s]", " ", t)).strip()
+
+    def calidad_bloque(self, sal, segundos=None):
+        """Lo que se puede medir sin criterio: citas literales, gancho al principio, variedad de escenas y duración."""
+        import re as _re
+        try:
+            b = json.loads(sal.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return ["el fichero no es JSON válido"]
+        fallos = []
+        pasos = b.get("pasos") or []
+        txt = json.dumps(pasos, ensure_ascii=False)
+        corp = self._corpus()
+        for c in set(_re.findall(r"«([^«»]{12,400})»", txt)):
+            if len(c.split()) >= 4 and self._n(c) not in corp:
+                fallos.append(f"cita no literal en las fuentes: «{c[:90]}»")
+        if pasos and "«" not in pasos[0].get("di", "")[:200] and "breve" not in txt[:300]:
+            fallos.append("el primer «di» no abre con la frase gancho literal entre «»")
+        tipos = [(p.get("ve") or {}).get("tipo") for p in pasos if p.get("ve")]
+        if len(set(tipos)) < 3 and "breve" not in tipos:
+            fallos.append(f"solo {len(set(tipos))} tipos de escena (mínimo 3)")
+        if segundos:
+            pal = sum(len(p.get("di", "").split()) for p in pasos)
+            if pal < segundos * 2.75 * 0.75:
+                fallos.append(f"se queda corto: {pal} palabras para {segundos} s (~{int(segundos * 2.75)}): añade contexto del dossier")
+        return fallos
+
     def _redacta(self, nn, que, dos):
         if True:
             sal = self.dia / "bloques" / f"{nn}.json"
             if not sal.exists():
                 self.puesto("redactor", f"Escribe {que}.", [self.dia / "escaleta.json", *dos, *self.comunes()], sal,
                             valida=lambda r: isinstance(r, dict) and r.get("pasos"))
-            for _ in range(2):                         # lo mecánico, antes de la mesa
+            e = self.json("escaleta.json") or {}
+            seg = next((b.get("segundos") for b in e.get("bloques", []) if f"{b['n']:02d}" == nn), None)
+            for intento in range(3):                   # lo mecánico y la calidad medible, antes de la mesa
                 r = subprocess.run([PY, "prechequeo.py", self.f, nn], cwd=RAIZ, capture_output=True, text=True)
-                if r.stdout.strip().endswith("OK") or not sal.exists():
+                pre = "" if r.stdout.strip().endswith("OK") else r.stdout[-2500:]
+                cal = self.calidad_bloque(sal, seg) if sal.exists() else ["no existe"]
+                if not pre and not cal:
                     break
-                self.puesto("redactor", f"Corrige {que}: el prechequeo mecánico dice:\n{r.stdout[-3000:]}",
+                problemas = (pre + "\n" + "\n".join("- " + c for c in cal)).strip()
+                if intento == 2:                       # Gemini no lo ha dejado bien: lo rehace Claude (calidad)
+                    self.claude("redactor", f"Bloque {nn}: corrige estos problemas de calidad:\n{problemas}",
+                                sal.relative_to(RAIZ), motivo=f"bloque {nn} sin la calidad mínima tras 2 intentos de Gemini")
+                    break
+                self.puesto("redactor", f"Corrige {que}. Problemas detectados:\n{problemas}",
                             [sal, self.dia / "escaleta.json", *dos, *self.comunes()], sal,
                             valida=lambda r: isinstance(r, dict) and r.get("pasos"))
 
@@ -183,6 +237,12 @@ class Jornada:
                              *self.comunes()], sal, valida=lambda r: isinstance(r, dict) and r.get("pasos"))
             if not corregir:
                 break
+            if vuelta == 2:                             # 10-nov (calidad): lo que Gemini no ha cerrado, Claude
+                for n in corregir:
+                    self.claude("verificador", f"Bloque {n}: revísalo contra su dossier y las noticias y, si hay errores, "
+                                f"corrígelos tú directamente en bloques/{n}.json (también los de revision/).",
+                                (self.dia / "bloques" / f"{n}.json").relative_to(RAIZ),
+                                motivo=f"bloque {n} sigue en CORREGIR tras dos vueltas")
             pendientes = corregir
         (self.dia / "revision" / "mesa_hecha").touch()
         return True
@@ -234,6 +294,15 @@ class Jornada:
                          valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
         if ok:
             E = self.normaliza(self.json("episodio.json"))
+            pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
+            if pal / 2.75 / 60 < 7.0:                   # 10-nov (calidad): 7-9 min; si falta, más contexto del dossier
+                self.parte(f"episodio corto (~{pal / 2.75 / 60:.1f} min): se amplía con contexto")
+                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 7-9: amplía los "
+                            f"bloques con más contexto de sus dossieres (antecedentes, datos, la versión de la otra parte), sin "
+                            f"inventar nada y sin tocar las citas. Devuelve el episodio.json completo.",
+                            [self.dia / "episodio.json", *sorted((self.dia / "dossier").glob("*.md")), *self.comunes()],
+                            self.dia / "episodio.json", valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
+                E = self.normaliza(self.json("episodio.json"))
             (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
             pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
             self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
@@ -268,14 +337,49 @@ class Jornada:
             return False
         self.py("control_calidad.py", self.f, log="calidad.log")
         self.parte("montaje hecho y fotogramas de control sacados")
+        return self.control_visual()
+
+    def control_visual(self):
+        """10-nov (calidad): Gemini mira las hojas de contacto como el agente de control de calidad; si ve problemas,
+        entran el control de calidad y el montador de Claude, como antes (máximo una vuelta)."""
+        import gem
+        from PIL import Image
+        hojas = sorted((self.dia / "calidad").glob("hoja_*.png"))
+        if not hojas:
+            return True
+        partes = [{"text": "Eres el control de calidad visual de un informativo de YouTube. Mira estas hojas de contacto (un "
+                   "fotograma por escena) y busca SOLO problemas graves: texto cortado o que se sale, piezas que se tapan, "
+                   "escenas vacías o negras, letras inventadas en las ilustraciones, una foto que claramente no corresponde al "
+                   "nombre que la acompaña (p. ej., una multitud o un objeto en un retrato), subtítulos ilegibles. Responde JSON: "
+                   "{\"veredicto\": \"APTO\"|\"CORREGIR\", \"problemas\": [\"hoja N: ...\"]}"}]
+        for h in hojas:
+            partes += [{"text": h.name}, gem.imagen(Image.open(h), 1600)]
+        r = gem.pide(partes, como_json=True) or {}
+        prob = r.get("problemas") or []
+        (self.dia / "calidad" / "informe_gemini.json").write_text(json.dumps(r, ensure_ascii=False, indent=1), encoding="utf-8")
+        if r.get("veredicto") != "CORREGIR":
+            self.parte("control visual (Gemini): APTO")
+            return True
+        self.parte(f"control visual (Gemini): CORREGIR ({len(prob)} problemas): entran control de calidad y montador de Claude")
+        self.claude("control-calidad", "Revisa el vídeo. Gemini ha visto: " + "; ".join(prob)[:1500],
+                    (self.dia / "calidad" / "informe.md").relative_to(RAIZ), motivo="el control visual detecta problemas")
+        inf = (self.dia / "calidad" / "informe.md")
+        if inf.exists() and "CORREGIR" in inf.read_text(encoding="utf-8"):
+            (self.dia / "episodio.mp4").unlink(missing_ok=True)
+            self.claude("montador", "Arregla lo de calidad/informe.md y vuelve a montar con largo.py.",
+                        (self.dia / "episodio.mp4").relative_to(RAIZ), motivo="hay que corregir el montaje")
+            if not (self.dia / "episodio.mp4").exists() and self.py("largo.py", self.f, log="render.log", timeout=7200) != 0:
+                return False
         return True
 
     def miniatura(self):
         if (self.dia / "miniatura.png").exists():
             return True
         rc = self.py("miniatura_auto.py", self.f, log="miniatura.log", timeout=1800)
-        if rc != 0 or not (self.dia / "miniatura.png").exists():
-            self.claude("disenador-grafico", "Haz la miniatura del episodio.", self.dia.relative_to(RAIZ) / "miniatura.png")
+        if rc != 0 or not (self.dia / "miniatura.png").exists():   # 10-nov (calidad): por debajo de 7, el diseñador
+            (self.dia / "miniatura.png").unlink(missing_ok=True)
+            self.claude("disenador-grafico", "Haz la miniatura del episodio (las versiones automáticas no llegaron a 7).",
+                        self.dia.relative_to(RAIZ) / "miniatura.png", motivo="la miniatura automática no llega al 7")
         self.parte("miniatura lista")
         return True
 
