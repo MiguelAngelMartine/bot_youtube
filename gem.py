@@ -57,9 +57,8 @@ def pide(partes, como_json=False, temperatura=0.2):
             continue
         cfg = dict(conf, thinkingConfig={"thinkingLevel": "low"}) if modelo.startswith("gemini-3") else conf   # mas rapido
         for intento in range(3):
-            if time.time() > limite:                    # saturado: mejor que lo haga Claude que esperar
-                print("  (Gemini saturado: se pasa el trabajo a Claude)", file=sys.stderr)
-                return None
+            if time.time() > limite:                    # saturado: antes que Claude, los modelos gratuitos (10-nov)
+                return _pool(partes, como_json, temperatura)
             try:
                 r = requests.post(f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
                                   headers={"x-goog-api-key": k}, timeout=max(20, limite - time.time()),
@@ -89,4 +88,37 @@ def pide(partes, como_json=False, temperatura=0.2):
                 cfg = conf                              # este modelo no admite el ajuste: sin el
                 continue
             break
+    return _pool(partes, como_json, temperatura)
+
+
+POOL = Path.home() / ".local" / "bin" / "freellmpool"
+
+
+def _pool(partes, como_json, temperatura):
+    """10-nov-2026 (petición del usuario: ahorrar créditos de Claude): si Gemini no responde, el trabajo de texto pasa
+    a freellmpool (proveedores gratuitos con relevo automático, routing «quality»; instalado con `uv tool install`
+    porque pide Python ≥ 3.11). Solo texto: con imágenes no (sus modelos gratuitos no las ven bien). Si tampoco
+    responde, None y lo hace el agente de Claude, como antes. El material es público (noticias), sin secretos."""
+    import subprocess
+    if not POOL.exists() or any("text" not in p for p in partes):
+        print("  (Gemini saturado: se pasa el trabajo a Claude)", file=sys.stderr)
+        return None
+    texto = "\n\n".join(p["text"] for p in partes)
+    if como_json:
+        texto += "\n\nResponde SOLO con JSON válido, sin texto antes ni después."
+    try:
+        r = subprocess.run([str(POOL), "ask", "--routing", "quality", "--max-tokens", "8000", "--timeout", "120",
+                            "--temperature", str(temperatura)] + (["--json"] if como_json else []),
+                           input=texto, capture_output=True, text=True, timeout=400)
+        out = r.stdout.strip()
+        if r.returncode == 0 and out:
+            print("  (freellmpool: modelo gratuito)", file=sys.stderr)
+            if not como_json:
+                return out
+            import re
+            m = re.search(r"[\[{].*[\]}]", out, re.S)
+            return json.loads(m.group(0)) if m else None
+    except (subprocess.SubprocessError, ValueError, OSError):
+        pass
+    print("  (Gemini y freellmpool sin respuesta: se pasa el trabajo a Claude)", file=sys.stderr)
     return None

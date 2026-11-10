@@ -96,3 +96,4 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 - **Miniatura:** franjas de aviso, nombre del canal y barra inferior con SUSCRÍBETE (`miniatura.adornos_impacto`), con fotos reales de gesto fuerte.
 - **Viñetas:** más detalle (8 pasos en Cloudflare, estilo de novela gráfica cuidada).
 - **Vídeo largo:** contexto alrededor de cada frase; selección más exigente de ganchos.
+- **freellmpool** (10-nov-2026, petición del usuario para ahorrar créditos): proveedores gratuitos de LLM con relevo automático, instalado con `uv tool install --python 3.12 freellmpool` (`~/.local/bin/freellmpool`; el servidor tiene Python 3.10). Es el **segundo respaldo** de `gem.pide`: si Gemini no responde, el trabajo de texto pasa a freellmpool antes que al agente de Claude (las comprobaciones literales de los programas siguen igual). No se usa para los agentes de Claude (jefe, redactores, mesa): su calidad y neutralidad dependen del modelo.
