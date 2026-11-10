@@ -66,6 +66,11 @@ def main(fecha):
     import apto_anuncios as AA                         # 10-nov: sin tacos ni insultos personales en el título (anuncios)
     sumario = [it.get("titular", "") for p in G["secciones"][0]["pasos"] for it in (p.get("ve") or {}).get("items", [])]
     titulo = AA.elige(titulo, G.get("titulo_video", ""), *sumario, "Los cruces de la política española de hoy")
+    try:                                               # 10-nov: el estratega de YouTube elige el mejor de 5 títulos
+        import experto_youtube as EX
+        titulo = EX.mejor_titulo(titulo, sumario, [x.get("titulo", "") for x in G["secciones"][1:]])
+    except Exception as e:
+        print(f"(experto sin respuesta: {type(e).__name__})")
     vistos, hs = set(), []
     for h in r.get("hashtags", []):                    # máximo 15 (con más, YouTube los ignora todos), sin repetir
         h = "#" + re.sub(r"[\s#]+", "", str(h))

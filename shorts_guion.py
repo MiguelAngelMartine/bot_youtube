@@ -158,6 +158,11 @@ def main(fecha, n=3):
         (dia / "shorts" / "short_1.json").write_text(json.dumps(fijo, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"short_1: {fijo['kicker']} · guion fijo del director")
     cands = r.get("shorts", [])
+    try:                                               # 10-nov: el experto en YouTube puntúa y pule; primero los mejores
+        import experto_youtube as EX
+        cands = EX.pule_shorts(cands)
+    except Exception as e:
+        print(f"  (experto sin respuesta: {type(e).__name__})")
     vistos_p, orden, resto = set(), [], []                # reparto: primero un Short por partido; si faltan, repite
     for s in cands:
         (resto if s.get("partido") in vistos_p else orden).append(s)
@@ -170,6 +175,9 @@ def main(fecha, n=3):
                 v = (obj.get(campo) or "").strip()
                 if len(v) > 2 and v[0] in "«“\"" and v[-1] in "»”\"" and not re.search(r"[«»“”\"]", v[1:-1]):
                     obj[campo] = v[1:-1].strip()
+        if s.get("nota_experto") is not None and s["nota_experto"] < 6:   # menos, pero mejor (10-nov)
+            print(f"  descartada por el experto ({s['nota_experto']:.0f}/10): «{s.get('cita', '')[:50]}»")
+            continue
         if re.search(r"[«»“”\"]", s.get("cita", "")):
             print(f"  descartada: «{s.get('cita', '')[:60]}» es una cita parcial (solo entrecomilla una parte)")
             continue
