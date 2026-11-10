@@ -187,6 +187,45 @@ class Jornada:
         (self.dia / "revision" / "mesa_hecha").touch()
         return True
 
+    DESPEDIDA = ("Esto ha sido todo por hoy. Si te ha servido, suscríbete y activa la campanita para no perderte el "
+                 "resumen de mañana. Gracias por vernos. Mañana, más.")
+
+    def normaliza(self, E):
+        """El formato exacto de CONTRATOS.md, que el montaje necesita (Gemini a veces cambia la forma del sumario o
+        se deja tono y fuentes): sumario como sección con un paso «sumario», tono y fuentes en cada sección y la
+        despedida como último paso."""
+        e = self.json("escaleta.json") or {}
+        tonos = {b.get("titulo"): b.get("tono", "normal") for b in e.get("bloques", [])}
+        fuentes = {}
+        for f in (self.dia / "bloques").glob("*.json"):
+            try:
+                b = json.loads(f.read_text(encoding="utf-8"))
+                fuentes[b.get("titulo")] = b.get("fuentes", [])
+            except ValueError:
+                pass
+        secs = []
+        for k, s in enumerate(E.get("secciones", [])):
+            if not s.get("pasos") and (s.get("items") or s.get("texto")):          # sumario con otra forma
+                s = {"titulo": "Lo más importante del día", "pasos": [{"di": s.get("texto") or s.get("di", ""),
+                     "ve": {"tipo": "sumario", "items": s.get("items", [])}}]}
+            if not s.get("pasos"):
+                continue
+            s = {"titulo": s.get("titulo") or "Lo más importante del día", "tono": s.get("tono") or tonos.get(s.get("titulo"), "normal"),
+                 "fuentes": s.get("fuentes") or fuentes.get(s.get("titulo"), []), "pasos": s["pasos"]}
+            s["pasos"] = [p for p in s["pasos"] if isinstance(p, dict) and p.get("di")]
+            secs.append(s)
+        if secs and (secs[0]["pasos"][0].get("ve") or {}).get("tipo") == "sumario":
+            for it in secs[0]["pasos"][0]["ve"].get("items", []):
+                it.setdefault("texto", it.get("titular", ""))
+                it.setdefault("titular", it.get("texto", ""))
+        ult = secs[-1]["pasos"] if secs else []
+        if not any((p.get("ve") or {}).get("tipo") == "despedida" for p in ult):
+            ult.append({"di": self.DESPEDIDA, "ve": {"tipo": "despedida"}})
+        E["secciones"] = secs
+        E.setdefault("fecha", e.get("fecha", self.f))
+        E.setdefault("titulo_video", e.get("titulo_video", ""))
+        return E
+
     def cierre(self):
         if self.json("episodio.json"):
             return True
@@ -194,7 +233,10 @@ class Jornada:
                          *sorted((self.dia / "bloques").glob("*.json")), *self.comunes()], self.dia / "episodio.json",
                          valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
         if ok:
-            self.parte("cierre: episodio.json listo")
+            E = self.normaliza(self.json("episodio.json"))
+            (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
+            pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
+            self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
         return ok
 
     def grafica(self):
