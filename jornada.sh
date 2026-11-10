@@ -35,6 +35,25 @@ lanza)
     # espera a que se renueve y retoma (la skill salta las fases ya hechas). Nunca empieza un intento después de las 21:00.
     # Aviso por Telegram de que empieza el vídeo del día (petición del usuario del 4-nov-2026)
     "$PY" notifica.py "$FECHA" --aviso "empieza la jornada: me pongo con el vídeo de hoy. Te aviso cuando esté subido (unas 2 h)." >> "$LOG" 2>&1
+    # 10-nov-2026 (petición del usuario): cada fase que se completa (cada línea nueva del parte del día) se avisa por
+    # Telegram, para saber que todo sigue adelante. Lo hace este vigía, sin gastar tokens; un mensaje por minuto como mucho.
+    PARTE="$DIA/parte_del_dia.md"
+    (
+        N=$( [ -f "$PARTE" ] && wc -l < "$PARTE" || echo 0 )
+        while true; do
+            sleep 60
+            [ -f "$PARTE" ] || continue
+            T=$(wc -l < "$PARTE")
+            if [ "$T" -gt "$N" ]; then
+                NUEVAS=$(tail -n +"$((N + 1))" "$PARTE" | head -n "$((T - N))" | sed 's/^/✅ /')
+                "$PY" notifica.py "$FECHA" --aviso "fase completada:
+$NUEVAS" >> "$LOG" 2>&1
+                N=$T
+            fi
+        done
+    ) &
+    VIGIA=$!
+    trap 'kill $VIGIA 2>/dev/null' EXIT
     for INTENTO in 1 2 3; do
         echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
         ANTES=$(wc -l < "$LOG")
