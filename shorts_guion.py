@@ -162,6 +162,11 @@ def main(fecha, n=3):
     for s in orden + resto:
         if buenos >= n:
             break
+        for obj in [s, s.get("replica") or {}] + [g for g in (s.get("segmentos") or []) if isinstance(g, dict)]:
+            for campo in ("cita", "gancho"):                 # 10-nov: comillas que envuelven la cita entera, fuera
+                v = (obj.get(campo) or "").strip()
+                if len(v) > 2 and v[0] in "«“\"" and v[-1] in "»”\"" and not re.search(r"[«»“”\"]", v[1:-1]):
+                    obj[campo] = v[1:-1].strip()
         if re.search(r"[«»“”\"]", s.get("cita", "")):
             print(f"  descartada: «{s.get('cita', '')[:60]}» es una cita parcial (solo entrecomilla una parte)")
             continue
