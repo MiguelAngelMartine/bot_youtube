@@ -281,43 +281,7 @@ def _imagenes_tema(dia, i, sec, quien):
             f = (p.get("ve") or {}).get("foto")
             if f and (dia / "imagenes" / f).exists():
                 out.append(dia / "imagenes" / f)
-    if len(out) < 3:                                   # 10-nov: sin B-roll el Short se queda quieto: las de los
-        try:                                           # bloques donde sale esa persona y, si no, las del día
-            G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
-            ape = (quien or "").split()[-1] if quien else "@@"
-            for k, s_ in enumerate(G["secciones"]):
-                if k and ape in json.dumps(s_, ensure_ascii=False):
-                    out += sorted((dia / "vinetas").glob(f"s{k}_*.jpg"))
-            if len(out) < 3:                           # nunca imágenes de otro tema: otras fotos de la persona
-                cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
-                out += [dia / "imagenes" / f for f, c in cred.items()
-                        if c.get("persona") == quien and (dia / "imagenes" / f).exists() and "_recorte" not in f]
-        except (OSError, ValueError):
-            pass
     return list(dict.fromkeys(out))[:8]
-
-
-def _trozos(frase, maximo=16):
-    """10-nov (ritmo): una frase larga, en trozos de ~16 palabras cortando por comas, para que el texto cambie a menudo."""
-    import re as _re
-    if len(frase.split()) <= maximo:
-        return [frase]
-    partes, cur = [], ""
-    for p in _re.split(r"(?<=,)\s+", frase):
-        if cur and len((cur + " " + p).split()) > maximo:
-            partes.append(cur)
-            cur = p
-        else:
-            cur = (cur + " " + p).strip()
-    if cur:
-        partes.append(cur)
-    fus = []                                           # nada de trozos sueltos de 1-4 palabras («Por su parte,»)
-    for p in partes:
-        if fus and (len(fus[-1].split()) < 5 or len(p.split()) < 5):
-            fus[-1] = fus[-1] + " " + p
-        else:
-            fus.append(p)
-    return fus
 
 
 def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
@@ -349,29 +313,6 @@ def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
     im.alpha_composite(tx, ((AN - tx.width) // 2, yt))
     im.alpha_composite(_cabecera(fecha), (0, 0))
     return im
-
-
-RITMO = 2.2                                              # 10-nov-2026 (estilo TikTok): un corte de imagen cada ~2,2 s
-
-
-def _vista_panel(im, k, tl):
-    """Cada panel con un movimiento distinto (acercar, alejar, barrer a izquierda o derecha) y un golpe al entrar."""
-    alto = ZONA[1] - ZONA[0]
-    q = min(tl, RITMO) / RITMO
-    modo = k % 4
-    z = (1.0 + 0.12 * q) if modo in (0, 2) else (1.12 - 0.12 * q)
-    z *= 1.0 + 0.08 * max(0.0, 1 - tl / 0.18)            # golpe de zoom al entrar
-    cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
-    px = (0.2 + 0.6 * q) if modo == 1 else (0.8 - 0.6 * q) if modo == 3 else 0.5
-    x0 = int((im.width - cw) * px)
-    y0 = (im.height - ch) // 2
-    return im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
-
-
-def _cap_pop(cp, a):
-    """Subtítulo que «salta» al aparecer (escala 1,25 → 1 en 0,12 s)."""
-    s_ = 1.25 - 0.25 * min(1.0, max(0.0, a) / 0.12)
-    return cp.resize((int(cp.width * s_), int(cp.height * s_)), Image.BILINEAR) if s_ > 1.001 else cp
 
 
 def _cierre(fr, tl):
@@ -434,12 +375,11 @@ def main_segmentos(fecha, n, S):
             imgs = _imagenes_tema(dia, i_s, sec_s, g["quien"])[:3]
         p_ = _persona(dia, g["quien"], g.get("cargo", ""), (0.5, 0.36), 0.42)
         frases, pos = [], texto.find(g["contexto"].strip()[:30])
-        for fr0 in re.split(r"(?<=[.?!])\s+", g["contexto"].strip()):
-            for fr_ in _trozos(fr0):
-                k_ = texto.find(fr_[:25], pos)
-                if k_ >= 0:
-                    frases.append((T.en(k_), _caja(fr_, tam=50)))
-                    pos = k_ + 1
+        for fr_ in re.split(r"(?<=[.?!])\s+", g["contexto"].strip()):
+            k_ = texto.find(fr_[:25], pos)
+            if k_ >= 0:
+                frases.append((T.en(k_), _caja(fr_, tam=50)))
+                pos = k_ + 1
         SEG.append({"g": g, "t0": t0, "tc": tc, "tq": T.en(kq) if kq >= 0 else t0, "p": p_, "k": _kicker(g["kicker"].upper()),
                     "c": _cita(g["cita"], g.get("destaca", ""), max_tam=104), "frases": frases or [(tc, _caja(g["contexto"], tam=44))],
                     "fondo": _fondo_tema(imgs[0] if imgs else None), "imgs": imgs,
@@ -475,15 +415,21 @@ def main_segmentos(fecha, n, S):
 
     def panel_en(fr, sg, t):
         pans = sg["paneles"]
-        k = int((t - sg["tc"]) / RITMO)                    # 10-nov: un corte cada ~2,2 s, ciclando las imágenes
-        im, tl = pans[k % len(pans)], t - sg["tc"] - k * RITMO
-        vista = _vista_panel(im, k, tl)
-        dx = int(AN * (1 - G2.suave(min(1.0, tl / 0.2))))
+        cada = max(2.5, (sg["t1"] - sg["tc"]) / max(1, len(pans)))
+        k = min(len(pans) - 1, int((t - sg["tc"]) / cada))
+        im, tl = pans[k], t - sg["tc"] - k * cada
+        alto = ZONA[1] - ZONA[0]
+        z = 1.0 + 0.06 * min(tl, 5) / 5
+        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
+        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
+        y0 = (im.height - ch) // 2
+        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        dx = int(AN * (1 - G2.suave(min(1.0, tl / 0.35))))
         fr.alpha_composite(vista, (min(dx, AN - 1), ZONA[0]))
         d = ImageDraw.Draw(fr)
         d.rectangle([0, ZONA[0] - 6, AN, ZONA[0]], fill=AMARILLO + (255,))
         d.rectangle([0, ZONA[1], AN, ZONA[1] + 6], fill=AMARILLO + (255,))
-        et = "Ilustración IA" if "vinetas" in str(sg["imgs"][k % len(sg["imgs"])]) else "Foto del tema"
+        et = "Ilustración IA" if "vinetas" in str(sg["imgs"][k]) else "Foto del tema"
         d.text((AN - 24, ZONA[1] - 14), et, font=fuente("Inter-SemiBold.ttf", 22), fill=(255, 255, 255, 230), anchor="rd")
 
     _cc = {}
@@ -535,7 +481,7 @@ def main_segmentos(fecha, n, S):
         j = max(0, np.searchsorted(ini, t, side="right") - 1)
         if caps and caps[j][0] <= t < caps[j][1]:
             _, _, ws, clave, _ = caps[j]
-            cp = _cap_pop(C.capa_cap(ws, clave, 0, 0.9, AN - 120), t - caps[j][0])
+            cp = C.capa_cap(ws, clave, 0, 0.9, AN - 120)
             fr.alpha_composite(cp, ((AN - cp.width) // 2, 1760 - cp.height // 2))
         i = max(j for j, sg in enumerate(SEG) if sg["t0"] <= t + 1e-9) if t < t_fin else NSEG - 1
         ImageDraw.Draw(fr).text((AN // 2, AL - 50), f"Fuente: {SEG[i]['g'].get('fuente', S.get('fuente', ''))}"[:70],
@@ -543,12 +489,6 @@ def main_segmentos(fecha, n, S):
         return fr
 
     cortes = [sg["t0"] for sg in SEG[1:]] + [sg["tc"] for sg in SEG] + [t_fin]
-    for sg in SEG:                                     # un «whoosh» en cada corte de imagen
-        if sg["paneles"]:
-            x = sg["tc"] + RITMO
-            while x < sg["t1"] - 0.5:
-                cortes.append(x)
-                x += RITMO
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
     g0 = SEG[0]
     foto_p = None
@@ -631,12 +571,11 @@ def main(fecha, n):
     # 6-nov: el contexto, frase a frase y sincronizado con la voz (entero no cabía y se cortaba)
     c_ini = texto.find(S["contexto"].strip()[:30])
     frases_ctx, pos = [], c_ini
-    for fr0 in re.split(r"(?<=[.?!])\s+", S["contexto"].strip()):
-        for fr_ in _trozos(fr0):
-            k_ = texto.find(fr_[:25], pos)
-            if k_ >= 0:
-                frases_ctx.append((T.en(k_), _caja(fr_, tam=52)))
-                pos = k_ + 1
+    for fr_ in re.split(r"(?<=[.?!])\s+", S["contexto"].strip()):
+        k_ = texto.find(fr_[:25], pos)
+        if k_ >= 0:
+            frases_ctx.append((T.en(k_), _caja(fr_, tam=52)))
+            pos = k_ + 1
     if not frases_ctx:
         frases_ctx = [(t_ctx, _caja(S["contexto"], tam=44))]
 
@@ -659,10 +598,8 @@ def main(fecha, n):
     fin_ctx = t_rep if t_rep is not None else t_fin
     paneles = []
     if broll:
-        nk = max(1, int((fin_ctx - t_ctx) / RITMO))
-        _pc = {}
-        paneles = [(t_ctx + k * (fin_ctx - t_ctx) / nk, _pc.setdefault(k % len(broll), _panel(broll[k % len(broll)])))
-                   for k in range(nk)]
+        nk = max(1, min(len(broll), int((fin_ctx - t_ctx) / 4.5) or 1))
+        paneles = [(t_ctx + k * (fin_ctx - t_ctx) / nk, _panel(broll[k])) for k in range(nk)]
     golpes = [0.0, t_ctx] + ([t_rep] if t_rep is not None else []) + ([t_med] if med else [])
 
     def persona_en(fr, p, t0, t, a=1.0):
@@ -682,15 +619,20 @@ def main(fecha, n):
         k = max(j for j, (tp, _) in enumerate(paneles) if tp <= t + 1e-6) if any(tp <= t for tp, _ in paneles) else 0
         tp, im = paneles[k]
         tl = t - tp
-        vista = _vista_panel(im, k, tl)
-        entra = G2.suave(min(1.0, tl / 0.2))
+        alto = ZONA[1] - ZONA[0]
+        z = 1.0 + 0.06 * min(tl, 5) / 5
+        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
+        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
+        y0 = (im.height - ch) // 2
+        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        entra = G2.suave(min(1.0, tl / 0.35)) if k > 0 else G2.suave(min(1.0, tl / 0.3))
         dx = int(AN * (1 - entra))
         fr.alpha_composite(vista, (dx, ZONA[0]) if dx < AN else (AN - 1, ZONA[0]))
         d = ImageDraw.Draw(fr)
         d.rectangle([0, ZONA[0] - 6, AN, ZONA[0]], fill=AMARILLO + (255,))
         d.rectangle([0, ZONA[1], AN, ZONA[1] + 6], fill=AMARILLO + (255,))
         ff = fuente("Inter-SemiBold.ttf", 22)
-        et = "Ilustración IA" if "vinetas" in str(broll[k % len(broll)]) else "Foto del tema"
+        et = "Ilustración IA" if "vinetas" in str(broll[k]) else "Foto del tema"
         d.text((AN - 24, ZONA[1] - 14), et, font=ff, fill=(255, 255, 255, 230), anchor="rd")
 
     def cuadro(t):
@@ -723,9 +665,6 @@ def main(fecha, n):
                 fr.alpha_composite(c1, (40, 1180))
             else:                                                    # el contexto ocupa el sitio de la frase
                 ctx, tc = ctx_en(t)
-                fr = _mueve(fondo, t, total).convert("RGBA")         # 10-nov: golpe de cámara en cada trozo
-                persona_en(fr, p1, t - tc, t)
-                fr.alpha_composite(k1, (60, 1080))
                 a = G2.suave(min(1.0, tc / 0.25))
                 G2.pega(fr, ctx, 60, 1190 + int(40 * (1 - a)), a)
         for g in golpes:                                             # destello breve en cada cambio de parte
@@ -736,7 +675,7 @@ def main(fecha, n):
         j = max(0, np.searchsorted(ini, t, side="right") - 1)    # subtítulos grandes
         if t < caps[j][1] and t >= caps[j][0]:
             _, _, ws, clave, _ = caps[j]
-            cp = _cap_pop(C.capa_cap(ws, clave, 0, 0.9, AN - 120), t - caps[j][0])
+            cp = C.capa_cap(ws, clave, 0, 0.9, AN - 120)
             fr.alpha_composite(cp, ((AN - cp.width) // 2, 1760 - cp.height // 2))
         ImageDraw.Draw(fr).text((AN // 2, AL - 50), f"Fuente: {S.get('fuente', '')}"[:70], font=fte,
                                 fill=(190, 198, 215, 255), anchor="mm")

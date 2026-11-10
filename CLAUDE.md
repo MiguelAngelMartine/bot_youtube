@@ -108,5 +108,5 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 
 ## 11-nov-2026: línea clara y Shorts con ritmo TikTok (decisión del usuario del 10-nov)
 - **Viñetas en línea clara europea con rasgos españoles** (balcones de forja, persianas, plazas, terrazas, gente mediterránea), elegida entre cuatro opciones; referencia `canal/estilo_lineaclara.jpg` (`ia_vinetas.ESTILO` y `PERSONA`). Para Shorts y vídeo largo.
-- **Shorts con más ritmo:** un corte de imagen cada ~2,2 s (`short.RITMO`) ciclando las imágenes del tema, cada una con un movimiento distinto y golpe de zoom al entrar, «whoosh» en cada corte, subtítulos que saltan, el contexto en trozos de ~16 palabras y golpe de cámara en cada trozo. Si no hay imágenes del bloque de la cita: las de los bloques donde sale esa persona y, si no, otras fotos suyas (nunca imágenes de otro tema).
+- **Ritmo de los Shorts:** se probó un ritmo «TikTok» (cortes cada 2,2 s, subtítulos que saltan, contexto en trozos) y al usuario no le gustó («queda fatal»): se volvió al ritmo anterior. No volver a proponerlo así.
 - Descartado: motion comic con capas y «recreación» con cámara 3D por profundidad (al usuario no le convencieron). Vídeo con IA (Wan 2.1) pendiente de prueba con la cuota gratuita de Hugging Face.
