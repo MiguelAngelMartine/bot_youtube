@@ -327,6 +327,20 @@ def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
     return im
 
 
+def _vista_mc(im, ruta, tl, alto, k):
+    """10-nov: la imagen del tema como viñeta animada (motion comic con profundidad); si falla, el zoom de siempre."""
+    try:
+        import motion_comic as MC
+        v = MC.anima(im, ruta, tl, AN, alto, semilla=k, dur=5.0).convert("RGBA")
+        return MC.ambiente(v, tl, tl + k * 3.1, semilla=k)
+    except Exception:
+        z = 1.0 + 0.06 * min(tl, 5) / 5
+        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
+        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
+        y0 = (im.height - ch) // 2
+        return im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+
+
 def _cierre(fr, tl, pregunta="¿Qué opinas?"):
     """Pantalla final: la pregunta (10-nov: de sí o no, sobre la frase), «Te leo en comentarios» y suscribirse."""
     # 8-nov: sin el logo de Urni; botón de suscribirse
@@ -432,11 +446,7 @@ def main_segmentos(fecha, n, S):
         k = min(len(pans) - 1, int((t - sg["tc"]) / cada))
         im, tl = pans[k], t - sg["tc"] - k * cada
         alto = ZONA[1] - ZONA[0]
-        z = 1.0 + 0.06 * min(tl, 5) / 5
-        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
-        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
-        y0 = (im.height - ch) // 2
-        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        vista = _vista_mc(im, sg["imgs"][k], tl, alto, k)
         dx = int(AN * (1 - G2.suave(min(1.0, tl / 0.35))))
         fr.alpha_composite(vista, (min(dx, AN - 1), ZONA[0]))
         d = ImageDraw.Draw(fr)
@@ -637,11 +647,7 @@ def main(fecha, n):
         tp, im = paneles[k]
         tl = t - tp
         alto = ZONA[1] - ZONA[0]
-        z = 1.0 + 0.06 * min(tl, 5) / 5
-        cw, ch = int(im.width / 1.1 / z), int(im.height / 1.1 / z)
-        x0 = int((im.width - cw) * (0.3 + 0.4 * min(tl, 5) / 5))
-        y0 = (im.height - ch) // 2
-        vista = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, alto), Image.BILINEAR).convert("RGBA")
+        vista = _vista_mc(im, broll[k], tl, alto, k)
         entra = G2.suave(min(1.0, tl / 0.35)) if k > 0 else G2.suave(min(1.0, tl / 0.3))
         dx = int(AN * (1 - entra))
         fr.alpha_composite(vista, (dx, ZONA[0]) if dx < AN else (AN - 1, ZONA[0]))

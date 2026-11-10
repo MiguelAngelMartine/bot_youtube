@@ -384,11 +384,16 @@ def _panel(pn, tl, sobrio):
                 im = ImageEnhance.Color(im).enhance(0.35)
             _comic_cache[k] = im
         base = _comic_cache[k]
-        z = 1.0 + 0.07 * min(tl, 12) / 12               # zoom y desplazamiento lentos (Ken Burns)
-        cw, ch = int(base.width / z), int(base.height / z)
-        x0 = int((base.width - cw) * (0.3 + 0.4 * min(tl, 12) / 12))
-        y0 = int((base.height - ch) * 0.45)
-        im = base.crop((x0, y0, x0 + cw, y0 + ch)).resize((BW, BH), Image.BILINEAR).convert("RGBA")
+        try:                                             # 10-nov: motion comic (cámara 2,5D con profundidad)
+            import motion_comic as MC
+            im = MC.anima(base, pn["ruta"], tl, BW, BH, semilla=hash(str(pn["ruta"])) % 97).convert("RGBA")
+            im = MC.ambiente(im, tl, pn.get("t", 0) + tl, semilla=hash(str(pn["ruta"])) % 97, sobrio=sobrio)
+        except Exception:                                # sin modelo o sin profundidad: el Ken Burns de siempre
+            z = 1.0 + 0.07 * min(tl, 12) / 12
+            cw, ch = int(base.width / z), int(base.height / z)
+            x0 = int((base.width - cw) * (0.3 + 0.4 * min(tl, 12) / 12))
+            y0 = int((base.height - ch) * 0.45)
+            im = base.crop((x0, y0, x0 + cw, y0 + ch)).resize((BW, BH), Image.BILINEAR).convert("RGBA")
         if pn.get("credito"):
             ff = fuente("Inter-SemiBold.ttf", 22)
             d = ImageDraw.Draw(im)
@@ -724,6 +729,11 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
             wavs.append(tmp / "golpe.wav")
             t = golpe0 + GOLPE
     fin_voz = t
+    try:                                               # 10-nov: profundidad de cada viñeta, antes de repartir el render
+        import motion_comic as MC
+        MC.prepara(sorted((dia / "vinetas").glob("s*_*.jpg")))
+    except Exception as e:
+        print(f"  (motion comic sin profundidades: {type(e).__name__})")
     lista = tmp / "voz.txt"
     lista.write_text("".join(f"file '{w.name}'\n" for w in wavs), encoding="utf-8")
     subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista), "-c", "copy",
