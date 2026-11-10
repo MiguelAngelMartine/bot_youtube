@@ -1,0 +1,73 @@
+"""MINIATURA SIN AGENTE (10-nov-2026: ahorro del plan de Claude y más variedad). Toma el primer titular del sumario
+(el gancho del día: frase literal, palabra destacada, etiqueta y protagonista), busca a su rival (otra persona del mismo
+bloque) para el cara a cara, prueba dos ESTILOS de miniatura.py que no se hayan usado en los últimos 4 días y el
+director de arte (Gemini, director_arte.py) elige la mejor. Registro de estilos: archivo/estilos_miniatura.json.
+Uso: python miniatura_auto.py AAAA-MM-DD"""
+from __future__ import annotations
+
+import json
+import random
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+import miniatura as M
+
+RAIZ = Path(__file__).parent
+REG = RAIZ / "archivo" / "estilos_miniatura.json"
+
+
+def _retrato(cred, nombre, img):
+    fs = [f for f, c in cred.items() if c.get("persona") == nombre and (img / f).exists() and "_recorte" not in f]
+    return sorted(fs, key=lambda f: -float(cred[f].get("puntos_gemini", 0) or 0))[0] if fs else ""
+
+
+def main(fecha):
+    dia = RAIZ / "dia" / fecha
+    G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
+    img = dia / "imagenes"
+    items = next((p["ve"]["items"] for p in G["secciones"][0]["pasos"] if (p.get("ve") or {}).get("tipo") == "sumario"), [])
+    it = next((x for x in items if x.get("persona") and _retrato(cred, x["persona"], img)), items[0] if items else {})
+    titular = (it.get("titular") or it.get("texto") or G.get("titulo_video", "")).strip()
+    persona = it.get("persona", "")
+    rival = ""
+    sec = G["secciones"][it["seccion"]] if isinstance(it.get("seccion"), int) and it["seccion"] < len(G["secciones"]) else None
+    if sec:                                            # el aludido: otra persona con foto en el mismo bloque
+        import corto as C
+        otros = [n for p in sec["pasos"] if p.get("ve") for n in C.personas_de(p["ve"]) if n != persona]
+        rival = next((n for n in otros if _retrato(cred, n, img)), "")
+    fondo = ""                                         # de fondo, una viñeta o foto del bloque (nunca azul vacío)
+    if isinstance(it.get("seccion"), int):
+        cand = sorted((dia / "vinetas").glob(f"s{it['seccion']}_*.jpg")) or sorted((dia / "vinetas").glob("s*_*.jpg"))
+        cand += [img / f for f in cred if f.startswith(f"s{it['seccion']}_") and (img / f).exists()]
+        if cand:
+            fondo = "../" + str(cand[0].relative_to(dia)) if "vinetas" in str(cand[0]) else cand[0].name
+    usados = json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else []
+    libres = [e for e in M.ESTILOS if e not in usados[-4:]] or list(M.ESTILOS)
+    rnd = random.Random(fecha)
+    probar = rnd.sample(libres, min(2, len(libres)))
+    hechas = []
+    for k, est in enumerate(probar):
+        M.ESTILO = dict(M.ESTILOS[est], invierte=rnd.random() < 0.5)
+        sal = f"miniatura_{est}.png"
+        try:
+            M.miniatura(fecha, titular, it.get("destaca", ""), it.get("etiqueta", ""), _retrato(cred, persona, img),
+                        fondo, False, sal, _retrato(cred, rival, img) if rival else "", "", "")
+            hechas.append((est, sal))
+        except Exception as e:
+            print(f"  estilo {est}: {type(e).__name__}: {e}")
+    if not hechas:
+        return 1
+    r = subprocess.run([sys.executable, "director_arte.py", fecha] + [s for _, s in hechas], cwd=RAIZ)
+    if not (dia / "miniatura.png").exists():           # ninguna llegó al 7: la primera, y se avisa en el parte
+        shutil.copy(dia / hechas[0][1], dia / "miniatura.png")
+    elegida = next((e for e, s in hechas if (dia / s).read_bytes() == (dia / "miniatura.png").read_bytes()), hechas[0][0])
+    REG.write_text(json.dumps((usados + [elegida])[-20:]), encoding="utf-8")
+    print(f"miniatura: estilo {elegida} · «{titular}» · {persona}" + (f" vs {rival}" if rival else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1]))

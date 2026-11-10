@@ -31,6 +31,23 @@ GRAD = {"blanco": ((255, 255, 255), (245, 246, 250), (196, 202, 214)),
         "amarillo": ((255, 240, 120), (250, 200, 10), (226, 128, 0))}
 LISO = {"blanco": (BLANCO,) * 3, "amarillo": (AMARILLO,) * 3}
 LIMPIA = "¿?¡!.,:;«»\"'"
+# 10-nov-2026 (el usuario: «las miniaturas son muy parecidas, parece el mismo vídeo»): estilos con paleta, letra y
+# composición distintos; miniatura_auto.py elige uno que no se haya usado en los últimos días.
+ESTILOS = {
+    "clasico":  {"fuente": "Inter-Black.ttf", "acento": ((255, 240, 120), (250, 200, 10), (226, 128, 0)), "franja": (229, 37, 33),
+                 "izq": (120, 10, 25), "der": (10, 25, 70), "rayas": (250, 204, 21), "inclina": 4},
+    "esmeralda": {"fuente": "Anton-Regular.ttf", "acento": ((200, 255, 170), (120, 230, 90), (40, 160, 60)), "franja": (110, 30, 140),
+                 "izq": (15, 80, 55), "der": (60, 15, 85), "rayas": (120, 230, 90), "inclina": -3},
+    "naranja":  {"fuente": "BarlowCondensed-Bold.ttf", "acento": ((180, 250, 255), (60, 210, 240), (0, 140, 200)), "franja": (245, 110, 20),
+                 "izq": (130, 50, 0), "der": (0, 50, 90), "rayas": (245, 110, 20), "inclina": 6},
+    "comic":    {"fuente": "Bangers-Regular.ttf", "acento": ((255, 245, 140), (255, 215, 0), (240, 150, 0)), "franja": (220, 20, 120),
+                 "izq": (110, 0, 70), "der": (20, 20, 110), "rayas": (255, 215, 0), "inclina": -5},
+    "noche":    {"fuente": "Anton-Regular.ttf", "acento": ((255, 200, 200), (250, 70, 70), (190, 10, 30)), "franja": (20, 20, 26),
+                 "izq": (40, 40, 48), "der": (90, 10, 20), "rayas": (250, 70, 70), "inclina": 3},
+    "oro":      {"fuente": "Inter-Black.ttf", "acento": ((255, 250, 210), (240, 200, 90), (180, 120, 20)), "franja": (16, 28, 52),
+                 "izq": (16, 28, 52), "der": (100, 70, 10), "rayas": (240, 200, 90), "inclina": 0},
+}
+ESTILO = dict(ESTILOS["clasico"], invierte=False)
 
 
 # ---------- piezas ----------
@@ -99,9 +116,9 @@ def fondo(foto: Path | None, sobrio: bool, con_persona: bool):
         return G2.fondo_marca(2.0).resize((W, H)).convert("RGBA")
     f = ImageOps.fit(Image.open(foto).convert("RGB"), (W, H), Image.LANCZOS)
     if con_persona:                                    # fondo: a color (4-nov-2026), apagado y desenfocado; manda la cara
-        f = ImageEnhance.Color(f.filter(ImageFilter.GaussianBlur(13))).enhance(0.7)
+        f = ImageEnhance.Color(f.filter(ImageFilter.GaussianBlur(7))).enhance(0.95)   # 10-nov: el tema, más visible
     f = f.filter(ImageFilter.GaussianBlur(4 if con_persona else 1))
-    f = ImageEnhance.Brightness(f).enhance(0.6 if sobrio else 0.6 if con_persona else 0.85)
+    f = ImageEnhance.Brightness(f).enhance(0.6 if sobrio else 0.78 if con_persona else 0.85)
     im = ImageEnhance.Contrast(f).enhance(1.15).convert("RGBA")
     vi = Image.new("L", (W, H), 0)                    # vineta: bordes mas oscuros
     ImageDraw.Draw(vi).ellipse([-300, -500, W + 500, H + 300], fill=255)
@@ -131,8 +148,8 @@ def texto(lineas, tam, sobrio=False, interlinea=0.96, espacio=1.0):
     """Letra de miniatura: relleno en degradado, brillo arriba, contorno negro grueso, filo exterior claro
     y relieve 3D hacia abajo-derecha. En sobrio, letra lisa con contorno fino y sombra."""
     negro, exterior, relieve = (6, 0, 0) if sobrio else (18, 7, 16)
-    colores = LISO if sobrio else GRAD
-    f = fuente("Inter-Black.ttf", tam)
+    colores = LISO if sobrio else dict(GRAD, amarillo=ESTILO["acento"])
+    f = fuente("Inter-Black.ttf" if sobrio else ESTILO["fuente"], tam)
     m = negro + exterior + relieve + 30
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
     hueco = int(0.7 * (negro + exterior))              # el contorno se come el espacio entre palabras
@@ -178,7 +195,7 @@ def ajusta(titular, destaca, ancho, sobrio):
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
     for max_lineas in (2, 3):
         for tam in range(300 if len(palabras) == 1 else 210, 109, -6):   # una sola palabra («DIMITE»), aun mas grande
-            f = fuente("Inter-Black.ttf", tam)
+            f = fuente("Inter-Black.ttf" if sobrio else ESTILO["fuente"], tam)
             extra = 2 * (6 if sobrio else 25)
             lineas, cur = [], []
             for p in palabras:
@@ -348,8 +365,8 @@ def gradua(im, vs=False):
     capa = Image.new("RGBA", (W, H))
     g = Image.linear_gradient("L").rotate(90, expand=True).resize((W, H))      # izquierda opaca -> derecha clara
     if vs:
-        izq = Image.new("RGBA", (W, H), (120, 10, 25, 255))
-        der = Image.new("RGBA", (W, H), (10, 25, 70, 255))
+        izq = Image.new("RGBA", (W, H), ESTILO["izq"] + (255,))
+        der = Image.new("RGBA", (W, H), ESTILO["der"] + (255,))
         m = Image.new("L", (W, H), 0)
         ImageDraw.Draw(m).polygon([(0, 0), (W * 0.56, 0), (W * 0.44, H), (0, H)], fill=150)
         capa.alpha_composite(Image.merge("RGBA", (*izq.convert("RGB").split(), m)))
@@ -357,7 +374,7 @@ def gradua(im, vs=False):
         ImageDraw.Draw(m2).polygon([(W * 0.56, 0), (W, 0), (W, H), (W * 0.44, H)], fill=150)
         capa.alpha_composite(Image.merge("RGBA", (*der.convert("RGB").split(), m2)))
     else:
-        azul = Image.new("RGB", (W, H), (8, 18, 48))
+        azul = Image.new("RGB", (W, H), tuple(int(c * 0.6) for c in ESTILO["izq"]))   # 10-nov: el tono del estilo
         capa = Image.merge("RGBA", (*azul.split(), g.point(lambda v: int(v * 0.62))))
     im.alpha_composite(capa)
 
@@ -399,7 +416,8 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     ancho_texto = 1750
     if vs:                                             # enfrentamiento: una persona a cada lado, cara a cara
         diagonal(im)
-        for (nombre, lado), gesto in zip(((rival, "izq"), (persona, "der")), gestos):
+        lados = ((persona, "izq"), (rival, "der")) if ESTILO.get("invierte") else ((rival, "izq"), (persona, "der"))
+        for (nombre, lado), gesto in zip(lados, gestos):
             r = recorte(img / nombre if not caricatura else _caricatura(dia, nombre, lado, gesto))
             k = min(1000 / r.height, 760 / r.width)
             cc, pad = silueta(realza(r.resize((int(r.width * k), int(r.height * k)), Image.LANCZOS)))
@@ -415,9 +433,10 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
         x = None
         if not sobrio:
             rayos(im)
-            x = protagonista(im, c)                    # encuadre por la cara, como un fotografo
+            inv = ESTILO.get("invierte")               # 10-nov: la persona a la izquierda y el texto a la derecha
+            x = protagonista(im, c, centro=(0.28, 0.37) if inv else (0.72, 0.37), alto_cara=0.32)
             if x is not None:
-                ancho_texto = min(1750, x + 170)       # el texto puede montar un poco sobre el hombro
+                ancho_texto = 1150 if inv else min(1750, x + 170)   # el texto puede montar un poco sobre el hombro
         if x is None:                                  # sin cara detectable (o sobria): como antes
             if not sobrio:
                 c = realza(encuadre(c, 960))
@@ -429,20 +448,21 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     t = texto(lineas, tam, sobrio)
     if vs:                                             # 7-nov: franja roja de brocha detras del titular (referencia)
         t = brocha(t)
-    inclina = 0 if sobrio else 4
+    inclina = 0 if sobrio else ESTILO["inclina"]
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
     y = H - t.height - (10 if vs else 40) - (0 if sobrio else 92)   # 10-nov: deja sitio a la barra inferior
     if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
         pm = polaroid_mini(img / inserto)
         im.alpha_composite(pm, (150, max(40, y - pm.height - 40)))
-    tx = (W - t.width) // 2 if vs else (30 if not sobrio else 70)
+    der = ESTILO.get("invierte") and not vs and not sobrio and persona
+    tx = (W - t.width) // 2 if vs else (W - t.width - 40 if der else (30 if not sobrio else 70))
     im.alpha_composite(t, (tx, y))
     if etiqueta_txt:
         e = etiqueta(etiqueta_txt.upper(), sobrio)
         if inclina:
             e = e.rotate(inclina, resample=Image.BICUBIC, expand=True)
-        ex = (W - e.width) // 2 if vs else 80
+        ex = (W - e.width) // 2 if vs else (W - e.width - 80 if der else 80)
         im.alpha_composite(e, (ex, max(190, y - e.height + 30)))
     im.alpha_composite(G2.logo(110), (60, 50))
     if insignia_txt and not sobrio:
@@ -450,7 +470,7 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     if not sobrio:
         adornos_impacto(im)
         im = grano(im)
-        marco(im)
+        marco(im, col=ESTILO["rayas"])
     out = dia / salida
     fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
     fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)     # nitidez final
@@ -466,7 +486,7 @@ def adornos_impacto(im):
         dc = ImageDraw.Draw(capa)
         for k in range(5):
             o = 60 + k * 70
-            col = AMARILLO + (255,) if k % 2 == 0 else (12, 12, 16, 255)
+            col = ESTILO["rayas"] + (255,) if k % 2 == 0 else (12, 12, 16, 255)
             dc.polygon([(x0 + sx * o, y0), (x0 + sx * (o + 70), y0), (x0, y0 + sy * (o + 70)), (x0, y0 + sy * o)], fill=col)
         im.alpha_composite(capa)
     f_n = fuente("Inter-Black.ttf", 46)
@@ -522,7 +542,7 @@ def brocha(t):
     sombra = Image.new("RGBA", (w, h), (0, 0, 0, 150))
     capa.paste(sombra, (10, 12), m)
     capa = capa.filter(ImageFilter.GaussianBlur(8))
-    capa.paste(Image.new("RGBA", (w, h), ROJO + (255,)), (0, 0), m)
+    capa.paste(Image.new("RGBA", (w, h), ESTILO["franja"] + (255,)), (0, 0), m)
     capa.alpha_composite(t, (pad_x, pad_y))
     return capa
 

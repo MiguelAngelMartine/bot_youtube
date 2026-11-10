@@ -41,7 +41,7 @@ def imagen(im, ancho=None):
     return {"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(b.getvalue()).decode()}}
 
 
-def pide(partes, como_json=False, temperatura=0.2):
+def pide(partes, como_json=False, temperatura=0.2, pensar="low", limite_s=None, modelos=None):
     """partes: texto o lista de partes (textos y imágenes). Devuelve texto, dict/list si como_json, o None."""
     if isinstance(partes, str):
         partes = [{"text": partes}]
@@ -50,12 +50,12 @@ def pide(partes, como_json=False, temperatura=0.2):
     if como_json:
         conf["responseMimeType"] = "application/json"
     claves = _claves()
-    limite = time.time() + LIMITE_S
+    limite = time.time() + (limite_s or LIMITE_S)
     agotados = set()                                    # cuota diaria gastada: ese modelo con esa clave, fuera hasta mañana
-    for modelo, k in [(m, c) for m in MODELOS for c in claves] * 3:   # vueltas por modelos y claves mientras quede tiempo
+    for modelo, k in [(m, c) for m in (modelos or MODELOS) for c in claves] * 3:   # vueltas por modelos y claves mientras quede tiempo
         if (modelo, k) in agotados:
             continue
-        cfg = dict(conf, thinkingConfig={"thinkingLevel": "low"}) if modelo.startswith("gemini-3") else conf   # mas rapido
+        cfg = dict(conf, thinkingConfig={"thinkingLevel": pensar}) if modelo.startswith("gemini-3") else conf   # mas rapido
         for intento in range(3):
             if time.time() > limite:                    # saturado: antes que Claude, los modelos gratuitos (10-nov)
                 return _pool(partes, como_json, temperatura)

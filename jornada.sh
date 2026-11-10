@@ -54,7 +54,14 @@ $NUEVAS" >> "$LOG" 2>&1
     ) &
     VIGIA=$!
     trap 'kill $VIGIA 2>/dev/null' EXIT
+    # 10-nov-2026 (8 % del consumo semanal como máximo): primero el coordinador en Python, con Gemini haciendo cada puesto
+    # (jornada.py). Solo si no termina, entra el coordinador de Claude de siempre, que retoma donde se quedó.
+    echo "[$(date +%FT%T)] Coordinador en Python (Gemini)" >> "$LOG"
+    timeout 4h "$PY" -u jornada.py "$FECHA" >> "$DIA/jornada_py.log" 2>&1
+    COD=$?
+    echo "[$(date +%FT%T)] jornada.py terminó con código $COD" >> "$LOG"
     for INTENTO in 1 2 3; do
+        if [ -f "$DIA/youtube.json" ] && [ -f "$DIA/shorts/youtube.json" ]; then COD=0; break; fi
         echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
         ANTES=$(wc -l < "$LOG")
         # Tope de 3 h para que una jornada atascada no se quede colgada.
