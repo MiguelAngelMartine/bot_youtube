@@ -106,3 +106,6 @@ Como el ejemplo del usuario: **dos fotos REALES grandes**, una frente a otra, co
 
 ## Variedad: nada se repite en 7 días (decisión del usuario del 8-nov-2026)
 Una foto o una viñeta usada en un vídeo o un Short no se vuelve a usar hasta pasados 7 días (registro en `archivo/imagenes_usadas.json`, `variedad.py`; lo apunta `subir.py` al subir). `fotos.py buscar` y `mejores` ya quitan las usadas y `elegir` se niega a guardarlas: busca otras (otra ocasión, otro acto, otra categoría por año de Commons). Las viñetas se vuelven a generar en otra versión si la misma ya salió esa semana. **Más variedad dentro del vídeo:** foto de escena en todas las escenas que la admiten (no solo algunas) y hasta 3 retratos distintos por persona.
+
+## Más impacto (10-nov-2026, referencia del usuario)
+`miniatura.py` ya pone solo las franjas de aviso amarillas y negras, el nombre del canal y la barra «NOTICIAS · ANÁLISIS · CONTEXTO» con SUSCRÍBETE. Lo que depende de ti: **fotos reales con gesto fuerte** (`fotos.py mejores --animo "señalando, hablando con energía, enfadado"` para quien ataca y `--animo "serio, ceño fruncido"` para el aludido), caras grandes y enfrentadas (`--rival`) y titular corto de 2-5 palabras. Nunca imágenes generadas con IA de personas reales.

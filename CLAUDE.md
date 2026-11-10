@@ -89,3 +89,10 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 
 ## Ganchos: aprender del director (8-nov-2026)
 `oficina/EJEMPLOS_GANCHOS.md` reúne los ganchos que eligió el usuario («Les vamos a freír a impuestos», «Solo saben insultar», «Rufián ha venido a Badalona a insultarme»…): el trozo literal de más impacto, primero, y luego se desarrolla. Lo leen `ganchos.py`, `investiga.py frases`, `shorts_guion.py`, el jefe de edición y el redactor. **Shorts:** con un gancho, mínimo 60 s; con varios, mínimo 90 s; entre contenidos, una transición sencilla, **sin numerarlos** (ni en pantalla ni en la voz).
+
+## Mejoras del 10-nov-2026
+- **Voz:** las siglas que Tristán lee raro se dicen con su nombre (`voz.SIGLAS`, SSML `<sub alias>`: CCOO → Comisiones Obreras, TVE → Televisión Española, UE, CGPJ, «29N» → 29 de noviembre...); el texto y los subtítulos no cambian. La entonación sale de la puntuación y de frases cortas (redactor).
+- **Shorts:** fondo con más vida (foco de luz, franjas de la marca, destellos, barrido de luz cada 7 s); la portada sale al principio y al final del vídeo. YouTube **no aplica a los Shorts la miniatura subida por la API**: en la app de YouTube, Short → Editar → Miniatura, eligiendo el primer o el último fotograma.
+- **Miniatura:** franjas de aviso, nombre del canal y barra inferior con SUSCRÍBETE (`miniatura.adornos_impacto`), con fotos reales de gesto fuerte.
+- **Viñetas:** más detalle (8 pasos en Cloudflare, estilo de novela gráfica cuidada).
+- **Vídeo largo:** contexto alrededor de cada frase; selección más exigente de ganchos.

@@ -404,9 +404,9 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
             k = min(1000 / r.height, 760 / r.width)
             cc, pad = silueta(realza(r.resize((int(r.width * k), int(r.height * k)), Image.LANCZOS)))
             x = -pad + 10 if lado == "izq" else W - cc.width + pad - 10
-            im.alpha_composite(cc, (x, H - cc.height + pad - 10))     # hasta el borde de abajo; el titular, sobre los pechos
+            im.alpha_composite(cc, (x, H - cc.height + pad - 10 - (60 if not sobrio else 0)))   # 10-nov: sobre la barra
         oscurece_abajo(im, 380, 200)                   # el titular, legible sobre los dos
-        ancho_texto = 1250                             # mas contenido: no puede tapar las caras
+        ancho_texto = 1000                             # mas contenido: no puede tapar las caras (10-nov: 1000)
     elif persona:
         c = recorte(img / persona)                     # siempre a color (4-nov-2026)
         if sobrio:
@@ -432,7 +432,7 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     inclina = 0 if sobrio else 4
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
-    y = H - t.height - (10 if vs else 40)
+    y = H - t.height - (10 if vs else 40) - (0 if sobrio else 92)   # 10-nov: deja sitio a la barra inferior
     if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
         pm = polaroid_mini(img / inserto)
         im.alpha_composite(pm, (150, max(40, y - pm.height - 40)))
@@ -448,12 +448,43 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     if insignia_txt and not sobrio:
         insignia(im, insignia_txt.upper())
     if not sobrio:
+        adornos_impacto(im)
         im = grano(im)
         marco(im)
     out = dia / salida
     fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
     fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)     # nitidez final
     print(f"miniatura ({tam}px, {len(lineas)} lineas{', sobria' if sobrio else ''}) -> {out}")
+
+
+def adornos_impacto(im):
+    """10-nov-2026 (referencia del usuario): franjas de aviso amarillas y negras en dos esquinas, el nombre del canal
+    junto al logo y una barra inferior «NOTICIAS · ANÁLISIS · CONTEXTO» con el botón de suscribirse."""
+    d = ImageDraw.Draw(im)
+    for (x0, y0, sx, sy) in ((W, 0, -1, 1), (0, H, 1, -1)):          # esquinas: arriba dcha. y abajo izq.
+        capa = Image.new("RGBA", (W, H))
+        dc = ImageDraw.Draw(capa)
+        for k in range(5):
+            o = 60 + k * 70
+            col = AMARILLO + (255,) if k % 2 == 0 else (12, 12, 16, 255)
+            dc.polygon([(x0 + sx * o, y0), (x0 + sx * (o + 70), y0), (x0, y0 + sy * (o + 70)), (x0, y0 + sy * o)], fill=col)
+        im.alpha_composite(capa)
+    f_n = fuente("Inter-Black.ttf", 46)
+    d.text((185, 82), "EL HOY ", font=f_n, fill=BLANCO + (255,), anchor="lm", stroke_width=3, stroke_fill=(0, 0, 0, 200))
+    d.text((185 + f_n.getlength("EL HOY "), 82), "FORMATIVO", font=f_n, fill=AMARILLO + (255,), anchor="lm",
+           stroke_width=3, stroke_fill=(0, 0, 0, 200))
+    yb = H - 92
+    barra = Image.new("RGBA", (W, 92), (10, 18, 38, 235))
+    im.alpha_composite(barra, (0, yb))
+    d.rectangle([0, yb, W, yb + 4], fill=AMARILLO + (255,))
+    f_b = fuente("Inter-Bold.ttf", 40)
+    d.text((90, yb + 48), "»»", font=fuente("Inter-Black.ttf", 52), fill=AMARILLO + (255,), anchor="lm")
+    d.text((170, yb + 48), "NOTICIAS  ·  ANÁLISIS  ·  CONTEXTO", font=f_b, fill=BLANCO + (255,), anchor="lm")
+    bx = W - 470
+    d.rounded_rectangle([bx, yb + 14, W - 60, yb + 80], radius=14, fill=ROJO + (255,))
+    d.rounded_rectangle([bx + 22, yb + 30, bx + 82, yb + 64], radius=9, fill=BLANCO + (255,))
+    d.polygon([(bx + 44, yb + 37), (bx + 44, yb + 57), (bx + 64, yb + 47)], fill=ROJO + (255,))
+    d.text((bx + 100, yb + 47), "SUSCRÍBETE", font=fuente("Inter-Black.ttf", 40), fill=BLANCO + (255,), anchor="lm")
 
 
 def _caricatura(dia, nombre, lado, gesto=""):

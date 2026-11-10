@@ -60,7 +60,21 @@ def _mueve(base, t, total):
     cw, ch = int(base.width / 1.12 / z * 1.0), int(base.height / 1.12 / z * 1.0)
     x0 = int((base.width - cw) * (0.3 + 0.4 * q))
     y0 = int((base.height - ch) * 0.5)
-    return base.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, AL), Image.BILINEAR)
+    fr = base.crop((x0, y0, x0 + cw, y0 + ch)).resize((AN, AL), Image.BILINEAR)
+    q2 = (t % 7.0) / 7.0                                # 10-nov: un barrido de luz cruza la pantalla cada 7 s
+    if q2 < 0.35:
+        global _BARRIDO
+        if _BARRIDO is None:
+            b = Image.new("L", (900, AL))
+            ImageDraw.Draw(b).polygon([(300, 0), (520, 0), (420, AL), (200, AL)], fill=70)
+            _BARRIDO = b.filter(ImageFilter.GaussianBlur(60))
+        x = int(-900 + (AN + 900) * (q2 / 0.35))
+        fr = fr.convert("RGBA")
+        fr.paste(Image.new("RGBA", _BARRIDO.size, (255, 240, 200, 255)), (x, 0), _BARRIDO)
+    return fr
+
+
+_BARRIDO = None
 
 
 def _panel(ruta):
@@ -73,14 +87,39 @@ def _panel(ruta):
 
 
 def _fondo():
-    im = Image.new("RGB", (AN, AL), NAVY)
-    d = ImageDraw.Draw(im)
-    for y in range(0, AL, 20):                         # trama de cómic, muy suave
-        for x in range((y // 20) % 2 * 10, AN, 20):
-            d.ellipse([x, y, x + 6, y + 6], fill=(24, 36, 70))
-    g = Image.linear_gradient("L").resize((AN, AL)).point(lambda v: int(v * 0.75))
-    im.paste(Image.new("RGB", (AN, AL), (6, 10, 22)), (0, 0), g)
-    return im.convert("RGBA")
+    """10-nov-2026 (el usuario: «los fondos quedan muy vacíos»): azul noche con profundidad: foco de luz, franjas
+    diagonales de la marca, retícula de mapa, destellos desenfocados y el «EH» enorme en marca de agua."""
+    import random
+    rnd = random.Random(7)
+    w, h = AN, AL
+    im = Image.new("RGB", (w, h), (10, 18, 38))
+    luz = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(luz).ellipse([-300, 150, w + 300, 1350], fill=255)
+    im.paste(Image.new("RGB", (w, h), (34, 58, 120)), (0, 0), luz.filter(ImageFilter.GaussianBlur(260)))
+    capa = Image.new("RGBA", (w, h))
+    d = ImageDraw.Draw(capa)
+    for x in range(-h, w, 90):                         # retícula fina, como un mapa
+        d.line([(x, 0), (x + h * 0.35, h)], fill=(120, 160, 255, 16), width=2)
+    for y in range(0, h, 90):
+        d.line([(0, y), (w, y)], fill=(120, 160, 255, 12), width=2)
+    for x0, col, a in ((-500, ROJO, 70), (-330, AMARILLO, 55), (w - 260, ROJO, 60), (w - 120, AMARILLO, 45)):
+        d.polygon([(x0, h), (x0 + 120, h), (x0 + 120 + 0.55 * h, 0), (x0 + 0.55 * h, 0)], fill=col + (a,))
+    for _ in range(16):                                # destellos (bokeh)
+        x, y, r = rnd.uniform(0, w), rnd.uniform(0, h), rnd.uniform(14, 70)
+        c = rnd.choice([(255, 210, 90), (120, 170, 255), (255, 120, 110)])
+        d.ellipse([x - r, y - r, x + r, y + r], fill=c + (rnd.randint(18, 50),))
+    capa = capa.filter(ImageFilter.GaussianBlur(6))
+    eh = Image.new("RGBA", (w, h))
+    ImageDraw.Draw(eh).text((w // 2, h * 0.47), "EH", font=fuente("Inter-Black.ttf", 760), fill=(255, 255, 255, 8), anchor="mm")
+    capa.alpha_composite(eh)
+    out = im.convert("RGBA")
+    out.alpha_composite(capa)
+    g = Image.linear_gradient("L").resize((w, h)).point(lambda v: int(max(0, v - 120) * 1.5))
+    sombra = Image.new("RGBA", (w, h), (6, 10, 22, 255))
+    sombra.putalpha(g)
+    out.alpha_composite(sombra)
+    return out
+
 
 
 CATEGORIAS = {"ÚLTIMA HORA": (ROJO, BLANCO), "POLÉMICA": (AMARILLO, (16, 28, 52)), "ZASCA": (AMARILLO, (16, 28, 52)),
@@ -466,7 +505,7 @@ def main_segmentos(fecha, n, S):
                            "-c:a", "aac", "-b:a", "160k", "-shortest", str(out)], stdin=subprocess.PIPE)
     for fi in range(int(math.ceil(total * FPS))):
         t = fi / FPS
-        fr = PORT.copy() if t < 0.4 else cuadro(t)
+        fr = PORT.copy() if t < 0.4 or t > total - 0.7 else cuadro(t)   # 10-nov: portada también al final
         ff.stdin.write(fr.tobytes())
     ff.stdin.close()
     ff.wait()
@@ -667,8 +706,8 @@ def main(fecha, n):
     PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
     _cuadro_normal = cuadro
 
-    def cuadro(t):                                      # los primeros 0,4 s, la portada (YouTube suele tomarla)
-        if t < 0.4:
+    def cuadro(t):                                      # la portada, los primeros 0,4 s y los últimos 0,7 s (10-nov)
+        if t < 0.4 or t > total - 0.7:
             fr = PORT.copy()
             ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
             return fr

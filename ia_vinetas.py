@@ -23,7 +23,9 @@ REFERENCIA = RAIZ / "canal" / "estilo_vineta.jpg"     # vineta modelo del estilo
 ESCENAS = "@cf/black-forest-labs/flux-1-schnell"       # escenas: el estilo que eligio el usuario, rapido y barato
 PERSONAS = "@cf/black-forest-labs/flux-2-klein-4b"     # personas: admite su foto real y la referencia de estilo
 # sin la palabra "comic": con ella el modelo dibuja bocadillos con letras inventadas
-ESTILO = ("wordless graphic novel illustration, flat limited colors, thick black ink outlines, heavy black shadows, "
+ESTILO = ("wordless high-end graphic novel illustration, richly detailed scene with depth, intricate ink linework, "
+          "textured cross-hatching, dramatic cinematic lighting, strong composition with foreground and background, "
+          "limited but vibrant colors, thick black ink outlines, heavy black shadows, "
           "set in Spain, plain surfaces without writing, every box, screen, paper and sign blank and unlabeled, "
           "silent scene: ")
 PERSONA = ("Redraw the person from image 0 as a wordless graphic novel illustration, using only the drawing technique of "
@@ -89,7 +91,7 @@ def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
             campos[f"input_image_{k}"] = (f"img{k}.jpg", b, "image/jpeg")
         r = requests.post(url, headers=cab, files=campos, timeout=180)
     else:
-        r = requests.post(url, headers=cab, json={"prompt": prompt + (" " * intento), "steps": 4}, timeout=180)
+        r = requests.post(url, headers=cab, json={"prompt": prompt + (" " * intento), "steps": 8}, timeout=180)
     try:
         j = r.json()
     except ValueError:
@@ -160,7 +162,7 @@ def _escena_hf(prompt, intento, destino):
     env = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text(encoding="utf-8").splitlines()
                if "=" in l and not l.strip().startswith("#"))
     c = Client(HF_SPACE, token=env["HF_TOKEN"].strip().strip('"'), verbose=False)
-    r = c.predict(prompt=prompt, seed=intento, randomize_seed=False, width=1344, height=768, num_inference_steps=4,
+    r = c.predict(prompt=prompt, seed=intento, randomize_seed=False, width=1344, height=768, num_inference_steps=6,
                   api_name="/infer")
     CACHE.mkdir(parents=True, exist_ok=True)
     Image.open(r[0]).convert("RGB").save(destino, quality=93)

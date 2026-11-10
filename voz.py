@@ -124,11 +124,33 @@ def motor():
     raise RuntimeError(f"{motivo}. No se usa voz de reserva porque no seria monetizable: no se sube nada hoy.")
 
 
+# 10-nov-2026 (el usuario: «cuando lee siglas suena muy raro»): las siglas que Tristán no lee bien se dicen con su nombre
+# (<sub alias>: el guion y los subtítulos siguen con la sigla). Solo las que no se leen como palabra o letra a letra natural.
+SIGLAS = {"CCOO": "Comisiones Obreras", "CC.OO.": "Comisiones Obreras", "TVE": "Televisión Española",
+          "RTVE": "Radiotelevisión Española", "EEUU": "Estados Unidos", "EE.UU.": "Estados Unidos", "UE": "Unión Europea",
+          "CGPJ": "Consejo General del Poder Judicial", "IMV": "Ingreso Mínimo Vital", "TC": "Tribunal Constitucional",
+          "TS": "Tribunal Supremo", "AN": "Audiencia Nacional", "UCO": "la UCO", "DANA": "dana", "OTAN": "OTAN",
+          "PSC": "PSC", "PSPV": "PSPV", "BNG": "Bloque Nacionalista Galego", "CUP": "la CUP", "CEOE": "la CEOE",
+          "SMI": "salario mínimo", "IPC": "IPC", "PIB": "PIB", "IRPF": "IRPF", "IVA": "IVA", "EH Bildu": "Bildu"}
+SIGLAS = {k: v for k, v in SIGLAS.items() if k != v and not v.startswith("la ")}   # solo las que cambian la lectura
+
+
+def _siglas_ssml(texto_escapado):
+    import re
+    out = texto_escapado
+    for sigla in sorted(SIGLAS, key=len, reverse=True):
+        out = re.sub(r"(?<![\wÁÉÍÓÚÑáéíóúñ])" + re.escape(sigla) + r"(?![\wÁÉÍÓÚÑáéíóúñ])",
+                     f"<sub alias='{SIGLAS[sigla]}'>{sigla}</sub>", out)
+    # 29N, 11N... → «29 de noviembre»
+    out = re.sub(r"\b(\d{1,2})N\b", lambda m: f"<sub alias='{m.group(1)} de noviembre'>{m.group(0)}</sub>", out)
+    return out
+
+
 def _azure_mp3(texto, mp3):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{AZURE_VEL}'>{escape(texto)}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),

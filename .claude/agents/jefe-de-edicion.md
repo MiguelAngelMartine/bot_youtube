@@ -22,6 +22,7 @@ perras del mundo…», «Alí Babá tenía 40 ladrones…») adaptado al largo:
 - **Cada bloque = un enfrentamiento**: abre con la frase gancho literal más fuerte (3-12 palabras) y después se desarrolla:
   quién la dice, a quién, la frase entera, el contexto y la respuesta del aludido si la hay (plural y equilibrado: que no
   ataquen siempre los mismos ni al mismo).
+- **Exigencia** (10-nov-2026, el usuario: «las de hoy son un poco flojas»): antes de cerrar la escaleta, ordena todos los ganchos del día por impacto (ataque directo con nombre propio > acusación grave > zasca > declaración) y quédate con los más fuertes; un bloque sin gancho fuerte no entra. Busca también en Europa Press y EFE (titulares con comillas) y en X, no solo en los dossieres.
 - Un bloque puede reunir **2-3 ganchos con un hilo común** (impuestos, corrupción, el voto útil...), como el Short.
 - **Aprende de los ejemplos del director:** `oficina/EJEMPLOS_GANCHOS.md` (léelo antes de elegir): el gancho es el trozo literal de más impacto, no hace falta la frase entera; los del director del día van en `ganchos_director.md`.
 - Fuentes: `redes.md` con «GANCHOS DEL DÍA» primero, los dossieres y las agencias (**Europa Press y EFE**), además de X y
