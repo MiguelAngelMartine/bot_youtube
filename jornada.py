@@ -141,7 +141,8 @@ class Jornada:
             import unicodedata, re as _re
             txt = " ".join(f.read_text(encoding="utf-8", errors="ignore") for f in
                            [*(self.dia / "dossier").glob("*.md"), *(self.dia / "articulos").glob("*.txt"), self.dia / "redes.md",
-                            self.dia / "ganchos_director.md"] if f.exists())
+                            self.dia / "ganchos_director.md", self.dia / "noticias.json", self.dia / "ganchos.md",
+                            self.dia / "encargo.json"] if f.exists())
             self._corp = self._n(txt)
         return self._corp
 
@@ -163,8 +164,15 @@ class Jornada:
         pasos = b.get("pasos") or []
         txt = json.dumps(pasos, ensure_ascii=False)
         corp = self._corpus()
+        NUM = set("cero uno una dos tres cuatro cinco seis siete ocho nueve diez once doce trece catorce quince veinte "
+                  "treinta cuarenta cincuenta sesenta setenta ochenta noventa cien ciento doscientos trescientos mil millón "
+                  "millones y".split())
         for c in set(_re.findall(r"«([^«»]{12,400})»", txt)):
-            if len(c.split()) >= 4 and self._n(c) not in corp:
+            w = [x for x in self._n(c).split() if x not in NUM and not x.isdigit()]   # números: con letras en la voz
+            if len(w) < 4 or self._n(c) in corp:
+                continue
+            ini, fin = " ".join(w[:4]), " ".join(w[-4:])
+            if ini not in corp and fin not in corp:     # ni el principio ni el final están literales: inventada
                 fallos.append(f"cita no literal en las fuentes: «{c[:90]}»")
         if pasos and "«" not in pasos[0].get("di", "")[:200] and "breve" not in txt[:300]:
             fallos.append("el primer «di» no abre con la frase gancho literal entre «»")
