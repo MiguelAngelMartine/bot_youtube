@@ -126,7 +126,14 @@ class Jornada:
             nb = f"{len(e['bloques']) + 1:02d}"
             piezas.append((nb, f"los breves (van todos en bloques/{nb}.json)",
                            sum((self._dossier(b.get("id", "")) for b in e["breves"]), []) + [self.dia / "temas.json"]))
-        for nn, que, dos in piezas:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(3) as ex:                # 3 a la vez, como los redactores en paralelo de Claude
+            list(ex.map(lambda pz: self._redacta(*pz), piezas))
+        self.parte(f"redacción: {len(piezas)} piezas escritas y prechequeadas")
+        return True
+
+    def _redacta(self, nn, que, dos):
+        if True:
             sal = self.dia / "bloques" / f"{nn}.json"
             if not sal.exists():
                 self.puesto("redactor", f"Escribe {que}.", [self.dia / "escaleta.json", *dos, *self.comunes()], sal,
@@ -138,8 +145,6 @@ class Jornada:
                 self.puesto("redactor", f"Corrige {que}: el prechequeo mecánico dice:\n{r.stdout[-3000:]}",
                             [sal, self.dia / "escaleta.json", *dos, *self.comunes()], sal,
                             valida=lambda r: isinstance(r, dict) and r.get("pasos"))
-        self.parte(f"redacción: {len(piezas)} piezas escritas y prechequeadas")
-        return True
 
     def mesa(self):
         if (self.dia / "revision" / "mesa_hecha").exists():
@@ -150,12 +155,17 @@ class Jornada:
         revs = {"verificador": "verificacion.md", "defensor-neutralidad": "neutralidad.md", "asesor-cumplimiento": "cumplimiento.md"}
         pendientes = [b.stem for b in bloques]
         for vuelta in (1, 2):
-            for puesto, nom in revs.items():
+            from concurrent.futures import ThreadPoolExecutor
+
+            def revisa(item, vuelta=vuelta, pendientes=pendientes):
+                puesto, nom = item
                 self.puesto(puesto, f"Revisa los bloques {', '.join(pendientes)} (vuelta {vuelta}). Una sección por bloque "
                             f"«## Bloque NN» con APTO o CORREGIR, y cada problema con la frase exacta y el cambio.",
                             [self.dia / "bloques" / f"{n}.json" for n in pendientes] + dossieres + [self.dia / "escaleta.json",
                                                                                                    *self.comunes()],
                             self.dia / "revision" / nom, "md")
+            with ThreadPoolExecutor(3) as ex:            # los tres revisores a la vez
+                list(ex.map(revisa, revs.items()))
             corregir = []
             for n in pendientes:
                 for nom in revs.values():
