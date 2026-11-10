@@ -505,7 +505,7 @@ def main_segmentos(fecha, n, S):
                            "-c:a", "aac", "-b:a", "160k", "-shortest", str(out)], stdin=subprocess.PIPE)
     for fi in range(int(math.ceil(total * FPS))):
         t = fi / FPS
-        fr = PORT.copy() if t < 0.4 or t > total - 0.7 else cuadro(t)   # 10-nov: portada también al final
+        fr = PORT.copy() if t < 0.4 else cuadro(t)
         ff.stdin.write(fr.tobytes())
     ff.stdin.close()
     ff.wait()
@@ -706,8 +706,8 @@ def main(fecha, n):
     PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
     _cuadro_normal = cuadro
 
-    def cuadro(t):                                      # la portada, los primeros 0,4 s y los últimos 0,7 s (10-nov)
-        if t < 0.4 or t > total - 0.7:
+    def cuadro(t):                                      # los primeros 0,4 s, la portada (YouTube suele tomarla)
+        if t < 0.4:
             fr = PORT.copy()
             ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
             return fr

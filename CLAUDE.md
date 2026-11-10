@@ -92,7 +92,7 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 
 ## Mejoras del 10-nov-2026
 - **Voz:** las siglas que Tristán lee raro se dicen con su nombre (`voz.SIGLAS`, SSML `<sub alias>`: CCOO → Comisiones Obreras, TVE → Televisión Española, UE, CGPJ, «29N» → 29 de noviembre...); el texto y los subtítulos no cambian. La entonación sale de la puntuación y de frases cortas (redactor).
-- **Shorts:** fondo con más vida (foco de luz, franjas de la marca, destellos, barrido de luz cada 7 s); la portada sale al principio y al final del vídeo. YouTube **no aplica a los Shorts la miniatura subida por la API**: en la app de YouTube, Short → Editar → Miniatura, eligiendo el primer o el último fotograma.
+- **Shorts:** fondo con más vida (foco de luz, franjas de la marca, destellos, barrido de luz cada 7 s); la portada sale en los primeros 0,4 s. YouTube **no aplica a los Shorts la miniatura subida por la API**: el usuario la elige en YouTube Studio desde el ordenador (en la app móvil no aparece la opción).
 - **Miniatura:** franjas de aviso, nombre del canal y barra inferior con SUSCRÍBETE (`miniatura.adornos_impacto`), con fotos reales de gesto fuerte.
 - **Viñetas:** más detalle (8 pasos en Cloudflare, estilo de novela gráfica cuidada).
 - **Vídeo largo:** contexto alrededor de cada frase; selección más exigente de ganchos.
