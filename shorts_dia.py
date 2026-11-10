@@ -69,7 +69,7 @@ if __name__ == "__main__":
     def _por_defecto(fecha):                             # 8-nov: el director puede pedir otro número en encargo.json
         f = RAIZ / "dia" / fecha / "encargo.json"
         try:
-            return int(json.loads(f.read_text(encoding="utf-8")).get("num_shorts", 3)) if f.exists() else 3
+            return int(json.loads(f.read_text(encoding="utf-8")).get("num_shorts", 2)) if f.exists() else 2
         except (ValueError, TypeError):
-            return 3
+            return 2
     main(sys.argv[1], int(sys.argv[2]) if len(sys.argv) > 2 else _por_defecto(sys.argv[1]))

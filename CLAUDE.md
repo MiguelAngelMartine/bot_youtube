@@ -116,3 +116,10 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 - **Vídeo largo de 4-5 min** (650-830 palabras, 3-4 bloques y 1-3 breves; el primero, el cruce más fuerte): se abandonaba a los 1-3 min.
 - A mano en YouTube Studio (no hay API): el «Vídeo relacionado» de cada Short, apuntando al vídeo largo del día; publicar el largo a la vez que el Short más fuerte.
 - **Comentario del canal en los Shorts** (10-nov-2026): `comenta.py`, cada hora por cron, comenta en cada Short ya publicado (los privados no admiten comentarios) con el enlace al vídeo largo del día y su pregunta; una sola vez por Short (marca «comentado» en shorts/youtube.json). La API no permite fijarlo. El aviso de Telegram de los Shorts recuerda poner el «Vídeo relacionado» (el largo del día, publicado antes).
+
+## Camino a la monetización (10-nov-2026, aplicado por petición del usuario)
+- Página «Acerca de» del canal con el método (`canal/acerca_de.txt`, puesta por la API), idioma español y país España.
+- Títulos y miniaturas sin tacos ni insultos personales (`apto_anuncios.py`): la frase literal va en el vídeo y la descripción.
+- Variedad visual en los Shorts (`short.SESTILOS`: letra y colores distintos en cada uno) y **2 Shorts al día** por defecto (menos, pero mejor).
+- Las descripciones dicen que las frases están comprobadas y que el contenido lo revisa el equipo editorial antes de publicarse (es verdad: lo publica el usuario).
+- Guion del vídeo de presentación para que lo grabe el usuario (`canal/presentacion.md`); pendiente también la consulta con un abogado de propiedad intelectual.

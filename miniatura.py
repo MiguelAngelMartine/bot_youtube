@@ -555,7 +555,7 @@ def brocha(t):
 ANTON = "Anton-Regular.ttf"                            # tipografia condensada de impacto (OFL)
 
 
-def _txt_capa(lineas, f, destaca, interlinea=0.98):
+def _txt_capa(lineas, f, destaca, interlinea=0.98, acento=None, letra_acento=(12, 12, 16)):
     """Titular en Anton: blanco con contorno fino y sombra; la palabra clave, en negro sobre franja amarilla."""
     medir = ImageDraw.Draw(Image.new("L", (1, 1)))
     alto_l = int(f.size * interlinea) + 14
@@ -578,8 +578,8 @@ def _txt_capa(lineas, f, destaca, interlinea=0.98):
                 _, by0, _, by1 = d.textbbox((xn, y), "HQ", font=f)   # alto de la letra, sin tildes ni diéresis
                 caja = [bx0 - (12 if pre else 18), by0 - 14, bx1 + (12 if post else 18), by1 + 14]
                 ds.rectangle([c + 10 for c in caja], fill=(0, 0, 0, 170))
-                d.rectangle(caja, fill=AMARILLO + (255,))
-                d.text((xn, y), nucleo, font=f, fill=(12, 12, 16, 255))
+                d.rectangle(caja, fill=(acento or AMARILLO) + (255,))
+                d.text((xn, y), nucleo, font=f, fill=letra_acento + (255,))
                 xp = caja[2] + 2
                 for trozo, xt in ((pre, x), (post, xp)):
                     if trozo:

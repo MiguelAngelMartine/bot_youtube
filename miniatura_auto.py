@@ -30,6 +30,9 @@ def main(fecha):
     img = dia / "imagenes"
     items = next((p["ve"]["items"] for p in G["secciones"][0]["pasos"] if (p.get("ve") or {}).get("tipo") == "sumario"), [])
     it = next((x for x in items if x.get("persona") and _retrato(cred, x["persona"], img)), items[0] if items else {})
+    import apto_anuncios as AA                         # 10-nov: la miniatura, sin tacos ni insultos personales
+    if not AA.limpio(it.get("titular") or it.get("texto") or ""):
+        it = next((x for x in items if AA.limpio(x.get("titular") or x.get("texto") or "")), it)
     titular = (it.get("titular") or it.get("texto") or G.get("titulo_video", "")).strip()
     persona = it.get("persona", "")
     rival = ""

@@ -202,6 +202,10 @@ def main(fecha, n=3):
             print(f"  descartada: «{s.get('cita', '')[:50]}» se queda sin contexto comprobado")
             continue
         s["titulo"] = re.sub(r"\b(sentencia|zanja|estalla|arremete|carga|clama|lanza|suelta)\b", "dice", s.get("titulo", ""))
+        import apto_anuncios as AA                     # 10-nov: título y portada sin tacos ni insultos (anuncios)
+        s["titulo"] = AA.elige(s["titulo"], f"{s.get('quien', '')}: «{s.get('gancho') or s['cita']}»"[:95],
+                               f"{s.get('kicker', '').title()}: la frase del día")
+        s["portada"] = AA.elige(s.get("portada", ""), s.get("gancho", ""), s.get("kicker", ""))
         buenos += 1
         cita = s["cita"].strip().rstrip(".")
         gancho = (s.get("gancho") or "").strip().rstrip(".")

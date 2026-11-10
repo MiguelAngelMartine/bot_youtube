@@ -214,13 +214,25 @@ def _persona(dia, nombre, cargo, centro, alto_cara):
     return None
 
 
+# 10-nov-2026 (variedad, camino a la monetización: que los Shorts no parezcan hechos en serie): cada Short con un
+# estilo distinto de letra y color (el antetítulo, la franja de la palabra clave y la letra de la cita).
+SESTILOS = [
+    {"fuente": "Anton-Regular.ttf", "kicker": (229, 37, 33), "acento": (250, 204, 21), "letra": (12, 12, 16)},
+    {"fuente": "BarlowCondensed-Bold.ttf", "kicker": (0, 120, 200), "acento": (60, 210, 240), "letra": (8, 20, 40)},
+    {"fuente": "Bangers-Regular.ttf", "kicker": (220, 20, 120), "acento": (255, 215, 0), "letra": (20, 10, 30)},
+    {"fuente": "Anton-Regular.ttf", "kicker": (15, 110, 70), "acento": (255, 255, 255), "letra": (15, 110, 70)},
+    {"fuente": "Inter-Black.ttf", "kicker": (245, 110, 20), "acento": (229, 37, 33), "letra": (255, 255, 255)},
+]
+SESTILO = dict(SESTILOS[0])
+
+
 def _kicker(txt, tam=56):
     f = fuente("Inter-Black.ttf", tam)
     w = int(f.getlength(txt)) + 56
     e = Image.new("RGBA", (w + 12, int(tam * 1.5) + 12))
     d = ImageDraw.Draw(e)
     d.rectangle([10, 10, w + 10, int(tam * 1.5) + 10], fill=(0, 0, 0, 150))
-    d.rectangle([0, 0, w, int(tam * 1.5)], fill=ROJO + (255,))
+    d.rectangle([0, 0, w, int(tam * 1.5)], fill=SESTILO["kicker"] + (255,))
     d.text((28, tam * 0.75 + 2), txt, font=f, fill=BLANCO + (255,), anchor="lm")
     return e
 
@@ -233,7 +245,7 @@ def _cita(txt, destaca, ancho=960, max_tam=118):
     palabras = ("«" + txt.strip().rstrip(".") + "»").upper().split()
     tam = max_tam
     while tam > 60:
-        f = fuente(M.ANTON, tam)
+        f = fuente(SESTILO["fuente"], tam)
         lineas, cur = [], []
         for w in palabras:
             if cur and f.getlength(" ".join(cur + [w])) + 40 > ancho:
@@ -246,7 +258,7 @@ def _cita(txt, destaca, ancho=960, max_tam=118):
             break
         tam -= 6
     marca = {w.lower().strip(M.LIMPIA) for w in (destaca or "").split()}
-    return M._txt_capa(lineas, fuente(M.ANTON, tam), marca)
+    return M._txt_capa(lineas, fuente(SESTILO["fuente"], tam), marca, acento=SESTILO["acento"], letra_acento=SESTILO["letra"])
 
 
 def _caja(txt, ancho=940, tam=46):
@@ -529,6 +541,9 @@ def main_segmentos(fecha, n, S):
 def main(fecha, n):
     dia = RAIZ / "dia" / fecha
     S = json.loads((dia / "shorts" / f"short_{n}.json").read_text(encoding="utf-8"))
+    global SESTILO
+    import zlib
+    SESTILO = dict(SESTILOS[(zlib.crc32(fecha[:10].encode()) + int(n)) % len(SESTILOS)])
     if S.get("segmentos"):
         return main_segmentos(fecha, n, S)
     tmp = dia / "shorts" / f"tmp_{n}"

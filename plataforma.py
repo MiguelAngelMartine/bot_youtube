@@ -55,13 +55,17 @@ def main(fecha):
     desc_base = (dia / "episodio_descripcion.txt").read_text(encoding="utf-8")
     desc_base = desc_base.split("\n\n", 1)[1] if desc_base.startswith(G.get("titulo_video", "\0")) else desc_base
     descripcion = (" ".join(r.get("lineas", [])) + "\n\n" + desc_base.strip()
-                   + "\n\nEl Hoyformativo: la política española del día, en claro y con fuentes. Nuevo episodio cada tarde.")
+                   + "\n\nEl Hoyformativo: la actualidad, en un minuto. Frases literales y comprobadas en su fuente, con todas "
+                   "las partes. Contenido revisado por el equipo editorial antes de publicarse.")
     etiquetas = [e.strip() for e in r.get("etiquetas", []) if e.strip()]
     while len(", ".join(etiquetas)) > 480:
         etiquetas.pop()
     for mal, bien in ((r"\b(carga|cargan|arremete|arremeten|estalla|estallan) contra\b", "critica a"),
                       (r"\b(sentencia|zanja|suelta|clama)\b", "dice")):
         titulo = re.sub(mal, bien, titulo)               # verbos valorativos fuera (libro de estilo)
+    import apto_anuncios as AA                         # 10-nov: sin tacos ni insultos personales en el título (anuncios)
+    sumario = [it.get("titular", "") for p in G["secciones"][0]["pasos"] for it in (p.get("ve") or {}).get("items", [])]
+    titulo = AA.elige(titulo, G.get("titulo_video", ""), *sumario, "Los cruces de la política española de hoy")
     vistos, hs = set(), []
     for h in r.get("hashtags", []):                    # máximo 15 (con más, YouTube los ignora todos), sin repetir
         h = "#" + re.sub(r"[\s#]+", "", str(h))

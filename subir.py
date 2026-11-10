@@ -212,6 +212,8 @@ def subir_shorts(dia_txt):
                  [cita, "", S["contexto"].strip(), "",
                   "Más información en el vídeo de hoy" + (f": {largo['url']}" if largo.get("url") else "."),
                   "¿Qué opinas? Te leo en comentarios.",
+                  "",
+                  "Frases literales y comprobadas en su fuente. Contenido revisado por el equipo editorial de El Hoyformativo antes de publicarse.",
                   "", f"Fuente: {S.get('fuente', '')}" + (f" {S['enlace']}" if S.get("enlace") else "")]
         cr = S.get("creditos") or []
         if cr:
