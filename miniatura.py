@@ -451,6 +451,10 @@ def miniatura(dia_txt, titular, destaca="", etiqueta_txt="", persona="", foto_fo
     inclina = 0 if sobrio else ESTILO["inclina"]
     if inclina:
         t = t.rotate(inclina, resample=Image.BICUBIC, expand=True)
+    cabe = (W - 60) if vs else ancho_texto + 60         # 10-nov: con la inclinación, que nunca se salga del borde
+    if t.width > cabe:
+        k = cabe / t.width
+        t = t.resize((int(t.width * k), int(t.height * k)), Image.LANCZOS)
     y = H - t.height - (10 if vs else 40) - (0 if sobrio else 92)   # 10-nov: deja sitio a la barra inferior
     if inserto and not sobrio and not vs:              # foto secundaria del lugar u objeto de la noticia
         pm = polaroid_mini(img / inserto)

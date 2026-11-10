@@ -347,11 +347,13 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
     libres = [c for c in cands if not variedad.reciente(variedad.clave_foto(c), dia_txt)]
     if len(libres) < len(cands):
         print(f"  {nombre}: {len(cands) - len(libres)} candidatas fuera por usadas en los últimos 7 días")
-    if libres:
+    if len(libres) >= 3:
         cands = libres
-    else:
-        print(f"  AVISO {nombre}: todas sus fotos libres se usaron esta semana; se repite la más antigua")
-        cands.sort(key=lambda c: variedad.reciente(variedad.clave_foto(c), dia_txt) or "")
+    else:                                               # 10-nov: pocas nuevas (políticos que salen a diario): primero
+        print(f"  AVISO {nombre}: solo {len(libres)} fotos sin usar esta semana; se añaden las usadas hace más tiempo")
+        vetada = lambda c: variedad.reciente(variedad.clave_foto(c), dia_txt) == "9999-12-31"
+        cands = libres + sorted([c for c in cands if c not in libres and not vetada(c)],
+                                key=lambda c: variedad.reciente(variedad.clave_foto(c), dia_txt) or "")
     buenas = []
     for c in cands[:30]:
         im = baja(c["miniatura"], 900)
