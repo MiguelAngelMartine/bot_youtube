@@ -104,6 +104,13 @@ def aviso_shorts(dia_txt, hechos):
     txt = [f"📱 El Hoyformativo · {dia_txt}: {len(hechos)} Shorts subidos a YouTube como PRIVADOS, para revisar y publicar:"]
     txt += [f"{k}. {h['titulo']}\n{h['studio']}" + (f"\n({h['aviso']})" if h.get("aviso") else "")
             for k, h in enumerate(hechos, 1)]
+    import json as _j                                  # 10-nov: el largo del día, para el «Vídeo relacionado»
+    yl = Path(__file__).parent / "dia" / dia_txt[:10] / "youtube.json"
+    if yl.exists():
+        largo = _j.loads(yl.read_text(encoding="utf-8"))
+        txt.append(f"🔗 Al publicar cada Short, en «Vídeo relacionado» elige el vídeo largo del día (publícalo antes):\n"
+                   f"«{largo.get('titulo', '')}»\n{largo.get('url', '')}\n"
+                   f"El comentario del canal con el enlace se pone solo cuando el Short esté público.")
     envia(api, "sendMessage", data={"chat_id": chat, "text": "\n\n".join(txt)[:4000]}, timeout=30)
     for k, h in enumerate(hechos, 1):
         portada = Path(h["portada"])
