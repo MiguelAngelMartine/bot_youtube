@@ -18,3 +18,4 @@ token_youtube.json
 # biblioteca de viñetas: solo se guardan las aceptadas
 canal/biblioteca_vinetas/pendientes/
 cache/x_cuentas.db
+modelos/

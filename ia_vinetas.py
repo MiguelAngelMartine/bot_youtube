@@ -19,20 +19,21 @@ from PIL import Image
 
 RAIZ = Path(__file__).parent
 CACHE = RAIZ / "cache" / "vinetas"
-REFERENCIA = RAIZ / "canal" / "estilo_vineta.jpg"     # vineta modelo del estilo del canal (elegida por el usuario)
+REFERENCIA = RAIZ / "canal" / "estilo_lineaclara.jpg"   # 10-nov: línea clara     # vineta modelo del estilo del canal (elegida por el usuario)
 ESCENAS = "@cf/black-forest-labs/flux-1-schnell"       # escenas: el estilo que eligio el usuario, rapido y barato
 PERSONAS = "@cf/black-forest-labs/flux-2-klein-4b"     # personas: admite su foto real y la referencia de estilo
 # sin la palabra "comic": con ella el modelo dibuja bocadillos con letras inventadas
-ESTILO = ("wordless high-end graphic novel illustration, richly detailed scene with depth, intricate ink linework, "
-          "textured cross-hatching, dramatic cinematic lighting, strong composition with foreground and background, "
-          "limited but vibrant colors, thick black ink outlines, heavy black shadows, "
-          "set in Spain, plain surfaces without writing, every box, screen, paper and sign blank and unlabeled, "
-          "silent scene: ")
-PERSONA = ("Redraw the person from image 0 as a wordless graphic novel illustration, using only the drawing technique of "
-           "image 1 (flat limited colors, thick black ink outlines, heavy solid black shadows, simple shapes). Do not copy "
-           "anything else from image 1: no train, no objects, no background from it. Keep the likeness of image 0 exactly: "
-           "same face shape, same hair, same beard, same age, and do not add glasses, hats or accessories that are not in "
-           "image 0. Same pose and framing as image 0, calm serious expression, drawn with respect. {escena}"
+# 10-nov-2026 (elegido por el usuario entre cuatro opciones): LÍNEA CLARA europea con rasgos españoles en escenas y
+# personajes (balcones de forja, persianas, plazas, terrazas, gente mediterránea). Referencia: canal/estilo_lineaclara.jpg
+ESTILO = ("wordless European ligne claire comic illustration, clean uniform thin black outlines, flat clean colors without "
+          "gradients, richly detailed scene with depth, set in Spain with typical Spanish architecture (wrought-iron balconies, "
+          "shutters, plazas, bar terraces) and ordinary Spanish people with Mediterranean features, "
+          "plain surfaces without writing, every box, screen, paper and sign blank and unlabeled, silent scene: ")
+PERSONA = ("Redraw the person from image 0 as a wordless European ligne claire comic illustration, using only the drawing "
+           "technique of image 1 (clean uniform thin black outlines, flat clean colors without gradients). Do not copy anything "
+           "else from image 1: no people, no buildings, no background from it. Keep the likeness of image 0 exactly: same face "
+           "shape, same hair, same beard, same age, and do not add glasses, hats or accessories that are not in image 0. Same "
+           "pose and framing as image 0, calm serious expression, drawn with respect. {escena}"
            "Plain simple background. No text, no letters, no speech bubbles.")
 SOBRIO = ", muted desaturated colors, quiet respectful mood"
 
