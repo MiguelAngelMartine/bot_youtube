@@ -315,12 +315,13 @@ def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
     return im
 
 
-def _cierre(fr, tl):
-    """Pantalla final: «¿Qué opinas?», «Te leo en comentarios» y botón de suscribirse con campana."""
+def _cierre(fr, tl, pregunta="¿Qué opinas?"):
+    """Pantalla final: la pregunta (10-nov: de sí o no, sobre la frase), «Te leo en comentarios» y suscribirse."""
     # 8-nov: sin el logo de Urni; botón de suscribirse
     d = ImageDraw.Draw(fr)
     a_ = G2.suave(min(1.0, tl / 0.25))
-    d.text((AN // 2, 560 + int(30 * (1 - a_))), "¿Qué opinas?", font=fuente("Inter-Black.ttf", 104),
+    tam_p = 104 if len(pregunta) <= 16 else max(60, int(104 * 16 / len(pregunta)))
+    d.text((AN // 2, 560 + int(30 * (1 - a_))), pregunta, font=fuente("Inter-Black.ttf", tam_p),
            fill=AMARILLO + (int(255 * a_),), anchor="mm")
     d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
     d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
@@ -359,7 +360,7 @@ def main_segmentos(fecha, n, S):
     texto = S["voz"]
     pal, dur = voz.locuta([{"di": texto}], "normal", tmp / "voz.wav", cola=0.4)
     T = E.Tiempos(texto, pal, 0.0)
-    k_fin = texto.find("¿Qué opinas?")
+    k_fin = texto.find(S.get("pregunta") or "¿Qué opinas?")
     t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0
     total = dur + 1.4
     SEG = []
@@ -442,7 +443,7 @@ def main_segmentos(fecha, n, S):
     def cuadro(t):
         if t >= t_fin:
             fr = _mueve(SEG[-1]["fondo"], t, total).convert("RGBA")
-            _cierre(fr, t - t_fin)
+            _cierre(fr, t - t_fin, S.get("pregunta") or "¿Qué opinas?")
         else:
             i = max(j for j, sg in enumerate(SEG) if sg["t0"] <= t + 1e-9)
             sg = SEG[i]
@@ -552,7 +553,8 @@ def main(fecha, n):
     rp_ = S.get("replica") or {}
     k_rep = texto.find(rp_.get("entrada") or f"{rp_.get('quien')} le responde") if rp_ else -1
     t_rep = T.en(k_rep) if k_rep >= 0 else None        # (buscar solo el nombre fallaba si el contexto lo nombraba)
-    k_fin = next((texto.find(x) for x in ("¿Qué opinas?", "Más información", "Todo el cruce") if x in texto), -1)
+    k_fin = next((texto.find(x) for x in (S.get("pregunta") or "@@", "¿Qué opinas?", "Más información", "Todo el cruce")
+                  if x in texto), -1)
     t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0    # 8-nov: el cierre, solo desde la pregunta (3-4 s)
     total = dur + 1.4
 
@@ -645,7 +647,7 @@ def main(fecha, n):
             cr = _cita_cache(S["replica"]["cita"][:n_] if tl < 1.9 else S["replica"]["cita"], "")
             fr.alpha_composite(cr, (40, 1180))
         elif t >= t_fin:                                             # 4) cierre
-            _cierre(fr, t - t_fin)
+            _cierre(fr, t - t_fin, S.get("pregunta") or "¿Qué opinas?")
         elif med and t_med <= t < t_ctx:                             # 1b) la segunda voz (8-nov)
             tl = t - t_med
             persona_en(fr, p3, t_med, t, G2.suave(min(1.0, tl / 0.3)))

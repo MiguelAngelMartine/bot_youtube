@@ -34,7 +34,7 @@ Escribe `dia/<fecha>/episodio.json` con:
 5. **`titulo_video`:** el de la escaleta, sin el nombre del canal ni la fecha (decisión del usuario del 4-nov-2026). **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:
-- el total de palabras (1.000-1.300, unos 7-9 min con la voz de Tristán). **Si pasa de 1.450 palabras (más de 9 min), devuelve al redactor el bloque más largo para que quite datos secundarios** (no conectores ni versiones de las partes) antes de cerrar;
+- el total de palabras (650-830, unos 4-5 min con la voz de Tristán; desde el 11-nov-2026). **Si pasa de 900 palabras (más de 5,5 min), devuelve al redactor el bloque más largo para que quite datos secundarios** (no conectores ni versiones de las partes) antes de cerrar;
 - que no se repitan datos entre bloques;
 - que todos los `cuando` estén literales en su texto.
 

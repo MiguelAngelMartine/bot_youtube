@@ -37,7 +37,7 @@
   - cuando solo lo publica un medio, «según El País» **en el texto de pantalla** de la nota, nunca en la voz (decisión del 1-nov-2026: la voz no nombra medios para no estar citando fuentes continuamente). La voz sí dice quién afirma algo y si no está confirmado («sin confirmación oficial», «está previsto», «hay versiones distintas»);
   - sin atribución solo si está CONTRASTADO (2+ medios de líneas distintas);
   - las acusaciones, siempre atribuidas.
-- **Duración:** el episodio entero, 7-9 min (unas 1.000-1.300 palabras; con Tristán, ~2,75 palabras por segundo). Un bloque principal, 65-120 s (170-320 palabras). Desde el 2-nov-2026 el usuario prefiere algo más de duración si a cambio el texto fluye: nunca se quitan conectores para ahorrar segundos. Un breve, 10-20 s.
+- **Duración:** el episodio entero, 4-5 min desde el 11-nov-2026 (unas 650-830 palabras; con Tristán, ~2,75 palabras por segundo). Un bloque principal, 65-120 s (170-320 palabras). Desde el 2-nov-2026 el usuario prefiere algo más de duración si a cambio el texto fluye: nunca se quitan conectores para ahorrar segundos. Un breve, 10-20 s.
 - **Tono «sobrio»** (muertes, accidentes, atentados): sin ganchos llamativos, música baja. (Desde el 2-nov-2026 Urni no sale en ningún vídeo; solo el logo.)
 
 ## Escribir para el oído (decisión del usuario del 2-nov-2026)

@@ -70,7 +70,7 @@ def main(dias=28):
         vistas, minutos, media, pct, likes, com, comp, subs = val
         r25 = f"{ret[0.25] * 100:.0f} %" if 0.25 in ret else "-"
         r50 = f"{ret[0.5] * 100:.0f} %" if 0.5 in ret else "-"
-        md.append(f"| {pub} | {'Short' if sh else 'Largo'} | {t[:60]} | {vistas} | {media} | {pct:.0f} % | {r25} / {r50} | {likes} | {com} | {comp} | {subs} |")
+        md.append(f"| {pub} | {'Short' if sh else 'Largo'} | {t[:60].replace('|', '/')} | {vistas} | {media} | {pct:.0f} % | {r25} / {r50} | {likes} | {com} | {comp} | {subs} |")
     md += ["", "## De dónde llegan las visitas", ""] + [f"- {s}: {n}" for s, n in fuentes]
     if tipo:
         md += ["", "## Por formato", ""] + [f"- {t}: {n} vistas, {p:.0f} % visto de media" for t, n, p in tipo]

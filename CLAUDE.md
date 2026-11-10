@@ -110,3 +110,8 @@ El usuario busca a mano en las cuentas oficiales de los periódicos nacionales (
 - **Viñetas en línea clara europea con rasgos españoles** (balcones de forja, persianas, plazas, terrazas, gente mediterránea), elegida entre cuatro opciones; referencia `canal/estilo_lineaclara.jpg` (`ia_vinetas.ESTILO` y `PERSONA`). Para Shorts y vídeo largo.
 - **Ritmo de los Shorts:** se probó un ritmo «TikTok» (cortes cada 2,2 s, subtítulos que saltan, contexto en trozos) y al usuario no le gustó («queda fatal»): se volvió al ritmo anterior. No volver a proponerlo así.
 - Descartado: motion comic con capas y «recreación» con cámara 3D por profundidad (al usuario no le convencieron). Vídeo con IA (Wan 2.1) pendiente de prueba con la cuota gratuita de Hugging Face.
+
+## Mejoras por las estadísticas (10-nov-2026, `analitica.py`; informe semanal por Telegram los lunes a las 9:20, `informe_semanal.py`)
+- Los Shorts se quedaban en un techo de ~1.200-2.000 vistas; los que mejor funcionaron, cortos y con gancho claro («Hay que ser cobarde»: 107 % visto). **Desde el 11-nov: Shorts de 25-40 s** (40-60 s con varios ganchos), terminados con una **pregunta de sí o no sobre la frase, sin tomar partido** («¿Tiene razón Ayuso?»), que también sale en la pantalla final. Sustituye al mínimo de 60/90 s del 8-nov.
+- **Vídeo largo de 4-5 min** (650-830 palabras, 3-4 bloques y 1-3 breves; el primero, el cruce más fuerte): se abandonaba a los 1-3 min.
+- A mano en YouTube Studio (no hay API): el «Vídeo relacionado» de cada Short, apuntando al vídeo largo del día; publicar el largo a la vez que el Short más fuerte.

@@ -38,10 +38,11 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   la cita entera. Que no cambie el sentido (si la cita es condicional, «si han robado…», el gancho conserva el «si»).
 - VARIOS GANCHOS EN UN SHORT: si el día tiene más frases fuertes que Shorts, UNO de los Shorts puede reunir 2-3 ganchos
   de personas y partidos distintos con un hilo común (impuestos, corrupción, el voto...): ponlos en "segmentos" (cada
-  uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 4-6 frases) y deja "cita" y
-  "gancho" del Short iguales a los del primero. Con más de un gancho dura COMO MÍNIMO 90 s (hasta 120).
+  uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-3 frases) y deja "cita" y
+  "gancho" del Short iguales a los del primero. Con varios ganchos dura 40-60 s.
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 8-11 frases (140-180 palabras: el Short dura COMO MÍNIMO 60 s, decisión del usuario del 8-nov-2026), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
+- "contexto": 4-6 frases (60-90 palabras: el Short dura 25-40 s; decisión del usuario del 10-nov-2026 tras ver las
+  estadísticas: los cortos se ven enteros y se repiten, los largos se abandonan), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
   APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
   antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
@@ -50,6 +51,8 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - "categoria": el formato, uno de «POLÉMICA» (cruce de declaraciones entre políticos), «ZASCA» (respuesta corta y directa
   en redes a otro político), «ÚLTIMA HORA» (un hecho noticioso de hoy: decisión, anuncio, dato) o «ANÁLISIS» (explica
   datos o antecedentes). Que sea verdad: «ÚLTIMA HORA» solo si el hecho es de hoy.
+- "pregunta": la pregunta final, de sí o no, corta (≤ 6 palabras) y directa sobre la frase, SIN tomar partido, que
+  invite a comentar («¿Tiene razón Ayuso?», «¿Se pasó Rufián?», «¿Exagera Abascal?»).
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
 - "portada": 2-5 palabras LITERALES de la cita, las de más gancho, para el titular enorme de la miniatura
@@ -63,7 +66,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
-"portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
+"pregunta": "¿...?", "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
 "segmentos": null o [{{"quien": "...", "cargo": "...", "partido": "...", "kicker": "...", "gancho": "...", "cita": "...",
 "destaca": "...", "fuente": "...", "contexto": "..."}}]}}]}}
 
@@ -233,12 +236,15 @@ def main(fecha, n=3):
             s.pop("segmentos", None)
         if s.get("replica"):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
-        voz += (" Más información en el vídeo de hoy. ¿Qué opinas? Te leo en comentarios. Y dale a suscribirte, "
-                "que he visto que aún no lo has hecho.")
-        palabras = len(voz.split()) + 25                    # + el cierre (~25 palabras); Tristán: ~2,75 palabras/s
-        minimo = 250 if s.get("segmentos") else 165          # 8-nov: mínimo 60 s (90 s con varios ganchos)
-        if palabras < minimo:
-            print(f"  AVISO: «{s['cita'][:40]}» se queda en ~{palabras / 2.75:.0f} s (mínimo {minimo / 2.75:.0f} s)")
+        preg = (s.get("pregunta") or "").strip()            # 10-nov: pregunta de sí o no que invite a comentar
+        if not (preg.startswith("¿") and preg.endswith("?") and len(preg.split()) <= 8):
+            preg = "¿Qué opinas?"
+        s["pregunta"] = preg
+        voz += f" {preg} Te leo en comentarios. Y dale a suscribirte, que he visto que aún no lo has hecho."
+        palabras = len(voz.split())                          # Tristán: ~2,75 palabras/s
+        maximo = 170 if s.get("segmentos") else 115          # 10-nov: 25-40 s (40-60 s con varios ganchos)
+        if palabras > maximo:
+            print(f"  AVISO: «{s['cita'][:40]}» sale de ~{palabras / 2.75:.0f} s (objetivo ≤ {maximo / 2.75:.0f} s)")
         if enc.get("verificada") and buenos == 1 and _norm(enc["frase"]) in _norm(s["cita"]):   # 9-nov: la del director
             s["portada"] = enc["frase"]                          # es la portada y el gancho principal
             if not s.get("segmentos"):

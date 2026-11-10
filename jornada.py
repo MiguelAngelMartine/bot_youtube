@@ -303,9 +303,9 @@ class Jornada:
         if ok:
             E = self.normaliza(self.json("episodio.json"))
             pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
-            if pal / 2.75 / 60 < 7.0:                   # 10-nov (calidad): 7-9 min; si falta, más contexto del dossier
+            if pal / 2.75 / 60 < 3.8:                   # 11-nov: 4-5 min; si falta, más contexto del dossier
                 self.parte(f"episodio corto (~{pal / 2.75 / 60:.1f} min): se amplía con contexto")
-                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 7-9: amplía los "
+                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 4-5: amplía los "
                             f"bloques con más contexto de sus dossieres (antecedentes, datos, la versión de la otra parte), sin "
                             f"inventar nada y sin tocar las citas. Devuelve el episodio.json completo.",
                             [self.dia / "episodio.json", *sorted((self.dia / "dossier").glob("*.md")), *self.comunes()],
