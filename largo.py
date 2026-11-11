@@ -159,8 +159,8 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             f, c = misma[it["nombre"]]
             ti = cuando(it.get("cuando"), t0 + 1 + 3 * k)
             x = 30 + col * k
-            out.append((polaroid(f, it["nombre"], it["cargo"], it["partido"], c, ap), x + (col - ap - 30) // 2, 140, ti))
-            out.append((nota(it["cita"], col - 40, 36 if n < 3 else 32, "Fuente: " + it["medio"]), x, 140 + ap + 150,
+            out.append((polaroid(f, it["nombre"], it["cargo"], it.get("partido", ""), c, ap), x + (col - ap - 30) // 2, 140, ti))
+            out.append((nota(it["cita"], col - 40, 36 if n < 3 else 32, "Fuente: " + it.get("medio", "")), x, 140 + ap + 150,
                         ti + 0.6))
     elif tipo == "posturas":
         out.append((pegatina(ve["titulo"], tam=46), 40, 20, t0 + 0.1))
