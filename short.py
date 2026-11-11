@@ -291,9 +291,18 @@ def _imagenes_tema(dia, i, sec, quien):
         out += sorted((dia / "vinetas").glob(f"s{i}_*.jpg"))
         for p in sec["pasos"]:
             f = (p.get("ve") or {}).get("foto")
-            if f and (dia / "imagenes" / f).exists():
-                out.append(dia / "imagenes" / f)
+            if f and (dia / "imagenes" / f).exists() and _foto_buena(dia / "imagenes" / f):
+                out.append(dia / "imagenes" / f)      # 11-nov: «mejor una buena viñeta que una mala imagen»
     return list(dict.fromkeys(out))[:8]
+
+
+def _foto_buena(ruta, ancho=1600, alto=900):
+    """Una foto solo entra en el contexto si tiene calidad: alta resolución y apaisada (si no, mejor una viñeta)."""
+    try:
+        w, h = Image.open(ruta).size
+        return w >= ancho and h >= alto and w >= h
+    except OSError:
+        return False
 
 
 def portada(fecha, fondo, foto_persona, kicker, titular, destaca):

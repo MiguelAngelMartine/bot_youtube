@@ -51,6 +51,29 @@ def main(fecha):
     vin = sorted((dia / "vinetas").glob(f"s{it.get('seccion', 1)}_*.jpg")) or sorted((dia / "vinetas").glob("s*_*.jpg"))
     fot = [f for f, c in cred.items() if f.startswith("s") and not c.get("persona") and (img / f).exists()]
     fondos = [("../vinetas/" + v.name) for v in vin[:2]] + fot[:2]
+    try:                                               # 11-nov: fondos fotográficos generados (Gemini o FLUX), sin personas reales
+        import gem
+        import imagen_fondo as IF
+        sec_txt = " ".join(p.get("di", "") for p in sec["pasos"])[:1500] if sec else ""
+        r = gem.pide(f"Para la miniatura de YouTube de esta noticia de política española, describe EN INGLÉS dos escenas "
+                     f"fotográficas simbólicas (una para la izquierda y otra para la derecha) que la representen SIN personas "
+                     f"reales reconocibles (manos, siluetas, gente de espaldas, objetos, lugares) y sin texto. Titular: "
+                     f"«{titular}». Noticia: {sec_txt}\nResponde SOLO JSON: {{\"izquierda\": \"...\", \"derecha\": \"...\"}}",
+                     como_json=True) or {}
+        gen = []
+        for lado in ("izquierda", "derecha"):
+            if isinstance(r, dict) and r.get(lado):
+                dest = img / f"miniatura_fondo_{lado}.jpg"
+                motor = IF.genera(r[lado], dest)
+                if motor:
+                    gen.append(dest.name)
+                    cred[dest.name] = {"titulo": "Imagen de fondo generada con IA", "autor": f"Imagen generada con IA ({motor})",
+                                       "licencia": "generada", "fuente": motor}
+        if gen:
+            (dia / "creditos.json").write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+            fondos = gen + fondos
+    except Exception as e:
+        print(f"  fondos generados: {type(e).__name__}: {e}")
     try:                                               # 11-nov: siempre una versión temática (sin persona), el estilo del director
         M.miniatura_tematica(fecha, titular, fondos[0] if fondos else "", fondos[1] if len(fondos) > 1 else "",
                              "miniatura_tematica.png")

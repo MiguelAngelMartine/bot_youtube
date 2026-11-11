@@ -289,11 +289,11 @@ def fondo_vivo(ruta, w, h, sobrio=False):
 
 
 def fondo_de(ve, foto, vin, fotos, bloque_img):
-    """La imagen del tema de una escena: su foto, su viñeta, la foto de alguien que sale en ella o la del bloque."""
+    """La imagen del tema de una escena: su viñeta, su foto (si es buena), la de alguien que sale en ella o la del bloque."""
+    if vin:                                            # 11-nov: primero la viñeta
+        return vin[min(vin)]
     if foto:
         return foto[0]
-    if vin:
-        return vin[min(vin)]
     txt = json.dumps(ve, ensure_ascii=False, default=str)
     for n, f in fotos.items():
         if n and n in txt and Path(f).exists():
@@ -664,7 +664,14 @@ def main(dia_txt, solo_fotogramas=False, hasta=None, desde=0.0):
                 foto, fn = None, ve.get("foto")
                 if fn and ve["tipo"] in E.CON_FOTO:
                     if fn in cred and (dia / "imagenes" / fn).exists():
-                        foto = (dia / "imagenes" / fn, cred[fn])
+                        try:                           # 11-nov: «mejor una buena viñeta que una mala imagen»
+                            w_, h_ = Image.open(dia / "imagenes" / fn).size
+                        except OSError:
+                            w_ = h_ = 0
+                        if w_ >= 1600 and h_ >= 900:
+                            foto = (dia / "imagenes" / fn, cred[fn])
+                        else:
+                            print(f"  foto {fn} de baja calidad ({w_}x{h_}): la escena va con su viñeta")
                     else:
                         print(f"  AVISO: la foto {fn} no esta en imagenes/ o no tiene credito; la escena va sin foto")
                 pz = sorted(piezas_h(ve, T, c, t0, fotos, cred, foto, usadas), key=lambda z: z[3])

@@ -594,14 +594,14 @@ def miniatura_tematica(dia_txt, titular, fondo_izq="", fondo_der="", salida="min
         return Image.open(f).convert("RGB") if f and f.exists() else None
     a, b = carga(fondo_izq), carga(fondo_der) or carga(fondo_izq)
     im = (ImageOps.fit(a, (W, H), Image.LANCZOS) if a else G2.fondo_marca(2.0).resize((W, H)).convert("RGB"))
-    im = ImageEnhance.Brightness(im.filter(ImageFilter.GaussianBlur(3))).enhance(0.8).convert("RGBA")
+    im = ImageEnhance.Brightness(im.filter(ImageFilter.GaussianBlur(1.2))).enhance(0.95).convert("RGBA")
     if b is not None:                                  # el lado derecho, en duotono rojo
-        dch = ImageOps.fit(b, (int(W * 0.42), H), Image.LANCZOS, centering=(0.6, 0.5)).convert("L")
+        dch = ImageOps.fit(b, (int(W * 0.34), H), Image.LANCZOS, centering=(0.6, 0.5)).convert("L")
         dch = ImageOps.colorize(ImageOps.autocontrast(dch), (40, 0, 0), (235, 70, 70)).convert("RGBA")
         m = Image.linear_gradient("L").rotate(90, expand=True).resize(dch.size)
         dch.putalpha(m.point(lambda v: int(min(255, v * 1.6))))
         im.alpha_composite(dch, (W - dch.width, 0))
-    oscurece_abajo(im, 500, 120)
+    oscurece_abajo(im, 380, 90)
     palabras = titular.upper().replace("«", "").replace("»", "").replace('"', "").split()
     if len(palabras) <= 3:
         lineas = [" ".join([p]) for p in palabras]
@@ -619,7 +619,7 @@ def miniatura_tematica(dia_txt, titular, fondo_izq="", fondo_der="", salida="min
     tams = []
     for txt in lineas:
         t = int(min((H - 120) / len(lineas) / 1.02, 300))
-        while t > 80 and fuente(f_nom, t).getlength(txt) > W * 0.90:
+        while t > 80 and fuente(f_nom, t).getlength(txt) > W * 0.74:
             t -= 6
         tams.append(t)
     y = max(40, (H - sum(int(t * 1.06) for t in tams)) // 2)
