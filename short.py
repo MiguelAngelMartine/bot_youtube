@@ -656,6 +656,22 @@ def main(fecha, n):
             print(f"  (sin viñetas propias para el Short: {type(e).__name__})")
     usadas |= {b.name for b in broll}
     reg_u.write_text(json.dumps(sorted(usadas)), encoding="utf-8")
+    CLIPS = {}                                         # 11-nov: viñetas animadas con IA (LTX) si el Short lo pide
+    if S.get("animado"):
+        import cv2
+        import animar_ia
+        for b in broll:
+            if "vinetas" in str(b):
+                mp4 = animar_ia.clip(b, S.get("movimiento", "camera slowly pushes in, subtle natural motion"))
+                if mp4:
+                    cap, frs = cv2.VideoCapture(str(mp4)), []
+                    while True:
+                        ok, fr_ = cap.read()
+                        if not ok:
+                            break
+                        frs.append(Image.fromarray(cv2.cvtColor(fr_, cv2.COLOR_BGR2RGB)))
+                    if frs:
+                        CLIPS[str(b)] = (frs, cap.get(5) or 24)
     cab = _cabecera(fecha, S.get("categoria", ""))
     p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.36), 0.42)
     fondo_img = broll[-1] if len(broll) > 1 else None   # 11-nov: el fondo, distinto de la primera imagen del contexto
@@ -718,7 +734,14 @@ def main(fecha, n):
         tp, im = paneles[k]
         tl = t - tp
         alto = ZONA[1] - ZONA[0]
-        vista = _vista_mc(im, broll[k], tl, alto, k)
+        if str(broll[k]) in CLIPS:                     # clip animado: ida y vuelta para cubrir todo el panel
+            frs, cfps = CLIPS[str(broll[k])]
+            j = int(tl * cfps) % (2 * len(frs) - 2 or 1)
+            j = j if j < len(frs) else 2 * len(frs) - 2 - j
+            from PIL import ImageOps as _IO
+            vista = _IO.fit(frs[j], (AN, alto), Image.BILINEAR).convert("RGBA")
+        else:
+            vista = _vista_mc(im, broll[k], tl, alto, k)
         entra = G2.suave(min(1.0, tl / 0.35)) if k > 0 else G2.suave(min(1.0, tl / 0.3))
         dx = int(AN * (1 - entra))
         fr.alpha_composite(vista, (dx, ZONA[0]) if dx < AN else (AN - 1, ZONA[0]))
