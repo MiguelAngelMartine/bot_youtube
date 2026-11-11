@@ -22,7 +22,8 @@ política española neutral y riguroso. Te paso varios Shorts candidatos del dí
 - "titulo": ≤ 70 caracteres, como lo escribiría un experto: la frase o su parte más fuerte entre comillas y quién la dice,
   verbo neutro («dice», «responde», «afirma»), sin tacos ni insultos personales, sin clickbait engañoso, con #Shorts al final.
   NO añadas lugares, fechas ni hechos que no estén en la cita o el contexto.
-- "pregunta": de sí o no, ≤ 6 palabras, sin tomar partido, que provoque comentarios («¿Tiene razón Ayuso?»).
+- "pregunta": de sí o no, ≤ 6 palabras, que NOMBRA por su apellido a quien dijo la frase, sin tomar partido
+  («¿Tiene razón Ayuso?», «¿Se pasó Rufián?»); nunca sobre el futuro ni dirigida al espectador.
 Responde SOLO JSON: {{"shorts": [{{"n": 1, "nota": 0, "gancho": "...", "portada": "...", "titulo": "...", "pregunta": "..."}}]}}
 
 CANDIDATOS:
@@ -74,7 +75,8 @@ def pule_shorts(candidatos):
         if t and len(t) <= 100 and AA.limpio(t) and not re.search(r"\b(sentencia|zanja|estalla|arremete|carga|clama|suelta)\b", t, re.I):
             c["titulo"] = t
         q = (p.get("pregunta") or "").strip()
-        if q.startswith("¿") and q.endswith("?") and len(q.split()) <= 8:
+        ape = (c.get("quien") or "").split()[-1] if c.get("quien") else ""
+        if q.startswith("¿") and q.endswith("?") and len(q.split()) <= 8 and ape and ape in q:
             c["pregunta"] = q
     return sorted(candidatos, key=lambda c: -c.get("nota_experto", 0))
 

@@ -51,8 +51,11 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - "categoria": el formato, uno de «POLÉMICA» (cruce de declaraciones entre políticos), «ZASCA» (respuesta corta y directa
   en redes a otro político), «ÚLTIMA HORA» (un hecho noticioso de hoy: decisión, anuncio, dato) o «ANÁLISIS» (explica
   datos o antecedentes). Que sea verdad: «ÚLTIMA HORA» solo si el hecho es de hoy.
-- "pregunta": la pregunta final, de sí o no, corta (≤ 6 palabras) y directa sobre la frase, SIN tomar partido, que
-  invite a comentar («¿Tiene razón Ayuso?», «¿Se pasó Rufián?», «¿Exagera Abascal?»).
+- "pregunta": la pregunta final, de sí o no, ≤ 6 palabras, que NOMBRA por su apellido a quien dijo la frase y pregunta
+  por la frase, sin tomar partido: «¿Tiene razón Ayuso?», «¿Se pasó Rufián?», «¿Exagera Abascal?», «¿Acierta Colau?».
+  Nunca preguntas sobre el futuro ni dirigidas al espectador («¿Subirán los impuestos?», «¿Te pagarían un programa?»).
+- "escenas": 2 descripciones EN INGLÉS de lo que se ve, para dos ilustraciones de cómic del contexto de la noticia
+  (lugares, objetos, gente anónima; concretas; sin texto, sin carteles con letras, sin personas reales reconocibles).
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
 - "portada": 2-5 palabras LITERALES de la cita, las de más gancho, para el titular enorme de la miniatura
@@ -66,7 +69,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
-"pregunta": "¿...?", "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
+"pregunta": "¿...?", "escenas": ["...", "..."], "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
 "segmentos": null o [{{"quien": "...", "cargo": "...", "partido": "...", "kicker": "...", "gancho": "...", "cita": "...",
 "destaca": "...", "fuente": "...", "contexto": "..."}}]}}]}}
 
@@ -146,6 +149,7 @@ def main(fecha, n=3):
     base = _norm(guion + "\n" + redes)
     (dia / "shorts").mkdir(exist_ok=True)
     buenos, partidos, usadas = 0, set(), set()
+    (dia / "shorts" / "imagenes_usadas.json").unlink(missing_ok=True)   # 11-nov: el registro de imágenes, de cero
     for viejo in (dia / "shorts").glob("short_*"):       # los de una vuelta anterior, fuera
         if viejo.is_file():
             viejo.unlink()
@@ -249,8 +253,9 @@ def main(fecha, n=3):
         if s.get("replica"):
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
         preg = (s.get("pregunta") or "").strip()            # 10-nov: pregunta de sí o no que invite a comentar
-        if not (preg.startswith("¿") and preg.endswith("?") and len(preg.split()) <= 8):
-            preg = "¿Qué opinas?"
+        ape = (s.get("quien") or "").split()[-1] if s.get("quien") else ""
+        if not (preg.startswith("¿") and preg.endswith("?") and len(preg.split()) <= 8 and ape and ape in preg):
+            preg = f"¿Tiene razón {ape}?" if ape else "¿Qué opinas?"      # 11-nov: siempre sobre quien lo dijo
         s["pregunta"] = preg
         voz += f" {preg} Te leo en comentarios. Y dale a suscribirte, que he visto que aún no lo has hecho."
         palabras = len(voz.split())                          # Tristán: ~2,75 palabras/s

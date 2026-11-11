@@ -585,9 +585,27 @@ def main(fecha, n):
 
     i_sec, sec = _seccion(dia, S["cita"])
     broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
+    # 11-nov (el usuario: «has repetido imágenes en los Shorts»): ninguna imagen se repite entre los Shorts del día;
+    # si faltan, dos viñetas nuevas de su propio contexto (las «escenas» que describe Gemini)
+    reg_u = dia / "shorts" / "imagenes_usadas.json"
+    usadas = set(json.loads(reg_u.read_text(encoding="utf-8"))) if reg_u.exists() else set()
+    broll = [b for b in broll if b.name not in usadas]
+    if len(broll) < 3:
+        try:
+            import ia_vinetas as IA
+            for k, esc in enumerate((S.get("escenas") or [])[:2]):
+                dest = dia / "vinetas" / f"short{n}_{k}.jpg"
+                if not dest.exists():
+                    dest.parent.mkdir(exist_ok=True)
+                    IA.ilustra(esc).save(dest, quality=92)
+                broll.append(dest)
+        except Exception as e:
+            print(f"  (sin viñetas propias para el Short: {type(e).__name__})")
+    usadas |= {b.name for b in broll}
+    reg_u.write_text(json.dumps(sorted(usadas)), encoding="utf-8")
     cab = _cabecera(fecha, S.get("categoria", ""))
     p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.36), 0.42)
-    fondo_img = broll[0] if broll else None
+    fondo_img = broll[-1] if len(broll) > 1 else None   # 11-nov: el fondo, distinto de la primera imagen del contexto
     if fondo_img is None and p1 and not p1[3].startswith("Ilustración"):
         fondo_img = next((f for f, c in json.loads((dia / "creditos.json").read_text(encoding="utf-8")).items()
                           if c.get("persona") == S["quien"] and (dia / "imagenes" / f).exists()), None)
