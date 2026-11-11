@@ -109,3 +109,6 @@ Una foto o una viñeta usada en un vídeo o un Short no se vuelve a usar hasta p
 
 ## Más impacto (10-nov-2026, referencia del usuario)
 `miniatura.py` ya pone solo las franjas de aviso amarillas y negras, el nombre del canal y la barra «NOTICIAS · ANÁLISIS · CONTEXTO» con SUSCRÍBETE. Lo que depende de ti: **fotos reales con gesto fuerte** (`fotos.py mejores --animo "señalando, hablando con energía, enfadado"` para quien ataca y `--animo "serio, ceño fruncido"` para el aludido), caras grandes y enfrentadas (`--rival`) y titular corto de 2-5 palabras. Nunca imágenes generadas con IA de personas reales.
+
+## Estilo del director (11-nov-2026, referencia: canal/miniatura_referencia_2.png)
+«No siempre tiene que salir una persona, y menos si la foto es pobre». El estilo preferido: **sin persona**, la imagen del tema de fondo (un lado en rojo), el **titular gigante en 3 líneas** (blanca; negra sobre franja amarilla de brocha; blanca sobre franja roja de brocha), letra ancha y pesada, textura gastada y trazos rojos de exclamación: `miniatura.miniatura_tematica()`. Con persona solo si hay una foto suya realmente buena (nota ≥ 8) y como alternativa; el director de arte compara con la referencia.

@@ -47,11 +47,21 @@ def main(fecha):
         cand += [img / f for f in cred if f.startswith(f"s{it['seccion']}_") and (img / f).exists()]
         if cand:
             fondo = "../" + str(cand[0].relative_to(dia)) if "vinetas" in str(cand[0]) else cand[0].name
+    hechas = []
+    vin = sorted((dia / "vinetas").glob(f"s{it.get('seccion', 1)}_*.jpg")) or sorted((dia / "vinetas").glob("s*_*.jpg"))
+    fot = [f for f, c in cred.items() if f.startswith("s") and not c.get("persona") and (img / f).exists()]
+    fondos = [("../vinetas/" + v.name) for v in vin[:2]] + fot[:2]
+    try:                                               # 11-nov: siempre una versión temática (sin persona), el estilo del director
+        M.miniatura_tematica(fecha, titular, fondos[0] if fondos else "", fondos[1] if len(fondos) > 1 else "",
+                             "miniatura_tematica.png")
+        hechas.append(("tematica", "miniatura_tematica.png"))
+    except Exception as e:
+        print(f"  temática: {type(e).__name__}: {e}")
+    foto_buena = persona and float(cred.get(_retrato(cred, persona, img), {}).get("puntos_gemini", 0) or 0) >= 8
     usados = json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else []
     libres = [e for e in M.ESTILOS if e not in usados[-4:]] or list(M.ESTILOS)
     rnd = random.Random(fecha)
-    probar = rnd.sample(libres, min(2, len(libres)))
-    hechas = []
+    probar = rnd.sample(libres, min(1 if foto_buena else 0, len(libres)))   # con persona, solo si su foto es muy buena
     for k, est in enumerate(probar):
         M.ESTILO = dict(M.ESTILOS[est], invierte=rnd.random() < 0.5)
         sal = f"miniatura_{est}.png"

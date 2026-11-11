@@ -47,6 +47,13 @@ def evalua(fecha, archivos):
         sumario = " ".join(p.get("di", "") for p in G["secciones"][0]["pasos"])
         contexto = f"Título del vídeo: {G.get('titulo_video', '')}\nLo que cuenta el vídeo (sumario): {sumario}"
     partes = [{"text": CRITERIOS + "\n\n" + contexto}]
+    ref = RAIZ / "canal" / "miniatura_referencia_2.png"  # 11-nov: el estilo y el nivel que quiere el director del canal
+    if ref.exists():
+        partes += [{"text": "REFERENCIA DEL DIRECTOR DEL CANAL (no es una versión: es el estilo y el nivel que quiere; "
+                            "puntúa más alto lo que se le acerque: titular gigante en 3 líneas con franjas de brocha "
+                            "amarilla y roja, letra ancha, imagen del tema de fondo, impacto inmediato; una cara pequeña o "
+                            "una foto pobre de una persona puntúa bajo):"},
+                   {"inline_data": {"mime_type": "image/png", "data": _png(Image.open(ref))}}]
     for a in archivos:
         im = Image.open(dia / a)
         peq = im.resize((320, int(320 * im.height / im.width)), Image.LANCZOS)

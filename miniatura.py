@@ -15,6 +15,7 @@ Uso: python miniatura.py AAAA-MM-DD --titular "«Me espera un calvario»" --dest
 from __future__ import annotations
 
 import argparse
+import math
 from datetime import date
 from pathlib import Path
 
@@ -549,6 +550,111 @@ def brocha(t):
     capa.paste(Image.new("RGBA", (w, h), ESTILO["franja"] + (255,)), (0, 0), m)
     capa.alpha_composite(t, (pad_x, pad_y))
     return capa
+
+
+def _franja_brocha(w, h, color, semilla=0):
+    """Franja de brocha con bordes desflecados (como la referencia del director del 11-nov-2026)."""
+    rng = np.random.default_rng(semilla)
+    m = Image.new("L", (w, h), 0)
+    d = ImageDraw.Draw(m)
+    d.rectangle([int(w * 0.02), int(h * 0.12), int(w * 0.98), int(h * 0.88)], fill=255)
+    for _ in range(int(w / 3)):                        # flecos en los bordes
+        x = rng.uniform(0, w)
+        for y0, sgn in ((h * 0.12, -1), (h * 0.88, 1)):
+            ln = rng.uniform(4, h * 0.14)
+            d.line([(x, y0), (x + rng.uniform(-6, 6), y0 + sgn * ln)], fill=255, width=int(rng.uniform(2, 6)))
+        y = rng.uniform(h * 0.15, h * 0.85)
+        for x0, sgn in ((w * 0.02, -1), (w * 0.98, 1)):
+            ln = rng.uniform(6, w * 0.035)
+            d.line([(x0, y), (x0 + sgn * ln, y + rng.uniform(-4, 4))], fill=255, width=int(rng.uniform(2, 7)))
+    capa = Image.new("RGBA", (w, h), color + (255,))
+    capa.putalpha(m.filter(ImageFilter.GaussianBlur(0.8)))
+    return capa
+
+
+def _gastado(capa, semilla=0, fuerza=0.22):
+    """Textura de imprenta gastada sobre las letras: motas que se comen la tinta."""
+    rng = np.random.default_rng(semilla)
+    a = np.array(capa.getchannel("A")).astype(np.float32)
+    ruido = rng.random(a.shape)
+    motas = (ruido < fuerza * 0.12).astype(np.float32)
+    motas = np.array(Image.fromarray((motas * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(3))) / 255.0
+    capa.putalpha(Image.fromarray((a * (1 - 0.85 * motas)).astype(np.uint8)))
+    return capa
+
+
+def miniatura_tematica(dia_txt, titular, fondo_izq="", fondo_der="", salida="miniatura.png"):
+    """11-nov-2026 (referencia del director, canal/miniatura_referencia_2.png): SIN persona. La escena del tema de fondo
+    (a la izquierda natural, a la derecha teñida de rojo), el titular gigante en 3 líneas —blanca; negra sobre franja
+    amarilla de brocha; blanca sobre franja roja de brocha—, con textura gastada y trazos rojos de exclamación."""
+    dia = RAIZ / "dia" / dia_txt
+    img = dia / "imagenes"
+    def carga(nombre):
+        f = img / nombre if nombre else None
+        return Image.open(f).convert("RGB") if f and f.exists() else None
+    a, b = carga(fondo_izq), carga(fondo_der) or carga(fondo_izq)
+    im = (ImageOps.fit(a, (W, H), Image.LANCZOS) if a else G2.fondo_marca(2.0).resize((W, H)).convert("RGB"))
+    im = ImageEnhance.Brightness(im.filter(ImageFilter.GaussianBlur(3))).enhance(0.8).convert("RGBA")
+    if b is not None:                                  # el lado derecho, en duotono rojo
+        dch = ImageOps.fit(b, (int(W * 0.42), H), Image.LANCZOS, centering=(0.6, 0.5)).convert("L")
+        dch = ImageOps.colorize(ImageOps.autocontrast(dch), (40, 0, 0), (235, 70, 70)).convert("RGBA")
+        m = Image.linear_gradient("L").rotate(90, expand=True).resize(dch.size)
+        dch.putalpha(m.point(lambda v: int(min(255, v * 1.6))))
+        im.alpha_composite(dch, (W - dch.width, 0))
+    oscurece_abajo(im, 500, 120)
+    palabras = titular.upper().replace("«", "").replace("»", "").replace('"', "").split()
+    if len(palabras) <= 3:
+        lineas = [" ".join([p]) for p in palabras]
+    else:                                              # 3 líneas con longitudes parecidas (la última, la más fuerte)
+        import itertools
+        mejor = None
+        for i, j in itertools.combinations(range(1, len(palabras)), 2):
+            ls = [" ".join(palabras[:i]), " ".join(palabras[i:j]), " ".join(palabras[j:])]
+            coste = max(map(len, ls)) - 0.3 * len(ls[2])
+            if mejor is None or coste < mejor[0]:
+                mejor = (coste, ls)
+        lineas = mejor[1]
+    estilos = [((255, 255, 255), None), ((10, 10, 10), AMARILLO), ((255, 255, 255), ROJO)][-len(lineas):]
+    f_nom = "Inter-Black.ttf"          # letra ancha y pesada, como la referencia
+    tams = []
+    for txt in lineas:
+        t = int(min((H - 120) / len(lineas) / 1.02, 300))
+        while t > 80 and fuente(f_nom, t).getlength(txt) > W * 0.90:
+            t -= 6
+        tams.append(t)
+    y = max(40, (H - sum(int(t * 1.06) for t in tams)) // 2)
+    for k, (txt, (col, fondo_c)) in enumerate(zip(lineas, estilos)):
+        t = tams[k]
+        f = fuente(f_nom, t)
+        tw = int(f.getlength(txt))
+        hh = int(t * 1.08)
+        x = (W - tw) // 2
+        if fondo_c:
+            fr = _franja_brocha(tw + 220, int(hh * 1.05), fondo_c, semilla=k)
+            im.alpha_composite(fr, (x - 110, y - int(hh * 0.02)))
+        capa = Image.new("RGBA", (W, hh + 40))
+        dd = ImageDraw.Draw(capa)
+        borde = (0, 0, 0) if col == (255, 255, 255) else (255, 255, 255)
+        if fondo_c is None or col == (255, 255, 255):
+            dd.text((x + 8, 14), txt, font=f, fill=(0, 0, 0, 200))              # sombra
+        dd.text((x, 4), txt, font=f, fill=col + (255,), stroke_width=8 if col == (255, 255, 255) else 2,
+                stroke_fill=(0, 0, 0, 255) if col == (255, 255, 255) else col + (255,))
+        im.alpha_composite(_gastado(capa, semilla=k, fuerza=0.07), (0, y - 10))
+        if k == 0:                                     # trazos rojos de exclamación a los dos lados
+            dd2 = ImageDraw.Draw(im)
+            for lado in (-1, 1):
+                cx = W // 2 + lado * (tw // 2 + 70)
+                for ang in (-50, -15, 20):
+                    a_ = math.radians(ang if lado > 0 else 180 - ang)
+                    r0, r1 = 30, 120
+                    dd2.line([(cx + r0 * math.cos(a_), y + 80 - r0 * math.sin(a_)),
+                              (cx + r1 * math.cos(a_), y + 80 - r1 * math.sin(a_))], fill=ROJO + (255,), width=22)
+        y += int(hh * 0.98)
+    im = grano(im)
+    out = dia / salida
+    fin = im.convert("RGB").resize((1280, 720), Image.LANCZOS)
+    fin.filter(ImageFilter.UnsharpMask(radius=1.2, percent=55, threshold=2)).save(out)
+    print(f"miniatura temática -> {out}")
 
 
 # ---------- plantillas profesionales (4-nov-2026) ----------
