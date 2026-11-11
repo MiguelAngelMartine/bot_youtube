@@ -41,7 +41,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-3 frases) y deja "cita" y
   "gancho" del Short iguales a los del primero. Con varios ganchos dura 40-60 s.
 - "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 4-6 frases (60-90 palabras: el Short dura 25-40 s; decisión del usuario del 10-nov-2026 tras ver las
+- "contexto": 4-6 frases de 20 palabras como mucho cada una (60-90 palabras: el Short dura 25-40 s; decisión del usuario del 10-nov-2026 tras ver las
   estadísticas: los cortos se ven enteros y se repiten, los largos se abandonan), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
   APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
   antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un

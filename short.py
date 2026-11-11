@@ -263,7 +263,12 @@ def _cita(txt, destaca, ancho=960, max_tam=118):
 
 def _caja(txt, ancho=940, tam=46):
     f = fuente("ComicNeue-Bold.ttf", tam)
-    ls = C.lineas(txt, f, ancho - 50)[:6]
+    ls = C.lineas(txt, f, ancho - 50)
+    while len(ls) > 5 and tam > 30:                    # 11-nov: si no cabe, letra más pequeña (nunca texto cortado)
+        tam -= 3
+        f = fuente("ComicNeue-Bold.ttf", tam)
+        ls = C.lineas(txt, f, ancho - 50)
+    ls = ls[:7]
     h = 40 + int(tam * 1.25) * len(ls)
     im = Image.new("RGBA", (ancho + 14, h + 14))
     d = ImageDraw.Draw(im)
@@ -303,6 +308,45 @@ def _foto_buena(ruta, ancho=1600, alto=900):
         return w >= ancho and h >= alto and w >= h
     except OSError:
         return False
+
+
+def portada_tematica(fondo, titular):
+    """11-nov-2026: portada vertical SIN persona, con el estilo de la miniatura de referencia del director: la imagen
+    del tema de fondo y el titular gigante en 3 líneas (blanca / negra sobre amarillo de brocha / blanca sobre rojo)."""
+    im = fondo.convert("RGB").resize((AN, AL)) if fondo is not None else _fondo().convert("RGB")
+    from PIL import ImageEnhance
+    im = ImageEnhance.Brightness(im).enhance(0.75).convert("RGBA")
+    pal = titular.upper().replace("«", "").replace("»", "").split()
+    if len(pal) <= 3:
+        lineas = pal
+    else:
+        import itertools
+        mejor = min(([" ".join(pal[:i]), " ".join(pal[i:j]), " ".join(pal[j:])]
+                     for i, j in itertools.combinations(range(1, len(pal)), 2)), key=lambda ls: max(map(len, ls)))
+        lineas = mejor
+    estilos = [((255, 255, 255), None), ((10, 10, 10), AMARILLO), ((255, 255, 255), ROJO)][-len(lineas):]
+    tams = []
+    for t_ in lineas:
+        t = 200
+        while t > 70 and fuente("Inter-Black.ttf", t).getlength(t_) > AN * 0.86:
+            t -= 6
+        tams.append(t)
+    y = (AL - sum(int(t * 1.15) for t in tams)) // 2
+    for k, (t_, (col, fc)) in enumerate(zip(lineas, estilos)):
+        f = fuente("Inter-Black.ttf", tams[k])
+        tw, hh = int(f.getlength(t_)), int(tams[k] * 1.12)
+        x = (AN - tw) // 2
+        if fc:
+            fr = M._franja_brocha(tw + 140, int(hh * 1.05), fc, semilla=k)
+            im.alpha_composite(fr, (x - 70, y))
+        capa = Image.new("RGBA", (AN, hh + 30))
+        d = ImageDraw.Draw(capa)
+        d.text((x, 4), t_, font=f, fill=col + (255,), stroke_width=8 if col == (255, 255, 255) else 2,
+               stroke_fill=(0, 0, 0, 255) if col == (255, 255, 255) else col + (255,))
+        im.alpha_composite(M._gastado(capa, semilla=k, fuerza=0.07), (0, y - 4))
+        y += int(hh * 1.03)
+    im.alpha_composite(_cabecera_logo(), (40, 40)) if "_cabecera_logo" in globals() else None
+    return im
 
 
 def portada(fecha, fondo, foto_persona, kicker, titular, destaca):
@@ -749,7 +793,10 @@ def main(fecha, n):
             foto_p = next((dia / "imagenes" / f for f, c_ in cred_.items() if c_.get("persona") == S["quien"]
                            and (dia / "imagenes" / f).exists()), None)
     try:
-        PORT = portada(fecha, fondo, foto_p, S["kicker"], S.get("portada") or S["cita"], S.get("destaca", ""))
+        if S.get("portada_tematica"):                  # 11-nov: sin buena foto de la persona, titular de impacto
+            PORT = portada_tematica(Image.open(broll[0]) if broll else None, S["portada_tematica"])
+        else:
+            PORT = portada(fecha, fondo, foto_p, S["kicker"], S.get("portada") or S["cita"], S.get("destaca", ""))
     except Exception as e:                              # sin portada propia, el fotograma del gancho
         print(f"  AVISO: portada propia no hecha ({type(e).__name__}): se usa el fotograma del gancho")
         PORT = cuadro(0.6)
