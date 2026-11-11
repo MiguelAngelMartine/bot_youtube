@@ -28,7 +28,7 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
-AZURE_TEMP = "0.8"                                 # entonacion intermedia (elegida por el usuario el 5-nov-2026)
+AZURE_TEMP = "0.85"                                # 11-nov-2026: muestra «3b natural estable», elegida por el usuario
 AZURE_MAX = 2500                                   # caracteres por peticion (el plan F0 admite hasta 3.000)
 WHISPER = "tiny"                                   # 4x mas rapido que el audio en el servidor
 SESGO = {"tiny": 0.085, "base": 0.0}               # retraso medio medido contra los tiempos exactos de edge-tts (2-nov)
@@ -331,14 +331,15 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
         if azure:
             pal = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
-        pal, _ = pausas.naturaliza(wav, pal, PAUSA, COMA, sala=False)
+        if not azure:                              # 11-nov-2026 (voz 3b): con Azure, las pausas que marca Tristán, sin añadir
+            pal, _ = pausas.naturaliza(wav, pal, PAUSA, COMA, sala=False)
         x, _ = pausas.lee(wav)
         # recorta el silencio del principio y del final del trozo y deja la pausa de locutor entre trozos
         ini = max(0.0, pal[0][0] - 0.05) if pal else 0.0
         fin = min(len(x) / sr, pal[-1][1] + 0.18) if pal else len(x) / sr
         x = x[int(ini * sr):int(fin * sr)]
         palabras += [(a - ini + t, b - ini + t, w) for a, b, w in pal]
-        hueco = PAUSA if j + 1 < len(trozos) else cola
+        hueco = (0.22 if azure else PAUSA) if j + 1 < len(trozos) else cola   # 11-nov: entre trozos, 0,22 s
         audio += [x, np.zeros((int(hueco * sr), 2), dtype=np.float32)]
         t += len(x) / sr + hueco
         mp3.unlink(missing_ok=True)
