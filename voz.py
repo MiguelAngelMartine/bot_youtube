@@ -306,12 +306,17 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     azure = motor() == "azure"
     if azure:                                      # la voz HD no usa registros; trozos largos se parten por frases
         partidos = []
+        exclama = re.compile(r"[?!][»\"”']*\.?$")       # 11-nov: preguntas y exclamaciones, en su propio trozo
         for txt, r in trozos:
             cur = ""
             for f in frases(txt):
-                if cur and len(cur) + len(f) + 1 > AZURE_MAX:
+                aparte = bool(exclama.search(f.strip()))
+                if cur and (aparte or len(cur) + len(f) + 1 > AZURE_MAX):
                     partidos.append((cur, r))
                     cur = ""
+                if aparte:                         # medido el 11-nov: dentro de un texto largo Tristán no sube el tono
+                    partidos.append((f, r))        # al final de la pregunta; sola, sí (de 111 a 174 Hz)
+                    continue
                 cur = f"{cur} {f}".strip()
             if cur:
                 partidos.append((cur, r))
