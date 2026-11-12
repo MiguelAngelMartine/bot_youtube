@@ -649,6 +649,8 @@ def main(fecha, n):
     # si faltan, dos viñetas nuevas de su propio contexto (las «escenas» que describe Gemini)
     reg_u = dia / "shorts" / "imagenes_usadas.json"
     usadas = set(json.loads(reg_u.read_text(encoding="utf-8"))) if reg_u.exists() else set()
+    if S.get("solo_vinetas") and len(broll) < 2:       # 12-nov: sin cuota para dibujar, las viñetas del día (mismo estilo)
+        pass                                           # (se completa más abajo, tras intentar dibujar las propias)
     if not S.get("imagenes") and not S.get("solo_vinetas"):   # las del director no pasan por el filtro
         broll = [b for b in broll if b.name not in usadas]
     if len(broll) < 3 and not S.get("imagenes"):
@@ -662,14 +664,21 @@ def main(fecha, n):
                 broll.append(dest)
         except Exception as e:
             print(f"  (sin viñetas propias para el Short: {type(e).__name__})")
+    if S.get("solo_vinetas") and len(broll) < 3:       # no se pudieron dibujar: las del vídeo largo del tema y del día
+        extra = _imagenes_tema(dia, i_sec, sec, S["quien"]) + sorted((dia / "vinetas").glob("s*_*.jpg"))
+        extra = [b for b in dict.fromkeys(extra) if "vinetas" in str(b) and b.name not in usadas and b not in broll
+                 and not b.name.startswith("short")]
+        broll += extra[:6 - len(broll)]
+        if extra:
+            print(f"  viñetas del día como respaldo: {[b.name for b in extra[:6]]}")
     usadas |= {b.name for b in broll}
     reg_u.write_text(json.dumps(sorted(usadas)), encoding="utf-8")
     CLIPS = {}                                         # 11-nov: viñetas animadas con IA (LTX) si el Short lo pide
     if S.get("animado"):
         import cv2
         import animar_ia
-        for b in broll:
-            if "vinetas" in str(b):
+        for b in [x for x in broll if "vinetas" in str(x)][:3]:   # 12-nov: 3 clips por Short como mucho (cuota)
+            if True:
                 mp4 = animar_ia.clip(b, S.get("movimiento", "camera slowly pushes in, subtle natural motion"))
                 if mp4:
                     cap, frs = cv2.VideoCapture(str(mp4)), []
@@ -771,7 +780,10 @@ def main(fecha, n):
         fr = _mueve(fondo, t, total).convert("RGBA")
         if t_rep is not None and t_rep <= t < t_fin:                  # 3) réplica
             tl = t - t_rep
-            persona_en(fr, p2, t_rep, t, G2.suave(min(1.0, tl / 0.3)))
+            if S.get("solo_vinetas") and paneles:                    # 12-nov: un solo estilo, también en la réplica
+                panel_en(fr, paneles[-1][0] + 0.5 + tl * 0.3)
+            else:
+                persona_en(fr, p2, t_rep, t, G2.suave(min(1.0, tl / 0.3)))
             fr.alpha_composite(k2, (60, 1080))
             n_ = max(1, int(len(S["replica"]["cita"]) * min(1.0, (tl - 0.3) / 1.6)))
             cr = _cita_cache(S["replica"]["cita"][:n_] if tl < 1.9 else S["replica"]["cita"], "")
@@ -780,7 +792,10 @@ def main(fecha, n):
             _cierre(fr, t - t_fin, S.get("pregunta") or "¿Qué opinas?")
         elif med and t_med <= t < t_ctx:                             # 1b) la segunda voz (8-nov)
             tl = t - t_med
-            persona_en(fr, p3, t_med, t, G2.suave(min(1.0, tl / 0.3)))
+            if S.get("solo_vinetas") and paneles:
+                panel_en(fr, paneles[min(1, len(paneles) - 1)][0] + 0.5 + tl * 0.3)
+            else:
+                persona_en(fr, p3, t_med, t, G2.suave(min(1.0, tl / 0.3)))
             fr.alpha_composite(k3, (60, 1080))
             n_ = max(1, int(len(med["cita"]) * min(1.0, (tl - 0.3) / 2.2)))
             fr.alpha_composite(_cita_cache(med["cita"][:n_] if tl < 2.5 else med["cita"], ""), (40, 1180))
