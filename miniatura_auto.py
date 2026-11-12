@@ -55,23 +55,19 @@ def main(fecha):
         import gem
         import imagen_fondo as IF
         sec_txt = " ".join(p.get("di", "") for p in sec["pasos"])[:1500] if sec else ""
-        r = gem.pide(f"Para la miniatura de YouTube de esta noticia de política española, describe EN INGLÉS dos escenas "
-                     f"fotográficas simbólicas (una para la izquierda y otra para la derecha) que la representen SIN personas "
-                     f"reales reconocibles (manos, siluetas, gente de espaldas, objetos, lugares) y sin texto. Titular: "
-                     f"«{titular}». Noticia: {sec_txt}\nResponde SOLO JSON: {{\"izquierda\": \"...\", \"derecha\": \"...\"}}",
-                     como_json=True) or {}
-        gen = []
-        for lado in ("izquierda", "derecha"):
-            if isinstance(r, dict) and r.get(lado):
-                dest = img / f"miniatura_fondo_{lado}.jpg"
-                motor = IF.genera(r[lado], dest)
-                if motor:
-                    gen.append(dest.name)
-                    cred[dest.name] = {"titulo": "Imagen de fondo generada con IA", "autor": f"Imagen generada con IA ({motor})",
-                                       "licencia": "generada", "fuente": motor}
-        if gen:
-            (dia / "creditos.json").write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
-            fondos = gen + fondos
+        r = gem.pide(f"Para la miniatura de YouTube de esta noticia de política española, describe EN INGLÉS UNA escena "
+                     f"fotográfica simbólica que la represente SIN personas reales reconocibles (manos, siluetas, gente de "
+                     f"espaldas, objetos, lugares) y sin texto. Titular: «{titular}». Noticia: {sec_txt}\n"
+                     f"Responde SOLO JSON: {{\"escena\": \"...\"}}", como_json=True) or {}
+        esc = r.get("escena") if isinstance(r, dict) else None
+        if esc:                                        # 12-nov: un solo fondo (calidad media); el lado rojo lo tiñe el código
+            dest = img / "miniatura_fondo.jpg"
+            motor = IF.genera(esc, dest)
+            if motor:
+                cred[dest.name] = {"titulo": "Imagen de fondo generada con IA", "autor": f"Imagen generada con IA ({motor})",
+                                   "licencia": "generada", "fuente": motor}
+                (dia / "creditos.json").write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+                fondos = [dest.name] + fondos
     except Exception as e:
         print(f"  fondos generados: {type(e).__name__}: {e}")
     try:                                               # 11-nov: siempre una versión temática (sin persona), el estilo del director

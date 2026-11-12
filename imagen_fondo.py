@@ -25,7 +25,7 @@ def _openai(prompt, destino):
     if not key:
         return False
     r = requests.post("https://api.openai.com/v1/images/generations", headers={"Authorization": f"Bearer {key}"}, timeout=180,
-                      json={"model": "gpt-image-2", "prompt": prompt, "size": "1536x1024", "n": 1})
+                      json={"model": "gpt-image-2", "prompt": prompt, "size": "1536x1024", "quality": "medium", "n": 1})
     if not r.ok:                                        # p. ej. safety_violations=[political]: lo coge FLUX
         print(f"  (OpenAI no genera: {r.json().get('error', {}).get('message', r.status_code)[:90]})")
         return False
