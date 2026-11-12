@@ -640,16 +640,18 @@ def main(fecha, n):
     broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
     if S.get("imagenes"):                              # 12-nov: imágenes fijadas por el director (estilo de su portada)
         broll = [dia / "imagenes" / x for x in S["imagenes"] if (dia / "imagenes" / x).exists()]
+    if S.get("solo_vinetas"):                          # 12-nov: todo el vídeo en un solo estilo (viñetas animadas)
+        broll = []
     # 11-nov (el usuario: «has repetido imágenes en los Shorts»): ninguna imagen se repite entre los Shorts del día;
     # si faltan, dos viñetas nuevas de su propio contexto (las «escenas» que describe Gemini)
     reg_u = dia / "shorts" / "imagenes_usadas.json"
     usadas = set(json.loads(reg_u.read_text(encoding="utf-8"))) if reg_u.exists() else set()
-    if not S.get("imagenes"):                          # las del director no pasan por el filtro
+    if not S.get("imagenes") and not S.get("solo_vinetas"):   # las del director no pasan por el filtro
         broll = [b for b in broll if b.name not in usadas]
     if len(broll) < 3 and not S.get("imagenes"):
         try:
             import ia_vinetas as IA
-            for k, esc in enumerate((S.get("escenas") or [])[:2]):
+            for k, esc in enumerate((S.get("escenas") or [])[:4 if S.get("solo_vinetas") else 2]):
                 dest = dia / "vinetas" / f"short{n}_{k}.jpg"
                 if not dest.exists():
                     dest.parent.mkdir(exist_ok=True)
@@ -677,7 +679,7 @@ def main(fecha, n):
                         CLIPS[str(b)] = (frs, cap.get(5) or 24)
     cab = _cabecera(fecha, S.get("categoria", ""))
     p1 = _persona(dia, S["quien"], S.get("cargo", ""), (0.5, 0.36), 0.42)
-    fondo_img = broll[-1] if len(broll) > 1 else None   # 11-nov: el fondo, distinto de la primera imagen del contexto
+    fondo_img = broll[-1] if len(broll) > 1 else (broll[0] if broll else None)   # 11-nov: el fondo, distinto de la primera imagen del contexto
     if fondo_img is None and p1 and not p1[3].startswith("Ilustración"):
         fondo_img = next((f for f, c in json.loads((dia / "creditos.json").read_text(encoding="utf-8")).items()
                           if c.get("persona") == S["quien"] and (dia / "imagenes" / f).exists()), None)
@@ -779,7 +781,7 @@ def main(fecha, n):
             a = G2.suave(min(1.0, tc / 0.25))
             G2.pega(fr, ctx, 60, ZONA[1] + 150 + int(40 * (1 - a)), a)
         else:                                                        # 1) gancho (y contexto sin imágenes)
-            if S.get("imagenes") and paneles:                        # 12-nov: con las imágenes del director, desde el inicio
+            if (S.get("imagenes") or S.get("solo_vinetas")) and paneles:   # 12-nov: un solo estilo desde el inicio
                 panel_en(fr, paneles[0][0] + 0.5 + t * 0.3)
             else:
                 persona_en(fr, p1, 0.0, t)
