@@ -638,12 +638,15 @@ def main(fecha, n):
 
     i_sec, sec = _seccion(dia, S["cita"])
     broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
+    if S.get("imagenes"):                              # 12-nov: imágenes fijadas por el director (estilo de su portada)
+        broll = [dia / "imagenes" / x for x in S["imagenes"] if (dia / "imagenes" / x).exists()]
     # 11-nov (el usuario: «has repetido imágenes en los Shorts»): ninguna imagen se repite entre los Shorts del día;
     # si faltan, dos viñetas nuevas de su propio contexto (las «escenas» que describe Gemini)
     reg_u = dia / "shorts" / "imagenes_usadas.json"
     usadas = set(json.loads(reg_u.read_text(encoding="utf-8"))) if reg_u.exists() else set()
-    broll = [b for b in broll if b.name not in usadas]
-    if len(broll) < 3:
+    if not S.get("imagenes"):                          # las del director no pasan por el filtro
+        broll = [b for b in broll if b.name not in usadas]
+    if len(broll) < 3 and not S.get("imagenes"):
         try:
             import ia_vinetas as IA
             for k, esc in enumerate((S.get("escenas") or [])[:2]):
@@ -776,7 +779,10 @@ def main(fecha, n):
             a = G2.suave(min(1.0, tc / 0.25))
             G2.pega(fr, ctx, 60, ZONA[1] + 150 + int(40 * (1 - a)), a)
         else:                                                        # 1) gancho (y contexto sin imágenes)
-            persona_en(fr, p1, 0.0, t)
+            if S.get("imagenes") and paneles:                        # 12-nov: con las imágenes del director, desde el inicio
+                panel_en(fr, paneles[0][0] + 0.5 + t * 0.3)
+            else:
+                persona_en(fr, p1, 0.0, t)
             fr.alpha_composite(k1, (60, 1080))
             if t < t_ctx:
                 fr.alpha_composite(c1, (40, 1180))
@@ -816,7 +822,10 @@ def main(fecha, n):
             foto_p = next((dia / "imagenes" / f for f, c_ in cred_.items() if c_.get("persona") == S["quien"]
                            and (dia / "imagenes" / f).exists()), None)
     try:
-        if S.get("portada_tematica"):                  # 11-nov: sin buena foto de la persona, titular de impacto
+        if S.get("portada_imagen") and (dia / "imagenes" / S["portada_imagen"]).exists():   # 12-nov: la del director
+            from PIL import ImageOps as _IO
+            PORT = _IO.fit(Image.open(dia / "imagenes" / S["portada_imagen"]).convert("RGB"), (AN, AL)).convert("RGBA")
+        elif S.get("portada_tematica"):                # 11-nov: sin buena foto de la persona, titular de impacto
             PORT = portada_tematica(Image.open(broll[0]) if broll else None, S["portada_tematica"])
         else:
             PORT = portada(fecha, fondo, foto_p, S["kicker"], S.get("portada") or S["cita"], S.get("destaca", ""))
