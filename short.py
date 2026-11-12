@@ -637,6 +637,9 @@ def main(fecha, n):
     total = dur + 1.4
 
     i_sec, sec = _seccion(dia, S["cita"])
+    if not S.get("imagenes"):                          # 12-nov (el usuario: «viñetas animadas siempre»): todo el Short
+        S.setdefault("solo_vinetas", True)             # en viñetas de línea clara animadas, sin fotos ni otros estilos
+        S.setdefault("animado", True)
     broll = _imagenes_tema(dia, i_sec, sec, S["quien"])
     if S.get("imagenes"):                              # 12-nov: imágenes fijadas por el director (estilo de su portada)
         broll = [dia / "imagenes" / x for x in S["imagenes"] if (dia / "imagenes" / x).exists()]
