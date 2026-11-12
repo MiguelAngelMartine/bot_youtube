@@ -160,6 +160,11 @@ class Jornada:
             b = json.loads(sal.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             return ["el fichero no es JSON válido"]
+        if isinstance(b, list) and len(b) == 1 and isinstance(b[0], dict):   # envuelto en lista: se desenvuelve
+            b = b[0]
+            sal.write_text(json.dumps(b, ensure_ascii=False, indent=1), encoding="utf-8")
+        if not isinstance(b, dict):
+            return ["el bloque no es un objeto JSON {titulo, tono, fuentes, pasos}"]
         fallos = []
         pasos = b.get("pasos") or []
         txt = json.dumps(pasos, ensure_ascii=False)
