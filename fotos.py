@@ -323,7 +323,7 @@ debería ser: {animo}. Puntúa cada una de 1 a 10 valorando, por este orden:
 Responde SOLO JSON: {{"puntos": [p0, p1, ...]}} con un número por foto, en el mismo orden."""
 
 
-def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
+def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignora_variedad=False):
     """7-nov-2026 (el usuario: «las fotos son muy malas, poco profesional»): reúne muchas candidatas de la persona
     (Wikidata, su categoría de Commons y subcategorías por año, Pool Moncloa), descarta las de cara pequeña o sin cara
     (YuNet) y Gemini elige las de más calidad y con el gesto que pide la noticia. Guarda retrato_<apellido>[_k].jpg con
@@ -344,7 +344,7 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
         except Exception as e:
             print(f"  (una fuente no responde: {type(e).__name__})")
     import variedad                                     # 8-nov: nada usado en los últimos 7 días (si queda alguna)
-    libres = [c for c in cands if not variedad.reciente(variedad.clave_foto(c), dia_txt)]
+    libres = cands if ignora_variedad else [c for c in cands if not variedad.reciente(variedad.clave_foto(c), dia_txt)]
     if len(libres) < len(cands):
         print(f"  {nombre}: {len(cands) - len(libres)} candidatas fuera por usadas en los últimos 7 días")
     if len(libres) >= 3:
@@ -361,6 +361,8 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None):
             continue
         k = M.cara(im)
         if not k or k[3] < 0.14 * im.height or k[3] < 70:        # cara pequeña: foto de grupo o de lejos
+            continue
+        if solo and M.n_caras(im) > 1:                          # 12-nov: retrato a solas, sin fotos de grupo
             continue
         buenas.append((c, im))
     if not buenas:

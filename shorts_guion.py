@@ -133,6 +133,9 @@ def main(fecha, n=3):
     redes = (dia / "redes.md").read_text(encoding="utf-8")[:30000] if (dia / "redes.md").exists() else ""
     enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
     obligada = ""
+    if enc.get("short_persona"):                       # 12-nov: el director pide un Short de una persona concreta
+        obligada += (f"\n\nOBLIGATORIO: uno de los Shorts es la frase más fuerte de {enc['short_persona']} del día "
+                     f"(comprobada literal en el material), con {enc['short_persona']} de protagonista.")
     if enc.get("verificada") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
         redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
                 f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes

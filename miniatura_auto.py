@@ -18,6 +18,39 @@ RAIZ = Path(__file__).parent
 REG = RAIZ / "archivo" / "estilos_miniatura.json"
 
 
+def enc_rival(dia, nombre, cred, img):
+    e = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
+    r = (e.get("miniatura") or {}).get("rival") if isinstance(e.get("miniatura"), dict) else None
+    return _retrato(cred, r, img) if r else ""         # sin rival salvo que se pida: la persona sola, grande
+
+
+def _forzar_persona(fecha, nombre, items, G, cred, img):
+    """Miniatura con una persona concreta (la pide el director). Usa el titular del sumario donde sale ella; si no sale,
+    su frase gancho del día. Devuelve 0 si la hace, None si no tiene foto buena (entonces, temática)."""
+    import fotos
+    ape = nombre.split()[-1]
+    try:                                               # retrato suyo A SOLAS y de calidad (no una foto de grupo)
+        for st in (img / f"retrato_{fotos.slug(ape)}.jpg", img / f"retrato_{fotos.slug(ape)}_recorte.png"):
+            st.unlink(missing_ok=True)                 # fuera el retrato y el recorte anteriores (podían ser de grupo)
+        fotos.mejores(fecha, nombre, "retrato de prensa, primer plano, sola, mirando a cámara", 1, solo=True, ignora_variedad=True)
+    except Exception as e:
+        print(f"  (no se pudo bajar foto de {nombre}: {type(e).__name__})")
+    cred = json.loads((RAIZ / "dia" / fecha / "creditos.json").read_text(encoding="utf-8")) if (RAIZ / "dia" / fecha / "creditos.json").exists() else cred
+    solo = f"retrato_{fotos.slug(ape)}.jpg"
+    fa = solo if (img / solo).exists() else _retrato(cred, nombre, img)
+    if not fa:
+        return None
+    it = next((x for x in items if x.get("persona") == nombre or ape in (x.get("titular", "") + x.get("texto", ""))), None)
+    titular = (it.get("titular") or it.get("texto") if it else "") or f"{ape}, a la carga"
+    rival = enc_rival(RAIZ / "dia" / fecha, nombre, cred, img)   # solo si el director lo pide expresamente
+    fondo = next((f for f in (sorted((RAIZ / "dia" / fecha / "vinetas").glob("s*_*.jpg")) or []) ), None)
+    M.ESTILO = dict(M.ESTILOS["clasico"], invierte=False)
+    M.miniatura(fecha, titular, it.get("destaca", "") if it else "", (it.get("etiqueta", "") if it else "") or ape.upper(),
+                fa, ("../vinetas/" + fondo.name) if fondo else "", False, "miniatura.png", rival, "", "")
+    print(f"miniatura: {nombre}" + (f" vs rival" if rival else "") + f" · «{titular}»")
+    return 0
+
+
 def _retrato(cred, nombre, img):
     fs = [f for f, c in cred.items() if c.get("persona") == nombre and (img / f).exists() and "_recorte" not in f]
     return sorted(fs, key=lambda f: -float(cred[f].get("puntos_gemini", 0) or 0))[0] if fs else ""
@@ -29,6 +62,13 @@ def main(fecha):
     cred = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
     img = dia / "imagenes"
     items = next((p["ve"]["items"] for p in G["secciones"][0]["pasos"] if (p.get("ve") or {}).get("tipo") == "sumario"), [])
+    enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
+    forzada = (enc.get("miniatura") or {}).get("persona") if isinstance(enc.get("miniatura"), dict) else enc.get("miniatura_persona")
+    if forzada:                                        # 12-nov: el director pide una persona concreta en la miniatura
+        rc = _forzar_persona(fecha, forzada, items, G, cred, img)
+        if rc is not None:
+            return rc
+        print(f"  (no hay foto buena de {forzada}: miniatura temática)")
     it = next((x for x in items if x.get("persona") and _retrato(cred, x["persona"], img)), items[0] if items else {})
     import apto_anuncios as AA                         # 10-nov: la miniatura, sin tacos ni insultos personales
     if not AA.limpio(it.get("titular") or it.get("texto") or ""):

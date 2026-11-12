@@ -266,6 +266,22 @@ def cara(c):
     return tuple(int(v / k) for v in (x, y, w, h))
 
 
+def n_caras(c, minfrac=0.11):
+    """Cuántas caras grandes (alto >= minfrac de la imagen) hay: para descartar fotos de grupo en un retrato a solas."""
+    import cv2
+    rgb = np.array(c.convert("RGB"))[:, :, ::-1].copy()
+    kk = min(1.0, 900 / max(rgb.shape[:2]))
+    if kk < 1:
+        rgb = cv2.resize(rgb, (int(rgb.shape[1] * kk), int(rgb.shape[0] * kk)))
+    if not YUNET.exists():
+        return 1
+    det = cv2.FaceDetectorYN.create(str(YUNET), "", (rgb.shape[1], rgb.shape[0]), 0.6)
+    _, caras = det.detect(rgb)
+    if caras is None:
+        return 0
+    return sum(1 for f in caras if f[3] >= minfrac * rgb.shape[0])
+
+
 def encuadre_cara(c, ancho, alto, centro=(0.72, 0.37), alto_cara=0.30, suave=False):
     """Encuadre profesional por la cara para un lienzo ancho x alto: la cara grande (alto_cara del alto) y centrada en
     'centro'; el cuerpo sale por abajo y se disuelve sin cortes rectos. Devuelve (imagen, x, y) o None si no hay cara."""
