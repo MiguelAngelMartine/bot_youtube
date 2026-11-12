@@ -28,7 +28,10 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
-AZURE_TEMP = "0.85"                                # 11-nov-2026: muestra «3b natural estable», elegida por el usuario
+AZURE_TEMP = "0.8"                                 # 12-nov-2026: «fluido_08», elegida por el usuario
+RADIO = ("highpass=f=70,equalizer=f=150:t=q:w=1.0:g=4,equalizer=f=350:t=q:w=1.5:g=1.5,"
+         "equalizer=f=5500:t=q:w=2.0:g=-5,lowpass=f=12500,"
+         "acompressor=threshold=-16dB:ratio=3:attack=4:release=130,alimiter=limit=0.92")   # 12-nov: filtro «radio»
 AZURE_MAX = 2500                                   # caracteres por peticion (el plan F0 admite hasta 3.000)
 WHISPER = "tiny"                                   # 4x mas rapido que el audio en el servidor
 SESGO = {"tiny": 0.085, "base": 0.0}               # retraso medio medido contra los tiempos exactos de edge-tts (2-nov)
@@ -345,4 +348,9 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         mp3.unlink(missing_ok=True)
         wav.unlink(missing_ok=True)
     pausas.escribe(wav_salida, np.concatenate(audio), sr)
+    if motor() == "azure":                             # 12-nov: filtro «radio» (quita el metálico, aplasta picos de volumen);
+        tmpf = Path(f"{wav_salida}.radio.wav")          # el EQ/compresor/limitador no cambian la duración: los tiempos siguen valiendo
+        r = subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(wav_salida), "-af", RADIO, str(tmpf)])
+        if r.returncode == 0 and tmpf.exists():
+            tmpf.replace(wav_salida)
     return palabras, t
