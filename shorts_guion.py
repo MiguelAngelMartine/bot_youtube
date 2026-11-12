@@ -54,8 +54,8 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - "pregunta": la pregunta final, de sí o no, ≤ 6 palabras, que NOMBRA por su apellido a quien dijo la frase y pregunta
   por la frase, sin tomar partido: «¿Tiene razón Ayuso?», «¿Se pasó Rufián?», «¿Exagera Abascal?», «¿Acierta Colau?».
   Nunca preguntas sobre el futuro ni dirigidas al espectador («¿Subirán los impuestos?», «¿Te pagarían un programa?»).
-- "escenas": 4 descripciones EN INGLÉS de lo que se ve, para cuatro viñetas de cómic animadas que cuenten la noticia
-  en orden (la primera, la del gancho)
+- "escenas": 6 descripciones EN INGLÉS de lo que se ve, para seis viñetas de cómic animadas DISTINTAS que cuenten la
+  noticia en orden (la primera, la del gancho), cada una con algo que se mueva (gente que camina, gesticula, escribe...)
   (lugares, objetos, gente anónima; concretas; sin texto, sin carteles con letras, sin personas reales reconocibles).
 - "kicker": 2-5 palabras en mayúsculas para la pantalla: quién y a quién («AYUSO, A SÁNCHEZ»).
 - "destaca": la palabra de la cita que irá resaltada en amarillo.
@@ -70,7 +70,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
-"pregunta": "¿...?", "escenas": ["...", "...", "...", "..."], "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
+"pregunta": "¿...?", "escenas": ["...", "...", "...", "...", "...", "..."], "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "...",
 "segmentos": null o [{{"quien": "...", "cargo": "...", "partido": "...", "kicker": "...", "gancho": "...", "cita": "...",
 "destaca": "...", "fuente": "...", "contexto": "..."}}]}}]}}
 

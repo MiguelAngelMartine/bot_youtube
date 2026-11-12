@@ -654,7 +654,7 @@ def main(fecha, n):
     if len(broll) < 3 and not S.get("imagenes"):
         try:
             import ia_vinetas as IA
-            for k, esc in enumerate((S.get("escenas") or [])[:4 if S.get("solo_vinetas") else 2]):
+            for k, esc in enumerate((S.get("escenas") or [])[:6 if S.get("solo_vinetas") else 2]):
                 dest = dia / "vinetas" / f"short{n}_{k}.jpg"
                 if not dest.exists():
                     dest.parent.mkdir(exist_ok=True)
@@ -744,10 +744,17 @@ def main(fecha, n):
         alto = ZONA[1] - ZONA[0]
         if str(broll[k]) in CLIPS:                     # clip animado: ida y vuelta para cubrir todo el panel
             frs, cfps = CLIPS[str(broll[k])]
-            j = int(tl * cfps) % (2 * len(frs) - 2 or 1)
-            j = j if j < len(frs) else 2 * len(frs) - 2 - j
             from PIL import ImageOps as _IO
-            vista = _IO.fit(frs[j], (AN, alto), Image.BILINEAR).convert("RGBA")
+            j = int(tl * cfps)
+            if j < len(frs):                           # el clip, una sola vez
+                vista = _IO.fit(frs[j], (AN, alto), Image.BILINEAR).convert("RGBA")
+            else:                                      # 12-nov: sin marcha atrás; el último fotograma con un acercamiento
+                extra = tl - len(frs) / cfps           # lento que continúa el movimiento
+                z = 1.0 + 0.03 * min(extra, 4.0)
+                ult = frs[-1]
+                cw, ch = int(ult.width / z), int(ult.height / z)
+                ult = ult.crop(((ult.width - cw) // 2, (ult.height - ch) // 2, (ult.width + cw) // 2, (ult.height + ch) // 2))
+                vista = _IO.fit(ult, (AN, alto), Image.BILINEAR).convert("RGBA")
         else:
             vista = _vista_mc(im, broll[k], tl, alto, k)
         entra = G2.suave(min(1.0, tl / 0.35)) if k > 0 else G2.suave(min(1.0, tl / 0.3))
