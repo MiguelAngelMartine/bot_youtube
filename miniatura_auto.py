@@ -63,8 +63,9 @@ def main(fecha):
     img = dia / "imagenes"
     items = next((p["ve"]["items"] for p in G["secciones"][0]["pasos"] if (p.get("ve") or {}).get("tipo") == "sumario"), [])
     enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
-    forzada = (enc.get("miniatura") or {}).get("persona") if isinstance(enc.get("miniatura"), dict) else enc.get("miniatura_persona")
-    if forzada:                                        # 12-nov: el director pide una persona concreta en la miniatura
+    forced = (enc.get("miniatura") or {}).get("persona") if isinstance(enc.get("miniatura"), dict) else enc.get("miniatura_persona")
+    forzada = forced or next((it.get("persona") for it in items if it.get("persona")), None)   # 13-nov: por defecto, el protagonista
+    if forzada:                                        # miniatura con foto REAL de la persona (mejor que FLUX)
         rc = _forzar_persona(fecha, forzada, items, G, cred, img)
         if rc is not None:
             return rc

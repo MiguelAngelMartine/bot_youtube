@@ -133,9 +133,17 @@ def main(fecha, n=3):
     redes = (dia / "redes.md").read_text(encoding="utf-8")[:30000] if (dia / "redes.md").exists() else ""
     enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
     obligada = ""
-    if enc.get("short_persona"):                       # 12-nov: el director pide un Short de una persona concreta
-        obligada += (f"\n\nOBLIGATORIO: uno de los Shorts es la frase más fuerte de {enc['short_persona']} del día "
-                     f"(comprobada literal en el material), con {enc['short_persona']} de protagonista.")
+    pedidos = []                                       # 13-nov: uno o varios Shorts obligados (persona y, si se da, tema)
+    if enc.get("short_persona"):
+        pedidos.append({"persona": enc["short_persona"]})
+    for x in (enc.get("shorts_personas") or []):
+        pedidos.append(x if isinstance(x, dict) else {"persona": x})
+    for i, pd in enumerate(pedidos):
+        quien_p, tema_p = pd.get("persona", ""), pd.get("tema", "")
+        obligada += (f"\n\nOBLIGATORIO: el Short {i + 1} es {quien_p}" + (f", sobre {tema_p}" if tema_p else "") +
+                     f", con su frase más fuerte del día (comprobada literal en el material) y {quien_p} de protagonista.")
+    if enc.get("evita_temas"):
+        obligada += f"\n\nEVITA estos temas (ya tratados o que no quiere el director): {', '.join(enc['evita_temas'])}."
     if enc.get("verificada") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
         redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
                 f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes
