@@ -800,6 +800,107 @@ def miniatura_pro(dia_txt, titular, destaca="", etiqueta_txt="", persona="", fot
     print(f"miniatura {plantilla} -> {out}")
 
 
+def _subrayado_brocha(ancho, color, grosor=46, semilla=0):
+    """Trazo de brocha horizontal (subrayado) con bordes rotos, como en la referencia del director (14-nov)."""
+    rng = np.random.default_rng(semilla)
+    w, h = ancho + 80, grosor + 30
+    m = Image.new("L", (w, h), 0)
+    d = ImageDraw.Draw(m)
+    cy = h // 2
+    arriba = [(x, cy - grosor / 2 + rng.uniform(-6, 6)) for x in range(0, w + 1, 16)]
+    abajo = [(x, cy + grosor / 2 + rng.uniform(-6, 6)) for x in range(w, -1, -16)]
+    d.polygon(arriba + abajo, fill=255)                # trazo recto (no lazo)
+    for _ in range(int(w / 6)):
+        x = rng.uniform(0, w)
+        if rng.random() < 0.25 or x < 40 or x > w - 40:
+            r = rng.uniform(1, 5)
+            yy = cy + rng.uniform(-grosor / 2 - 8, grosor / 2 + 8)
+            d.ellipse([x - r, yy - r, x + r, yy + r], fill=255)
+    capa = Image.new("RGBA", (w, h), color + (255,))
+    capa.putalpha(m.filter(ImageFilter.GaussianBlur(0.7)))
+    return capa
+
+
+def _degradado_rojo():
+    g = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(g).ellipse([-W * 0.3, -H * 0.4, W * 1.3, H * 1.1], fill=255)
+    g = ImageOps.invert(g.filter(ImageFilter.GaussianBlur(300)))
+    rojo = Image.new("RGBA", (W, H), (120, 10, 15, 255))
+    rojo.putalpha(g.point(lambda v: int(v * 0.4)))
+    ab = Image.new("L", (1, H))
+    for yy in range(H):
+        ab.putpixel((0, yy), int(150 * (yy / H) ** 2))
+    neg = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+    neg.putalpha(ab.resize((W, H)))
+    rojo.alpha_composite(neg)
+    return rojo
+
+
+def miniatura_titular(dia_txt, titular, destaca="", fondo="", salida="miniatura.png", persona=""):
+    """Miniatura estilo referencia del director (14-nov-2026): titular GIGANTE en 3 líneas (blanco con subrayado rojo de
+    brocha; la línea clave en amarillo), sobre el tema de fondo oscurecido. Con `persona` va a la izquierda, grande; sin
+    foto, el titular ocupa el centro. SIEMPRE la misma composición, haya foto o no."""
+    import itertools
+    dia = RAIZ / "dia" / dia_txt
+    img = dia / "imagenes"
+    f = img / fondo if fondo and (img / fondo).exists() else None
+    base = ImageOps.fit(Image.open(f).convert("RGB"), (W, H), Image.LANCZOS) if f else G2.fondo_marca(2.0).resize((W, H)).convert("RGB")
+    im = ImageEnhance.Brightness(base.filter(ImageFilter.GaussianBlur(1.5))).enhance(0.74).convert("RGBA")
+    im.alpha_composite(_degradado_rojo())
+    c = recorte(img / persona) if persona and (img / persona).exists() else None
+    zona_x0 = 40
+    if c is not None:
+        x = protagonista(im, c, centro=(0.28, 0.40), alto_cara=0.44)
+        zona_x0 = x or int(W * 0.46)
+    ancho_zona = W - zona_x0 - 60
+    limpio_t = titular.upper().replace("«", "").replace("»", "").replace('"', "").replace(",", "").replace(".", "")
+    palabras = [w for w in limpio_t.split() if w]
+    if len(palabras) <= 3:
+        lineas = palabras
+    else:
+        lineas = min(([" ".join(palabras[:i]), " ".join(palabras[i:j]), " ".join(palabras[j:])]
+                      for i, j in itertools.combinations(range(1, len(palabras)), 2)), key=lambda ls: max(map(len, ls)))
+    marca = {w.lower().strip(LIMPIA) for w in (destaca or "").split()}
+    amar = [k for k, l in enumerate(lineas) if marca & {w.lower().strip(LIMPIA) for w in l.split()}] or [len(lineas) - 1]
+    tams = []
+    for l in lineas:
+        t = 290
+        while t > 70 and fuente(ANTON, t).getlength(l) > ancho_zona:
+            t -= 6
+        tams.append(t)
+    sep = 34
+    d0 = ImageDraw.Draw(im)
+    def alto_linea(l, t):                              # alto REAL que ocupa la línea: caja de texto + mitad del subrayado
+        bb = d0.textbbox((0, 0), l, font=fuente(ANTON, t), stroke_width=max(6, t // 20))
+        return bb[3] + int(max(24, int(t * 0.15)) * 0.5)
+    arr, aba = 90, 80                                  # márgenes seguros arriba/abajo
+    for _ in range(12):                                # reducir todo a la vez hasta que quepa de verdad
+        total = sum(alto_linea(l, t) for l, t in zip(lineas, tams)) + sep * (len(lineas) - 1)
+        if total <= H - arr - aba:
+            break
+        tams = [max(60, int(t * 0.94)) for t in tams]
+    y = max(arr, (H - total) // 2)
+    for k, l in enumerate(lineas):
+        t = tams[k]
+        fnt = fuente(ANTON, t)
+        tw = int(fnt.getlength(l))
+        x = zona_x0 + (ancho_zona - tw) // 2
+        col = AMARILLO if k in amar else (255, 255, 255)
+        d = ImageDraw.Draw(im)
+        sw = max(6, t // 20)
+        d.text((x + 6, y + 7), l, font=fnt, fill=(0, 0, 0, 190))
+        d.text((x, y), l, font=fnt, fill=col + (255,), stroke_width=sw, stroke_fill=(10, 10, 12, 255))
+        bb = d.textbbox((x, y), l, font=fnt, stroke_width=sw)      # caja real: el subrayado, justo en el borde de abajo
+        sub = _subrayado_brocha(tw, ROJO, grosor=max(24, int(t * 0.15)), semilla=k)
+        im.alpha_composite(sub, (x - 40, bb[3] - int(sub.height * 0.5)))
+        y = bb[3] + sep
+    im.alpha_composite(G2.logo(100), (55, 45))
+    im = grano(im)
+    out = dia / salida
+    im.convert("RGB").resize((1280, 720), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.2, percent=60, threshold=2)).save(out)
+    print(f"miniatura titular{' con ' + persona if persona else ' (sin foto)'} -> {out}")
+
+
 # ---------- banner y avatar del canal ----------
 def partes_marca():
     """El nombre del canal en trozos con su color: «HOY» en amarillo dentro de «EL HOYFORMATIVO»."""

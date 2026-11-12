@@ -42,12 +42,10 @@ def _forzar_persona(fecha, nombre, items, G, cred, img):
         return None
     it = next((x for x in items if x.get("persona") == nombre or ape in (x.get("titular", "") + x.get("texto", ""))), None)
     titular = (it.get("titular") or it.get("texto") if it else "") or f"{ape}, a la carga"
-    rival = enc_rival(RAIZ / "dia" / fecha, nombre, cred, img)   # solo si el director lo pide expresamente
     fondo = next((f for f in (sorted((RAIZ / "dia" / fecha / "vinetas").glob("s*_*.jpg")) or []) ), None)
-    M.ESTILO = dict(M.ESTILOS["clasico"], invierte=False)
-    M.miniatura(fecha, titular, it.get("destaca", "") if it else "", (it.get("etiqueta", "") if it else "") or ape.upper(),
-                fa, ("../vinetas/" + fondo.name) if fondo else "", False, "miniatura.png", rival, "", "")
-    print(f"miniatura: {nombre}" + (f" vs rival" if rival else "") + f" · «{titular}»")
+    M.miniatura_titular(fecha, titular, it.get("destaca", "") if it else "",   # composición de referencia del director (14-nov)
+                        ("../vinetas/" + fondo.name) if fondo else "", "miniatura.png", fa)
+    print(f"miniatura (titular): {nombre} · «{titular}»")
     return 0
 
 
@@ -111,26 +109,20 @@ def main(fecha):
                 fondos = [dest.name] + fondos
     except Exception as e:
         print(f"  fondos generados: {type(e).__name__}: {e}")
-    try:                                               # 11-nov: siempre una versión temática (sin persona), el estilo del director
-        M.miniatura_tematica(fecha, titular, fondos[0] if fondos else "", fondos[1] if len(fondos) > 1 else "",
-                             "miniatura_tematica.png")
-        hechas.append(("tematica", "miniatura_tematica.png"))
+    fondo_t = fondos[0] if fondos else ""              # 14-nov: composición de referencia del director (SIEMPRE la misma)
+    try:                                               # versión sin persona (titular gigante sobre el tema)
+        M.miniatura_titular(fecha, titular, it.get("destaca", ""), fondo_t, "miniatura_titular.png")
+        hechas.append(("titular", "miniatura_titular.png"))
     except Exception as e:
-        print(f"  temática: {type(e).__name__}: {e}")
+        print(f"  titular: {type(e).__name__}: {e}")
     foto_buena = persona and float(cred.get(_retrato(cred, persona, img), {}).get("puntos_gemini", 0) or 0) >= 8
-    usados = json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else []
-    libres = [e for e in M.ESTILOS if e not in usados[-4:]] or list(M.ESTILOS)
-    rnd = random.Random(fecha)
-    probar = rnd.sample(libres, min(1 if foto_buena else 0, len(libres)))   # con persona, solo si su foto es muy buena
-    for k, est in enumerate(probar):
-        M.ESTILO = dict(M.ESTILOS[est], invierte=rnd.random() < 0.5)
-        sal = f"miniatura_{est}.png"
+    if foto_buena:                                     # misma composición con la foto real a la izquierda (si es muy buena)
         try:
-            M.miniatura(fecha, titular, it.get("destaca", ""), it.get("etiqueta", ""), _retrato(cred, persona, img),
-                        fondo, False, sal, _retrato(cred, rival, img) if rival else "", "", "")
-            hechas.append((est, sal))
+            M.miniatura_titular(fecha, titular, it.get("destaca", ""), fondo_t, "miniatura_titular_persona.png",
+                                _retrato(cred, persona, img))
+            hechas.append(("titular_persona", "miniatura_titular_persona.png"))
         except Exception as e:
-            print(f"  estilo {est}: {type(e).__name__}: {e}")
+            print(f"  titular con persona: {type(e).__name__}: {e}")
     if not hechas:
         return 1
     r = subprocess.run([sys.executable, "director_arte.py", fecha] + [s for _, s in hechas], cwd=RAIZ)
@@ -138,8 +130,9 @@ def main(fecha):
     if floja:
         shutil.copy(dia / hechas[0][1], dia / "miniatura.png")
     elegida = next((e for e, s in hechas if (dia / s).read_bytes() == (dia / "miniatura.png").read_bytes()), hechas[0][0])
+    usados = (json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else [])
     REG.write_text(json.dumps((usados + [elegida])[-20:]), encoding="utf-8")
-    print(f"miniatura: estilo {elegida} · «{titular}» · {persona}" + (f" vs {rival}" if rival else ""))
+    print(f"miniatura: {elegida} · «{titular}» · {persona}" + (f" vs {rival}" if rival else ""))
     return 3 if floja else 0                            # 3: no llega al nivel; jornada.py llama al diseñador de Claude
 
 
