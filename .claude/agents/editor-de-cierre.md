@@ -39,3 +39,6 @@ Comprueba:
 - que todos los `cuando` estén literales en su texto.
 
 Responde con la lista de secciones, las palabras de cada una, el total y la duración estimada.
+
+## Estilo (desde el 12-nov-2026)
+El vídeo va en tono fluido y desenfadado (`oficina/GUION_ESTILO.md`): el **sumario** abre con un gancho coloquial («Vamos con lo gordo del día, que hoy hay tela…») y cierra con «Vamos al lío»; resume las 3-4 noticias con el mismo tono. La **corrección** va honesta y directa, sin chascarrillos. La **despedida**: «Si te ha servido, suscríbete y dale a la campanita. Y si no, también, hombre, que no cuesta nada. Gracias por vernos. Mañana, más.» Cifras en dígitos.

@@ -15,7 +15,7 @@ from pathlib import Path
 import gem
 
 RAIZ = Path(__file__).parent
-COMUNES = [RAIZ / "oficina" / "LIBRO_DE_ESTILO.md", RAIZ / "oficina" / "CONTRATOS.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md"]
+COMUNES = [RAIZ / "oficina" / "LIBRO_DE_ESTILO.md", RAIZ / "oficina" / "CONTRATOS.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md", RAIZ / "oficina" / "GUION_ESTILO.md"]
 
 
 def instrucciones(puesto):

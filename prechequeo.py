@@ -13,8 +13,7 @@ MEDIOS = ["El País", "elDiario", "Público", "La Vanguardia", "RTVE", "Europa P
           "El Confidencial", "El Mundo", "ABC", "La Razón", "EFE", "Telecinco", "Antena 3", "laSexta", "La Sexta",
           "Cadena SER", "COPE", "Onda Cero", "El Español", "OKdiario", "Vozpópuli", "The Objective"]
 SILENCIO = re.compile(r"no consta (su |ninguna )?(respuesta|réplica)|no ha (respondido|contestado|replicado)|sin (respuesta|réplica)|no hubo (respuesta|réplica)", re.I)
-PROHIBIDAS = ["zasca", "le dio un repaso", "humill", "destroz", "se retrata", "escándalo", "vergonzoso", "histórico",
-              "ni más ni menos", "y es que", "ojo,", "atentos"]
+PROHIBIDAS = ["zasca", "le dio un repaso", "humill", "destroz", "se retrata"]   # 12-nov: solo lo que declara un ganador
 CIFRA = re.compile(r"\d")
 
 
@@ -33,9 +32,7 @@ def chequea(fecha, nn):
             fallos.append(f"palabra o muletilla prohibida: «{w}»")
     for k, p in enumerate(pasos):
         di = p.get("di", "")
-        if CIFRA.search(di):
-            fallos.append(f"paso {k}: cifra escrita con números en la voz («{CIFRA.search(di).group(0)}…»): con letras")
-        ve = p.get("ve") or {}
+        ve = p.get("ve") or {}      # 12-nov: las cifras en la voz van en DÍGITOS (nuevo estilo); ya no se marcan
         textos = [ve.get("cuando")] + [it.get("cuando") for it in ve.get("items", []) if isinstance(it, dict)]
         resto = " ".join(q.get("di", "") for q in pasos[k:])
         for c in filter(None, textos):

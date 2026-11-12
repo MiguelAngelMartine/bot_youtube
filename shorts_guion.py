@@ -16,8 +16,8 @@ import gem
 RAIZ = Path(__file__).parent
 EJEMPLOS = (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").read_text(encoding="utf-8") if (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").exists() else ""   # EJEMPLOS_GANCHOS: aprende del director
 
-PROMPT = """Eres el editor de Shorts de «El Hoyformativo», informativo de política española en YouTube: neutral y riguroso,
-pero con gancho (el «salseo»: los cruces de declaraciones entre políticos). Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
+PROMPT = """Eres el guionista de Shorts de «El Hoyformativo»: política española en tono DESENFADADO Y CON OPINIÓN LIGERA, estilo «La
+Pulla» o «Vikingo Blanco» (lee oficina/GUION_ESTILO.md). Humor e ironía sobre TODOS por igual, SIN tomar partido. Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
 para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - Prioriza los de la sección «GANCHOS DEL DÍA» (al principio del material; los «del director», primero): frases cortas
   con impacto, zascas y cruces con respuesta.
@@ -40,9 +40,12 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   de personas y partidos distintos con un hilo común (impuestos, corrupción, el voto...): ponlos en "segmentos" (cada
   uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-3 frases) y deja "cita" y
   "gancho" del Short iguales a los del primero. Con varios ganchos dura 40-60 s.
-- "entrada": cómo lo dice la voz antes de la cita, ≤ 14 palabras, neutra («Isabel Díaz Ayuso, sobre Sánchez, en X:»).
-- "contexto": 4-6 frases de 20 palabras como mucho cada una (60-90 palabras: el Short dura 25-40 s; decisión del usuario del 10-nov-2026 tras ver las
-  estadísticas: los cortos se ven enteros y se repiten, los largos se abandonan), escritas para el oído y con conectores. Tómalas y adáptalas del GUION
+- "entrada": cómo PRESENTA la voz la cita, en tono de bar y ≤ 16 palabras («Ojo a lo que suelta Ayuso en redes», «Y va
+  Colau y le dice a la marquesa»). Sin «aseguró», «por su parte», «afirma».
+- "contexto": 4-6 frases FLUIDAS y coloquiales (60-90 palabras: el Short dura 25-40 s). Que fluya como una conversación:
+  frases de longitud variada, comas y puntos suspensivos para las pausas, conectores orales («Y claro…», «Mira…», «Fíjate…»),
+  verbos coloquiales, y algo de ironía sobre la situación (nunca a favor de un bando). Cifras en DÍGITOS («47 detenidos»,
+  «el 41 por ciento», «29 de noviembre»). Nada de ráfagas de frases de una palabra (con Tristán suenan abruptas)., escritas para el oído y con conectores. Tómalas y adáptalas del GUION
   APROBADO del bloque donde sale la frase (ya está verificado): qué ha pasado, a qué se refiere la frase, el dato o
   antecedente que ayuda a entenderla (quién, cuándo, cuánto) y, si el guion la da, la versión de la otra parte. Un
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
