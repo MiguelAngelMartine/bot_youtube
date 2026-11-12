@@ -18,6 +18,21 @@ REGLAS = ("photorealistic editorial news photograph, dramatic cinematic lighting
           "no text, no letters, no logos, no flags with text. Scene: ")
 
 
+def _openai(prompt, destino):
+    import base64
+    key = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text().splitlines()
+               if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
+    if not key:
+        return False
+    r = requests.post("https://api.openai.com/v1/images/generations", headers={"Authorization": f"Bearer {key}"}, timeout=180,
+                      json={"model": "gpt-image-2", "prompt": prompt, "size": "1536x1024", "n": 1})
+    if not r.ok:                                        # p. ej. safety_violations=[political]: lo coge FLUX
+        print(f"  (OpenAI no genera: {r.json().get('error', {}).get('message', r.status_code)[:90]})")
+        return False
+    Path(destino).write_bytes(base64.b64decode(r.json()["data"][0]["b64_json"]))
+    return True
+
+
 def _gemini(prompt, destino):
     import gem
     for k in gem._claves():
@@ -50,11 +65,12 @@ def _flux(prompt, destino):
 def genera(descripcion, destino):
     """Devuelve "gemini", "flux" o None."""
     prompt = REGLAS + descripcion
-    try:
-        if _gemini(prompt, destino):
-            return "gemini"
-    except Exception:
-        pass
+    for motor, fn in (("openai", _openai), ("gemini", _gemini)):   # 12-nov: OpenAI primero (lo no político), luego Gemini
+        try:
+            if fn(prompt, destino):
+                return motor
+        except Exception:
+            pass
     try:
         if _flux(prompt, destino):
             return "flux"
