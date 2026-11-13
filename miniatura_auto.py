@@ -62,17 +62,24 @@ def main(fecha):
     items = next((p["ve"]["items"] for p in G["secciones"][0]["pasos"] if (p.get("ve") or {}).get("tipo") == "sumario"), [])
     enc = json.loads((dia / "encargo.json").read_text(encoding="utf-8")) if (dia / "encargo.json").exists() else {}
     forced = (enc.get("miniatura") or {}).get("persona") if isinstance(enc.get("miniatura"), dict) else enc.get("miniatura_persona")
-    forzada = forced or next((it.get("persona") for it in items if it.get("persona")), None)   # 13-nov: por defecto, el protagonista
-    if forzada:                                        # miniatura con foto REAL de la persona (mejor que FLUX)
-        rc = _forzar_persona(fecha, forzada, items, G, cred, img)
+    if forced:                                         # el director fija una persona: miniatura con su FOTO REAL
+        rc = _forzar_persona(fecha, forced, items, G, cred, img)
         if rc is not None:
             return rc
-        print(f"  (no hay foto buena de {forzada}: miniatura temática)")
-    it = next((x for x in items if x.get("persona") and _retrato(cred, x["persona"], img)), items[0] if items else {})
+        print(f"  (no hay foto buena de {forced}: sigue con OpenAI/temática)")
     import apto_anuncios as AA                         # 10-nov: la miniatura, sin tacos ni insultos personales
-    if not AA.limpio(it.get("titular") or it.get("texto") or ""):
-        it = next((x for x in items if AA.limpio(x.get("titular") or x.get("texto") or "")), it)
+    it = next((x for x in items if AA.limpio(x.get("titular") or x.get("texto") or "")), items[0] if items else {})
     titular = (it.get("titular") or it.get("texto") or G.get("titulo_video", "")).strip()
+    sec = G["secciones"][it["seccion"]] if isinstance(it.get("seccion"), int) and it["seccion"] < len(G["secciones"]) else None
+    sec_txt = " ".join(p.get("di", "") for p in sec["pasos"])[:600] if sec else titular
+    try:                                               # 13-nov (el usuario): la miniatura la hace OpenAI como PRIMERA opción,
+        import imagen_fondo as IF                       # con el texto gancho incrustado y un fondo del contexto, sin caras
+        if titular and IF.miniatura_openai(titular, sec_txt, dia / "miniatura.png"):
+            print(f"miniatura: OpenAI · «{titular}»")
+            return 0
+        print("  (OpenAI no hizo la miniatura: la hace miniatura.py con el titular)")
+    except Exception as e:
+        print(f"  (OpenAI miniatura: {type(e).__name__}: {e})")
     persona = it.get("persona", "")
     rival = ""
     sec = G["secciones"][it["seccion"]] if isinstance(it.get("seccion"), int) and it["seccion"] < len(G["secciones"]) else None

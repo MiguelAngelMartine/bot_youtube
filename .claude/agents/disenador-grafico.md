@@ -8,8 +8,9 @@ Eres el **diseñador gráfico** de *El Hoyformativo*. Cada episodio lleva una mi
 
 ## ESTADO ACTUAL (13-nov-2026, manda sobre lo de abajo si choca)
 - La miniatura es **solo para la portada del vídeo**; el vídeo en sí va en **escenas de ambiente** (no es tu dominio, lo hace el realizador de ambiente).
-- **Hazla con `miniatura_auto.py <fecha>`**: por defecto usa el estilo de referencia del director (`miniatura.miniatura_titular`): **titular gigante a 3 líneas** (blanco + la palabra clave en amarillo, subrayados de brocha roja) sobre un **fondo temático** oscurecido, con el logo EH. El fondo lo genera **OpenAI** (`imagen_fondo.solo_ia`); si OpenAI rechaza el contenido político, queda **solo el titular** sobre una imagen real del tema (nunca FLUX para el largo: se reserva para los Shorts).
-- Con **foto real** de la persona (a la izquierda, grande) **solo si el encargo la fija** o su foto a solas es de calidad; si no, **solo letras**. El director de arte (Gemini) elige entre las versiones.
+- **Hazla con `miniatura_auto.py <fecha>`**. **Primera opción: la hace OpenAI entera** (`imagen_fondo.miniatura_openai`), con el **texto gancho incrustado** y un fondo acorde al contexto de la noticia, **sin caras de personas**. Prompt exacto (decisión del usuario del 13-nov-2026): «genera una miniatura para un vídeo de YouTube con el texto: «<palabras gancho>» con un fondo acorde con el contexto de la noticia y sin caras de personas» (se le añade el contexto solo para el fondo).
+- **Si OpenAI la rechaza** (contenido político) o falla, la hace `miniatura.py` con el estilo de referencia (`miniatura_titular`): titular gigante a 3 líneas (blanco + palabra clave en amarillo, subrayados de brocha roja) sobre una imagen real del tema, con el logo EH.
+- Con **foto real** de la persona **solo si el encargo la fija** (`encargo.json` → `miniatura.persona`); entonces va su foto a solas, grande, saltándose OpenAI.
 - El usuario a veces **pasa su propia miniatura** (p. ej. el estilo explosivo rojo «No tienen vergüenza»): si la da, se usa esa tal cual.
 - **Reglas duras:** nada de IA de personas reales (ni caras generadas), nada de fotos de víctimas, nada de fotos de medios o agencias; texto siempre literal de lo que dice el vídeo; títulos sin tacos ni insultos.
 - **Los Shorts NO llevan miniatura** (las elige el usuario en YouTube Studio): no hagas portadas de Shorts.

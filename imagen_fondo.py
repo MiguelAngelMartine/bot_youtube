@@ -33,6 +33,37 @@ def _openai(prompt, destino):
     return True
 
 
+def miniatura_openai(gancho, contexto, destino):
+    """13-nov-2026 (decisión del usuario): la miniatura la hace OpenAI como PRIMERA opción, con el texto gancho ya
+    incrustado. Prompt exacto del usuario. `destino` queda en 1280x720. Devuelve True si OpenAI la generó, False si no
+    (entonces la hace miniatura.py con el titular sobre una imagen)."""
+    import base64
+    import io
+
+    from PIL import Image, ImageOps
+    key = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text().splitlines()
+               if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
+    if not key:
+        return False
+    prompt = (f"genera una miniatura para un vídeo de YouTube con el texto: «{gancho.strip()}» con un fondo acorde con el "
+              f"contexto de la noticia y sin caras de personas")
+    if contexto:
+        prompt += f". Contexto de la noticia (solo para el fondo, no lo escribas): {contexto.strip()[:600]}"
+    try:
+        r = requests.post("https://api.openai.com/v1/images/generations", headers={"Authorization": f"Bearer {key}"},
+                          timeout=200, json={"model": "gpt-image-2", "prompt": prompt, "size": "1536x1024",
+                                             "quality": "medium", "n": 1})
+    except requests.RequestException as e:
+        print(f"  (OpenAI miniatura falla: {type(e).__name__})")
+        return False
+    if not r.ok:                                           # p. ej. contenido político: lo hace miniatura.py
+        print(f"  (OpenAI no hace la miniatura: {r.json().get('error', {}).get('message', r.status_code)[:90]})")
+        return False
+    im = Image.open(io.BytesIO(base64.b64decode(r.json()["data"][0]["b64_json"]))).convert("RGB")
+    ImageOps.fit(im, (1280, 720), Image.LANCZOS).save(destino, quality=92)
+    return True
+
+
 def _gemini(prompt, destino):
     import gem
     for k in gem._claves():
