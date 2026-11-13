@@ -182,10 +182,11 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             ne = nota(ve["etiqueta"], 700, 38, color=AMARILLA)
             out.append((ne, 720, y + 10, te))
             y += ne.height + 10
-        ap = ve["aparte"]
-        ta = cuando(ap.get("cuando"), t0 + 6)
-        out.append((pegatina(ap["nombre"].upper(), (150, 150, 160), BLANCO, 44), 720, y + 30, ta))
-        out.append((nota(ap["texto"], 760, 34, "Fuentes: " + ve.get("fuente", "")), 720, y + 120, ta + 0.5))
+        ap = ve.get("aparte")
+        if ap:
+            ta = cuando(ap.get("cuando"), t0 + 6)
+            out.append((pegatina(ap["nombre"].upper(), (150, 150, 160), BLANCO, 44), 720, y + 30, ta))
+            out.append((nota(ap["texto"], 760, 34, "Fuentes: " + ve.get("fuente", "")), 720, y + 120, ta + 0.5))
     elif tipo in ("claves", "cronologia", "sumario"):
         titulo = "HOY EN EL RESUMEN" if tipo == "sumario" else ve["titulo"]
         out.append((pegatina(titulo, tam=46), 40, 56, t0 + 0.1))
@@ -226,6 +227,7 @@ def piezas_h(ve, T, c0, t0, fotos, cred, foto, usadas):
             out.append((nt, 480, y + 58, ti + 0.2))
             y += 58 + nt.height - 12
     elif tipo == "breve":
+        ve.setdefault("titular", ve.get("sub", ""))    # breve sin titular: el sub hace de titular
         out.append((pegatina(ve["lugar"], ROJO, BLANCO, 44), 40, 30, t0 + 0.1))
         if 0 in ve.get("_vin", {}):
             out.append((VIN.vineta(None, ve["titular"], 700, sobrio=ve.get("_sobrio", False),
