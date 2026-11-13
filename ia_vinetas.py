@@ -36,6 +36,14 @@ PERSONA = ("Redraw the person from image 0 as a wordless European ligne claire c
            "pose and framing as image 0, calm serious expression, drawn with respect. {escena}"
            "Plain simple background. No text, no letters, no speech bubbles.")
 SOBRIO = ", muted desaturated colors, quiet respectful mood"
+# 13-nov-2026 (el usuario: «escenas relacionadas con lo que se narra pero SIN personajes en primer plano»): plano general
+# del lugar o del objeto, sin figuras cercanas; como mucho, siluetas lejanas y pequeñas de fondo.
+ESTILO_AMBIENTE = ("wordless European ligne claire comic illustration, clean uniform thin black outlines, flat clean colors "
+                   "without gradients, a richly detailed ESTABLISHING WIDE SHOT of a place or object, set in Spain with typical "
+                   "Spanish architecture (wrought-iron balconies, shutters, plazas, bar terraces), sense of depth and distance. "
+                   "NO people in the foreground, no characters close to the camera, no faces; at most a few tiny distant "
+                   "silhouettes in the far background. Empty quiet scene, plain surfaces without writing, every box, screen, "
+                   "paper and sign blank and unlabeled, silent scene: ")
 
 
 def _claves():
@@ -55,16 +63,17 @@ def _jpg(ruta, lado=500):
     return b.getvalue()
 
 
-def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0):
+def ilustra(escena, retrato: Path | None = None, sobrio=False, intento=0, ambiente=False):
     """escena: descripcion en ingles de lo que se ve (sin texto). retrato: foto real de la persona, si la hay.
+    ambiente=True: plano general del lugar/objeto, SIN personajes en primer plano (13-nov-2026).
     intento: para pedir otra version de la misma escena. Devuelve RGB o lanza RuntimeError (sin claves)."""
-    if retrato:
+    if retrato and not ambiente:
         modelo = PERSONAS
         prompt = PERSONA.format(escena=(escena.strip().rstrip(".") + ". ") if escena else "") + (SOBRIO if sobrio else "")
         fotos = [_jpg(retrato), _jpg(REFERENCIA)]
     else:
         modelo = ESCENAS
-        prompt = ESTILO + escena.strip().rstrip(".") + (SOBRIO if sobrio else "")
+        prompt = (ESTILO_AMBIENTE if ambiente else ESTILO) + escena.strip().rstrip(".") + (SOBRIO if sobrio else "")
         fotos = []
     import variedad                                     # 8-nov: una viñeta no se repite en 7 días: otra versión
     for _ in range(6):
