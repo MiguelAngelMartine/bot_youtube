@@ -25,6 +25,12 @@ Tristán respeta la puntuación: la coma es pausa corta, el punto pausa larga, l
 - Enlaza las ideas con conectores; que un bloque fluya como una conversación, no como viñetas sueltas.
 - Una idea larga, pártela en dos frases unidas por una coma o un conector, no en cinco trozos secos.
 
+## La voz oficial: Tristán HD «A» (desde el 13-nov-2026)
+La voz es **Tristán HD de Azure a temperatura 1,0, velocidad normal y filtro «radio»** (voz «A», elegida por el usuario entre pruebas): es **expresiva y con energía**. El guion tiene que **aprovechar esa energía y adaptarse a su ritmo** para que todo salga fluido y natural:
+- A temperatura 1,0 la voz entona con fuerza y variedad: dale material para ello con **frases bien rematadas y puntuación clara** (comas, puntos, puntos suspensivos). Si escribes atropellado, la energía se vuelve ansiedad; si escribes con pausas, suena segura y natural.
+- **Ritmo marcado pero natural**: alterna frases medias con remates cortos, sin ráfagas de una palabra (suenan a ametralladora) y sin frases kilométricas sin comas (se queda sin aire). Léelo en voz alta: tiene que sonar a una persona con chispa contándolo, no a locutor plano ni a sobreactuado.
+- Una pregunta o exclamación suelta de vez en cuando le sienta muy bien (se sintetizan aparte para que entonen); **con medida**, no en cada frase.
+
 ## Compatibilidad con Tristán (voz TTS de Azure)
 - **Cifras en DÍGITOS**, no con letras: «35 a 34», «el 41 por ciento», «29 de noviembre», «47 detenidos», «50 euros».
   Tristán los lee bien en español y el oyente los procesa antes. (Antes se escribían con letra: ya no.)

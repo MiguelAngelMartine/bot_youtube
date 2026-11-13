@@ -28,7 +28,8 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
-AZURE_TEMP = "0.8"                                 # 12-nov-2026: «fluido_08», elegida por el usuario
+AZURE_TEMP = "1.0"                                 # 13-nov-2026: voz «A» (temperatura 1,0, más expresiva, velocidad normal
+#                                                    y filtro «radio»), elegida por el usuario entre pruebas. Sustituye a 0,8.
 RADIO = ("highpass=f=70,equalizer=f=150:t=q:w=1.0:g=4,equalizer=f=350:t=q:w=1.5:g=1.5,"
          "equalizer=f=5500:t=q:w=2.0:g=-5,lowpass=f=12500,"
          "acompressor=threshold=-16dB:ratio=3:attack=4:release=130,alimiter=limit=0.92")   # 12-nov: filtro «radio»
@@ -271,7 +272,8 @@ def locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     import json
     import shutil
     fuentes = "".join((Path(__file__).parent / m).read_text(encoding="utf-8") for m in ("voz.py", "pausas.py"))
-    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes, motor()],
+    cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO] if motor() == "azure" else []   # la config de voz entra en la clave
+    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes, motor()] + cfg,
                                     ensure_ascii=False).encode()).hexdigest()[:20]
     wav_c, meta_c = CACHE / f"{clave}.wav", CACHE / f"{clave}.json"
     if wav_c.exists() and meta_c.exists():
