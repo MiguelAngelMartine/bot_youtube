@@ -195,42 +195,66 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None):
     return full, small
 
 
-def _dibuja_polas(fr, t, quotes, full, small, modo):
-    """Dibuja la(s) Polaroid(s) activa(s) en el instante t: la de la cita en curso (grande, con pop); si viene de un cruce
-    con otra persona, la anterior se queda pequeña al lado (conversación) hasta que acaba la cita."""
+def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None):
+    """Dibuja la(s) Polaroid(s) activa(s) en el instante t y, en el largo, también coloca el recuadro de la frase (caja):
+      · UNA sola Polaroid -> Polaroid a la izquierda y el recuadro a la derecha;
+      · DOS Polaroids (cruce/conversación) -> las dos arriba, justo encima del recuadro, y el recuadro centrado abajo;
+      · ninguna -> el recuadro centrado abajo.
+    En los Shorts (vertical) no caben lado a lado: Polaroid(s) arriba y el recuadro lo pone el llamador debajo."""
     W, H = fr.size
     i = next((k for k, (a, b, p) in enumerate(quotes) if a - 0.12 <= t <= b), None)
-    if i is None:
-        return
-    a, b, p = quotes[i]
-    pop = 0.84 + 0.16 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
+    estado = "none"
+    if i is not None:
+        a, b, p = quotes[i]
+        prev = quotes[i - 1] if i > 0 else None
+        conversa = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in small and p in full)
+        estado = "double" if conversa else ("single" if p in full else "none")
 
     def esc(img, s):
         return img.resize((max(1, int(img.width * s)), max(1, int(img.height * s))), Image.BILINEAR) if abs(s - 1) > 0.004 else img
-    prev = quotes[i - 1] if i > 0 else None
-    conversa = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in full)
-    cur = full.get(p)
-    if modo == "largo":                                    # zona alta (el recuadro de la frase va abajo)
-        y = 185
-        if conversa and cur:
+
+    def pop_de(a):
+        return 0.84 + 0.16 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
+
+    if modo == "largo":
+        if estado == "single":
+            a, b, p = quotes[i]
+            cim = esc(full[p], pop_de(a))
+            py = H - 90 - cim.height
+            fr.alpha_composite(cim, (100, py))
+            if caja is not None:
+                cx = min(100 + cim.width + 55, W - caja.width - 60)
+                fr.alpha_composite(caja, (cx, H - 80 - caja.height))
+        elif estado == "double":
+            a, b, p = quotes[i]; prev = quotes[i - 1]
+            cim = esc(full[p], pop_de(a))
             ps = small.get(prev[2])
+            cjy = H - 70 - (caja.height if caja is not None else 0)
+            if caja is not None:
+                fr.alpha_composite(caja, ((W - caja.width) // 2, cjy))
+            bb = cjy - 22
+            gap = 44
+            grp = (ps.width + gap if ps else 0) + cim.width
+            sx = (W - grp) // 2
             if ps:
-                fr.alpha_composite(ps, (90, y + 70))
-            cim = esc(cur, pop)
-            fr.alpha_composite(cim, (W - cim.width - 110, y))
-        elif cur:
-            cim = esc(cur, pop)
-            fr.alpha_composite(cim, (90, y))
-    else:                                                  # short (vertical): arriba
-        if conversa and cur:
-            ps = small.get(prev[2])
-            if ps:
-                fr.alpha_composite(ps, (30, 250))
-            cim = esc(cur, pop)
-            fr.alpha_composite(cim, (W - cim.width - 30, 230))
-        elif cur:
-            cim = esc(cur, pop)
-            fr.alpha_composite(cim, ((W - cim.width) // 2, 220))
+                fr.alpha_composite(ps, (sx, bb - ps.height)); sx += ps.width + gap
+            fr.alpha_composite(cim, (sx, bb - cim.height))
+        elif caja is not None:
+            fr.alpha_composite(caja, ((W - caja.width) // 2, H - 70 - caja.height))
+        return
+
+    # short (vertical): Polaroid(s) arriba (el recuadro lo pone el llamador debajo)
+    if estado == "double":
+        a, b, p = quotes[i]; prev = quotes[i - 1]
+        ps = small.get(prev[2])
+        if ps:
+            fr.alpha_composite(ps, (30, 250))
+        cim = esc(full[p], pop_de(a))
+        fr.alpha_composite(cim, (W - cim.width - 30, 230))
+    elif estado == "single":
+        a, b, p = quotes[i]
+        cim = esc(full[p], pop_de(a))
+        fr.alpha_composite(cim, ((W - cim.width) // 2, 220))
 
 
 def _foto_persona(dia, fecha, nombre, cargo=""):
@@ -514,7 +538,7 @@ def largo(fecha):
             ei = min(ne - 1, int(j * ne / max(1, len(frases))))
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
-        cajas = [SH._caja(f.strip(), ancho=1480, tam=44) for f in frases]
+        cajas = [SH._caja(f.strip(), ancho=1180, tam=44) for f in frases]
         # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
@@ -554,11 +578,9 @@ def largo(fecha):
         som = Image.new("RGBA", (AN2, 430), (6, 10, 22, 255)); som.putalpha(g)
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
-        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo")
         fi = max([j for j, te in enumerate(bl["tf"]) if te <= t] or [0]) if bl["tf"] else 0
-        if bl["cajas"]:
-            caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)]
-            fr.alpha_composite(caja, ((AN2 - caja.width) // 2, AL2 - 70 - caja.height))
+        caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)] if bl["cajas"] else None
+        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo", caja)
         return fr
 
     out = dia / "episodio.mp4"
