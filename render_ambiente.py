@@ -282,9 +282,17 @@ def largo(fecha):
                 except Exception as e:
                     print(f"  (L{i} escena {k}: {type(e).__name__})"); continue
             rutas.append(d_)
+        if not rutas:                                     # sin cuota de FLUX: otras escenas de AMBIENTE del día, nunca con personas
+            pool = sorted((dia / "vinetas").glob("*_env_*.jpg"))
+            if pool:
+                rutas = pool[:2]
+            else:                                         # ni eso: fondo de marca (sin personas), no una viñeta cualquiera
+                bg = dia / "vinetas" / "_fondo_marca.jpg"
+                if not bg.exists():
+                    G2.fondo_marca(2.0).resize((1280, 720)).convert("RGB").save(bg, quality=90)
+                rutas = [bg]
         escenas = [_escena_viva(r, "camera slowly pushes in, subtle natural motion", animar=(i < 2 and kk < 1),
-                                w=AN2, h=AL2) for kk, r in enumerate(rutas)] or [_escena_viva(
-            next(iter(sorted((dia / "vinetas").glob("*.jpg"))), None) or rutas, "", False, w=AN2, h=AL2)]
+                                w=AN2, h=AL2) for kk, r in enumerate(rutas)]
         # cambios de escena por frase dentro del bloque
         frases = [f for f in re.split(r"(?<=[.?!])\s+", btxt) if f.strip()]
         tf, pos = [], c
@@ -304,6 +312,8 @@ def largo(fecha):
     for a, b in zip(bloques, bloques[1:]):
         a["t1"] = b["t0"]
     bloques[-1]["t1"] = total
+    for bl in bloques:                                     # cabecera cacheada por bloque (no se rehace cada fotograma)
+        bl["cab"] = _cabecera16(fecha, bl["i"] + 1, bl["n"], bl["titulo"], bl["fuentes"])
     cortes = [cc[0] for bl in bloques for cc in bl["cambios"][1:]] + [bl["t0"] for bl in bloques[1:]]
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.2, [], efectos=[(x, "whoosh") for x in sorted(cortes)],
                   con_sintonia=True)
@@ -323,7 +333,7 @@ def largo(fecha):
             prev = _vista(bl["escenas"][ip], t - cam[kc - 1][0], 6, ip, w=AN2, h=AL2)
             comp = Image.new("RGBA", (AN2, AL2)); comp.paste(prev, (int(-AN2 * 0.2 * q), 0))
             comp.alpha_composite(fr, (int(AN2 * (1 - q)), 0)); fr = comp
-        fr.alpha_composite(_cabecera16(fecha, bl["i"] + 1, bl["n"], bl["titulo"], bl["fuentes"]), (0, 0))
+        fr.alpha_composite(bl["cab"], (0, 0))
         fi = max([j for j, te in enumerate(bl["tf"]) if te <= t] or [0]) if bl["tf"] else 0
         if bl["cajas"]:
             caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)]
@@ -331,17 +341,55 @@ def largo(fecha):
         return fr
 
     out = dia / "episodio.mp4"
-    ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN2}x{AL2}",
-                           "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
-                           "-crf", "21", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
-                           "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], stdin=subprocess.PIPE)
     import multiprocessing as mp
+    import os
+    import time
     total_fr = int(math.ceil(total * FPS))
-    for fi2 in range(total_fr):
-        if fi2 % 900 == 0:
-            print(f"  fotograma {fi2}/{total_fr}", flush=True)
-        ff.stdin.write(cuadro(fi2 / FPS).tobytes())
-    ff.stdin.close(); ff.wait()
+    nproc = max(1, min(int(os.environ.get("RENDER_PROCESOS", os.cpu_count() or 1)), total_fr // (FPS * 10) or 1))
+    bordes = [total_fr * k // nproc for k in range(nproc + 1)]
+    t_ini = time.time()
+
+    def dibuja_trozo(k):
+        a, b = bordes[k], bordes[k + 1]
+        ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN2}x{AL2}",
+                               "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
+                               "-threads", "2", "-pix_fmt", "yuv420p", str(tmp / f"trozo{k}.mp4")], stdin=subprocess.PIPE)
+        for fi2 in range(a, b):
+            if k == 0 and (fi2 - a) % (FPS * 20) == 0:
+                print(f"  fotograma {(fi2 - a) * nproc}/{total_fr} aprox. ({nproc} a la vez)", flush=True)
+            ff.stdin.write(cuadro(fi2 / FPS).tobytes())
+        ff.stdin.close()
+        return ff.wait()
+
+    if nproc > 1:
+        try:
+            import cv2 as _cv2
+            _cv2.setNumThreads(1)                          # evitar que el fork cuelgue con los hilos de OpenCV vivos
+        except ImportError:
+            pass
+        ctx = mp.get_context("fork")
+
+        def hijo(k):
+            try:
+                os._exit(dibuja_trozo(k))
+            except Exception:
+                import traceback
+                traceback.print_exc(); os._exit(1)
+        procs = [ctx.Process(target=hijo, args=(k,)) for k in range(nproc)]
+        for pr in procs:
+            pr.start()
+        for pr in procs:
+            pr.join()
+        if any(pr.exitcode for pr in procs):
+            raise RuntimeError(f"fallo un trozo del render: {[pr.exitcode for pr in procs]}")
+    elif dibuja_trozo(0):
+        raise RuntimeError("fallo el render")
+    lista = tmp / "trozos.txt"
+    lista.write_text("".join(f"file 'trozo{k}.mp4'\n" for k in range(nproc)), encoding="utf-8")
+    subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista),
+                    "-i", str(tmp / "audio.wav"), "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
+                    "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], check=True)
+    print(f"  render: {(time.time() - t_ini) / 60:.1f} min con {nproc} proceso(s) para {total / 60:.1f} min", flush=True)
     import shutil
     shutil.rmtree(tmp, ignore_errors=True)
     print(f"LARGO (ambiente): {total:.1f} s -> {out}")
