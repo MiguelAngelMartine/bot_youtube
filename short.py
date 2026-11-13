@@ -566,23 +566,15 @@ def main_segmentos(fecha, n, S):
 
     cortes = [sg["t0"] for sg in SEG[1:]] + [sg["tc"] for sg in SEG] + [t_fin]
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
-    g0 = SEG[0]
-    foto_p = None
-    if g0["p"] and not g0["p"][3].startswith("Ilustración"):
-        cred_ = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
-        foto_p = C.fotos_personas({g0["g"]["quien"]}, cred_, dia / "imagenes").get(g0["g"]["quien"])
-    PORT = portada(fecha, g0["fondo"], foto_p, S.get("kicker") or g0["g"]["kicker"], S.get("portada") or g0["g"]["cita"],
-                   S.get("destaca") or g0["g"].get("destaca", ""))
-    PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
+    # 13-nov-2026 (decisión del usuario): las miniaturas/portadas de los Shorts las elige él en YouTube Studio; no se
+    # generan aquí (se ahorra el montaje y el FLUX). El Short abre directo con el fotograma del gancho.
     out = dia / "shorts" / f"short_{n}.mp4"
     ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN}x{AL}",
                            "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",
                            "-crf", "21", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
                            "-c:a", "aac", "-b:a", "160k", "-shortest", str(out)], stdin=subprocess.PIPE)
     for fi in range(int(math.ceil(total * FPS))):
-        t = fi / FPS
-        fr = PORT.copy() if t < 0.4 else cuadro(t)
-        ff.stdin.write(fr.tobytes())
+        ff.stdin.write(cuadro(fi / FPS).tobytes())
     ff.stdin.close()
     ff.wait()
     cred_all = json.loads((dia / "creditos.json").read_text(encoding="utf-8")) if (dia / "creditos.json").exists() else {}
@@ -840,34 +832,8 @@ def main(fecha, n):
 
     cortes = [x for x in (t_ctx, t_rep, t_fin) if x] + [tp for tp, _ in paneles[1:]]
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes], con_sintonia=False)
-    foto_p = None                                       # la foto real de la persona (no la ilustración) para la portada
-    if p1 and not p1[3].startswith("Ilustración"):
-        cred_ = json.loads((dia / "creditos.json").read_text(encoding="utf-8"))
-        fp = C.fotos_personas({S["quien"]}, cred_, dia / "imagenes").get(S["quien"])
-        foto_p = fp if fp and Path(fp).exists() else None
-        if foto_p is None:
-            foto_p = next((dia / "imagenes" / f for f, c_ in cred_.items() if c_.get("persona") == S["quien"]
-                           and (dia / "imagenes" / f).exists()), None)
-    try:
-        if S.get("portada_imagen") and (dia / "imagenes" / S["portada_imagen"]).exists():   # 12-nov: la del director
-            from PIL import ImageOps as _IO
-            PORT = _IO.fit(Image.open(dia / "imagenes" / S["portada_imagen"]).convert("RGB"), (AN, AL)).convert("RGBA")
-        elif S.get("portada_tematica"):                # 11-nov: sin buena foto de la persona, titular de impacto
-            PORT = portada_tematica(Image.open(broll[0]) if broll else None, S["portada_tematica"])
-        else:
-            PORT = portada(fecha, fondo, foto_p, S["kicker"], S.get("portada") or S["cita"], S.get("destaca", ""))
-    except Exception as e:                              # sin portada propia, el fotograma del gancho
-        print(f"  AVISO: portada propia no hecha ({type(e).__name__}): se usa el fotograma del gancho")
-        PORT = cuadro(0.6)
-    PORT.convert("RGB").save(dia / "shorts" / f"short_{n}_portada.png")
-    _cuadro_normal = cuadro
-
-    def cuadro(t):                                      # los primeros 0,4 s, la portada (YouTube suele tomarla)
-        if t < 0.4:
-            fr = PORT.copy()
-            ImageDraw.Draw(fr).rectangle([0, AL - 12, int(AN * min(1.0, t / dur)), AL], fill=AMARILLO + (255,))
-            return fr
-        return _cuadro_normal(t)
+    # 13-nov-2026 (decisión del usuario): las miniaturas/portadas de los Shorts las elige él en YouTube Studio; no se
+    # generan aquí (se ahorra el montaje y el FLUX). El Short abre directo con el fotograma del gancho.
     out = dia / "shorts" / f"short_{n}.mp4"
     ff = subprocess.Popen([V1.FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{AN}x{AL}",
                            "-r", str(FPS), "-i", "-", "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast",

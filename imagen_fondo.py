@@ -62,6 +62,19 @@ def _flux(prompt, destino):
     return False
 
 
+def solo_ia(descripcion, destino):
+    """13-nov-2026: para la miniatura del vídeo largo, solo OpenAI (y Gemini de reserva), SIN FLUX: si no sale un fondo
+    generado, el que llama usa una imagen real del tema. Devuelve "openai", "gemini" o None."""
+    prompt = REGLAS + descripcion
+    for motor, fn in (("openai", _openai), ("gemini", _gemini)):
+        try:
+            if fn(prompt, destino):
+                return motor
+        except Exception:
+            pass
+    return None
+
+
 def genera(descripcion, destino):
     """Devuelve "gemini", "flux" o None."""
     prompt = REGLAS + descripcion

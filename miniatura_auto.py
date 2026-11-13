@@ -90,23 +90,25 @@ def main(fecha):
     vin = sorted((dia / "vinetas").glob(f"s{it.get('seccion', 1)}_*.jpg")) or sorted((dia / "vinetas").glob("s*_*.jpg"))
     fot = [f for f, c in cred.items() if f.startswith("s") and not c.get("persona") and (img / f).exists()]
     fondos = [("../vinetas/" + v.name) for v in vin[:2]] + fot[:2]
-    try:                                               # 11-nov: fondos fotográficos generados (Gemini o FLUX), sin personas reales
-        import gem
+    try:                                               # 13-nov: el fondo de la miniatura del vídeo largo lo genera OpenAI
+        import gem                                      # (sin FLUX: eso se reserva para los Shorts). Acorde a la noticia/gancho
         import imagen_fondo as IF
         sec_txt = " ".join(p.get("di", "") for p in sec["pasos"])[:1500] if sec else ""
         r = gem.pide(f"Para la miniatura de YouTube de esta noticia de política española, describe EN INGLÉS UNA escena "
-                     f"fotográfica simbólica que la represente SIN personas reales reconocibles (manos, siluetas, gente de "
-                     f"espaldas, objetos, lugares) y sin texto. Titular: «{titular}». Noticia: {sec_txt}\n"
-                     f"Responde SOLO JSON: {{\"escena\": \"...\"}}", como_json=True) or {}
+                     f"fotográfica simbólica acorde a la noticia o a la frase gancho, SIN personas reales reconocibles "
+                     f"(manos, siluetas, gente de espaldas, objetos, lugares) y sin texto. Frase gancho/titular: "
+                     f"«{titular}». Noticia: {sec_txt}\nResponde SOLO JSON: {{\"escena\": \"...\"}}", como_json=True) or {}
         esc = r.get("escena") if isinstance(r, dict) else None
-        if esc:                                        # 12-nov: un solo fondo (calidad media); el lado rojo lo tiñe el código
+        if esc:                                        # un solo fondo generado con OpenAI (gpt-image, calidad media)
             dest = img / "miniatura_fondo.jpg"
-            motor = IF.genera(esc, dest)
+            motor = IF.solo_ia(esc, dest)
             if motor:
                 cred[dest.name] = {"titulo": "Imagen de fondo generada con IA", "autor": f"Imagen generada con IA ({motor})",
                                    "licencia": "generada", "fuente": motor}
                 (dia / "creditos.json").write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
                 fondos = [dest.name] + fondos
+            else:                                      # OpenAI no lo generó (p. ej. contenido político): solo letras
+                print("  (OpenAI no dio fondo: miniatura solo con letras sobre una imagen real del tema)")
     except Exception as e:
         print(f"  fondos generados: {type(e).__name__}: {e}")
     fondo_t = fondos[0] if fondos else ""              # 14-nov: composición de referencia del director (SIEMPRE la misma)
