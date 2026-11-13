@@ -95,6 +95,75 @@ def escenas_ambiente(S, n_esc=5):
     return FALLBACK_ESC[:n_esc]
 
 
+# ---- Polaroid de la persona que dice la frase, integrada en el fondo cómic (13-nov-2026, aprobado por el usuario) ----
+import colorsys
+
+
+def _acento(crop):
+    """Color de acento en armonía con el fondo: el dominante del recorte, más saturado y con cuerpo."""
+    c = crop.convert("RGB").resize((1, 1), Image.LANCZOS).getpixel((0, 0))
+    h, s, v = colorsys.rgb_to_hsv(*[x / 255 for x in c])
+    s = min(1.0, s * 1.5 + 0.25)
+    v = min(1.0, max(0.45, v * 0.95))
+    r, g, b = colorsys.hsv_to_rgb(h, s, v)
+    return (int(r * 255), int(g * 255), int(b * 255))
+
+
+def polaroid_armonica(foto, nombre, cargo, credito, ancho, acento):
+    """Polaroid con la FOTO REAL de quien dice la frase, marco en armonía con el fondo (color de acento). Sin celo, a doble
+    tamaño que en los primeros vídeos. Devuelve RGBA ya inclinada."""
+    alto_f = int(ancho * 0.80)
+    im = Image.new("RGBA", (ancho + 60, alto_f + 210), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([26, 34, ancho + 42, alto_f + 206], radius=14, fill=(0, 0, 0, 90))          # sombra
+    d.rounded_rectangle([16, 24, ancho + 32, alto_f + 198], radius=12, fill=(250, 248, 243, 255))   # tarjeta hueso
+    d.rounded_rectangle([16, 24, ancho + 32, alto_f + 198], radius=12, outline=acento + (255,), width=10)  # marco de acento
+    f = Image.open(foto).convert("RGB")
+    rr = max((ancho - 20) / f.width, (alto_f - 20) / f.height)
+    f = f.resize((math.ceil(f.width * rr), math.ceil(f.height * rr)), Image.LANCZOS)
+    x0, y0 = (f.width - (ancho - 20)) // 2, int((f.height - (alto_f - 20)) * 0.22)
+    d.rectangle([34, 42, 34 + ancho - 20, 42 + alto_f - 20], fill=acento + (255,))                  # orla de acento
+    im.paste(f.crop((x0, y0, x0 + ancho - 20, y0 + alto_f - 20)), (38, 46))
+    fn = fuente("Inter-Black.ttf", 52)
+    while fn.getlength((nombre or "").upper()) > ancho - 10 and fn.size > 28:
+        fn = fuente("Inter-Black.ttf", fn.size - 2)
+    d.text(((ancho + 48) / 2, alto_f + 62), (nombre or "").upper(), font=fn, fill=(20, 22, 28, 255), anchor="mt")
+    if cargo:
+        d.text(((ancho + 48) / 2, alto_f + 124), cargo, font=fuente("Inter-SemiBold.ttf", 32), fill=acento + (255,), anchor="mt")
+    d.text(((ancho + 48) / 2, alto_f + 170), (credito or "Foto de archivo")[:46], font=fuente("Inter-Regular.ttf", 20),
+           fill=(140, 140, 150, 255), anchor="mt")
+    return im.rotate(-3, expand=True, resample=Image.BICUBIC)
+
+
+def _foto_persona(dia, fecha, nombre, cargo=""):
+    """Foto real, de CALIDAD y con VARIEDAD (nada repetido en 7 días), de la persona para su Polaroid. Usa la del día si la
+    hay; si no, la baja con fotos.mejores (descarta caras pequeñas; Gemini elige la mejor). Devuelve (ruta, cargo, credito)."""
+    import json
+    cred_f = dia / "creditos.json"
+    cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else {}
+
+    def busca():
+        fs = [(f, c) for f, c in cred.items() if c.get("persona") == nombre and "_recorte" not in f
+              and (dia / "imagenes" / f).exists()]
+        fs.sort(key=lambda fc: -float(fc[1].get("puntos_gemini", 0) or 0))
+        return fs[0] if fs else None
+
+    hit = busca()
+    if not hit:
+        try:
+            import fotos
+            fotos.mejores(fecha, nombre, "serio, primer plano, mirando a cámara", 2)   # calidad + variedad (7 días)
+            cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else cred
+            hit = busca()
+        except Exception as e:
+            print(f"  (sin foto de {nombre}: {type(e).__name__})")
+    if not hit:
+        return None, cargo, ""
+    f, c = hit
+    cr = f"Foto: {c.get('autor', '')[:30]} · {c.get('licencia', 'CC')}"
+    return dia / "imagenes" / f, (c.get("cargo") or cargo), cr
+
+
 def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3):
     """Intenta SIEMPRE una imagen nueva con FLUX (máxima variedad); si FLUX falla, la mejor de la biblioteca de ambiente.
     Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None)."""
@@ -180,6 +249,26 @@ def short(fecha, n):
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
     cajas = {i: SH._caja(f.strip(), ancho=940, tam=50) for i, f in enumerate(frases)}
 
+    # Polaroid de quien dice la frase (foto real, calidad + variedad), en armonía con el fondo cómic; la réplica cuando le toca
+    base0 = escenas[0][2]
+    acento_s = _acento(base0.crop((0, int(base0.height * 0.45), base0.width, int(base0.height * 0.75))))
+    hablantes = [(S.get("quien"), 0.0)]
+    rep_quien = (S.get("replica") or {}).get("quien")
+    if rep_quien:
+        kf = texto.find(rep_quien.split()[-1])
+        hablantes.append((rep_quien, T.en(kf) if kf >= 0 else t_fin))
+    polas = []
+    for quien, t_q in hablantes:
+        if not quien:
+            continue
+        foto, cargo, cred = _foto_persona(dia, fecha, quien)
+        if foto:
+            try:
+                polas.append((t_q, polaroid_armonica(foto, quien, cargo, cred, 470, acento_s)))
+            except Exception as e:
+                print(f"  (Polaroid de {quien}: {type(e).__name__})")
+    polas.sort(key=lambda x: x[0])
+
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes],
                   con_sintonia=False)
 
@@ -219,6 +308,13 @@ def short(fecha, n):
         st.putalpha(gt)
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
+        act = [p for p in polas if p[0] <= t]               # Polaroid del hablante, en la zona alta, con un pop
+        if act:
+            t_p, pol = act[-1]
+            e = min(1.0, (t - t_p) / 0.4)
+            s_ = 0.86 + 0.14 * (1 - (1 - e) ** 2)
+            p_im = pol.resize((int(pol.width * s_), int(pol.height * s_)), Image.BILINEAR) if s_ < 0.999 else pol
+            fr.alpha_composite(p_im, ((AN - p_im.width) // 2, 210))
         caja = cajas[frase_idx(t)]
         fr.alpha_composite(kick, (50, AL - 300 - caja.height))
         fr.alpha_composite(caja, ((AN - caja.width) // 2, AL - 250 - caja.height // 2))
@@ -338,9 +434,31 @@ def largo(fecha):
             ei = min(ne - 1, int(j * ne / max(1, len(frases))))
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
-        cajas = [SH._caja(f.strip(), ancho=1200, tam=46) for f in frases]
+        cajas = [SH._caja(f.strip(), ancho=1040, tam=44) for f in frases]
+        # Polaroid de quien dice la frase: fondo cómic + foto real integrada y en armonía con el color del fondo
+        base0 = escenas[0][2]
+        acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
+        personas = []
+        for p in s["pasos"]:
+            if p.get("ve"):
+                for n2 in _C.personas_de(p["ve"]):
+                    if n2 and n2 not in personas:
+                        personas.append(n2)
+        polas = []
+        for n2 in personas[:4]:
+            foto, cargo, cred = _foto_persona(dia, fecha, n2)
+            if not foto:
+                continue
+            kf = texto.find(n2.split()[-1], c)
+            t_n = T.en(kf) if 0 <= kf < c + len(btxt) else t0
+            try:
+                polas.append((t_n, polaroid_armonica(foto, n2, cargo, cred, 600, acento)))
+            except Exception as e:
+                print(f"  (Polaroid de {n2}: {type(e).__name__})")
+        polas.sort(key=lambda x: x[0])
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
-                        "cambios": cambios or [(t0, 0)], "frases": frases, "tf": tf, "cajas": cajas, "n": len(secs)})
+                        "cambios": cambios or [(t0, 0)], "frases": frases, "tf": tf, "cajas": cajas,
+                        "n": len(secs), "polas": polas})
         c += len(btxt) + 1
     for a, b in zip(bloques, bloques[1:]):
         a["t1"] = b["t0"]
@@ -366,11 +484,27 @@ def largo(fecha):
             prev = _vista(bl["escenas"][ip], t - cam[kc - 1][0], 6, ip, w=AN2, h=AL2)
             comp = Image.new("RGBA", (AN2, AL2)); comp.paste(prev, (int(-AN2 * 0.2 * q), 0))
             comp.alpha_composite(fr, (int(AN2 * (1 - q)), 0)); fr = comp
+        # sombra inferior para el texto
+        g = Image.linear_gradient("L").resize((AN2, 430)).point(lambda v: int(max(0, v - 70) * 1.3))
+        som = Image.new("RGBA", (AN2, 430), (6, 10, 22, 255)); som.putalpha(g)
+        fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
+        # Polaroid de quien habla en este momento (la última cuya frase ya empezó), con un pop al entrar
+        caja_x = 60
+        polas = bl.get("polas") or []
+        act = [p for p in polas if p[0] <= t]
+        if act:
+            t_p, pol = act[-1]
+            e = min(1.0, (t - t_p) / 0.45)
+            s_ = 0.86 + 0.14 * (1 - (1 - e) ** 2)
+            p_im = pol.resize((int(pol.width * s_), int(pol.height * s_)), Image.BILINEAR) if s_ < 0.999 else pol
+            py = max(165, AL2 - p_im.height - 40)
+            fr.alpha_composite(p_im, (60, py))
+            caja_x = 60 + pol.width + 10
         fi = max([j for j, te in enumerate(bl["tf"]) if te <= t] or [0]) if bl["tf"] else 0
         if bl["cajas"]:
             caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)]
-            fr.alpha_composite(caja, (60, AL2 - 90 - caja.height))
+            fr.alpha_composite(caja, (caja_x, AL2 - 80 - caja.height))
         return fr
 
     out = dia / "episodio.mp4"
