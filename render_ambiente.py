@@ -109,9 +109,9 @@ def _acento(crop):
     return (int(r * 255), int(g * 255), int(b * 255))
 
 
-def polaroid_armonica(foto, nombre, cargo, credito, ancho, acento):
+def polaroid_armonica(foto, nombre, cargo, credito, ancho, acento, giro=-3):
     """Polaroid con la FOTO REAL de quien dice la frase, marco en armonía con el fondo (color de acento). Sin celo, a doble
-    tamaño que en los primeros vídeos. Devuelve RGBA ya inclinada."""
+    tamaño que en los primeros vídeos. Devuelve RGBA ya inclinada (`giro` grados)."""
     alto_f = int(ancho * 0.80)
     im = Image.new("RGBA", (ancho + 60, alto_f + 210), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -132,7 +132,105 @@ def polaroid_armonica(foto, nombre, cargo, credito, ancho, acento):
         d.text(((ancho + 48) / 2, alto_f + 124), cargo, font=fuente("Inter-SemiBold.ttf", 32), fill=acento + (255,), anchor="mt")
     d.text(((ancho + 48) / 2, alto_f + 170), (credito or "Foto de archivo")[:46], font=fuente("Inter-Regular.ttf", 20),
            fill=(140, 140, 150, 255), anchor="mt")
-    return im.rotate(-3, expand=True, resample=Image.BICUBIC)
+    return im.rotate(giro, expand=True, resample=Image.BICUBIC)
+
+
+_ACC = str.maketrans("áéíóúüÁÉÍÓÚÜàèìòùÀÈÌÒÙäëïöÄËÏÖñÑçÇ", "aeiouuAEIOUUaeiouAEIOUaeioAEIOnNcC")
+
+
+def _norm(s):
+    return (s or "").translate(_ACC).lower()                # sin acentos, misma longitud (los índices siguen valiendo)
+
+
+def _conocidas():
+    """Personas conocidas (de archivo/personas.json): [(nombre, cargo)]. Para atribuir cada cita a quien la dice."""
+    import json
+    f = RAIZ / "archivo" / "personas.json"
+    p = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    return [(n, (v or {}).get("cargo", "")) for n, v in p.items()]
+
+
+def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
+    """Línea de tiempo de las CITAS («...») del bloque: (t_ini, t_fin, persona). La persona es el apellido conocido que
+    aparece más cerca ANTES de la cita (sin acentos). Citas muy cortas se alargan; citas seguidas de la misma, se funden."""
+    import re as _re
+    nbt = _norm(btxt)
+    apes = [(_norm(n.split()[-1]), n) for n, _ in conocidas if len(n.split()[-1]) >= 4]
+    qs = []
+    for m in _re.finditer(r"«([^»]{3,})»", btxt):
+        a, b = T.en(c0 + m.start()), T.en(c0 + m.end())
+        best, bestpos = quien_def, -1
+        for ape, n in apes:
+            pos = nbt.rfind(ape, 0, m.start())
+            if pos > bestpos:
+                bestpos, best = pos, n
+        qs.append([a, b, best])
+    MIN, GAP = 2.3, 1.3
+    out = []
+    for a, b, p in qs:
+        b = max(b, a + MIN)
+        if out and out[-1][2] == p and a - out[-1][1] < GAP:   # dos citas seguidas de la misma persona: se mantiene
+            out[-1][1] = max(out[-1][1], b)
+        else:
+            out.append([a, b, p])
+    return out
+
+
+def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None):
+    """Polaroid grande (giro izq.) y pequeña (giro der.) de cada persona que dice alguna cita, con foto real de calidad y
+    variedad, en armonía con el fondo. Solo para las personas que de verdad hablan en el bloque."""
+    cargos = cargos or {}
+    full, small = {}, {}
+    for n in dict.fromkeys(p for _, _, p in quotes):
+        if not n or n in full:
+            continue
+        foto, cargo, cred = _foto_persona(dia, fecha, n, cargos.get(n, ""))
+        if not foto:
+            continue
+        try:
+            full[n] = polaroid_armonica(foto, n, cargo or cargos.get(n, ""), cred, ancho_f, acento, giro=-3)
+            small[n] = polaroid_armonica(foto, n, cargo or cargos.get(n, ""), cred, ancho_s, acento, giro=4)
+        except Exception as e:
+            print(f"  (Polaroid de {n}: {type(e).__name__})")
+    return full, small
+
+
+def _dibuja_polas(fr, t, quotes, full, small, modo):
+    """Dibuja la(s) Polaroid(s) activa(s) en el instante t: la de la cita en curso (grande, con pop); si viene de un cruce
+    con otra persona, la anterior se queda pequeña al lado (conversación) hasta que acaba la cita."""
+    W, H = fr.size
+    i = next((k for k, (a, b, p) in enumerate(quotes) if a - 0.12 <= t <= b), None)
+    if i is None:
+        return
+    a, b, p = quotes[i]
+    pop = 0.84 + 0.16 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
+
+    def esc(img, s):
+        return img.resize((max(1, int(img.width * s)), max(1, int(img.height * s))), Image.BILINEAR) if abs(s - 1) > 0.004 else img
+    prev = quotes[i - 1] if i > 0 else None
+    conversa = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in full)
+    cur = full.get(p)
+    if modo == "largo":                                    # zona alta (el recuadro de la frase va abajo)
+        y = 185
+        if conversa and cur:
+            ps = small.get(prev[2])
+            if ps:
+                fr.alpha_composite(ps, (90, y + 70))
+            cim = esc(cur, pop)
+            fr.alpha_composite(cim, (W - cim.width - 110, y))
+        elif cur:
+            cim = esc(cur, pop)
+            fr.alpha_composite(cim, (90, y))
+    else:                                                  # short (vertical): arriba
+        if conversa and cur:
+            ps = small.get(prev[2])
+            if ps:
+                fr.alpha_composite(ps, (30, 250))
+            cim = esc(cur, pop)
+            fr.alpha_composite(cim, (W - cim.width - 30, 230))
+        elif cur:
+            cim = esc(cur, pop)
+            fr.alpha_composite(cim, ((W - cim.width) // 2, 220))
 
 
 def _foto_persona(dia, fecha, nombre, cargo=""):
@@ -152,7 +250,7 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
     if not hit:
         try:
             import fotos
-            fotos.mejores(fecha, nombre, "serio, primer plano, mirando a cámara", 2)   # calidad + variedad (7 días)
+            fotos.mejores(fecha, nombre, "serio, primer plano, mirando a cámara", 2, solo=True)   # solo individual, calidad + variedad
             cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else cred
             hit = busca()
         except Exception as e:
@@ -249,25 +347,13 @@ def short(fecha, n):
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
     cajas = {i: SH._caja(f.strip(), ancho=940, tam=50) for i, f in enumerate(frases)}
 
-    # Polaroid de quien dice la frase (foto real, calidad + variedad), en armonía con el fondo cómic; la réplica cuando le toca
+    # Polaroids de quien dice cada CITA (foto real, calidad + variedad), en armonía con el fondo; aparecen con la cita y se
+    # quitan al acabarla; en un cruce, la anterior se queda pequeña al lado hasta que termina la segunda (como una charla).
     base0 = escenas[0][2]
     acento_s = _acento(base0.crop((0, int(base0.height * 0.45), base0.width, int(base0.height * 0.75))))
-    hablantes = [(S.get("quien"), 0.0)]
-    rep_quien = (S.get("replica") or {}).get("quien")
-    if rep_quien:
-        kf = texto.find(rep_quien.split()[-1])
-        hablantes.append((rep_quien, T.en(kf) if kf >= 0 else t_fin))
-    polas = []
-    for quien, t_q in hablantes:
-        if not quien:
-            continue
-        foto, cargo, cred = _foto_persona(dia, fecha, quien)
-        if foto:
-            try:
-                polas.append((t_q, polaroid_armonica(foto, quien, cargo, cred, 470, acento_s)))
-            except Exception as e:
-                print(f"  (Polaroid de {quien}: {type(e).__name__})")
-    polas.sort(key=lambda x: x[0])
+    conocidas = _conocidas()
+    quotes = _citas_timeline(texto, 0, texto[:k_fin] if k_fin >= 0 else texto, T, conocidas, S.get("quien", ""))
+    pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento_s, 460, 320, dict(conocidas))
 
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes],
                   con_sintonia=False)
@@ -308,13 +394,7 @@ def short(fecha, n):
         st.putalpha(gt)
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
-        act = [p for p in polas if p[0] <= t]               # Polaroid del hablante, en la zona alta, con un pop
-        if act:
-            t_p, pol = act[-1]
-            e = min(1.0, (t - t_p) / 0.4)
-            s_ = 0.86 + 0.14 * (1 - (1 - e) ** 2)
-            p_im = pol.resize((int(pol.width * s_), int(pol.height * s_)), Image.BILINEAR) if s_ < 0.999 else pol
-            fr.alpha_composite(p_im, ((AN - p_im.width) // 2, 210))
+        _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short")   # Polaroid de la cita en curso (y la del cruce)
         caja = cajas[frase_idx(t)]
         fr.alpha_composite(kick, (50, AL - 300 - caja.height))
         fr.alpha_composite(caja, ((AN - caja.width) // 2, AL - 250 - caja.height // 2))
@@ -434,31 +514,16 @@ def largo(fecha):
             ei = min(ne - 1, int(j * ne / max(1, len(frases))))
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
-        cajas = [SH._caja(f.strip(), ancho=1040, tam=44) for f in frases]
-        # Polaroid de quien dice la frase: fondo cómic + foto real integrada y en armonía con el color del fondo
+        cajas = [SH._caja(f.strip(), ancho=1480, tam=44) for f in frases]
+        # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
-        personas = []
-        for p in s["pasos"]:
-            if p.get("ve"):
-                for n2 in _C.personas_de(p["ve"]):
-                    if n2 and n2 not in personas:
-                        personas.append(n2)
-        polas = []
-        for n2 in personas[:4]:
-            foto, cargo, cred = _foto_persona(dia, fecha, n2)
-            if not foto:
-                continue
-            kf = texto.find(n2.split()[-1], c)
-            t_n = T.en(kf) if 0 <= kf < c + len(btxt) else t0
-            try:
-                polas.append((t_n, polaroid_armonica(foto, n2, cargo, cred, 600, acento)))
-            except Exception as e:
-                print(f"  (Polaroid de {n2}: {type(e).__name__})")
-        polas.sort(key=lambda x: x[0])
+        conocidas = _conocidas()
+        quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
+        pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento, 420, 300, dict(conocidas))
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
                         "cambios": cambios or [(t0, 0)], "frases": frases, "tf": tf, "cajas": cajas,
-                        "n": len(secs), "polas": polas})
+                        "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small})
         c += len(btxt) + 1
     for a, b in zip(bloques, bloques[1:]):
         a["t1"] = b["t0"]
@@ -489,22 +554,11 @@ def largo(fecha):
         som = Image.new("RGBA", (AN2, 430), (6, 10, 22, 255)); som.putalpha(g)
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
-        # Polaroid de quien habla en este momento (la última cuya frase ya empezó), con un pop al entrar
-        caja_x = 60
-        polas = bl.get("polas") or []
-        act = [p for p in polas if p[0] <= t]
-        if act:
-            t_p, pol = act[-1]
-            e = min(1.0, (t - t_p) / 0.45)
-            s_ = 0.86 + 0.14 * (1 - (1 - e) ** 2)
-            p_im = pol.resize((int(pol.width * s_), int(pol.height * s_)), Image.BILINEAR) if s_ < 0.999 else pol
-            py = max(165, AL2 - p_im.height - 40)
-            fr.alpha_composite(p_im, (60, py))
-            caja_x = 60 + pol.width + 10
+        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo")
         fi = max([j for j, te in enumerate(bl["tf"]) if te <= t] or [0]) if bl["tf"] else 0
         if bl["cajas"]:
             caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)]
-            fr.alpha_composite(caja, (caja_x, AL2 - 80 - caja.height))
+            fr.alpha_composite(caja, ((AN2 - caja.width) // 2, AL2 - 70 - caja.height))
         return fr
 
     out = dia / "episodio.mp4"
