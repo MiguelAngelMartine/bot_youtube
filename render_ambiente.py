@@ -95,6 +95,34 @@ def escenas_ambiente(S, n_esc=5):
     return FALLBACK_ESC[:n_esc]
 
 
+def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3):
+    """Intenta SIEMPRE una imagen nueva con FLUX (máxima variedad); si FLUX falla, la mejor de la biblioteca de ambiente.
+    Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None)."""
+    import biblioteca_ambiente as BIB
+    if Path(destino).exists():
+        return destino, "nueva"
+    try:
+        IA.ilustra(esc, None, sobrio, intento=intento, ambiente=True).save(destino, quality=92)
+        return destino, "nueva"
+    except Exception as ex:
+        print(f"  (FLUX falla «{esc[:36]}»: {type(ex).__name__}); biblioteca de ambiente")
+    got = BIB.busca(esc, usadas=usadas_lib)
+    if got:
+        usadas_lib.add(got[2])
+        return got[0], ("lib_clip" if got[1] else "lib_simple")
+    return None, None
+
+
+def _guarda_lib(ruta, esc, esc_viva):
+    """Guarda la escena en la biblioteca: animada si tiene su clip de vídeo IA, simple si no."""
+    try:
+        import biblioteca_ambiente as BIB
+        clip = Path(ruta).with_suffix(".mp4")
+        BIB.guarda(ruta, esc, clip=clip if (esc_viva[0] and clip.exists()) else None)
+    except Exception as e:
+        print(f"  (biblioteca no guardó {Path(ruta).name}: {type(e).__name__})")
+
+
 def short(fecha, n):
     dia = RAIZ / "dia" / fecha
     S = json.loads((dia / "shorts" / f"short_{n}.json").read_text(encoding="utf-8"))
@@ -109,23 +137,26 @@ def short(fecha, n):
     k_fin = next((texto.find(x) for x in (preg, "Te leo en comentarios") if x in texto), -1)
     t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0
 
-    # escenas de ambiente (lugares/objetos/símbolos, SIN personas en primer plano) acordes al tema
+    # escenas de ambiente (lugares/objetos/símbolos, SIN personas en primer plano) acordes al tema.
+    # SIEMPRE se intenta una imagen nueva con FLUX (variedad); la nueva se guarda en la biblioteca; si FLUX falla, biblioteca.
     escenas_txt = escenas_ambiente(S, 5)
-    rutas = []
+    rutas, descs, usadas_lib = [], [], set()
+    mov = S.get("movimiento", "camera slowly pushes in, subtle natural motion, flags and banners sway")
     for k, esc in enumerate(escenas_txt):
         d = dia / "vinetas" / f"short{n}_env_{k}.jpg"
-        if not d.exists():
-            try:
-                IA.ilustra(esc, None, False, intento=3, ambiente=True).save(d, quality=92)
-            except Exception as e:
-                print(f"  (sin escena {k}: {type(e).__name__})")
-                continue
-        rutas.append(d)
+        r, origen = _consigue_escena(d, esc, usadas_lib)
+        if r:
+            rutas.append((r, origen)); descs.append(esc)
     if not rutas:
         raise SystemExit(f"short {n}: sin escenas de ambiente")
-    # animación: LTX en las 3 primeras (cuota); el resto, cámara 2,5D
-    escenas = [_escena_viva(r, S.get("movimiento", "camera slowly pushes in, subtle natural motion, flags and banners sway"),
-                            animar=(kk < 3)) for kk, r in enumerate(rutas)]
+    escenas = []
+    for kk, ((r, origen), esc) in enumerate(zip(rutas, descs)):
+        animar = origen == "lib_clip" or (origen == "nueva" and kk < 3)   # LTX en lo nuevo (cuota) o reusar el clip guardado
+        ev = _escena_viva(r, mov, animar=animar)
+        escenas.append(ev)
+        if origen == "nueva":
+            _guarda_lib(r, esc, ev)
+    rutas = [r for r, _ in rutas]
 
     # tiempos de cada frase y reparto de escenas (una por frase, repartidas hasta el cierre)
     frases = [f for f in re.split(r"(?<=[.?!])\s+", texto[:k_fin] if k_fin >= 0 else texto) if f.strip()]
@@ -273,26 +304,26 @@ def largo(fecha):
         quien = next((n2 for p in s["pasos"] if p.get("ve") for n2 in _C.personas_de(p["ve"])), "")
         pseudo = {"quien": quien, "cita": titulo, "contexto": btxt[:400]}
         escs_txt = escenas_ambiente(pseudo, 3)
-        rutas = []
+        # SIEMPRE imagen nueva con FLUX (variedad); se guarda en la biblioteca; si FLUX falla, la mejor de la biblioteca.
+        pares, descs, usadas_lib = [], [], set()
         for k, esc in enumerate(escs_txt):
             d_ = dia / "vinetas" / f"L{i}_env_{k}.jpg"
-            if not d_.exists():
-                try:
-                    IA.ilustra(esc, None, s.get("tono") == "sobrio", intento=5, ambiente=True).save(d_, quality=92)
-                except Exception as e:
-                    print(f"  (L{i} escena {k}: {type(e).__name__})"); continue
-            rutas.append(d_)
-        if not rutas:                                     # sin cuota de FLUX: otras escenas de AMBIENTE del día, nunca con personas
-            pool = sorted((dia / "vinetas").glob("*_env_*.jpg"))
-            if pool:
-                rutas = pool[:2]
-            else:                                         # ni eso: fondo de marca (sin personas), no una viñeta cualquiera
-                bg = dia / "vinetas" / "_fondo_marca.jpg"
-                if not bg.exists():
-                    G2.fondo_marca(2.0).resize((1280, 720)).convert("RGB").save(bg, quality=90)
-                rutas = [bg]
-        escenas = [_escena_viva(r, "camera slowly pushes in, subtle natural motion", animar=(i < 2 and kk < 1),
-                                w=AN2, h=AL2) for kk, r in enumerate(rutas)]
+            r, origen = _consigue_escena(d_, esc, usadas_lib, sobrio=s.get("tono") == "sobrio", intento=5)
+            if r:
+                pares.append((r, origen)); descs.append(esc)
+        if not pares:                                     # ni biblioteca: fondo de marca (sin personas), nunca una viñeta cualquiera
+            bg = dia / "vinetas" / "_fondo_marca.jpg"
+            if not bg.exists():
+                G2.fondo_marca(2.0).resize((1280, 720)).convert("RGB").save(bg, quality=90)
+            pares, descs = [(bg, "lib_simple")], [titulo]
+        escenas = []
+        for kk, ((r, origen), esc) in enumerate(zip(pares, descs)):
+            animar = origen == "lib_clip" or (origen == "nueva" and i < 2 and kk < 1)
+            ev = _escena_viva(r, "camera slowly pushes in, subtle natural motion", animar=animar, w=AN2, h=AL2)
+            escenas.append(ev)
+            if origen == "nueva":
+                _guarda_lib(r, esc, ev)
+        rutas = [r for r, _ in pares]
         # cambios de escena por frase dentro del bloque
         frases = [f for f in re.split(r"(?<=[.?!])\s+", btxt) if f.strip()]
         tf, pos = [], c
