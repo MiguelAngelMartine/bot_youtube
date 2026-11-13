@@ -117,6 +117,29 @@ def verifica_contexto(contexto, guion, redes):
     return " ".join(f for k, f in enumerate(frases) if k + 1 in ok)
 
 
+def enriquece_contexto(contexto, cita, G, objetivo=70):
+    """13-nov-2026 (el usuario: «los Shorts salen muy cortos»): si el contexto verificado queda fino, se completa con las
+    frases del BLOQUE del vídeo largo que ya están comprobadas (las que no estén ya), hasta ~`objetivo` palabras. Así el
+    Short llega al mínimo (~35 s) sin inventar nada: todo sale del guion aprobado del día."""
+    nc = _norm(cita)
+    sec = next((s for s in G.get("secciones", []) if nc in _norm(" ".join(p.get("di", "") for p in s.get("pasos", [])))), None)
+    if not sec:
+        return contexto
+    di = " ".join(p.get("di", "") for p in sec.get("pasos", []))
+    frases = [f.strip() for f in re.split(r"(?<=[.?!»])\s+", di) if len(f.split()) >= 4]
+    ya = _norm(contexto)
+    out = contexto.strip()
+    for f in frases:
+        if len(out.split()) >= objetivo:
+            break
+        nf = _norm(f)
+        if nf in ya or nc in nf or _norm(f[:30]) in ya:    # ni repetir ni volver a soltar la cita
+            continue
+        out = (out + " " + f).strip()
+        ya = _norm(out)
+    return out
+
+
 def _norm(s):
     """Minúsculas y espacios uniformes. Las comillas se CONSERVAN (todas como "): si el medio solo entrecomilla una
     palabra («ve "irresponsable" decir...»), la frase entera no casa y no se atribuye como cita."""
@@ -225,6 +248,9 @@ def main(fecha, n=3):
             print(f"  aviso: {s.get('partido')} repite protagonista (no había más partidos con frase válida)")
         partidos.add(s.get("partido"))
         s["contexto"] = verifica_contexto(s["contexto"], guion, redes)
+        if not s.get("segmentos") and len(s["contexto"].split()) < 60:   # 13-nov: que no salga corto (mín. ~35 s)
+            s["contexto"] = enriquece_contexto(s["contexto"], s["cita"], G, objetivo=75)
+            print(f"  contexto completado desde el bloque del vídeo largo ({len(s['contexto'].split())} palabras)")
         if not s["contexto"]:
             print(f"  descartada: «{s.get('cita', '')[:50]}» se queda sin contexto comprobado")
             continue

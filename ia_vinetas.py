@@ -419,16 +419,19 @@ def preparar(dia_txt, versiones=2):
         sobrio = sec.get("tono") == "sobrio"
         destino = dia / "vinetas" / f"{clave}.jpg"
         quien = it.get("persona_vineta")
+        # 13-nov-2026 (el usuario: «el vídeo largo tiene que llevar el estilo de viñeta animada estándar»): si la persona
+        # no tiene retrato libre y dibujable, NO se deja la escena sin viñeta (caía a foto borrosa, «parece un PowerPoint»):
+        # se dibuja una viñeta de ESCENA de línea clara (sin inventar su cara, como en los Shorts), con «Ilustración IA».
+        if quien and quien not in fotos:
+            print(f"  {clave}: {quien} sin retrato libre: viñeta de escena de línea clara (sin su cara, no se inventa)")
+            quien = None
+        elif quien and not licencia_dibujable(cred.get(fotos[quien].name, {}).get("licencia")):
+            print(f"  {clave}: retrato de {quien} es {cred.get(fotos[quien].name, {}).get('licencia') or 'sin licencia'} "
+                  f"(solo CC0/PD/CC BY): viñeta de escena de línea clara (sin su cara, no se inventa)")
+            quien = None
         try:
             if quien:
-                if quien not in fotos:
-                    print(f"  {clave}: {quien} no tiene retrato en creditos.json; sin viñeta")
-                    continue
                 cr = cred.get(fotos[quien].name, {})
-                if not licencia_dibujable(cr.get("licencia")):
-                    print(f"  {clave}: el retrato de {quien} es {cr.get('licencia') or 'sin licencia'}; para dibujarla "
-                          f"solo valen CC0, dominio público o CC BY: sin viñeta (la nota sale con su texto)")
-                    continue
                 guarda_origen(dia, clave, {"persona": quien, "foto": fotos[quien].name, "autor": cr.get("autor", ""),
                                            "licencia": cr.get("licencia", ""), "pagina": cr.get("pagina", "")})
                 if destino.exists():
