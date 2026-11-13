@@ -138,8 +138,9 @@ def short(fecha, n):
     t_fin = T.en(k_fin) if k_fin >= 0 else dur - 3.0
 
     # escenas de ambiente (lugares/objetos/símbolos, SIN personas en primer plano) acordes al tema.
+    # Si el guion trae su propio «ambiente» (lo escribe el redactor), se usa; si no, lo genera Gemini.
     # SIEMPRE se intenta una imagen nueva con FLUX (variedad); la nueva se guarda en la biblioteca; si FLUX falla, biblioteca.
-    escenas_txt = escenas_ambiente(S, 5)
+    escenas_txt = [e for e in (S.get("ambiente") or []) if isinstance(e, str) and e.strip()][:5] or escenas_ambiente(S, 5)
     rutas, descs, usadas_lib = [], [], set()
     mov = S.get("movimiento", "camera slowly pushes in, subtle natural motion, flags and banners sway")
     for k, esc in enumerate(escenas_txt):
@@ -303,7 +304,8 @@ def largo(fecha):
         fuentes = " · ".join(s.get("fuentes", [])[:4])
         quien = next((n2 for p in s["pasos"] if p.get("ve") for n2 in _C.personas_de(p["ve"])), "")
         pseudo = {"quien": quien, "cita": titulo, "contexto": btxt[:400]}
-        escs_txt = escenas_ambiente(pseudo, 3)
+        amb_guion = [e for p in s["pasos"] for e in ((p.get("ve") or {}).get("ambiente") or []) if isinstance(e, str) and e.strip()]
+        escs_txt = amb_guion[:3] or escenas_ambiente(pseudo, 3)   # las que escribe el redactor o, si no, generadas
         # SIEMPRE imagen nueva con FLUX (variedad); se guarda en la biblioteca; si FLUX falla, la mejor de la biblioteca.
         pares, descs, usadas_lib = [], [], set()
         for k, esc in enumerate(escs_txt):
