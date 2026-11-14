@@ -179,3 +179,9 @@ Hace falta **alguien que controle la calidad y se dé cuenta de los fallos** ant
 - **Subtítulos**: que **salgan siempre** al pie, en blanco con las palabras clave en amarillo.
 - **Polaroid = quien dice la cita**: que la foto corresponda a la persona que dice ESA cita en ese momento; nunca la misma foto para citas de personas distintas (fallo real del 14-nov: en el largo salía Feijóo en citas de otros). Mejor sin Polaroid que con la cara equivocada.
 Detalle en `.claude/agents/control-calidad.md`.
+
+## Control de humanidad de la voz (14-nov-2026, petición del usuario) — `prevuelo_voz.py`
+Antes de montar cualquier vídeo y DESPUÉS de escribir el guion, se genera la locución y se revisa con **dos oídos** (`prevuelo_voz.py <fecha>` → `dia/<fecha>/calidad/prevuelo_voz.md`):
+- **Whisper** (objetivo): vuelve a transcribir el audio TTS; donde oye algo claramente distinto del guion, marca esa palabra como poco clara o mal dicha.
+- **Gemini** (subjetivo, SÍ oye el audio): juzga si suena natural, como leído por una persona, y señala palabras/expresiones que chirrían con una **alternativa** que suene bien.
+Si hay algo a revisar, **no se monta**: el redactor (Opus) reescribe esas palabras por otras naturales y se repite el prevuelo hasta que el guion suene **100% natural**. Solo entonces se monta el vídeo. Iteramos con **audio** (rápido), no con vídeo. Lo revisa el control de calidad.

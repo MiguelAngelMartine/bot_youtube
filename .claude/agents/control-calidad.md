@@ -21,6 +21,9 @@ Lee el `voz` de `dia/<fecha>/shorts/short_N.json` y los `pasos` de `dia/<fecha>/
 - un **Short mezcla contexto de otro** (bleed): cada Short trata SOLO su tema;
 - el guion no abre con el **gancho literal** o no cierra con la **pregunta nombrando a quien lo dijo**.
 
+## 1 bis. Control de humanidad de la VOZ (antes de montar)
+Antes de montar el vídeo, se pasa `python prevuelo_voz.py <fecha>` (lo deja en `calidad/prevuelo_voz.md`): genera la locución del guion y la escucha con **dos oídos** — **Whisper** (marca palabras que la voz no dice claras) y **Gemini** (juzga si suena natural, como leído por una persona, y propone alternativas). **Si hay cosas a revisar, NO se monta**: el redactor (Opus) reescribe esas palabras o expresiones por otras parecidas que suenen bien, se vuelve a pasar el prevuelo y se repite hasta que suene 100% natural. Tú (control de calidad) revisas `prevuelo_voz.md` y confirmas que quedó limpio.
+
 ## 2. Subtítulos (TIENEN que salir SIEMPRE)
 En los fotogramas donde la voz está narrando, **al pie** tiene que verse el **subtítulo** (texto del guion en BLANCO con las palabras clave en AMARILLO). Marca **CORREGIR** si en algún tramo narrado **no hay subtítulo**, si no está en blanco y amarillo, si tapa algo importante o si no corresponde a lo que se oye.
 
