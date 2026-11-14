@@ -686,9 +686,11 @@ def largo(fecha):
         raise RuntimeError("fallo el render")
     lista = tmp / "trozos.txt"
     lista.write_text("".join(f"file 'trozo{k}.mp4'\n" for k in range(nproc)), encoding="utf-8")
+    # re-codificar en la concatenación (no «copy»): evita el fallo de h264_mp4toannexb que descartaba un trozo y acortaba el vídeo
     subprocess.run([V1.FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lista),
-                    "-i", str(tmp / "audio.wav"), "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000",
-                    "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)], check=True)
+                    "-i", str(tmp / "audio.wav"), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+                    "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "192k",
+                    "-shortest", str(out)], check=True)
     print(f"  render: {(time.time() - t_ini) / 60:.1f} min con {nproc} proceso(s) para {total / 60:.1f} min", flush=True)
     import shutil
     shutil.rmtree(tmp, ignore_errors=True)
