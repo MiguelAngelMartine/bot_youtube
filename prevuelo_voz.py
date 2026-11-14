@@ -146,6 +146,21 @@ def veta(palabra, alternativa="", motivo=""):
     VETADAS.write_text(json.dumps(lista, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def _paleta():
+    """Coletillas/expresiones elegidas a propósito (de oficina/GUION_ESTILO.md): no se marcan como 'raras'."""
+    f = RAIZ / "oficina" / "GUION_ESTILO.md"
+    try:
+        lineas = f.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return set()
+    out = set()
+    for l in lineas:
+        m = re.match(r"\s*-\s+(.+)", l)
+        if m:
+            out.add(re.sub(r"[.!¡¿?«»]", "", m.group(1)).strip().lower())
+    return {e for e in out if 3 <= len(e) <= 60}
+
+
 def _fuera_de_citas(texto, palabra):
     """True si la palabra/expresión aparece en el guion FUERA de una cita «...» (si solo sale dentro, no se toca)."""
     sin_citas = re.sub(r"«[^»]*»", " ", texto)
@@ -165,13 +180,18 @@ def revisa(texto, auto_veta=False):
     if sub is None:                                        # 2º OpenAI (saturó Gemini)
         sub = _openai(mp3, texto)
         oido_usado = "openai"
-    sub = [p for p in (sub or []) if _fuera_de_citas(texto, p["texto"])]   # no se tocan las citas literales «...»
-    oido, wf = _whisper(wav, texto)                        # 3º Whisper (objetivo), siempre
-    wf = [p for p in wf if _fuera_de_citas(texto, p["texto"])]
+    pal = _paleta()                                        # coletillas elegidas a propósito: NO se tocan
+    def protegida(p):
+        w = (p["texto"] or "").strip().lower()
+        return (not _fuera_de_citas(texto, p["texto"])    # dentro de una cita literal
+                or any(w in expr or expr in w for expr in pal))   # es (parte de) una coletilla de la paleta
+    sub = [p for p in (sub or []) if not protegida(p)]     # oído subjetivo (Gemini/OpenAI): manda en el veredicto
+    oido, wf = _whisper(wav, texto)                        # Whisper: solo PISTA (no dicta el veredicto por sí solo)
+    wf = [dict(p, fuente="whisper (pista)") for p in wf if not protegida(p)]
     if auto_veta:
         for p in sub:
             veta(p["texto"], p.get("alternativa", ""), f"no suena natural ({p['fuente']})")
-    return {"ok": not (sub + wf), "problemas": sub + wf, "oido_subjetivo": oido_usado, "oido": oido}
+    return {"ok": not sub, "problemas": sub + wf, "oido_subjetivo": oido_usado, "oido": oido}
 
 
 def _piezas(fecha):
