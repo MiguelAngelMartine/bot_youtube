@@ -101,7 +101,7 @@ class Jornada:
 
     def comunes(self):
         return [self.dia / "contexto.md", self.dia / "correcciones.md", self.dia / "ganchos_director.md",
-                self.dia / "encargo.json"]
+                self.dia / "encargo.json", RAIZ / "archivo" / "palabras_vetadas.json"]   # lista negra de palabras para la voz
 
     def escaleta(self):
         if self.json("escaleta.json"):

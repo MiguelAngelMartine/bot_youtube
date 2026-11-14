@@ -67,36 +67,102 @@ def _whisper(wav, texto):
     return oido, out[:8]
 
 
+_PROMPT = (
+    "Eres un oído experto en locución en español de España. Te doy un GUION y su LOCUCIÓN con una voz sintética (Tristán HD). "
+    "ESCÚCHALA y juzga si suena NATURAL, como leída por una persona de verdad y no por una máquina. Señala SOLO las palabras o "
+    "expresiones que suenen mal: forzadas, mal pronunciadas, cortadas, con vocales pegadas, acento raro o poco naturales. Para "
+    "cada una propón una ALTERNATIVA parecida en significado que suene bien y natural con esta voz. Si todo suena natural, "
+    "devuelve la lista vacía. Sé exigente pero no inventes problemas donde no los hay. Responde SOLO en JSON: "
+    '{"natural": true/false, "problemas": [{"texto": "la palabra o expresión", "motivo": "por qué suena mal", '
+    '"alternativa": "cómo decirlo"}]}.\n\nGUION:\n')
+
+
+def _fmt(problemas, fuente):
+    return [{"texto": p.get("texto", ""), "alternativa": p.get("alternativa", ""),
+             "detalle": f"{p.get('motivo', '')} → «{p.get('alternativa', '')}»", "fuente": fuente}
+            for p in problemas if isinstance(p, dict) and p.get("texto")]
+
+
 def _gemini(mp3, texto):
-    """Oído subjetivo: Gemini escucha el audio y señala lo que no suena natural, con alternativa."""
+    """Oído subjetivo con Gemini (gratis). Devuelve lista de problemas, o None si Gemini no responde (saturado)."""
     import gem
     b64 = base64.b64encode(Path(mp3).read_bytes()).decode()
-    prompt = (
-        "Eres un oído experto en locución en español de España. Te doy un GUION y su LOCUCIÓN con una voz sintética (Tristán "
-        "HD). ESCÚCHALA y juzga si suena NATURAL, como leída por una persona de verdad y no por una máquina. Señala SOLO las "
-        "palabras o expresiones que suenen mal: forzadas, mal pronunciadas, cortadas, con acento raro o poco naturales. Para "
-        "cada una propón una ALTERNATIVA parecida en significado que suene bien y natural con esta voz. Si todo suena natural, "
-        "devuelve la lista vacía. Sé exigente pero no inventes problemas donde no los hay. Responde SOLO en JSON: "
-        '{"natural": true/false, "problemas": [{"texto": "la palabra o expresión", "motivo": "por qué suena mal", '
-        '"alternativa": "cómo decirlo"}]}.\n\nGUION:\n' + texto)
-    r = gem.pide([{"text": prompt}, {"inline_data": {"mime_type": "audio/mp3", "data": b64}}],
-                 como_json=True, limite_s=90, modelos=["gemini-flash-latest", "gemini-2.0-flash"])   # modelos que oyen audio
+    r = gem.pide([{"text": _PROMPT + texto}, {"inline_data": {"mime_type": "audio/mp3", "data": b64}}],
+                 como_json=True, limite_s=90, modelos=["gemini-flash-latest", "gemini-2.0-flash"])
     if not isinstance(r, dict):
-        return []
-    return [{"texto": p.get("texto", ""), "detalle": f"{p.get('motivo', '')} → «{p.get('alternativa', '')}»", "fuente": "gemini"}
-            for p in r.get("problemas", []) if isinstance(p, dict) and p.get("texto")]
+        return None                                        # no respondió: que lo coja OpenAI
+    return _fmt(r.get("problemas", []), "gemini")
 
 
-def revisa(texto):
-    """Genera la locución y la revisa con los dos oídos. Devuelve {ok, problemas, oido}."""
-    wav, mp3 = _audio(texto)
-    oido, wf = _whisper(wav, texto)
+def _openai(mp3, texto):
+    """Oído subjetivo con OpenAI (de pago, fiable; respaldo de Gemini). Devuelve lista de problemas, o None si falla."""
+    import requests
+    key = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text(encoding="utf-8").splitlines()
+               if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
+    if not key:
+        return None
+    b64 = base64.b64encode(Path(mp3).read_bytes()).decode()
     try:
-        gf = _gemini(mp3, texto)
+        r = requests.post("https://api.openai.com/v1/chat/completions", timeout=120,
+                          headers={"Authorization": f"Bearer {key}"},
+                          json={"model": "gpt-4o-audio-preview", "modalities": ["text"],
+                                "response_format": {"type": "json_object"},
+                                "messages": [{"role": "user", "content": [
+                                    {"type": "text", "text": _PROMPT + texto},
+                                    {"type": "input_audio", "input_audio": {"data": b64, "format": "mp3"}}]}]})
+        if not r.ok:
+            print(f"  (OpenAI oído no responde: {r.status_code} {r.text[:80]})", file=sys.stderr)
+            return None
+        txt = r.json()["choices"][0]["message"]["content"]
+        return _fmt(json.loads(txt).get("problemas", []), "openai")
     except Exception as e:
-        gf = []
-        print(f"  (Gemini oído no responde: {type(e).__name__})", file=sys.stderr)
-    return {"ok": not (wf + gf), "problemas": wf + gf, "oido": oido}
+        print(f"  (OpenAI oído falla: {type(e).__name__})", file=sys.stderr)
+        return None
+
+
+VETADAS = RAIZ / "archivo" / "palabras_vetadas.json"
+
+
+def vetadas():
+    """Lista negra de palabras/expresiones que la voz no dice bien (para que el redactor NO las use)."""
+    try:
+        return json.loads(VETADAS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+
+
+def veta(palabra, alternativa="", motivo=""):
+    """Añade una palabra/expresión descartada a la lista negra (sin repetir)."""
+    lista = vetadas()
+    pl = (palabra or "").strip().lower()
+    if not pl or any((e.get("palabra", "").lower() == pl) for e in lista):
+        return
+    import time as _t
+    lista.append({"palabra": palabra.strip(), "alternativa": alternativa.strip(), "motivo": motivo.strip(),
+                  "fecha": _t.strftime("%Y-%m-%d")})
+    VETADAS.parent.mkdir(parents=True, exist_ok=True)
+    VETADAS.write_text(json.dumps(lista, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def revisa(texto, auto_veta=False):
+    """Genera la locución y la revisa. Oído subjetivo: Gemini (gratis) y, si no responde, OpenAI (fiable). Oído objetivo:
+    Whisper. Devuelve {ok, problemas, oido}. Con auto_veta, añade a la lista negra lo que marque el oído subjetivo."""
+    wav, mp3 = _audio(texto)
+    sub = None
+    try:
+        sub = _gemini(mp3, texto)                          # 1º Gemini (gratis)
+    except Exception as e:
+        print(f"  (Gemini oído falla: {type(e).__name__})", file=sys.stderr)
+    oido_usado = "gemini"
+    if sub is None:                                        # 2º OpenAI (saturó Gemini)
+        sub = _openai(mp3, texto)
+        oido_usado = "openai"
+    sub = sub or []
+    oido, wf = _whisper(wav, texto)                        # 3º Whisper (objetivo), siempre
+    if auto_veta:
+        for p in sub:
+            veta(p["texto"], p.get("alternativa", ""), f"no suena natural ({p['fuente']})")
+    return {"ok": not (sub + wf), "problemas": sub + wf, "oido_subjetivo": oido_usado, "oido": oido}
 
 
 def _piezas(fecha):

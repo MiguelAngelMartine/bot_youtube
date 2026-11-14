@@ -185,3 +185,7 @@ Antes de montar cualquier vídeo y DESPUÉS de escribir el guion, se genera la l
 - **Whisper** (objetivo): vuelve a transcribir el audio TTS; donde oye algo claramente distinto del guion, marca esa palabra como poco clara o mal dicha.
 - **Gemini** (subjetivo, SÍ oye el audio): juzga si suena natural, como leído por una persona, y señala palabras/expresiones que chirrían con una **alternativa** que suene bien.
 Si hay algo a revisar, **no se monta**: el redactor (Opus) reescribe esas palabras por otras naturales y se repite el prevuelo hasta que el guion suene **100% natural**. Solo entonces se monta el vídeo. Iteramos con **audio** (rápido), no con vídeo. Lo revisa el control de calidad.
+
+### Ajustes del control de voz (14-nov-2026, petición del usuario)
+- **Orden de los oídos** en `prevuelo_voz.py`: **1) Gemini** (gratis), **2) OpenAI** (`gpt-4o-audio-preview`, de pago, cuando Gemini está saturado), **3) Whisper** (objetivo, siempre). Así el «oído de naturalidad» funciona aunque se agote la cuota gratis de Gemini.
+- **Lista negra de palabras** (`archivo/palabras_vetadas.json`): cada palabra/expresión que se descarta por no sonar natural se guarda con su alternativa. El **redactor la lee antes de redactar** (va en `comunes()` de la jornada) y NO las usa. El prevuelo la va alimentando (`prevuelo_voz.veta`). Ya sembrada con «rifirrafe» y «dichoso ático».
