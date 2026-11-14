@@ -151,20 +151,41 @@ def _conocidas():
     return [(n, (v or {}).get("cargo", "")) for n, v in p.items()]
 
 
+_SPEAK = (r"(?:dice|dijo|asegura|afirma|senala|responde|replica|contesta|espeta|suelta|lanza|acusa|carga|avisa|advierte|"
+          r"reprocha|insiste|remata|sentencia|declara|apunta|zanja|clama|exige|proclama|ironiza|anuncia|defiende|critica|"
+          r"tacha|llama|ataca|pregunta|recuerda|subraya|denuncia|celebra|lamenta|admite|reconoce|pide|exclama|grita)")
+
+
 def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
-    """Línea de tiempo de las CITAS («...») del bloque: (t_ini, t_fin, persona). La persona es el apellido conocido que
-    aparece más cerca ANTES de la cita (sin acentos). Citas muy cortas se alargan; citas seguidas de la misma, se funden."""
+    """Línea de tiempo de las CITAS («...») del bloque: (t_ini, t_fin, persona). La persona es QUIEN DICE la cita: por
+    defecto el hablante declarado (quien_def); solo se asigna a otro apellido conocido si de verdad es quien habla (verbo de
+    habla cerca, o pegado a la cita), nunca el DESTINATARIO («a/contra Fulano: ...»). Citas cortas se alargan; seguidas de la
+    misma persona, se funden."""
     import re as _re
     nbt = _norm(btxt)
     apes = [(_norm(n.split()[-1]), n) for n, _ in conocidas if len(n.split()[-1]) >= 4]
+
+    def _destinatario(p):   # el apellido es el destinatario del ataque, no quien habla («a/contra Pedro Sánchez»)
+        return bool(_re.search(r"\b(?:a|al|contra|hacia|sobre|para)\s+(?:\w+\s+){0,2}$", nbt[max(0, p - 26):p]))
+
     qs = []
     for m in _re.finditer(r"«([^»]{3,})»", btxt):
         a, b = T.en(c0 + m.start()), T.en(c0 + m.end())
-        best, bestpos = quien_def, -1
+        best, cand, candpos = quien_def, None, -1
         for ape, n in apes:
-            pos = nbt.rfind(ape, 0, m.start())
-            if pos > bestpos:
-                bestpos, best = pos, n
+            for mm in _re.finditer(r"\b" + _re.escape(ape) + r"\b", nbt[:m.start()]):
+                p = mm.start()
+                if _destinatario(p):
+                    continue
+                despues = nbt[mm.end():mm.end() + 22]
+                antes = nbt[max(0, p - 18):p]
+                hablante = (_re.match(r"\s*(?:\w+\s+){0,2}" + _SPEAK + r"\b", despues) is not None   # «Fulano … responde»
+                            or _re.search(r"\b(?:" + _SPEAK + r"|segun)\s+$", antes) is not None       # «responde/según Fulano»
+                            or (m.start() - mm.end()) <= 4)                                            # «Fulano: «...»»
+                if hablante and p > candpos:
+                    candpos, cand = p, n
+        if cand:
+            best = cand
         qs.append([a, b, best])
     MIN, GAP = 2.3, 1.3
     out = []
