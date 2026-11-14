@@ -170,3 +170,10 @@ Cada día: **1 vídeo largo + 3 Shorts**, con TODO lo nuevo de hoy como estánda
 - **Subtítulos SIEMPRE** (largo y Shorts): el texto del guion que lee la voz, sincronizado por frase, en **BLANCO con las palabras clave en AMARILLO** (citas «...», nombres propios y cifras), con borde para legibilidad, sobre caja azul noche (`render_ambiente._subtitulo`). No montar ningún vídeo sin ellos.
 - **Shorts de 25-40 s**, gancho literal al principio, cierre con pregunta nombrando a quien dijo la frase y «Te leo en comentarios» + suscríbete. Miniatura de los Shorts la pone el usuario en Studio.
 - Pendiente de código: que `shorts_guion.py` pase la `voz` final por Opus y aísle el contexto de cada Short (hoy, 14-nov, los guiones de los Shorts los reescribió Opus a mano).
+
+## Control de calidad reforzado (14-nov-2026, petición del usuario)
+Hace falta **alguien que controle la calidad y se dé cuenta de los fallos** antes de publicar. El agente `control-calidad` (y cualquier revisión antes de subir) tiene que comprobar SIEMPRE, además de la imagen y el sonido:
+- **Tono del guion**: que sea el **Vikingo desenfadado** fijado, no un lector de titulares plano (si no lo es, CORREGIR); citas literales, sin «.:», sin bleed entre Shorts.
+- **Subtítulos**: que **salgan siempre** al pie, en blanco con las palabras clave en amarillo.
+- **Polaroid = quien dice la cita**: que la foto corresponda a la persona que dice ESA cita en ese momento; nunca la misma foto para citas de personas distintas (fallo real del 14-nov: en el largo salía Feijóo en citas de otros). Mejor sin Polaroid que con la cara equivocada.
+Detalle en `.claude/agents/control-calidad.md`.
