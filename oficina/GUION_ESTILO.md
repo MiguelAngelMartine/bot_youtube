@@ -18,7 +18,10 @@ posicionamiento a favor o en contra de nadie.
   Gracias por vernos. Mañana, más.»
 
 ## Voz «1,6» ENERGÉTICA (14-nov-2026) — el guion le da RITMO
-La voz estándar es Tristán HD a **temperatura 1,6**, enérgica (sustituye a la de 1,0, que sonaba apagada). El guion se escribe **pensado para esa energía**: más ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción, preguntas y remates. Un guion lento y de frases largas deja la voz apagada. Esto lo revisa el control de calidad.
+La voz estándar es Tristán HD a **temperatura 1,6**, enérgica (sustituye a la de 1,0, que sonaba apagada). El guion se escribe **pensado para esa energía**: más ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción y remates. Un guion lento y de frases largas deja la voz apagada. Dos reglas con esta voz:
+- **NO preguntas en el cuerpo** (Tristán no las entona bien): la única pregunta es la **final** («¿Tiene razón X?»). En el cuerpo, en afirmativo.
+- **NO chascarrillos de UNA palabra** tras una frase o cita («Toma.»): quedan mal. Usa **coletillas populares más largas y con gancho** («esto no lo has visto venir», «se le ha quedado el culo torcío», «menudo zasca»…), actuales y sin tacos.
+Esto lo revisa el control de calidad.
 
 ## Fluidez (para que Tristán no suene abrupto) — MUY IMPORTANTE
 Tristán respeta la puntuación: la coma es pausa corta, el punto pausa larga, los puntos suspensivos «…» una pausa natural.
