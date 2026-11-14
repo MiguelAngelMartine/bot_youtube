@@ -157,6 +157,17 @@ _SPEAK = (r"(?:dice|dijo|asegura|afirma|senala|responde|replica|contesta|espeta|
           r"reprocha|insiste|remata|sentencia|declara|apunta|zanja|clama|exige|proclama|ironiza|anuncia|defiende|critica|"
           r"tacha|llama|ataca|pregunta|recuerda|subraya|denuncia|celebra|lamenta|admite|reconoce|pide|exclama|grita)")
 
+# palabras en mayúscula que NO son nombres de persona (para no confundir «España: «...»» con un hablante)
+_NO_NOMBRE = {"El", "La", "Los", "Las", "Un", "Una", "Lo", "Y", "O", "Pero", "En", "Con", "Sin", "Por", "Para", "Según",
+              "Hoy", "Ayer", "Mañana", "Ahora", "Mientras", "Así", "Además", "También", "No", "Sí", "Esto", "Eso", "Esa",
+              "Este", "Esta", "Ese", "Aquí", "Allí", "Cuando", "Donde", "Mira", "Ojo", "Atención", "España", "Madrid",
+              "Cataluña", "Gobierno", "Congreso", "Senado", "Moncloa", "Marruecos", "Europa", "Justicia", "Estado",
+              "Resulta", "Toma", "Vaya", "Agárrate", "Encima", "Luego", "Total", "Claro", "Bueno", "Pues", "Vamos"}
+_VERBOS_HABLA = set("dice dijo asegura afirma senala responde replica contesta espeta suelta lanza acusa carga avisa "
+                    "advierte reprocha insiste remata sentencia declara apunta zanja clama exige proclama ironiza anuncia "
+                    "defiende critica tacha llama ataca pregunta recuerda subraya denuncia celebra lamenta admite reconoce "
+                    "pide exclama grita abre".split())
+
 
 def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
     """Línea de tiempo de las CITAS («...») del bloque: (t_ini, t_fin, persona). La persona es QUIEN DICE la cita: por
@@ -188,6 +199,18 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
                     candpos, cand = p, n
         if cand:
             best = cand
+        else:
+            # Sin hablante conocido identificado: si en la frase de la cita hay OTRO nombre propio como SUJETO (un ponente no
+            # registrado, p. ej. en «La campaña en frases»), NO se pone la foto del hablante por defecto (mejor ninguna que la
+            # equivocada). Se ignoran los nombres que son destinatario («a/contra/sobre Fulano»).
+            ini = max([btxt.rfind(x, 0, m.start()) for x in ".!?»"] + [-1]) + 1
+            ape_def = _norm(quien_def.split()[-1]) if quien_def else ""
+            for mm in _re.finditer(r"\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b", btxt[ini:m.start()]):
+                w = mm.group(1)
+                if w in _NO_NOMBRE or _norm(w) in _VERBOS_HABLA or _norm(w) == ape_def or _destinatario(ini + mm.start()):
+                    continue
+                best = ""
+                break
         qs.append([a, b, best])
     MIN, GAP = 2.3, 1.3
     out = []
