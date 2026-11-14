@@ -219,6 +219,48 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None):
     return full, small
 
 
+def _subtitulo(txt, ancho=940, tam=46):
+    """Subtítulo del canal (va en TODOS los vídeos, largo y Shorts): el texto del guion que lee la voz, en BLANCO con las
+    palabras clave —citas «...», nombres propios y cifras— en AMARILLO, con borde para legibilidad, sobre caja azul noche.
+    Sustituye al recuadro liso; se sincroniza por frase (lo coloca quien lo llama según el tiempo de la voz)."""
+    import re as _re
+    f = fuente("ComicNeue-Bold.ttf", tam)
+    ls = C.lineas(txt, f, ancho - 50)
+    while len(ls) > 5 and tam > 30:                        # si no cabe, letra más pequeña (nunca texto cortado)
+        tam -= 3
+        f = fuente("ComicNeue-Bold.ttf", tam)
+        ls = C.lineas(txt, f, ancho - 50)
+    ls = ls[:7]
+    alto_l = int(tam * 1.32)
+    h = 34 + alto_l * len(ls)
+    im = Image.new("RGBA", (ancho + 16, h + 16))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([14, 14, ancho + 14, h + 14], radius=18, fill=(0, 0, 0, 95))      # sombra
+    d.rounded_rectangle([0, 0, ancho, h], radius=18, fill=(16, 28, 52, 235), outline=AMARILLO + (255,), width=3)
+
+    def clave(w, dent):
+        wl = w.strip("«»().,:;¡!¿?\"'- ")
+        if dent or "«" in w or "»" in w:
+            return True
+        if _re.search(r"\d", w):
+            return True
+        return len(wl) > 3 and wl[:1].isupper() and not wl.isupper()
+
+    dentro = False
+    for j, l in enumerate(ls):
+        x = (ancho - d.textlength(l, font=f)) / 2
+        y = 16 + alto_l * j
+        for w in l.split(" "):
+            col = (AMARILLO if clave(w, dentro) else BLANCO) + (255,)
+            d.text((x, y), w, font=f, fill=col, stroke_width=3, stroke_fill=(0, 0, 0, 255))
+            x += d.textlength(w + " ", font=f)
+            if "«" in w and "»" not in w:
+                dentro = True
+            elif "»" in w:
+                dentro = False
+    return im
+
+
 def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None):
     """Dibuja la(s) Polaroid(s) activa(s) en el instante t y, en el largo, también coloca el recuadro de la frase (caja):
       · UNA sola Polaroid -> Polaroid a la izquierda y el recuadro a la derecha;
@@ -428,7 +470,7 @@ def short(fecha, n):
 
     cab = SH._cabecera(fecha, S.get("categoria", ""))
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
-    cajas = {i: SH._caja(f.strip(), ancho=940, tam=50) for i, f in enumerate(frases)}
+    cajas = {i: _subtitulo(f.strip(), ancho=940, tam=50) for i, f in enumerate(frases)}
 
     # Polaroids de quien dice cada CITA (foto real, calidad + variedad), en armonía con el fondo; aparecen con la cita y se
     # quitan al acabarla; en un cruce, la anterior se queda pequeña al lado hasta que termina la segunda (como una charla).
@@ -597,7 +639,7 @@ def largo(fecha):
             ei = min(ne - 1, int(j * ne / max(1, len(frases))))
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
-        cajas = [SH._caja(f.strip(), ancho=1180, tam=44) for f in frases]
+        cajas = [_subtitulo(f.strip(), ancho=1180, tam=44) for f in frases]
         # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
