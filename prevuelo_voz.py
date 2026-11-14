@@ -69,11 +69,13 @@ def _whisper(wav, texto):
 
 _PROMPT = (
     "Eres un oído experto en locución en español de España. Te doy un GUION y su LOCUCIÓN con una voz sintética (Tristán HD). "
-    "ESCÚCHALA y juzga si suena NATURAL, como leída por una persona de verdad y no por una máquina. Señala SOLO las palabras o "
-    "expresiones que suenen mal: forzadas, mal pronunciadas, cortadas, con vocales pegadas, acento raro o poco naturales. Para "
-    "cada una propón una ALTERNATIVA parecida en significado que suene bien y natural con esta voz. Si todo suena natural, "
-    "devuelve la lista vacía. Sé exigente pero no inventes problemas donde no los hay. Responde SOLO en JSON: "
-    '{"natural": true/false, "problemas": [{"texto": "la palabra o expresión", "motivo": "por qué suena mal", '
+    "ESCÚCHALA y marca SOLO las palabras que suenen CLARAMENTE mal: una palabra atropellada, mal pronunciada, incomprensible o "
+    "con las sílabas pegadas de forma que no se entienda. Para cada una propón una ALTERNATIVA parecida en significado que "
+    "suene bien. REGLAS IMPORTANTES: (1) NO señales NUNCA el texto que va entre comillas «...»: son citas literales y NO se "
+    "pueden cambiar. (2) NO marques cuestiones de ESTILO, entonación leve, ni expresiones coloquiales elegidas a propósito "
+    "(«cara de boniato», «menudo percal», «sindiós»…): esas se quedan. (3) Solo lo que un oyente NO entendería o le chirriaría "
+    "de verdad. Si todo se entiende bien, devuelve la lista vacía. Responde SOLO en JSON: "
+    '{"natural": true/false, "problemas": [{"texto": "la palabra", "motivo": "por qué no se entiende", '
     '"alternativa": "cómo decirlo"}]}.\n\nGUION:\n')
 
 
@@ -105,8 +107,7 @@ def _openai(mp3, texto):
     try:
         r = requests.post("https://api.openai.com/v1/chat/completions", timeout=120,
                           headers={"Authorization": f"Bearer {key}"},
-                          json={"model": "gpt-4o-audio-preview", "modalities": ["text"],
-                                "response_format": {"type": "json_object"},
+                          json={"model": "gpt-audio-mini", "modalities": ["text"],
                                 "messages": [{"role": "user", "content": [
                                     {"type": "text", "text": _PROMPT + texto},
                                     {"type": "input_audio", "input_audio": {"data": b64, "format": "mp3"}}]}]})
@@ -114,7 +115,8 @@ def _openai(mp3, texto):
             print(f"  (OpenAI oído no responde: {r.status_code} {r.text[:80]})", file=sys.stderr)
             return None
         txt = r.json()["choices"][0]["message"]["content"]
-        return _fmt(json.loads(txt).get("problemas", []), "openai")
+        m = re.search(r"\{.*\}", txt, re.S)                # el JSON puede venir con texto o ```json alrededor
+        return _fmt(json.loads(m.group(0)).get("problemas", []), "openai") if m else []
     except Exception as e:
         print(f"  (OpenAI oído falla: {type(e).__name__})", file=sys.stderr)
         return None
@@ -144,6 +146,12 @@ def veta(palabra, alternativa="", motivo=""):
     VETADAS.write_text(json.dumps(lista, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def _fuera_de_citas(texto, palabra):
+    """True si la palabra/expresión aparece en el guion FUERA de una cita «...» (si solo sale dentro, no se toca)."""
+    sin_citas = re.sub(r"«[^»]*»", " ", texto)
+    return (palabra or "").strip().lower() in sin_citas.lower()
+
+
 def revisa(texto, auto_veta=False):
     """Genera la locución y la revisa. Oído subjetivo: Gemini (gratis) y, si no responde, OpenAI (fiable). Oído objetivo:
     Whisper. Devuelve {ok, problemas, oido}. Con auto_veta, añade a la lista negra lo que marque el oído subjetivo."""
@@ -157,8 +165,9 @@ def revisa(texto, auto_veta=False):
     if sub is None:                                        # 2º OpenAI (saturó Gemini)
         sub = _openai(mp3, texto)
         oido_usado = "openai"
-    sub = sub or []
+    sub = [p for p in (sub or []) if _fuera_de_citas(texto, p["texto"])]   # no se tocan las citas literales «...»
     oido, wf = _whisper(wav, texto)                        # 3º Whisper (objetivo), siempre
+    wf = [p for p in wf if _fuera_de_citas(texto, p["texto"])]
     if auto_veta:
         for p in sub:
             veta(p["texto"], p.get("alternativa", ""), f"no suena natural ({p['fuente']})")
