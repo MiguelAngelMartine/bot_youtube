@@ -36,6 +36,8 @@ def _escena_viva(ruta_img, movimiento, animar, w=AN, h=AL):
     """Devuelve (frames|None, fps, base). Si animar y hay cuota, clip LTX; si no, None (se usa motion_comic sobre `base`)."""
     base = ImageOps.fit(Image.open(ruta_img).convert("RGB"), (int(w * 1.12), int(h * 1.12)), Image.LANCZOS,
                         centering=(0.5, 0.42))
+    if os.environ.get("EH_SIN_LTX"):   # LTX (animar_ia) a veces degenera el clip en caras/logos inventados: solo cámara 2,5D
+        animar = False
     if animar:
         try:
             mp4 = animar_ia.clip(ruta_img, movimiento)
