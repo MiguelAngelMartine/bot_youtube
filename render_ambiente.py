@@ -219,46 +219,71 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None):
     return full, small
 
 
-def _subtitulo(txt, ancho=940, tam=46):
-    """Subtítulo del canal (va en TODOS los vídeos, largo y Shorts): el texto del guion que lee la voz, en BLANCO con las
-    palabras clave —citas «...», nombres propios y cifras— en AMARILLO, con borde para legibilidad, sobre caja azul noche.
-    Sustituye al recuadro liso; se sincroniza por frase (lo coloca quien lo llama según el tiempo de la voz)."""
+def _sub_es_clave(w):
+    """Palabra clave del subtítulo (va en AMARILLO): parte de una cita «...», cifra o nombre propio."""
     import re as _re
+    wl = w.strip("«»().,:;¡!¿?\"'-— ")
+    return bool("«" in w or "»" in w or _re.search(r"\d", w) or (len(wl) > 3 and wl[:1].isupper() and not wl.isupper()))
+
+
+def _sub_chunks(c0, btxt, T, nmax=4, cmax=26):
+    """Trocea el texto que lee la voz en grupos cortos tipo karaoke, con su ventana de tiempo (absoluta) según los tiempos de
+    palabra (T). Devuelve [[t_ini, t_fin, [palabras]], ...]. Dentro de «...» no corta hasta cerrar la cita."""
+    import re as _re
+    pals = [(m.group(0), T.en(c0 + m.start())) for m in _re.finditer(r"\S+", btxt)]
+    trozos, cur, dentro = [], [], False
+    for w, ts in pals:
+        cur.append((w, ts))
+        if "«" in w and "»" not in w:
+            dentro = True
+        elif "»" in w:
+            dentro = False
+        linea = " ".join(x[0] for x in cur)
+        fin = cur[-1][0].endswith((".", "!", "?", "…"))
+        if not dentro and (fin or len(cur) >= nmax or len(linea) >= cmax):
+            trozos.append(cur); cur = []
+    if cur:
+        trozos.append(cur)
+    out = []
+    for k, c in enumerate(trozos):
+        a = c[0][1]
+        b = trozos[k + 1][0][1] if k + 1 < len(trozos) else a + 1.6
+        out.append([a, b, [x[0] for x in c]])
+    return out
+
+
+def _dibuja_sub(fr, t, chunks, modo):
+    """Dibuja el subtítulo karaoke AL PIE (sin caja), texto del guion en BLANCO con las palabras clave en AMARILLO y borde
+    negro para legibilidad. El trozo activo es el que contiene el instante t. Estándar en todos los vídeos."""
+    if not chunks:
+        return
+    seg = next((c for c in chunks if c[0] <= t < c[1]), None)
+    if not seg and chunks and t >= chunks[-1][1] and t < chunks[-1][1] + 0.8:
+        seg = chunks[-1]                                   # mantener el último un pelín
+    if not seg:
+        return
+    W, H = fr.size
+    tam = 60 if modo == "short" else 52
     f = fuente("ComicNeue-Bold.ttf", tam)
-    ls = C.lineas(txt, f, ancho - 50)
-    while len(ls) > 5 and tam > 30:                        # si no cabe, letra más pequeña (nunca texto cortado)
-        tam -= 3
-        f = fuente("ComicNeue-Bold.ttf", tam)
-        ls = C.lineas(txt, f, ancho - 50)
-    ls = ls[:7]
-    alto_l = int(tam * 1.32)
-    h = 34 + alto_l * len(ls)
-    im = Image.new("RGBA", (ancho + 16, h + 16))
-    d = ImageDraw.Draw(im)
-    d.rounded_rectangle([14, 14, ancho + 14, h + 14], radius=18, fill=(0, 0, 0, 95))      # sombra
-    d.rounded_rectangle([0, 0, ancho, h], radius=18, fill=(16, 28, 52, 235), outline=AMARILLO + (255,), width=3)
-
-    def clave(w, dent):
-        wl = w.strip("«»().,:;¡!¿?\"'- ")
-        if dent or "«" in w or "»" in w:
-            return True
-        if _re.search(r"\d", w):
-            return True
-        return len(wl) > 3 and wl[:1].isupper() and not wl.isupper()
-
-    dentro = False
-    for j, l in enumerate(ls):
-        x = (ancho - d.textlength(l, font=f)) / 2
-        y = 16 + alto_l * j
-        for w in l.split(" "):
-            col = (AMARILLO if clave(w, dentro) else BLANCO) + (255,)
-            d.text((x, y), w, font=f, fill=col, stroke_width=3, stroke_fill=(0, 0, 0, 255))
+    d = ImageDraw.Draw(fr)
+    maxw = W * 0.9
+    lineas, cur = [], []
+    for w in seg[2]:
+        prueba = " ".join([x[0] for x in cur] + [w])
+        if cur and d.textlength(prueba, font=f) > maxw:
+            lineas.append(cur); cur = []
+        cur.append((w, _sub_es_clave(w)))
+    if cur:
+        lineas.append(cur)
+    lh = int(tam * 1.22)
+    y0 = (H - 165 - lh * len(lineas)) if modo == "short" else (H - 92 - lh * len(lineas))
+    for li, linea in enumerate(lineas):
+        tot = d.textlength(" ".join(x[0] for x in linea), font=f)
+        x = (W - tot) / 2
+        y = y0 + li * lh
+        for w, yel in linea:
+            d.text((x, y), w, font=f, fill=(AMARILLO if yel else BLANCO) + (255,), stroke_width=4, stroke_fill=(0, 0, 0, 255))
             x += d.textlength(w + " ", font=f)
-            if "«" in w and "»" not in w:
-                dentro = True
-            elif "»" in w:
-                dentro = False
-    return im
 
 
 def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None):
@@ -282,31 +307,23 @@ def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None):
     def pop_de(a):
         return 0.84 + 0.16 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
 
-    if modo == "largo":
-        if estado == "single":
+    if modo == "largo":                                    # el subtítulo karaoke va al pie; las Polaroids, en la zona media/alta
+        if estado == "single":                             # UNA: a la izquierda, centrada en vertical
             a, b, p = quotes[i]
             cim = esc(full[p], pop_de(a))
-            py = H - 90 - cim.height
-            fr.alpha_composite(cim, (100, py))
-            if caja is not None:
-                cx = min(100 + cim.width + 55, W - caja.width - 60)
-                fr.alpha_composite(caja, (cx, H - 80 - caja.height))
-        elif estado == "double":
+            py = max(150, (H - cim.height) // 2 - 20)
+            fr.alpha_composite(cim, (90, py))
+        elif estado == "double":                           # DOS (cruce): las dos arriba, por encima del subtítulo
             a, b, p = quotes[i]; prev = quotes[i - 1]
             cim = esc(full[p], pop_de(a))
             ps = small.get(prev[2])
-            cjy = H - 70 - (caja.height if caja is not None else 0)
-            if caja is not None:
-                fr.alpha_composite(caja, ((W - caja.width) // 2, cjy))
-            bb = cjy - 22
+            bb = H - 250
             gap = 44
             grp = (ps.width + gap if ps else 0) + cim.width
             sx = (W - grp) // 2
             if ps:
                 fr.alpha_composite(ps, (sx, bb - ps.height)); sx += ps.width + gap
             fr.alpha_composite(cim, (sx, bb - cim.height))
-        elif caja is not None:
-            fr.alpha_composite(caja, ((W - caja.width) // 2, H - 70 - caja.height))
         return
 
     # short (vertical): Polaroid(s) arriba (el recuadro lo pone el llamador debajo)
@@ -470,7 +487,7 @@ def short(fecha, n):
 
     cab = SH._cabecera(fecha, S.get("categoria", ""))
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
-    cajas = {i: _subtitulo(f.strip(), ancho=940, tam=50) for i, f in enumerate(frases)}
+    sub_chunks = _sub_chunks(0, texto[:k_fin] if k_fin >= 0 else texto, T)   # subtítulo karaoke al pie
 
     # Polaroids de quien dice cada CITA (foto real, calidad + variedad), en armonía con el fondo; aparecen con la cita y se
     # quitan al acabarla; en un cruce, la anterior se queda pequeña al lado hasta que termina la segunda (como una charla).
@@ -520,9 +537,8 @@ def short(fecha, n):
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
         _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short")   # Polaroid de la cita en curso (y la del cruce)
-        caja = cajas[frase_idx(t)]
-        fr.alpha_composite(kick, (50, AL - 300 - caja.height))
-        fr.alpha_composite(caja, ((AN - caja.width) // 2, AL - 250 - caja.height // 2))
+        fr.alpha_composite(kick, (50, AL - 470))                     # etiqueta (kicker) fija, encima del subtítulo
+        _dibuja_sub(fr, t, sub_chunks, "short")                      # subtítulo karaoke al pie (blanco + amarillo)
         d = ImageDraw.Draw(fr)
         d.text((AN // 2, AL - 70), f"Fuente: {S.get('fuente', '')}"[:70], font=fuente("Inter-SemiBold.ttf", 26),
                fill=(210, 216, 230, 255), anchor="mm")
@@ -639,7 +655,7 @@ def largo(fecha):
             ei = min(ne - 1, int(j * ne / max(1, len(frases))))
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
-        cajas = [_subtitulo(f.strip(), ancho=1180, tam=44) for f in frases]
+        subs = _sub_chunks(c, btxt, T)                     # subtítulo karaoke al pie (tiempos absolutos del bloque)
         # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
@@ -647,7 +663,7 @@ def largo(fecha):
         quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
         pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento, 420, 300, dict(conocidas))
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
-                        "cambios": cambios or [(t0, 0)], "frases": frases, "tf": tf, "cajas": cajas,
+                        "cambios": cambios or [(t0, 0)], "subs": subs,
                         "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small})
         c += len(btxt) + 1
     for a, b in zip(bloques, bloques[1:]):
@@ -679,9 +695,8 @@ def largo(fecha):
         som = Image.new("RGBA", (AN2, 430), (6, 10, 22, 255)); som.putalpha(g)
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
-        fi = max([j for j, te in enumerate(bl["tf"]) if te <= t] or [0]) if bl["tf"] else 0
-        caja = bl["cajas"][min(fi, len(bl["cajas"]) - 1)] if bl["cajas"] else None
-        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo", caja)
+        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo")
+        _dibuja_sub(fr, t, bl.get("subs") or [], "largo")   # subtítulo karaoke al pie (blanco + amarillo)
         return fr
 
     out = dia / "episodio.mp4"
