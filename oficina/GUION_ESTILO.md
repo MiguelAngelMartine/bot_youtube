@@ -97,3 +97,20 @@ Expresiones populares actuales para los remates, **adaptando pronombres al conte
 - ¡Qué barbaridad!
 - No te digo ná y te lo digo tó.
 - ¡Estamos apañados!
+
+### Más repertorio (14-nov-2026, ampliación del usuario) — usar la que mejor venga en cada situación
+Refranes:
+- Cada palo que aguante su vela.
+- Quien mucho abarca, poco aprieta.
+- A perro flaco, todo son pulgas.
+- El que se pica, ajos come.
+De cosecha propia (adaptar al contexto):
+- Se barruntaba el percal.
+- No se veía venir el estacazo.
+- Estaba el asunto más negro que el sobaco de un grillo.
+- Se mascaba el pescao.
+- Ni el tato daba un duro.
+- Se ha quedado la cosa como un solar después de la guerra.
+- No había por dónde meterle mano al asunto.
+- Esto venía de largo y de ancho.
+- Se ha descubierto el pastel y encima estaba revenío.
