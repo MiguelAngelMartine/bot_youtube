@@ -294,13 +294,18 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
 
     hit = busca()
     if not hit:
-        try:
-            import fotos
-            fotos.mejores(fecha, nombre, "serio, primer plano, mirando a cámara", 2, solo=True)   # solo individual, calidad + variedad
-            cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else cred
-            hit = busca()
-        except Exception as e:
-            print(f"  (sin foto de {nombre}: {type(e).__name__})")
+        import fotos
+        for iv in (False, True):      # 1º con variedad (7 días); si no hay foto buena, mejor UNA REPETIDA que ninguna Polaroid
+            try:
+                fotos.mejores(fecha, nombre, "serio, primer plano, mirando a cámara", 2, solo=True, ignora_variedad=iv)
+                cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else cred
+                hit = busca()
+            except Exception as e:
+                print(f"  (sin foto de {nombre}{' (repitiendo)' if iv else ''}: {type(e).__name__})")
+            if hit:
+                if iv:
+                    print(f"  {nombre}: sin foto nueva esta semana; se repite una buena para no quedarnos sin Polaroid")
+                break
     if not hit:
         return None, cargo, ""
     f, c = hit
