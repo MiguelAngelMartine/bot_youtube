@@ -18,14 +18,14 @@ REGLAS = ("photorealistic editorial news photograph, dramatic cinematic lighting
           "no text, no letters, no logos, no flags with text. Scene: ")
 
 
-def _openai(prompt, destino):
+def _openai(prompt, destino, size="1536x1024"):
     import base64
     key = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text().splitlines()
                if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
     if not key:
         return False
     r = requests.post("https://api.openai.com/v1/images/generations", headers={"Authorization": f"Bearer {key}"}, timeout=180,
-                      json={"model": "gpt-image-2", "prompt": prompt, "size": "1536x1024", "quality": "medium", "n": 1})
+                      json={"model": "gpt-image-2", "prompt": prompt, "size": size, "quality": "medium", "n": 1})
     if not r.ok:                                        # p. ej. safety_violations=[political]: lo coge FLUX
         print(f"  (OpenAI no genera: {r.json().get('error', {}).get('message', r.status_code)[:90]})")
         return False

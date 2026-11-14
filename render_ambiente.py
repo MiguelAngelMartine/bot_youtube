@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -286,12 +287,42 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
     return dia / "imagenes" / f, (c.get("cargo") or cargo), cr
 
 
-def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3):
+def _escena_openai(destino, esc, sobrio=False, orient="16:9"):
+    """Escena de ambiente de LÍNEA CLARA generada por OpenAI (excepción, cuando FLUX y HF no tienen cuota). Prompt RICO en
+    detalle del lugar de la noticia, sin personas en primer plano ni texto. Devuelve True si la generó."""
+    import imagen_fondo as IF
+    size = "1024x1536" if orient == "9:16" else "1536x1024"
+    extra = (" Muted desaturated palette, quiet respectful mood." if sobrio else "")
+    prompt = (IA.ESTILO_AMBIENTE + esc.strip().rstrip(".") +
+              ". Highly detailed graphic-novel ESTABLISHING WIDE SHOT: a specific, recognizable Spanish setting with clear "
+              "foreground, midground and background; architecture, street furniture, flags, lecterns, facades, urban textures "
+              "and atmospheric light that make the news context instantly readable at a glance; strong depth and composition. "
+              "Absolutely no people in the foreground, no human faces, no readable text, letters, numbers or logos." + extra)
+    tmp = Path(destino).with_suffix(".oai.png")
+    if not IF._openai(prompt, tmp, size=size):
+        return False
+    Image.open(tmp).convert("RGB").save(destino, quality=92)
+    try:
+        tmp.unlink()
+    except OSError:
+        pass
+    return True
+
+
+def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3, orient="16:9"):
     """Intenta SIEMPRE una imagen nueva con FLUX (máxima variedad); si FLUX falla, la mejor de la biblioteca de ambiente.
-    Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None)."""
+    Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None).
+    Excepción (EH_ESCENAS_OPENAI=1): se genera con OpenAI como primera opción (días sin cuota de FLUX/HF)."""
     import biblioteca_ambiente as BIB
     if Path(destino).exists():
         return destino, "nueva"
+    if os.environ.get("EH_ESCENAS_OPENAI"):
+        try:
+            if _escena_openai(destino, esc, sobrio, orient):
+                return destino, "nueva"
+            print(f"  (OpenAI no genera «{esc[:36]}»; pruebo FLUX/biblioteca)")
+        except Exception as ex:
+            print(f"  (OpenAI falla «{esc[:36]}»: {type(ex).__name__}); pruebo FLUX/biblioteca)")
     try:
         IA.ilustra(esc, None, sobrio, intento=intento, ambiente=True).save(destino, quality=92)
         return destino, "nueva"
@@ -336,7 +367,7 @@ def short(fecha, n):
     mov = S.get("movimiento", "camera slowly pushes in, subtle natural motion, flags and banners sway")
     for k, esc in enumerate(escenas_txt):
         d = dia / "vinetas" / f"short{n}_env_{k}.jpg"
-        r, origen = _consigue_escena(d, esc, usadas_lib)
+        r, origen = _consigue_escena(d, esc, usadas_lib, orient="9:16")
         if r:
             rutas.append((r, origen)); descs.append(esc)
     if not rutas:
