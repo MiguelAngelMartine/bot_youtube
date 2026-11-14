@@ -62,3 +62,38 @@ partir del 29 de noviembre haya una huelga eterna para el PSOE". Toma ya… una 
 para siempre. [chuckles] Y claro, la cosa acabó en la Diputación Permanente, y allí se lió. Sergio Sayas, del PP, preguntó,
 y ojo a esto, si "la resaca de tanta gamba" no había dejado a los sindicatos ver la realidad… La resaca de la gamba, en
 pleno Congreso, con dos tazas.»
+
+## Paleta de coletillas y chascarrillos (14-nov-2026, lista del usuario) — ritmo NORMAL, sin acelerar
+Expresiones populares actuales para los remates, **adaptando pronombres al contexto** (no literales): p. ej. «se me está poniendo cara de boniato» → «a Sánchez se le ha quedado cara de boniato». Una o dos por pieza, bien colocadas (al abrir, tras la cita, de remate); **no amontonarlas**. Se dicen a ritmo normal (probamos acelerarlas y quedaba peor). **Sin tacos** (quedan fuera «me cago en la leche», «coño», «del copón», «almorrana»…, que penalizan la monetización).
+- Me he quedao loco, Paco.
+- Esto es un sindiós de proporciones bíblicas. / Esto es un sindiós.
+- Estoy más perdido que un pulpo en un garaje.
+- Me está dando un parraque.
+- Se me está poniendo cara de boniato.
+- No carburo, macho.
+- Esto tiene una pinta regulera.
+- Me hallo en una encrucijada existencial.
+- Estoy más tieso que la mojama.
+- Qué fantasía más turbia.
+- Esto es una bacanal de sinsentidos.
+- Se me está poniendo el cuerpo como un botijo.
+- ¡Qué escándalo de criatura!
+- Estoy más agobiado que un gremlin en una sauna.
+- Esto es más raro que un ciervo con flequillo.
+- Menudo percal.
+- Me ha dado un vahído manchego.
+- Estoy en un sinvivir de categoría.
+- Qué despropósito de dimensiones industriales.
+- Se ha liao la mundial en el convento.
+- ¡Al turrón!
+- ¡Venga, que nos vamos!
+- Esto es así y punto pelota.
+- ¡Qué movida más gorda!
+- ¡A tope de power!
+- ¡Ni tan mal!
+- Se nos está yendo de las manos.
+- ¡Virgen del camino seco!
+- ¡La madre que me trajo!
+- ¡Qué barbaridad!
+- No te digo ná y te lo digo tó.
+- ¡Estamos apañados!
