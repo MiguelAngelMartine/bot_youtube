@@ -28,8 +28,8 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
-AZURE_TEMP = "1.0"                                 # 13-nov-2026: voz «A» (temperatura 1,0, más expresiva, velocidad normal
-#                                                    y filtro «radio»), elegida por el usuario entre pruebas. Sustituye a 0,8.
+AZURE_TEMP = "1.6"                                 # 14-nov-2026: voz «1,6» ENERGÉTICA (elegida por el usuario entre muestras;
+#                                                    velocidad normal + filtro «radio»). Sustituye a la «A» de 1,0, que sonaba apagada.
 RADIO = ("highpass=f=70,equalizer=f=150:t=q:w=1.0:g=4,equalizer=f=350:t=q:w=1.5:g=1.5,"
          "equalizer=f=5500:t=q:w=2.0:g=-5,lowpass=f=12500,"
          "acompressor=threshold=-16dB:ratio=3:attack=4:release=130,alimiter=limit=0.92")   # 12-nov: filtro «radio»

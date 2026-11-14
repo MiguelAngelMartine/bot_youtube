@@ -17,6 +17,9 @@ posicionamiento a favor o en contra de nadie.
 - El **cierre**, cercano: «Si te ha servido, suscríbete y dale a la campanita. Y si no, también, hombre, que no cuesta nada.
   Gracias por vernos. Mañana, más.»
 
+## Voz «1,6» ENERGÉTICA (14-nov-2026) — el guion le da RITMO
+La voz estándar es Tristán HD a **temperatura 1,6**, enérgica (sustituye a la de 1,0, que sonaba apagada). El guion se escribe **pensado para esa energía**: más ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción, preguntas y remates. Un guion lento y de frases largas deja la voz apagada. Esto lo revisa el control de calidad.
+
 ## Fluidez (para que Tristán no suene abrupto) — MUY IMPORTANTE
 Tristán respeta la puntuación: la coma es pausa corta, el punto pausa larga, los puntos suspensivos «…» una pausa natural.
 - **Frases de longitud variada**, no todas cortas de golpe: alterna alguna más larga que respire con remates cortos. NUNCA

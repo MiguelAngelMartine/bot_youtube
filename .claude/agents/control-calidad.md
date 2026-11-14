@@ -13,6 +13,7 @@ Te darán una fecha. `control_calidad.py` deja en `dia/<fecha>/calidad/` un foto
 ## 1. Guion y TONO (léelo, no solo lo mires)
 Lee el `voz` de `dia/<fecha>/shorts/short_N.json` y los `pasos` de `dia/<fecha>/episodio.json`. Marca **CORREGIR** si:
 - el tono NO es **Vikingo / La Pulla** (desenfadado, coloquial, con chascarrillos y conectores orales «Mira…», «Agárrate…», «Y claro…»); si suena a **lector de titulares plano** o meramente informativo, está mal;
+- el guion **no tiene RITMO acorde a la voz «1,6» enérgica** (frases cortas y punzantes, arranques rápidos, verbos de acción, remates): si va lento, con frases largas y arrastradas que dejan la voz apagada, está mal (el guion debe sacar el potencial de la voz enérgica);
 - hay **ráfagas de frases de una palabra**, tacos o insultos vejatorios, o doble puntuación «.:»;
 - una **cita «...» no es literal** (debe coincidir con la fuente) o falta la atribución;
 - un **Short mezcla contexto de otro** (bleed): cada Short trata SOLO su tema;
