@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 import cv2
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 import animar_ia
 import corto as C
@@ -229,23 +229,63 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
     return out
 
 
-def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None):
-    """Polaroid grande (giro izq.) y pequeña (giro der.) de cada persona que dice alguna cita, con foto real de calidad y
-    variedad, en armonía con el fondo. Solo para las personas que de verdad hablan en el bloque."""
+def _barra_nc(nombre, cargo, ancho=560):
+    bar = Image.new("RGBA", (ancho, 80), (0, 0, 0, 0)); db = ImageDraw.Draw(bar)
+    db.rounded_rectangle([0, 0, ancho, 80], radius=12, fill=(16, 26, 46, 240)); db.rectangle([0, 0, 9, 80], fill=ROJO + (255,))
+    db.text((26, 13), nombre.upper()[:24], font=fuente("Inter-Black.ttf", 30), fill=BLANCO)
+    if cargo:
+        db.text((26, 52), cargo.upper()[:36], font=fuente("Inter-SemiBold.ttf", 18), fill=AMARILLO + (255,))
+    return bar
+
+
+def _recorte_integrado(nombre, alto):
+    """Opción A (ESTÁNDAR 15-nov): recorte real SIN FONDO de la persona, con sombra suave, para ir INTEGRADO delante de la
+    escena (no Polaroid). Devuelve RGBA (con su sombra, pad incluido) o None si no hay recorte curado."""
+    try:
+        import biblioteca_fotos as BF
+        r, _ = BF.mejor_recorte(nombre)
+        if not (r and Path(r).exists()):
+            return None
+        cut = Image.open(r).convert("RGBA")
+        cut = cut.resize((max(1, int(cut.width * alto / cut.height)), alto), Image.LANCZOS)
+        pad = 60
+        a = Image.new("L", (cut.width + 2 * pad, cut.height + 2 * pad)); a.paste(cut.getchannel("A"), (pad, pad))
+        som = a.filter(ImageFilter.GaussianBlur(24)).point(lambda v: int(v * 0.6))
+        base = Image.new("RGBA", a.size)
+        base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", a.size).split(), som)), (-12, 16))
+        base.alpha_composite(cut, (pad, pad))
+        return base
+    except Exception as e:
+        print(f"  (recorte integrado {nombre}: {type(e).__name__})")
+        return None
+
+
+def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, alto_rec=0):
+    """Imagen de la persona para ir DELANTE de la escena (estándar «opción A», 15-nov). PRIMERO el recorte curado sin fondo
+    (integrado, con sombra); si no hay, Polaroid de respaldo. Devuelve (full, small, barras): full/small = imágenes grande y
+    pequeña; barras[n] = barra de nombre/cargo (None si la Polaroid ya la lleva baked)."""
     cargos = cargos or {}
-    full, small = {}, {}
+    full, small, barras = {}, {}, {}
     for n in dict.fromkeys(p for _, _, p in quotes):
         if not n or n in full:
             continue
-        foto, cargo, cred = _foto_persona(dia, fecha, n, cargos.get(n, ""))
+        cargo = cargos.get(n, "")
+        rec = _recorte_integrado(n, alto_rec) if alto_rec else None
+        if rec is not None:                                # opción A: recorte integrado + barra aparte
+            full[n] = rec
+            small[n] = rec.resize((int(rec.width * ancho_s / ancho_f), int(rec.height * ancho_s / ancho_f)), Image.LANCZOS)
+            barras[n] = _barra_nc(n, cargo)
+            continue
+        foto, cargo2, cred = _foto_persona(dia, fecha, n, cargo)   # respaldo: Polaroid (la barra va baked)
         if not foto:
             continue
         try:
-            full[n] = polaroid_armonica(foto, n, cargo or cargos.get(n, ""), cred, ancho_f, acento, giro=-3)
-            small[n] = polaroid_armonica(foto, n, cargo or cargos.get(n, ""), cred, ancho_s, acento, giro=4)
+            full[n] = polaroid_armonica(foto, n, cargo2 or cargo, cred, ancho_f, acento, giro=-3)
+            small[n] = polaroid_armonica(foto, n, cargo2 or cargo, cred, ancho_s, acento, giro=4)
+            barras[n] = None
         except Exception as e:
             print(f"  (Polaroid de {n}: {type(e).__name__})")
-    return full, small
+    return full, small, barras
 
 
 def _sub_es_clave(w):
@@ -315,58 +355,59 @@ def _dibuja_sub(fr, t, chunks, modo):
             x += d.textlength(w + " ", font=f)
 
 
-def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None):
-    """Dibuja la(s) Polaroid(s) activa(s) en el instante t y, en el largo, también coloca el recuadro de la frase (caja):
-      · UNA sola Polaroid -> Polaroid a la izquierda y el recuadro a la derecha;
-      · DOS Polaroids (cruce/conversación) -> las dos arriba, justo encima del recuadro, y el recuadro centrado abajo;
-      · ninguna -> el recuadro centrado abajo.
-    En los Shorts (vertical) no caben lado a lado: Polaroid(s) arriba y el recuadro lo pone el llamador debajo."""
+def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None, barras=None, persona_dom=None):
+    """ESTÁNDAR «opción A» (15-nov): SIEMPRE un personaje en la escena. Dibuja el recorte integrado (o Polaroid de respaldo)
+    de la persona ACTIVA —la que dice la cita en el instante t, o la persona dominante/referida del bloque si no hay cita—,
+    anclado abajo (largo: izquierda; short: arriba), con su barra de nombre/cargo. En un cruce, también la anterior."""
     W, H = fr.size
+    barras = barras or {}
     i = next((k for k, (a, b, p) in enumerate(quotes) if a - 0.12 <= t <= b), None)
-    estado = "none"
-    if i is not None:
+    if i is not None and quotes[i][2] in full:             # cita ATRIBUIDA: la persona que la dice
         a, b, p = quotes[i]
         prev = quotes[i - 1] if i > 0 else None
         conversa = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in small and p in full)
-        estado = "double" if conversa else ("single" if p in full else "none")
+        estado = "double" if conversa else "single"
+        a_ini = a
+    else:                                                  # cita sin atribuir o sin cita: la persona dominante (nunca vacío)
+        p = persona_dom if persona_dom in full else None
+        estado = "single" if p else "none"
+        a_ini = t - 1.0
 
     def esc(img, s):
         return img.resize((max(1, int(img.width * s)), max(1, int(img.height * s))), Image.BILINEAR) if abs(s - 1) > 0.004 else img
 
-    def pop_de(a):
-        return 0.84 + 0.16 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
+    def pop(a):
+        return 0.9 + 0.1 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
 
-    if modo == "largo":                                    # el subtítulo karaoke va al pie; las Polaroids, en la zona media/alta
-        if estado == "single":                             # UNA: a la izquierda, centrada en vertical
-            a, b, p = quotes[i]
-            cim = esc(full[p], pop_de(a))
-            py = max(150, (H - cim.height) // 2 - 20)
-            fr.alpha_composite(cim, (90, py))
-        elif estado == "double":                           # DOS (cruce): las dos arriba, por encima del subtítulo
-            a, b, p = quotes[i]; prev = quotes[i - 1]
-            cim = esc(full[p], pop_de(a))
-            ps = small.get(prev[2])
-            bb = H - 250
-            gap = 44
-            grp = (ps.width + gap if ps else 0) + cim.width
-            sx = (W - grp) // 2
+    if estado == "none":
+        return
+    if modo == "largo":
+        if estado == "double":
+            prev = quotes[i - 1]; cim = esc(full[p], pop(a_ini)); ps = small.get(prev[2])
             if ps:
-                fr.alpha_composite(ps, (sx, bb - ps.height)); sx += ps.width + gap
-            fr.alpha_composite(cim, (sx, bb - cim.height))
+                fr.alpha_composite(ps, (20, H - ps.height + 20))
+            fr.alpha_composite(cim, (W - cim.width - 10, H - cim.height + 20))
+            if barras.get(p) is not None:
+                fr.alpha_composite(barras[p], (W - cim.width + 30, H - 250))
+        else:
+            cim = esc(full[p], pop(a_ini))
+            fr.alpha_composite(cim, (20, H - cim.height + 20))
+            if barras.get(p) is not None:
+                fr.alpha_composite(barras[p], (40, H - 250))
         return
 
-    # short (vertical): Polaroid(s) arriba (el recuadro lo pone el llamador debajo)
+    # short (vertical): persona arriba
     if estado == "double":
-        a, b, p = quotes[i]; prev = quotes[i - 1]
-        ps = small.get(prev[2])
+        prev = quotes[i - 1]; ps = small.get(prev[2])
         if ps:
-            fr.alpha_composite(ps, (30, 250))
-        cim = esc(full[p], pop_de(a))
-        fr.alpha_composite(cim, (W - cim.width - 30, 230))
-    elif estado == "single":
-        a, b, p = quotes[i]
-        cim = esc(full[p], pop_de(a))
-        fr.alpha_composite(cim, ((W - cim.width) // 2, 220))
+            fr.alpha_composite(ps, (20, 230))
+        cim = esc(full[p], pop(a_ini)); fr.alpha_composite(cim, (W - cim.width - 20, 200))
+        if barras.get(p) is not None:
+            fr.alpha_composite(barras[p], (30, 200 + cim.height - 70))
+    else:
+        cim = esc(full[p], pop(a_ini)); fr.alpha_composite(cim, ((W - cim.width) // 2, 200))
+        if barras.get(p) is not None:
+            fr.alpha_composite(barras[p], ((W - barras[p].width) // 2, 200 + cim.height - 70))
 
 
 def _foto_persona(dia, fecha, nombre, cargo=""):
@@ -591,7 +632,14 @@ def short(fecha, n):
     acento_s = _acento(base0.crop((0, int(base0.height * 0.45), base0.width, int(base0.height * 0.75))))
     conocidas = _conocidas()
     quotes = _citas_timeline(texto, 0, texto[:k_fin] if k_fin >= 0 else texto, T, conocidas, S.get("quien", ""))
-    pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento_s, 600, 410, dict(conocidas))
+    pol_full, pol_small, barras = _polas_persona(dia, fecha, quotes, acento_s, 600, 410, dict(conocidas),
+                                                 alto_rec=int(AL * 0.46))
+    _qp = [p for *_, p in quotes if p]
+    pdom = max(_qp, key=_qp.count) if _qp else S.get("quien", "")
+    if pdom and pdom not in pol_full:                      # siempre un personaje en el Short
+        rec = _recorte_integrado(pdom, int(AL * 0.52))
+        if rec is not None:
+            pol_full[pdom] = rec; barras[pdom] = _barra_nc(pdom, dict(conocidas).get(pdom, ""))
 
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes],
                   con_sintonia=False)
@@ -632,7 +680,7 @@ def short(fecha, n):
         st.putalpha(gt)
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
-        _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short")   # Polaroid de la cita en curso (y la del cruce)
+        _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short", barras=barras, persona_dom=pdom)   # recorte integrado
         caja = cajas[frase_idx(t)]                                   # recuadro de la frase (zona media-baja)
         caja_y = AL - 400 - caja.height
         fr.alpha_composite(kick, (50, caja_y - kick.height - 14))    # etiqueta (kicker) encima del recuadro, sin solaparse
@@ -756,16 +804,24 @@ def largo(fecha):
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
         subs = _sub_chunks(c, btxt, T)                     # subtítulo karaoke al pie (tiempos absolutos del bloque)
-        cajas = [SH._caja(f.strip(), ancho=1180, tam=40) for f in frases]   # recuadro de la frase (además del karaoke)
-        # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
+        cajas = [SH._caja(f.strip(), ancho=820, tam=52) for f in frases]    # recuadro de la frase, grande, a la derecha
+        # Recorte integrado (opción A) por CITA/escena: la foto real de quien dice la cita o de la persona referida.
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
         conocidas = _conocidas()
         quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
-        pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento, 560, 380, dict(conocidas))
+        pol_full, pol_small, barras = _polas_persona(dia, fecha, quotes, acento, 560, 380, dict(conocidas),
+                                                      alto_rec=int(AL2 * 0.82))
+        _qp = [p for *_, p in quotes if p]
+        pdom = (max(_qp, key=_qp.count) if _qp else (s.get("persona") or quien))
+        if pdom and pdom not in pol_full:                  # siempre un personaje: aunque no tenga cita, su recorte
+            rec = _recorte_integrado(pdom, int(AL2 * 0.82))
+            if rec is not None:
+                pol_full[pdom] = rec; barras[pdom] = _barra_nc(pdom, dict(conocidas).get(pdom, ""))
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
                         "cambios": cambios or [(t0, 0)], "subs": subs, "cajas": cajas, "tf": tf,
-                        "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small})
+                        "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small,
+                        "barras": barras, "persona_dom": pdom})
         c += len(btxt) + 1
     for a, b in zip(bloques, bloques[1:]):
         a["t1"] = b["t0"]
@@ -796,12 +852,13 @@ def largo(fecha):
         som = Image.new("RGBA", (AN2, 430), (6, 10, 22, 255)); som.putalpha(g)
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
-        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo")
+        _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo",
+                      barras=bl.get("barras"), persona_dom=bl.get("persona_dom"))
         cajas, tf = bl.get("cajas") or [], bl.get("tf") or []
-        if cajas:                                           # recuadro de la frase (zona media-baja), además del karaoke
+        if cajas:                                           # recuadro de la frase a la DERECHA (opción A), además del karaoke
             fi = max([j for j, te in enumerate(tf) if te <= t] or [0])
             caja = cajas[min(fi, len(cajas) - 1)]
-            fr.alpha_composite(caja, ((AN2 - caja.width) // 2, AL2 - 265 - caja.height))
+            fr.alpha_composite(caja, (AN2 - caja.width - 70, 320))
         _dibuja_sub(fr, t, bl.get("subs") or [], "largo")   # subtítulo karaoke al pie (blanco + amarillo)
         return fr
 
