@@ -20,7 +20,7 @@ posicionamiento a favor o en contra de nadie.
 ## Voz «1,6» ENERGÉTICA (14-nov-2026) — el guion le da RITMO
 La voz estándar es Tristán HD a **temperatura 1,6**, enérgica (sustituye a la de 1,0, que sonaba apagada). El guion se escribe **pensado para esa energía**: más ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción y remates. Un guion lento y de frases largas deja la voz apagada. Dos reglas con esta voz:
 - **NO preguntas en el cuerpo** (Tristán no las entona bien): la única pregunta es la **final** («¿Tiene razón X?»). En el cuerpo, en afirmativo.
-- **NO chascarrillos de UNA palabra** tras una frase o cita («Toma.»): quedan mal. Usa **coletillas populares más largas y con gancho** («esto no lo has visto venir», «se le ha quedado el culo torcío», «menudo zasca»…), actuales y sin tacos.
+- **NO chascarrillos de UNA palabra** tras una frase o cita («Toma.»): quedan mal. Usa **coletillas populares más largas y con gancho** («esto no lo has visto venir», «menudo zasca»…), actuales y sin tacos.
 Esto lo revisa el control de calidad.
 
 ## Fluidez (para que Tristán no suene abrupto) — MUY IMPORTANTE
@@ -65,12 +65,9 @@ pleno Congreso, con dos tazas.»
 
 ## Paleta de coletillas y chascarrillos (14-nov-2026, lista del usuario) — ritmo NORMAL, sin acelerar
 Expresiones populares actuales para los remates, **adaptando pronombres al contexto** (no literales): p. ej. «se me está poniendo cara de boniato» → «a Sánchez se le ha quedado cara de boniato». Una o dos por pieza, bien colocadas (al abrir, tras la cita, de remate); **no amontonarlas**. Se dicen a ritmo normal (probamos acelerarlas y quedaba peor). **Sin tacos** (quedan fuera «me cago en la leche», «coño», «del copón», «almorrana»…, que penalizan la monetización).
-- Me he quedao loco, Paco.
 - Esto es un sindiós de proporciones bíblicas. / Esto es un sindiós.
 - Estoy más perdido que un pulpo en un garaje.
-- Me está dando un parraque.
 - Se me está poniendo cara de boniato.
-- No carburo, macho.
 - Esto tiene una pinta regulera.
 - Me hallo en una encrucijada existencial.
 - Estoy más tieso que la mojama.
@@ -81,7 +78,6 @@ Expresiones populares actuales para los remates, **adaptando pronombres al conte
 - Estoy más agobiado que un gremlin en una sauna.
 - Esto es más raro que un ciervo con flequillo.
 - Menudo percal.
-- Me ha dado un vahído manchego.
 - Estoy en un sinvivir de categoría.
 - Qué despropósito de dimensiones industriales.
 - Se ha liao la mundial en el convento.
@@ -89,13 +85,10 @@ Expresiones populares actuales para los remates, **adaptando pronombres al conte
 - ¡Venga, que nos vamos!
 - Esto es así y punto pelota.
 - ¡Qué movida más gorda!
-- ¡A tope de power!
 - ¡Ni tan mal!
 - Se nos está yendo de las manos.
 - ¡Virgen del camino seco!
-- ¡La madre que me trajo!
 - ¡Qué barbaridad!
-- No te digo ná y te lo digo tó.
 - ¡Estamos apañados!
 
 ### Más repertorio (14-nov-2026, ampliación del usuario) — usar la que mejor venga en cada situación
@@ -112,5 +105,4 @@ De cosecha propia (adaptar al contexto):
 - Ni el tato daba un duro.
 - Se ha quedado la cosa como un solar después de la guerra.
 - No había por dónde meterle mano al asunto.
-- Esto venía de largo y de ancho.
 - Se ha descubierto el pastel y encima estaba revenío.
