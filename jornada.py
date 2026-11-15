@@ -408,18 +408,25 @@ class Jornada:
                 return False
             self.py("notifica.py", self.f)
             self.parte("vídeo subido como privado")
-        if not (self.dia / "shorts" / "youtube.json").exists():
-            if self.py("shorts_dia.py", self.f, log="shorts.log", timeout=3600) == 0:
-                self.py("subir.py", self.f, "shorts", log="publicacion.log", timeout=3600)
-                self.parte("Shorts hechos y subidos como privados")
-            else:
-                self.parte("hoy sin Shorts (sin frases válidas o Gemini no responde)")
+        return True
+
+    def shorts(self):
+        # 16-nov-2026 (petición del usuario): los Shorts se hacen y suben ANTES que el vídeo largo. Solo dependen del
+        # cierre (episodio.json), no del largo. La cuota de FLUX es fresca a las 10:30; si se agota, la biblioteca de
+        # ambiente cubre las escenas del largo.
+        if (self.dia / "shorts" / "youtube.json").exists():
+            return True
+        if self.py("shorts_dia.py", self.f, log="shorts.log", timeout=3600) == 0:
+            self.py("subir.py", self.f, "shorts", log="publicacion.log", timeout=3600)
+            self.parte("Shorts hechos y subidos como privados (antes que el largo)")
+        else:
+            self.parte("hoy sin Shorts (sin frases válidas o Gemini no responde)")
         return True
 
     def corre(self):
         self.parte("coordinador en Python (Gemini; Claude solo de respaldo) en marcha")
-        for fase in (self.recogida, self.escaleta, self.redaccion, self.mesa, self.cierre, self.grafica, self.montaje,
-                     self.miniatura, self.publicacion):
+        for fase in (self.recogida, self.escaleta, self.redaccion, self.mesa, self.cierre, self.shorts, self.grafica,
+                     self.montaje, self.miniatura, self.publicacion):
             if not fase():
                 self.parte(f"FALLO en {fase.__name__}")
                 subprocess.run([PY, "notifica.py", self.f, "--error", f"la jornada falló en la fase «{fase.__name__}»"], cwd=RAIZ)
