@@ -13,7 +13,8 @@ MEDIOS = ["El País", "elDiario", "Público", "La Vanguardia", "RTVE", "Europa P
           "El Confidencial", "El Mundo", "ABC", "La Razón", "EFE", "Telecinco", "Antena 3", "laSexta", "La Sexta",
           "Cadena SER", "COPE", "Onda Cero", "El Español", "OKdiario", "Vozpópuli", "The Objective"]
 SILENCIO = re.compile(r"no consta (su |ninguna )?(respuesta|réplica)|no ha (respondido|contestado|replicado)|sin (respuesta|réplica)|no hubo (respuesta|réplica)", re.I)
-PROHIBIDAS = ["zasca", "le dio un repaso", "humill", "destroz", "se retrata"]   # 12-nov: solo lo que declara un ganador
+PROHIBIDAS = []   # 15-nov-2026 (usuario): el sarcasmo y las frases hechas («menudo zasca», «vaya repaso»…) son el sello
+# del canal y NO se prohíben por estilo; la pluralidad (que la guasa caiga sobre todos) la juzga la mesa, no un filtro de palabras.
 CIFRA = re.compile(r"\d")
 # 15-nov-2026 (petición del usuario): el tono Vikingo con chascarrillos es OBLIGATORIO en TODOS los vídeos; si un bloque
 # tiene menos de 2 coletillas/conectores con gancho, suena a lector de titulares plano y vuelve al redactor.
