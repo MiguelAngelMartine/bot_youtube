@@ -100,8 +100,11 @@ class Jornada:
         return True
 
     def comunes(self):
+        # 15-nov-2026: GUION_ESTILO.md y EJEMPLOS_GANCHOS.md SIEMPRE van con el guionista (llevan la paleta de coletillas y
+        # frases hechas del usuario, que hay que USAR de verdad, y los ganchos de ejemplo).
         return [self.dia / "contexto.md", self.dia / "correcciones.md", self.dia / "ganchos_director.md",
-                self.dia / "encargo.json", RAIZ / "archivo" / "palabras_vetadas.json"]   # lista negra de palabras para la voz
+                self.dia / "encargo.json", RAIZ / "archivo" / "palabras_vetadas.json",   # lista negra de palabras para la voz
+                RAIZ / "oficina" / "GUION_ESTILO.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md"]
 
     def escaleta(self):
         if self.json("escaleta.json"):
