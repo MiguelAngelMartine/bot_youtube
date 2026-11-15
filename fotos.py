@@ -40,7 +40,7 @@ def openverse(q, n):
     try:
         for intento in range(3):                          # 15-nov: 20 peticiones/min anónimas; reintenta ante el 429 de ráfaga
             r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=15,
-                             params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": n * 2})
+                             params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": min(n * 2, 20)})   # anónimo: máx 20
             if r.status_code != 429:
                 break
             time.sleep((4, 8, 0)[intento])
