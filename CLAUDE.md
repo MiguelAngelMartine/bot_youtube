@@ -189,3 +189,13 @@ Si hay algo a revisar, **no se monta**: el redactor (Opus) reescribe esas palabr
 ### Ajustes del control de voz (14-nov-2026, petición del usuario)
 - **Orden de los oídos** en `prevuelo_voz.py`: **1) Gemini** (gratis), **2) OpenAI** (`gpt-4o-audio-preview`, de pago, cuando Gemini está saturado), **3) Whisper** (objetivo, siempre). Así el «oído de naturalidad» funciona aunque se agote la cuota gratis de Gemini.
 - **Lista negra de palabras** (`archivo/palabras_vetadas.json`): cada palabra/expresión que se descarta por no sonar natural se guarda con su alternativa. El **redactor la lee antes de redactar** (va en `comunes()` de la jornada) y NO las usa. El prevuelo la va alimentando (`prevuelo_voz.veta`). Ya sembrada con «rifirrafe» y «dichoso ático».
+
+## Bibliotecas locales para TODOS los recursos (15-nov-2026, petición del usuario) — SIEMPRE
+Principio fijo: **todo recurso tiene su biblioteca local, en git y BIEN DOCUMENTADA**, para no depender de la red ni de caídas, y para ganar variedad con el tiempo. Cada pieza que bajamos/generamos buena se guarda etiquetada.
+- **Fotos** (NUEVO): `biblioteca_fotos.py` + `canal/biblioteca_fotos/<apellido>/` + `catalogo.json` (+ `LEEME.md`). `fotos.mejores` guarda en ella cada retrato bueno (recortado a primer plano, licencia comercial, con autor/fuente/url/título/gesto/nota); si falla la red o no hay foto nueva, `render_ambiente._foto_persona` tira de `biblioteca_fotos.busca(persona)`. Objetivo: mucha VARIEDAD de fotos por político en local.
+- **Escenas de ambiente**: `biblioteca_ambiente.py` + `canal/biblioteca_ambiente/` (ya existía).
+- **Viñetas genéricas**: `canal/biblioteca_vinetas/` (ya existía).
+- Al añadir cualquier recurso nuevo, se crea su biblioteca local documentada igual.
+
+### Mejora de fotos (15-nov-2026)
+Las fotos salían flojas por dos bugs, ya arreglados: (1) `fotos.openverse` pedía `page_size` > 20 (máx anónimo) → daba 401 y 0 fotos, y ni se llamaba desde `mejores()`; ahora Openverse aporta ~16-20 fotos **comerciales** (CC-BY/BY-SA) por político, + Parlamento Europeo. (2) casi todas las fotos comerciales de políticos son de evento/grupo y se rechazaban por «no solo»; ahora se **recortan a primer plano** (`fotos.recorta_cara`) y valen. Solo licencias comerciales (nunca CC BY-NC-ND).

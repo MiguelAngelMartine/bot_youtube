@@ -425,6 +425,11 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignor
                      "licencia": c["licencia"], "pagina": c["pagina"], "fuente": c["fuente"], "persona": nombre,
                      "puntos_gemini": puntos[i]}
         guardadas.append(dia / "imagenes" / nom)
+        try:                                                # 15-nov: a la biblioteca local de fotos (respaldo sin red)
+            import biblioteca_fotos as BF
+            BF.guarda(nombre, dia / "imagenes" / nom, dict(cred[nom], gesto=animo))
+        except Exception as e:
+            print(f"  (biblioteca de fotos no guardó: {type(e).__name__})")
         print(f"  {nom}: {puntos[i]:.0f}/10 · {c['licencia']} · {c['autor'][:30]} · {c['titulo'][:60]}")
     cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{nombre}: {len(guardadas)} retratos de {len(buenas)} candidatas con cara grande ({len(cands)} en total)")

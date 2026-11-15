@@ -390,6 +390,23 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
                 if iv:
                     print(f"  {nombre}: sin foto nueva esta semana; se repite una buena para no quedarnos sin Polaroid")
                 break
+    if not hit:                                            # 15-nov: RESPALDO sin red: biblioteca local de fotos
+        try:
+            import shutil
+
+            import biblioteca_fotos as BF
+            got = BF.busca(nombre, 1)
+            if got:
+                ruta_bib, ficha = got[0]
+                (dia / "imagenes").mkdir(parents=True, exist_ok=True)
+                nom = f"retrato_{_norm(nombre.split()[-1])}_bib.jpg"
+                shutil.copyfile(ruta_bib, dia / "imagenes" / nom)
+                cred[nom] = dict(ficha, persona=nombre, puntos_gemini=ficha.get("puntos") or 6)
+                cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+                hit = busca()
+                print(f"  {nombre}: foto de la BIBLIOTECA local (sin red / sin foto nueva)")
+        except Exception as e:
+            print(f"  (biblioteca de fotos no disponible para {nombre}: {type(e).__name__})")
     if not hit:
         return None, cargo, ""
     f, c = hit

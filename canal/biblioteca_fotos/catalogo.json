@@ -1,0 +1,32 @@
+{
+ "sanchez": [
+  {
+   "hash": "87e1bbeb45514a2d",
+   "img": "sanchez/87e1bbeb45514a2d.jpg",
+   "persona": "Pedro Sánchez",
+   "licencia": "CC BY / BY-SA",
+   "autor": "Pool Moncloa / CECOPI",
+   "fuente": "fotos.mejores",
+   "url": "",
+   "pagina": "",
+   "titulo": "retrato_sanchez.jpg",
+   "gesto": "serio",
+   "puntos": 8,
+   "guardado": "2026-11-15"
+  },
+  {
+   "hash": "7843089112924c92",
+   "img": "sanchez/7843089112924c92.jpg",
+   "persona": "Pedro Sánchez",
+   "licencia": "CC BY / BY-SA",
+   "autor": "Pool Moncloa / CECOPI",
+   "fuente": "fotos.mejores",
+   "url": "",
+   "pagina": "",
+   "titulo": "retrato_sanchez_2.jpg",
+   "gesto": "serio",
+   "puntos": 8,
+   "guardado": "2026-11-15"
+  }
+ ]
+}
