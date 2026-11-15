@@ -350,7 +350,9 @@ class Jornada:
         # ya no el tablero antiguo (largo.py).
         if self.py("render_ambiente.py", self.f, "largo", log="render.log", timeout=7200) != 0:
             return False
-        self.py("control_calidad.py", self.f, log="calidad.log")
+        # render_ambiente no deja escenas.json: las hojas de contacto para el control visual (Gemini) las saca hojas.py
+        # muestreando el mp4.
+        self.py("hojas.py", self.f, log="calidad.log")
         self.parte("montaje hecho y fotogramas de control sacados")
         return self.control_visual()
 
@@ -399,6 +401,9 @@ class Jornada:
         return True
 
     def publicacion(self):
+        # 15-nov-2026: render_ambiente no escribe episodio_descripcion.txt (lo hacía el motor antiguo) y plataforma.py lo
+        # necesita: lo genera descripcion.py desde episodio.json + creditos.json (capítulos, fuentes, aviso de IA, créditos).
+        self.py("descripcion.py", self.f, log="publicacion.log")
         if not (self.dia / "publicacion.md").exists() and self.py("plataforma.py", self.f, log="publicacion.log") != 0:
             self.claude("editor-plataforma", "Prepara publicacion.md.", self.dia.relative_to(RAIZ) / "publicacion.md")
         if not (self.dia / "youtube.json").exists():
