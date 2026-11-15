@@ -292,8 +292,8 @@ def _dibuja_sub(fr, t, chunks, modo):
     if not seg:
         return
     W, H = fr.size
-    tam = 70 if modo == "short" else 62      # subtítulo karaoke más grande (15-nov-2026, petición del usuario)
-    f = fuente("ComicNeue-Bold.ttf", tam)
+    tam = 72 if modo == "short" else 64      # subtítulo karaoke más grande (15-nov-2026, petición del usuario)
+    f = fuente("Inter-Black.ttf", tam)       # 15-nov-2026: ESTÁNDAR karaoke estilo TikTok (sans bold), no cómic
     d = ImageDraw.Draw(fr)
     maxw = W * 0.9
     lineas, cur = [], []
@@ -311,7 +311,7 @@ def _dibuja_sub(fr, t, chunks, modo):
         x = (W - tot) / 2
         y = y0 + li * lh
         for w, yel in linea:
-            d.text((x, y), w, font=f, fill=(AMARILLO if yel else BLANCO) + (255,), stroke_width=4, stroke_fill=(0, 0, 0, 255))
+            d.text((x, y), w, font=f, fill=(AMARILLO if yel else BLANCO) + (255,), stroke_width=7, stroke_fill=(0, 0, 0, 255))
             x += d.textlength(w + " ", font=f)
 
 
