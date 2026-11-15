@@ -41,6 +41,8 @@ SOBRIO = ", muted desaturated colors, quiet respectful mood"
 ESTILO_AMBIENTE = ("wordless European ligne claire comic illustration, clean uniform thin black outlines, flat clean colors "
                    "without gradients, a richly detailed ESTABLISHING WIDE SHOT of a place or object, set in Spain with typical "
                    "Spanish architecture (wrought-iron balconies, shutters, plazas, bar terraces), sense of depth and distance. "
+                   "SERIOUS, SOBER and SOLEMN atmosphere, muted restrained colour palette, moody overcast or late-afternoon "
+                   "light with longer shadows, calm and institutional tone (not cheerful, not bright, not sunny-postcard). "
                    "NO people in the foreground, no characters close to the camera, no faces; at most a few tiny distant "
                    "silhouettes in the far background. Empty quiet scene, plain surfaces without writing, every box, screen, "
                    "paper and sign blank and unlabeled, silent scene: ")

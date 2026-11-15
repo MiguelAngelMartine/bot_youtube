@@ -511,6 +511,7 @@ def short(fecha, n):
     cab = SH._cabecera(fecha, S.get("categoria", ""))
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
     sub_chunks = _sub_chunks(0, texto[:k_fin] if k_fin >= 0 else texto, T)   # subtítulo karaoke al pie
+    cajas = {i: SH._caja(f.strip(), ancho=940, tam=40) for i, f in enumerate(frases)}   # recuadro de la frase (además del karaoke)
 
     # Polaroids de quien dice cada CITA (foto real, calidad + variedad), en armonía con el fondo; aparecen con la cita y se
     # quitan al acabarla; en un cruce, la anterior se queda pequeña al lado hasta que termina la segunda (como una charla).
@@ -518,7 +519,7 @@ def short(fecha, n):
     acento_s = _acento(base0.crop((0, int(base0.height * 0.45), base0.width, int(base0.height * 0.75))))
     conocidas = _conocidas()
     quotes = _citas_timeline(texto, 0, texto[:k_fin] if k_fin >= 0 else texto, T, conocidas, S.get("quien", ""))
-    pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento_s, 460, 320, dict(conocidas))
+    pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento_s, 600, 410, dict(conocidas))
 
     musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.4, [], efectos=[(x, "whoosh") for x in cortes],
                   con_sintonia=False)
@@ -560,7 +561,10 @@ def short(fecha, n):
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
         _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short")   # Polaroid de la cita en curso (y la del cruce)
-        fr.alpha_composite(kick, (50, AL - 470))                     # etiqueta (kicker) fija, encima del subtítulo
+        caja = cajas[frase_idx(t)]                                   # recuadro de la frase (zona media-baja)
+        caja_y = AL - 400 - caja.height
+        fr.alpha_composite(kick, (50, caja_y - kick.height - 14))    # etiqueta (kicker) encima del recuadro, sin solaparse
+        fr.alpha_composite(caja, ((AN - caja.width) // 2, caja_y))
         _dibuja_sub(fr, t, sub_chunks, "short")                      # subtítulo karaoke al pie (blanco + amarillo)
         d = ImageDraw.Draw(fr)
         d.text((AN // 2, AL - 70), f"Fuente: {S.get('fuente', '')}"[:70], font=fuente("Inter-SemiBold.ttf", 26),
@@ -679,14 +683,15 @@ def largo(fecha):
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
         subs = _sub_chunks(c, btxt, T)                     # subtítulo karaoke al pie (tiempos absolutos del bloque)
+        cajas = [SH._caja(f.strip(), ancho=1180, tam=40) for f in frases]   # recuadro de la frase (además del karaoke)
         # Polaroids por CITA: cada cita «...» muestra la foto real de quien la dice; se quita al acabar; en un cruce, las dos
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
         conocidas = _conocidas()
         quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
-        pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento, 420, 300, dict(conocidas))
+        pol_full, pol_small = _polas_persona(dia, fecha, quotes, acento, 560, 380, dict(conocidas))
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
-                        "cambios": cambios or [(t0, 0)], "subs": subs,
+                        "cambios": cambios or [(t0, 0)], "subs": subs, "cajas": cajas, "tf": tf,
                         "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small})
         c += len(btxt) + 1
     for a, b in zip(bloques, bloques[1:]):
@@ -719,6 +724,11 @@ def largo(fecha):
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
         _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo")
+        cajas, tf = bl.get("cajas") or [], bl.get("tf") or []
+        if cajas:                                           # recuadro de la frase (zona media-baja), además del karaoke
+            fi = max([j for j, te in enumerate(tf) if te <= t] or [0])
+            caja = cajas[min(fi, len(cajas) - 1)]
+            fr.alpha_composite(caja, ((AN2 - caja.width) // 2, AL2 - 265 - caja.height))
         _dibuja_sub(fr, t, bl.get("subs") or [], "largo")   # subtítulo karaoke al pie (blanco + amarillo)
         return fr
 

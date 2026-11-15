@@ -38,8 +38,12 @@ def openverse(q, n):
     if CAIDA.exists() and time.time() - CAIDA.stat().st_mtime < 1800:
         raise RuntimeError("Openverse falló hace menos de 30 min; se salta")
     try:
-        r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=15,
-                         params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": n * 2})
+        for intento in range(3):                          # 15-nov: 20 peticiones/min anónimas; reintenta ante el 429 de ráfaga
+            r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=15,
+                             params={"q": q, "license": "cc0,pdm,by,by-sa", "page_size": n * 2})
+            if r.status_code != 429:
+                break
+            time.sleep((4, 8, 0)[intento])
         datos = r.json()
     except Exception:
         CAIDA.parent.mkdir(parents=True, exist_ok=True)
@@ -332,9 +336,12 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignor
     import miniatura as M
     dia = RAIZ / "dia" / dia_txt
     cands, vistos = [], set()
-    fuentes = [lambda: [retrato_wikidata(nombre)], lambda: commons_categoria(nombre, 24), lambda: moncloa(nombre, 10)]
+    fuentes = [lambda: [retrato_wikidata(nombre)], lambda: commons_categoria(nombre, 24), lambda: moncloa(nombre, 10),
+               lambda: openverse(nombre, 24), lambda: openverse(f"{nombre} European Parliament", 12),   # 15-nov: muchas más fotos comerciales
+               lambda: wikimedia(nombre, 12)]
     if extra_q:
         fuentes.append(lambda: commons_categoria(extra_q, 12))
+        fuentes.append(lambda: openverse(extra_q, 12))
     for f in fuentes:
         try:
             for c in f() or []:
