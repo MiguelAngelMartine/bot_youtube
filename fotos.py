@@ -327,6 +327,22 @@ debería ser: {animo}. Puntúa cada una de 1 a 10 valorando, por este orden:
 Responde SOLO JSON: {{"puntos": [p0, p1, ...]}} con un número por foto, en el mismo orden."""
 
 
+def recorta_cara(im, caja=None):
+    """Recorte simple de primer plano (cabeza y hombros) centrado en la cara, para que las fotos de evento/grupo sirvan como
+    retrato a solas. Devuelve la imagen recortada (PIL) o None si no hay cara o queda muy pequeña."""
+    import miniatura as M
+    k = caja or M.cara(im)
+    if not k:
+        return None
+    fx, fy, fw, fh = k
+    cx, cy = fx + fw / 2, fy + fh / 2
+    w, h = fw * 2.5, fh * 3.2                               # cabeza y hombros, la cara en el tercio superior
+    x0, y0 = cx - w / 2, cy - fh * 1.15
+    caja2 = (max(0, int(x0)), max(0, int(y0)), min(im.width, int(x0 + w)), min(im.height, int(y0 + h)))
+    crop = im.crop(caja2)
+    return crop if min(crop.size) >= 150 else None
+
+
 def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignora_variedad=False):
     """7-nov-2026 (el usuario: «las fotos son muy malas, poco profesional»): reúne muchas candidatas de la persona
     (Wikidata, su categoría de Commons y subcategorías por año, Pool Moncloa), descarta las de cara pequeña o sin cara
@@ -367,13 +383,16 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignor
         if im is None or min(im.size) < 300:
             continue
         k = M.cara(im)
-        if not k or k[3] < 0.14 * im.height or k[3] < 70:        # cara pequeña: foto de grupo o de lejos
+        if not k or k[3] < 55:                                  # sin cara o cara minúscula (ni recortando sirve)
             continue
-        if solo and M.n_caras(im) > 1:                          # 12-nov: retrato a solas, sin fotos de grupo
+        # 15-nov: en vez de rechazar fotos de grupo/evento (casi todas las comerciales de políticos lo son), se RECORTA a
+        # primer plano (cabeza y hombros) centrado en la cara del protagonista. Gemini verifica luego que es él y que vale.
+        crop = recorta_cara(im, k)
+        if crop is None:
             continue
-        buenas.append((c, im))
+        buenas.append((c, crop))
     if not buenas:
-        print(f"  {nombre}: ninguna candidata con la cara grande")
+        print(f"  {nombre}: ninguna candidata con cara utilizable")
         return []
     puntos = None
     for lote in range(0, len(buenas), 10):              # de 10 en 10 para no pasar el tamaño de la petición
@@ -396,9 +415,10 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignor
         if len(guardadas) >= n or puntos[i] < 6:
             break
         c, _ = buenas[i]
-        im = baja(original(c["url"]), 3200) or baja(c["url"], 3200)
-        if im is None:
+        full = baja(original(c["url"]), 3200) or baja(c["url"], 3200)
+        if full is None:
             continue
+        im = recorta_cara(full) or full                     # recorte a primer plano desde la resolución completa
         nom = f"retrato_{ap}{'' if not guardadas else '_' + str(len(guardadas) + 1)}.jpg"
         im.save(dia / "imagenes" / nom, quality=92)
         cred[nom] = {"titulo": c["titulo"], "url": c["url"], "ancho": im.width, "alto": im.height, "autor": c["autor"],
