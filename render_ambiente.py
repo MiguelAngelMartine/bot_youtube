@@ -155,7 +155,7 @@ def _conocidas():
 
 _SPEAK = (r"(?:dice|dijo|asegura|afirma|senala|responde|replica|contesta|espeta|suelta|lanza|acusa|carga|avisa|advierte|"
           r"reprocha|insiste|remata|sentencia|declara|apunta|zanja|clama|exige|proclama|ironiza|anuncia|defiende|critica|"
-          r"tacha|llama|ataca|pregunta|recuerda|subraya|denuncia|celebra|lamenta|admite|reconoce|pide|exclama|grita)")
+          r"tacha|llama|ataca|pregunta|recuerda|subraya|denuncia|celebra|lamenta|admite|reconoce|pide|exclama|grita|habla|hablan|escribe|expresa)")
 
 # palabras en mayúscula que NO son nombres de persona (para no confundir «España: «...»» con un hablante)
 _NO_NOMBRE = {"El", "La", "Los", "Las", "Un", "Una", "Lo", "Y", "O", "Pero", "En", "Con", "Sin", "Por", "Para", "Según",
@@ -166,7 +166,7 @@ _NO_NOMBRE = {"El", "La", "Los", "Las", "Un", "Una", "Lo", "Y", "O", "Pero", "En
 _VERBOS_HABLA = set("dice dijo asegura afirma senala responde replica contesta espeta suelta lanza acusa carga avisa "
                     "advierte reprocha insiste remata sentencia declara apunta zanja clama exige proclama ironiza anuncia "
                     "defiende critica tacha llama ataca pregunta recuerda subraya denuncia celebra lamenta admite reconoce "
-                    "pide exclama grita abre".split())
+                    "pide exclama grita abre habla hablan".split())
 
 
 def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
@@ -176,25 +176,29 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
     misma persona, se funden."""
     import re as _re
     nbt = _norm(btxt)
+    nq = _re.sub(r"«[^»]*»", lambda x: " " * len(x.group()), nbt)   # sin el interior de las citas (para hallar la frase)
     apes = [(_norm(n.split()[-1]), n) for n, _ in conocidas if len(n.split()[-1]) >= 4]
 
     def _destinatario(p):   # el apellido es el destinatario del ataque, no quien habla («a/contra Pedro Sánchez»)
-        return bool(_re.search(r"\b(?:a|al|contra|hacia|sobre|para)\s+(?:\w+\s+){0,2}$", nbt[max(0, p - 26):p]))
+        return bool(_re.search(r"\b(?:a|al|contra|hacia|sobre|para|que)\s+(?:\w+\s+){0,2}$", nbt[max(0, p - 26):p]))
 
     qs = []
     for m in _re.finditer(r"«([^»]{3,})»", btxt):
         a, b = T.en(c0 + m.start()), T.en(c0 + m.end())
         best, cand, candpos = quien_def, None, -1
+        # 15-nov: solo vale un hablante de LA MISMA FRASE que la cita (sin contar el interior de otras citas)
+        ini_f = max([nq.rfind(x, 0, m.start()) for x in ".!?;"] + [-1]) + 1
         for ape, n in apes:
             for mm in _re.finditer(r"\b" + _re.escape(ape) + r"\b", nbt[:m.start()]):
                 p = mm.start()
-                if _destinatario(p):
+                if p < ini_f or _destinatario(p):
                     continue
                 despues = nbt[mm.end():mm.end() + 22]
                 antes = nbt[max(0, p - 18):p]
                 hablante = (_re.match(r"\s*(?:\w+\s+){0,2}" + _SPEAK + r"\b", despues) is not None   # «Fulano … responde»
                             or _re.search(r"\b(?:" + _SPEAK + r"|segun)\s+$", antes) is not None       # «responde/según Fulano»
-                            or (m.start() - mm.end()) <= 4)                                            # «Fulano: «...»»
+                            or (m.start() - mm.end()) <= 4                                             # «Fulano: «...»»
+                            or _re.search(r"\b" + _SPEAK + r"\b", nq[mm.end():m.start()]) is not None)  # verbo de habla en la frase
                 if hablante and p > candpos:
                     candpos, cand = p, n
         if cand:
@@ -204,6 +208,8 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
             # registrado, p. ej. en «La campaña en frases»), NO se pone la foto del hablante por defecto (mejor ninguna que la
             # equivocada). Se ignoran los nombres que son destinatario («a/contra/sobre Fulano»).
             ini = max([btxt.rfind(x, 0, m.start()) for x in ".!?»"] + [-1]) + 1
+            if _re.search(r"\b(?:PSOE|PP|PNV|Vox|Sumar|Junts|ERC|Podemos|Bildu|Gobierno)\b", btxt[max(ini_f, ini):m.start()]):
+                best = ""      # la dice un partido/institución, no la persona por defecto
             ape_def = _norm(quien_def.split()[-1]) if quien_def else ""
             for mm in _re.finditer(r"\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b", btxt[ini:m.start()]):
                 w = mm.group(1)
@@ -370,6 +376,29 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
     cred_f = dia / "creditos.json"
     cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else {}
 
+    # 15-nov-2026 (petición del usuario): PRIMERO los recortes transparentes CURADOS por el usuario (identidad verificada
+    # por él, sin artefactos). Se componen sobre una tarjeta de estudio para que la Polaroid quede como una foto limpia.
+    try:
+        import biblioteca_fotos as BF
+        rec, ficha = BF.mejor_recorte(nombre)
+        if rec and Path(rec).exists():
+            from PIL import Image
+            cut = Image.open(rec).convert("RGBA")
+            w, h = cut.size
+            fondo = Image.new("RGBA", (w, h), (206, 214, 228, 255))                 # gris-azul claro
+            oscuro = Image.new("RGBA", (w, h), (120, 132, 156, 255))
+            fondo = Image.composite(oscuro, fondo, Image.linear_gradient("L").resize((w, h)))   # degradado de estudio
+            fondo.alpha_composite(cut)
+            (dia / "imagenes").mkdir(parents=True, exist_ok=True)
+            nom = f"retrato_{_norm(nombre.split()[-1])}_png.jpg"
+            fondo.convert("RGB").save(dia / "imagenes" / nom, quality=92)
+            cred[nom] = dict(ficha or {}, persona=nombre, autor=(ficha or {}).get("autor") or "archivo del canal",
+                             licencia=(ficha or {}).get("licencia") or "uso editorial", puntos_gemini=9)
+            cred_f.write_text(json.dumps(cred, ensure_ascii=False, indent=1), encoding="utf-8")
+            return dia / "imagenes" / nom, ((ficha or {}).get("cargo") or cargo), "Foto: archivo del canal"
+    except Exception as e:
+        print(f"  (recorte curado no disponible para {nombre}: {type(e).__name__})")
+
     def busca():
         fs = [(f, c) for f, c in cred.items() if c.get("persona") == nombre and "_recorte" not in f
               and (dia / "imagenes" / f).exists()]
@@ -436,6 +465,28 @@ def _escena_openai(destino, esc, sobrio=False, orient="16:9"):
     return True
 
 
+# 15-nov: escenas de la biblioteca que NO sirven (pantallas/logos/grafitis/fotos inventados) y escenas más vascas (Hernani)
+_LIB_MALAS = ("ec3eb2", "caabea", "69598c", "dad97a", "232cd0", "c82c99", "0c963d", "06bf54", "a76f43", "41a12f")
+_LIB_VASCAS = ("f433e5", "dff736", "6d1f15", "17d0bc")
+
+
+def _lib_elige(esc, usadas_lib):
+    """Escena de la biblioteca para `esc`: sin las malas, sin repetir en el vídeo (ni otro Congreso si ya salió uno) y, si la
+    escena es vasca, primero las de plaza/calle empedrada. Devuelve (ruta_img, ruta_clip|None, id) o None."""
+    import biblioteca_ambiente as BIB
+    cat = {e["id"][:6]: e for e in (BIB._catalogo() or [])}
+    if "basque" in esc.lower() or "bilbao" in esc.lower():
+        for k in _LIB_VASCAS:
+            e = cat.get(k)
+            if e and e["id"] not in usadas_lib and (BIB.BIB / e["img"]).exists():
+                return BIB.BIB / e["img"], None, e["id"]
+    malas = {e["id"] for k, e in cat.items() if k in _LIB_MALAS}
+    got = BIB.busca(esc, usadas=set(usadas_lib) | malas)
+    if got and got[2] in malas:
+        return None
+    return got
+
+
 def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3, orient="16:9"):
     """Intenta SIEMPRE una imagen nueva con FLUX (máxima variedad); si FLUX falla, la mejor de la biblioteca de ambiente.
     Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None).
@@ -455,9 +506,13 @@ def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3, orient="
         return destino, "nueva"
     except Exception as ex:
         print(f"  (FLUX falla «{esc[:36]}»: {type(ex).__name__}); biblioteca de ambiente")
-    got = BIB.busca(esc, usadas=usadas_lib)
+    got = _lib_elige(esc, usadas_lib)
     if got:
         usadas_lib.add(got[2])
+        for e in (BIB._catalogo() or []):          # un Congreso/Plaza Mayor ya usado cuenta para todos sus parecidos
+            for w in ("congress", "plaza mayor", "court of auditors"):
+                if w in e.get("desc", "").lower() and w in next((x.get("desc", "").lower() for x in BIB._catalogo() if x["id"] == got[2]), ""):
+                    usadas_lib.add(e["id"])
         return got[0], ("lib_clip" if got[1] else "lib_simple")
     return None, None
 
@@ -657,6 +712,7 @@ def largo(fecha):
     total = dur + 1.0
     import corto as _C
     # límites de bloque y escenas de ambiente por bloque
+    usadas_lib = set()                                     # ids de la biblioteca ya usados en TODO el vídeo (no repetir)
     bloques, c = [], 0
     for i, s in enumerate(secs):
         btxt = " ".join(p["di"] for p in s["pasos"])
@@ -668,7 +724,7 @@ def largo(fecha):
         amb_guion = [e for p in s["pasos"] for e in ((p.get("ve") or {}).get("ambiente") or []) if isinstance(e, str) and e.strip()]
         escs_txt = amb_guion[:3] or escenas_ambiente(pseudo, 3)   # las que escribe el redactor o, si no, generadas
         # SIEMPRE imagen nueva con FLUX (variedad); se guarda en la biblioteca; si FLUX falla, la mejor de la biblioteca.
-        pares, descs, usadas_lib = [], [], set()
+        pares, descs = [], []
         for k, esc in enumerate(escs_txt):
             d_ = dia / "vinetas" / f"L{i}_env_{k}.jpg"
             r, origen = _consigue_escena(d_, esc, usadas_lib, sobrio=s.get("tono") == "sobrio", intento=5)

@@ -21,9 +21,24 @@ BIB = RAIZ / "canal" / "biblioteca_fotos"
 CAT = BIB / "catalogo.json"
 
 
+def _ascii(s):
+    return re.sub(r"[^a-z0-9]+", "", unicodedata.normalize("NFKD", (s or "").lower()).encode("ascii", "ignore").decode())
+
+
+# Apellidos compartidos (15-nov-2026): el slug por defecto es el último apellido, pero cuando dos políticos lo comparten
+# hay que distinguirlos por el nombre completo, o se mezclan sus fotos (p. ej. Irene Montero vs María Jesús Montero).
+_DESAMBIGUA = {
+    "iremontero": {"irene"}, "mjmontero": {"maria", "mariajesus", "jesus", "mariaj"},   # Montero
+}
+
+
 def _slug(nombre):
-    s = unicodedata.normalize("NFKD", (nombre or "").split()[-1]).encode("ascii", "ignore").decode().lower()
-    return re.sub(r"[^a-z0-9]+", "", s) or "otro"
+    base = _ascii((nombre or "").split()[-1]) or "otro"
+    nom = _ascii(" ".join((nombre or "").split()[:-1]))     # nombre de pila (sin el apellido final)
+    for slug, pistas in _DESAMBIGUA.items():
+        if slug.endswith(base) and any(p in nom for p in pistas):
+            return slug
+    return base
 
 
 def _catalogo():

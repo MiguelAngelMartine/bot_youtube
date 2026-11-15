@@ -43,6 +43,34 @@
    "gesto": "serio, primer plano, mirando a cámara",
    "puntos": 8.0,
    "guardado": "2026-11-15"
+  },
+  {
+   "hash": "189cf2dda9c61dba",
+   "img": "feijoo/189cf2dda9c61dba.jpg",
+   "persona": "Alberto Nunez Feijoo",
+   "licencia": "CC BY 2.0",
+   "autor": "European People's Party",
+   "fuente": "Wikimedia Commons",
+   "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o_June_2023_%281%29.jpg/1280px-Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o_June_2023_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o_June_2023_(1).jpg",
+   "titulo": "File:Alberto Núñez Feijóo June 2023 (1).jpg",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 9.0,
+   "guardado": "2026-11-15"
+  },
+  {
+   "hash": "99a8aefcd20fad29",
+   "img": "feijoo/99a8aefcd20fad29.jpg",
+   "persona": "Alberto Nunez Feijoo",
+   "licencia": "CC BY 2.0",
+   "autor": "PP Comunidad de Madrid",
+   "fuente": "Wikimedia Commons",
+   "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Desayuno_Europa_Press_con_Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o.jpg/1280px-Desayuno_Europa_Press_con_Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Desayuno_Europa_Press_con_Alberto_N%C3%BA%C3%B1ez_Feij%C3%B3o.jpg",
+   "titulo": "File:Desayuno Europa Press con Alberto Núñez Feijóo.jpg",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 9.0,
+   "guardado": "2026-11-15"
   }
  ],
  "ayuso": [
@@ -453,5 +481,824 @@
    "guardado": "2026-11-15"
   }
  ],
- "_recortes": {}
+ "_recortes": {
+  "colau": [
+   {
+    "hash": "b95709e96ff737b9",
+    "img": "colau/recortes/b95709e96ff737b9.png",
+    "persona": "Ada Colau",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "640043e26a7bf4db",
+    "img": "colau/recortes/640043e26a7bf4db.png",
+    "persona": "Ada Colau",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "ee5c159b71504efc",
+    "img": "colau/recortes/ee5c159b71504efc.png",
+    "persona": "Ada Colau",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "76e52a779f40028a",
+    "img": "colau/recortes/76e52a779f40028a.png",
+    "persona": "Ada Colau",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "a0c5b56bc396268d",
+    "img": "colau/recortes/a0c5b56bc396268d.png",
+    "persona": "Ada Colau",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "esteban": [
+   {
+    "hash": "45121950e62efe60",
+    "img": "esteban/recortes/45121950e62efe60.png",
+    "persona": "Aitor Esteban",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "fb6378a351d0c3ff",
+    "img": "esteban/recortes/fb6378a351d0c3ff.png",
+    "persona": "Aitor Esteban",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "rivera": [
+   {
+    "hash": "b7debbcbc69e0c23",
+    "img": "rivera/recortes/b7debbcbc69e0c23.png",
+    "persona": "Albert Rivera",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "2250138e00b89a03",
+    "img": "rivera/recortes/2250138e00b89a03.png",
+    "persona": "Albert Rivera",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "791c1e29a2c8a50e",
+    "img": "rivera/recortes/791c1e29a2c8a50e.png",
+    "persona": "Albert Rivera",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "07b25986fcbece83",
+    "img": "rivera/recortes/07b25986fcbece83.png",
+    "persona": "Albert Rivera",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "7921454a1d9abaed",
+    "img": "rivera/recortes/7921454a1d9abaed.png",
+    "persona": "Albert Rivera",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "feijoo": [
+   {
+    "hash": "294343d653c77f40",
+    "img": "feijoo/recortes/294343d653c77f40.png",
+    "persona": "Alberto Núñez Feijóo",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "75bb79a860c34b44",
+    "img": "feijoo/recortes/75bb79a860c34b44.png",
+    "persona": "Alberto Núñez Feijóo",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "76088c0716c6141c",
+    "img": "feijoo/recortes/76088c0716c6141c.png",
+    "persona": "Alberto Núñez Feijóo",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "8bb1bcf2feb268cf",
+    "img": "feijoo/recortes/8bb1bcf2feb268cf.png",
+    "persona": "Alberto Núñez Feijóo",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "ponton": [
+   {
+    "hash": "ced135fc0e0e451c",
+    "img": "ponton/recortes/ced135fc0e0e451c.png",
+    "persona": "Ana Pontón",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "90d1cc3d4c9da34a",
+    "img": "ponton/recortes/90d1cc3d4c9da34a.png",
+    "persona": "Ana Pontón",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "8312363e674bf558",
+    "img": "ponton/recortes/8312363e674bf558.png",
+    "persona": "Ana Pontón",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "1ffc1bdea47e6764",
+    "img": "ponton/recortes/1ffc1bdea47e6764.png",
+    "persona": "Ana Pontón",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "otegi": [
+   {
+    "hash": "b6209f3927b5ade0",
+    "img": "otegi/recortes/b6209f3927b5ade0.png",
+    "persona": "Arnaldo Otegi",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "villacis": [
+   {
+    "hash": "92973b96e6c021fb",
+    "img": "villacis/recortes/92973b96e6c021fb.png",
+    "persona": "Begoña Villacís",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "67b07cfda7e0e29b",
+    "img": "villacis/recortes/67b07cfda7e0e29b.png",
+    "persona": "Begoña Villacís",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "4f854624c0f3a1d7",
+    "img": "villacis/recortes/4f854624c0f3a1d7.png",
+    "persona": "Begoña Villacís",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "puigdemont": [
+   {
+    "hash": "8fcb3a90e6a7eed1",
+    "img": "puigdemont/recortes/8fcb3a90e6a7eed1.png",
+    "persona": "Carles Puigdemont",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "397afdee4655d121",
+    "img": "puigdemont/recortes/397afdee4655d121.png",
+    "persona": "Carles Puigdemont",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "e5c1cf80887599db",
+    "img": "puigdemont/recortes/e5c1cf80887599db.png",
+    "persona": "Carles Puigdemont",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "cacbbd10c4a3c950",
+    "img": "puigdemont/recortes/cacbbd10c4a3c950.png",
+    "persona": "Carles Puigdemont",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "81ef73f32d5d91bb",
+    "img": "puigdemont/recortes/81ef73f32d5d91bb.png",
+    "persona": "Carles Puigdemont",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "rufian": [
+   {
+    "hash": "8634385af86ab8b5",
+    "img": "rufian/recortes/8634385af86ab8b5.png",
+    "persona": "Gabriel Rufián",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "7e67403c4181b337",
+    "img": "rufian/recortes/7e67403c4181b337.png",
+    "persona": "Gabriel Rufián",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "fa8cba2c41d3ec89",
+    "img": "rufian/recortes/fa8cba2c41d3ec89.png",
+    "persona": "Gabriel Rufián",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "arrimadas": [
+   {
+    "hash": "0fe91954ca98864c",
+    "img": "arrimadas/recortes/0fe91954ca98864c.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "f74b82dfb243318b",
+    "img": "arrimadas/recortes/f74b82dfb243318b.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "a91ab46639530969",
+    "img": "arrimadas/recortes/a91ab46639530969.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "62d7d821d1b08fc6",
+    "img": "arrimadas/recortes/62d7d821d1b08fc6.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "e7764c7edbb186fa",
+    "img": "arrimadas/recortes/e7764c7edbb186fa.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "d4b5eca7780c98fb",
+    "img": "arrimadas/recortes/d4b5eca7780c98fb.png",
+    "persona": "Inés Arrimadas",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "belarra": [
+   {
+    "hash": "8e22ccf95f1f1c0c",
+    "img": "belarra/recortes/8e22ccf95f1f1c0c.png",
+    "persona": "Ione Belarra",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "b36418b0452fbb9a",
+    "img": "belarra/recortes/b36418b0452fbb9a.png",
+    "persona": "Ione Belarra",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "967270a14d54545d",
+    "img": "belarra/recortes/967270a14d54545d.png",
+    "persona": "Ione Belarra",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "c81782720b7cea43",
+    "img": "belarra/recortes/c81782720b7cea43.png",
+    "persona": "Ione Belarra",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "29b84c55e30e9f27",
+    "img": "belarra/recortes/29b84c55e30e9f27.png",
+    "persona": "Ione Belarra",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "ayuso": [
+   {
+    "hash": "e5d51e5ba5793aba",
+    "img": "ayuso/recortes/e5d51e5ba5793aba.png",
+    "persona": "Isabel Díaz Ayuso",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "8a7750a93a551f4f",
+    "img": "ayuso/recortes/8a7750a93a551f4f.png",
+    "persona": "Isabel Díaz Ayuso",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "ad2f4cd2ce22e734",
+    "img": "ayuso/recortes/ad2f4cd2ce22e734.png",
+    "persona": "Isabel Díaz Ayuso",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "aizpurua": [
+   {
+    "hash": "1e232aa2338cff20",
+    "img": "aizpurua/recortes/1e232aa2338cff20.png",
+    "persona": "Mertxe Aizpurua",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "f1e4bb9823dc8d9c",
+    "img": "aizpurua/recortes/f1e4bb9823dc8d9c.png",
+    "persona": "Mertxe Aizpurua",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "nogueras": [
+   {
+    "hash": "645a249600926f1f",
+    "img": "nogueras/recortes/645a249600926f1f.png",
+    "persona": "Míriam Nogueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "2ce7268a83e735e0",
+    "img": "nogueras/recortes/2ce7268a83e735e0.png",
+    "persona": "Míriam Nogueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "583fa555a56d124b",
+    "img": "nogueras/recortes/583fa555a56d124b.png",
+    "persona": "Míriam Nogueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "a90085547b1e8abc",
+    "img": "nogueras/recortes/a90085547b1e8abc.png",
+    "persona": "Míriam Nogueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "junqueras": [
+   {
+    "hash": "4c10b319b12dc516",
+    "img": "junqueras/recortes/4c10b319b12dc516.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "7888962105f5acc4",
+    "img": "junqueras/recortes/7888962105f5acc4.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "48a26eafd51485db",
+    "img": "junqueras/recortes/48a26eafd51485db.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "6b961f444cf2c448",
+    "img": "junqueras/recortes/6b961f444cf2c448.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "63617522b5ebb38c",
+    "img": "junqueras/recortes/63617522b5ebb38c.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "cf184396d0e0f410",
+    "img": "junqueras/recortes/cf184396d0e0f410.png",
+    "persona": "Oriol Junqueras",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "matute": [
+   {
+    "hash": "e84d7b7b86acff96",
+    "img": "matute/recortes/e84d7b7b86acff96.png",
+    "persona": "Oskar Matute",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "7d42dcbe6476573e",
+    "img": "matute/recortes/7d42dcbe6476573e.png",
+    "persona": "Oskar Matute",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "sanchez": [
+   {
+    "hash": "c34900a59e237801",
+    "img": "sanchez/recortes/c34900a59e237801.png",
+    "persona": "Pedro Sánchez",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "feeeb361a5a6d121",
+    "img": "sanchez/recortes/feeeb361a5a6d121.png",
+    "persona": "Pedro Sánchez",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "828210f82cb21fa4",
+    "img": "sanchez/recortes/828210f82cb21fa4.png",
+    "persona": "Pedro Sánchez",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "71c82d7ffa9e697a",
+    "img": "sanchez/recortes/71c82d7ffa9e697a.png",
+    "persona": "Pedro Sánchez",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "illa": [
+   {
+    "hash": "ca4cf0ff89cd9b36",
+    "img": "illa/recortes/ca4cf0ff89cd9b36.png",
+    "persona": "Salvador Illa",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "dd595fcebb142a59",
+    "img": "illa/recortes/dd595fcebb142a59.png",
+    "persona": "Salvador Illa",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "dabe104f60a8b74c",
+    "img": "illa/recortes/dabe104f60a8b74c.png",
+    "persona": "Salvador Illa",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "54c60996fe953048",
+    "img": "illa/recortes/54c60996fe953048.png",
+    "persona": "Salvador Illa",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "abascal": [
+   {
+    "hash": "1ae670f240b07dbe",
+    "img": "abascal/recortes/1ae670f240b07dbe.png",
+    "persona": "Santiago Abascal",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "542a936c1f69328e",
+    "img": "abascal/recortes/542a936c1f69328e.png",
+    "persona": "Santiago Abascal",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "d595e0b9e62d1251",
+    "img": "abascal/recortes/d595e0b9e62d1251.png",
+    "persona": "Santiago Abascal",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "ec831c7742210dbf",
+    "img": "abascal/recortes/ec831c7742210dbf.png",
+    "persona": "Santiago Abascal",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "diaz": [
+   {
+    "hash": "287627184860604a",
+    "img": "diaz/recortes/287627184860604a.png",
+    "persona": "Yolanda Díaz",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "c72fe79948dcd334",
+    "img": "diaz/recortes/c72fe79948dcd334.png",
+    "persona": "Yolanda Díaz",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "3dc8914b4374f48a",
+    "img": "diaz/recortes/3dc8914b4374f48a.png",
+    "persona": "Yolanda Díaz",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "aabb7dda458edb6f",
+    "img": "diaz/recortes/aabb7dda458edb6f.png",
+    "persona": "Yolanda Díaz",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "iremontero": [
+   {
+    "hash": "1fdfc8d936930f4d",
+    "img": "iremontero/recortes/1fdfc8d936930f4d.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "d0af756003075fa5",
+    "img": "iremontero/recortes/d0af756003075fa5.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "b1582bfed38a41aa",
+    "img": "iremontero/recortes/b1582bfed38a41aa.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "0e518a9de8173402",
+    "img": "iremontero/recortes/0e518a9de8173402.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "c39306c456b33dec",
+    "img": "iremontero/recortes/c39306c456b33dec.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "babc3135d8eef37e",
+    "img": "iremontero/recortes/babc3135d8eef37e.png",
+    "persona": "Irene Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ],
+  "mjmontero": [
+   {
+    "hash": "30fc88971e146adb",
+    "img": "mjmontero/recortes/30fc88971e146adb.png",
+    "persona": "María Jesús Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "18482f0b766b3ff9",
+    "img": "mjmontero/recortes/18482f0b766b3ff9.png",
+    "persona": "María Jesús Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "0476f19a047edd50",
+    "img": "mjmontero/recortes/0476f19a047edd50.png",
+    "persona": "María Jesús Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "997f104d0511d55a",
+    "img": "mjmontero/recortes/997f104d0511d55a.png",
+    "persona": "María Jesús Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   },
+   {
+    "hash": "c8ba33a8b653c8d1",
+    "img": "mjmontero/recortes/c8ba33a8b653c8d1.png",
+    "persona": "María Jesús Montero",
+    "origen": "png_usuario",
+    "puntos": "10",
+    "guardado": "2026-11-15"
+   }
+  ]
+ },
+ "esteban": [
+  {
+   "hash": "4b90677df1de6f8b",
+   "img": "esteban/4b90677df1de6f8b.jpg",
+   "persona": "Aitor Esteban",
+   "licencia": "CC BY-SA 3.0 es",
+   "autor": "Carmen Moraga / El diario",
+   "fuente": "Commons (categoría)",
+   "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Portavoz-parlamentario-PNV-Aitor-Esteban_EDIIMA20160219_0246_5.jpg/1280px-Portavoz-parlamentario-PNV-Aitor-Esteban_EDIIMA20160219_0246_5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Portavoz-parlamentario-PNV-Aitor-Esteban_EDIIMA20160219_0246_5.jpg",
+   "titulo": "File:Portavoz-parlamentario-PNV-Aitor-Esteban EDIIMA20160219 0246 5.jpg (2016-02-19)",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 9.0,
+   "guardado": "2026-11-15"
+  }
+ ],
+ "colau": [
+  {
+   "hash": "cc643dee57721ca4",
+   "img": "colau/cc643dee57721ca4.jpg",
+   "persona": "Ada Colau",
+   "licencia": "CC BY-SA 4.0",
+   "autor": "Ferran Cornellà",
+   "fuente": "Commons (categoría)",
+   "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Entrevista_a_Ada_Colau._40_Comic_Barcelona_2022.jpg/1280px-Entrevista_a_Ada_Colau._40_Comic_Barcelona_2022.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Entrevista_a_Ada_Colau._40_Comic_Barcelona_2022.jpg",
+   "titulo": "File:Entrevista a Ada Colau. 40 Comic Barcelona 2022.jpg (2022-05-06)",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 9.0,
+   "guardado": "2026-11-15"
+  },
+  {
+   "hash": "473710ffff31bf04",
+   "img": "colau/473710ffff31bf04.jpg",
+   "persona": "Ada Colau",
+   "licencia": "CC0",
+   "autor": "Robo71, derivative work by Impru20",
+   "fuente": "Commons (categoría)",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Ada_Colau_2024_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Ada_Colau_2024_(cropped).jpg",
+   "titulo": "File:Ada Colau 2024 (cropped).jpg (2024-06-01)",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 8.0,
+   "guardado": "2026-11-15"
+  }
+ ],
+ "vaquero": [
+  {
+   "hash": "9f96e0fff5be9857",
+   "img": "vaquero/9f96e0fff5be9857.jpg",
+   "persona": "Maribel Vaquero",
+   "licencia": "CC BY-SA 2.0",
+   "autor": "EAJ - PNV Gipuzkoa",
+   "fuente": "Openverse/flickr",
+   "url": "https://live.staticflickr.com/8523/8564462055_6545a091bc_b.jpg",
+   "pagina": "https://www.flickr.com/photos/60064621@N05/8564462055",
+   "titulo": "Udal konbentzioa",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 8.0,
+   "guardado": "2026-11-15"
+  }
+ ],
+ "munoz": [
+  {
+   "hash": "ed93b5388bf83c76",
+   "img": "munoz/ed93b5388bf83c76.jpg",
+   "persona": "Ester Muñoz",
+   "licencia": "CC BY 4.0",
+   "autor": "PP Comunidad de Madrid",
+   "fuente": "Commons (categoría)",
+   "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Congreso_Nacional_del_PP_2025_-_Cayetana_%C3%81lvarez_de_Toledo_y_Ester_Mu%C3%B1oz.jpg/1280px-Congreso_Nacional_del_PP_2025_-_Cayetana_%C3%81lvarez_de_Toledo_y_Ester_Mu%C3%B1oz.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "pagina": "https://commons.wikimedia.org/wiki/File:Congreso_Nacional_del_PP_2025_-_Cayetana_%C3%81lvarez_de_Toledo_y_Ester_Mu%C3%B1oz.jpg",
+   "titulo": "File:Congreso Nacional del PP 2025 - Cayetana Álvarez de Toledo y Ester Muñoz.jpg",
+   "gesto": "serio, primer plano, mirando a cámara",
+   "puntos": 8.0,
+   "guardado": "2026-11-15"
+  }
+ ]
 }
