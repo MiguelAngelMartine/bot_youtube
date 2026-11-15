@@ -193,25 +193,22 @@ class Jornada:
     def _redacta(self, nn, que, dos):
         if True:
             sal = self.dia / "bloques" / f"{nn}.json"
+            # 15-nov-2026 (ESENCIA DEL CANAL, petición del usuario): el GUION lo escribe SIEMPRE Opus —es quien tiene el
+            # tono ácido/Vikingo, las coletillas y el sarcasmo, y adapta el texto para que la voz lo lea bien—, NUNCA Gemini.
             if not sal.exists():
-                self.puesto("redactor", f"Escribe {que}.", [self.dia / "escaleta.json", *dos, *self.comunes()], sal,
-                            valida=lambda r: isinstance(r, dict) and r.get("pasos"))
+                self.claude("redactor", f"Escribe {que} en {sal.name} (lee escaleta.json y el dossier del tema).",
+                            sal.relative_to(RAIZ), modelo="opus", motivo="el guion siempre lo escribe Opus")
             e = self.json("escaleta.json") or {}
             seg = next((b.get("segundos") for b in e.get("bloques", []) if f"{b['n']:02d}" == nn), None)
-            for intento in range(3):                   # lo mecánico y la calidad medible, antes de la mesa
+            for intento in range(2):                   # lo mecánico y la calidad medible, antes de la mesa
                 r = subprocess.run([PY, "prechequeo.py", self.f, nn], cwd=RAIZ, capture_output=True, text=True)
                 pre = "" if r.stdout.strip().endswith("OK") else r.stdout[-2500:]
                 cal = self.calidad_bloque(sal, seg) if sal.exists() else ["no existe"]
                 if not pre and not cal:
                     break
                 problemas = (pre + "\n" + "\n".join("- " + c for c in cal)).strip()
-                if intento == 2:                       # Gemini no lo ha dejado bien: lo rehace Claude (calidad)
-                    self.claude("redactor", f"Bloque {nn}: corrige estos problemas de calidad:\n{problemas}",
-                                sal.relative_to(RAIZ), motivo=f"bloque {nn} sin la calidad mínima tras 2 intentos de Gemini")
-                    break
-                self.puesto("redactor", f"Corrige {que}. Problemas detectados:\n{problemas}",
-                            [sal, self.dia / "escaleta.json", *dos, *self.comunes()], sal,
-                            valida=lambda r: isinstance(r, dict) and r.get("pasos"))
+                self.claude("redactor", f"Corrige {que} en {sal.name}: {problemas}",
+                            sal.relative_to(RAIZ), modelo="opus", motivo=f"corrección de calidad del guion (bloque {nn}, Opus)")
 
     def mesa(self):
         if (self.dia / "revision" / "mesa_hecha").exists():
@@ -417,15 +414,51 @@ class Jornada:
 
     def shorts(self):
         # 16-nov-2026 (petición del usuario): los Shorts se hacen y suben ANTES que el vídeo largo. Solo dependen del
-        # cierre (episodio.json), no del largo. La cuota de FLUX es fresca a las 10:30; si se agota, la biblioteca de
-        # ambiente cubre las escenas del largo.
-        if (self.dia / "shorts" / "youtube.json").exists():
+        # cierre (episodio.json), no del largo. La cuota de FLUX es fresca a las 10:30; si se agota, la biblioteca cubre.
+        carpeta = self.dia / "shorts"
+        if (carpeta / "youtube.json").exists():
             return True
-        if self.py("shorts_dia.py", self.f, log="shorts.log", timeout=3600) == 0:
-            self.py("subir.py", self.f, "shorts", log="publicacion.log", timeout=3600)
-            self.parte("Shorts hechos y subidos como privados (antes que el largo)")
-        else:
+        import json as _json
+        import time
+        enc = self.dia / "encargo.json"
+        try:
+            num = int(_json.loads(enc.read_text(encoding="utf-8")).get("num_shorts", 2)) if enc.exists() else 2
+        except (ValueError, TypeError, OSError):
+            num = 2
+        # 1) SELECCIÓN de frases + borrador: shorts_guion.py (Gemini; la selección sí puede ser de Gemini).
+        for intento in range(2):
+            r = subprocess.run([PY, "-u", "shorts_guion.py", self.f, str(num)], cwd=RAIZ)
+            if r.returncode != 2:
+                break
+            if intento == 0:
+                time.sleep(180)
+        jsons = sorted(carpeta.glob("short_*.json"), key=lambda x: int(x.stem.split("_")[1])) if carpeta.exists() else []
+        if not jsons:
             self.parte("hoy sin Shorts (sin frases válidas o Gemini no responde)")
+            return True
+        # 2) ESENCIA DEL CANAL: el GUION de cada Short lo escribe SIEMPRE Opus (tono ácido/Vikingo, coletillas, adaptado a
+        # la voz), SOLO su propio tema (prohibido el bleed). Opus reescribe «voz» y «ambiente» de cada short_N.json.
+        for j in jsons:
+            self.claude("redactor", f"Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
+                        "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
+                        "oficina/GUION_ESTILO.md). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
+                        "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
+                        "preguntas en el cuerpo, y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
+                        "en comentarios» y suscríbete. No toques las citas «» ni los demás campos.",
+                        j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
+        # 3) RENDER de cada Short con el motor de ambiente.
+        hechos = []
+        for j in jsons:
+            k = j.stem.split("_")[1]
+            if self.py("render_ambiente.py", self.f, k, log="shorts.log", timeout=1800) == 0 and (carpeta / f"short_{k}.mp4").exists():
+                hechos.append(k)
+        if hechos:
+            import shorts_dia
+            shorts_dia.hoja(carpeta)
+            self.py("subir.py", self.f, "shorts", log="publicacion.log", timeout=3600)
+            self.parte(f"{len(hechos)} Shorts (guion Opus) subidos como privados, antes del largo")
+        else:
+            self.parte("hoy sin Shorts (fallo al renderizar)")
         return True
 
     def corre(self):
