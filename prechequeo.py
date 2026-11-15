@@ -15,6 +15,16 @@ MEDIOS = ["El País", "elDiario", "Público", "La Vanguardia", "RTVE", "Europa P
 SILENCIO = re.compile(r"no consta (su |ninguna )?(respuesta|réplica)|no ha (respondido|contestado|replicado)|sin (respuesta|réplica)|no hubo (respuesta|réplica)", re.I)
 PROHIBIDAS = ["zasca", "le dio un repaso", "humill", "destroz", "se retrata"]   # 12-nov: solo lo que declara un ganador
 CIFRA = re.compile(r"\d")
+# 15-nov-2026 (petición del usuario): el tono Vikingo con chascarrillos es OBLIGATORIO en TODOS los vídeos; si un bloque
+# tiene menos de 2 coletillas/conectores con gancho, suena a lector de titulares plano y vuelve al redactor.
+COLETILLAS = [r"mira", r"\bojo\b", r"f[íi]jate", r"ag[áa]rrate", r"atenci[óo]n", r"resulta que", r"y claro",
+              r"va y (dice|suelta|contesta|responde|promete)", r"menudo", r"vaya tela", r"de traca", r"casi nada",
+              r"sin medias tintas", r"a todo gas", r"para enmarcar", r"no lo has visto venir", r"y de paso",
+              r"y encima", r"\btotal,", r"as[íi] est[áa] la cosa", r"ni corto ni perezoso", r"y mientras",
+              r"pero espera", r"se le ha quedado", r"a ver qui[ée]n", r"la que se ha liado", r"como lo o[íi]s",
+              r"de las que (se recuerdan|hacen historia)", r"con rima incluida", r"traer tela", r"traen tela",
+              r"con sal y pimienta", r"melon[ae]s? de la campa", r"al l[íi]o"]
+COLETILLAS_RE = [re.compile(x, re.I) for x in COLETILLAS]
 
 
 def chequea(fecha, nn):
@@ -41,6 +51,10 @@ def chequea(fecha, nn):
     for frase in re.split(r"(?<=[.?!])\s+", voz):
         if len(frase.split()) > 34:
             fallos.append(f"frase de {len(frase.split())} palabras (máximo 30): «{frase[:60]}…»")
+    gracia = sum(1 for r in COLETILLAS_RE if r.search(voz))   # tono Vikingo: coletillas/conectores con gancho
+    if gracia < 2:
+        fallos.append(f"suena plano: solo {gracia} coletilla(s)/conector(es) con gancho (mínimo 2; tono Vikingo "
+                      "obligatorio, no un lector de titulares). Añade chascarrillos repartidos por igual.")
     palabras = len(voz.split())
     print(f"bloque {nn}: {palabras} palabras, ~{palabras / 2.75:.0f} s")
     print("\n".join("- " + f for f in fallos) if fallos else "OK: sin problemas mecánicos")
