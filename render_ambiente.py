@@ -286,7 +286,7 @@ def _dibuja_sub(fr, t, chunks, modo):
     if not seg:
         return
     W, H = fr.size
-    tam = 60 if modo == "short" else 52
+    tam = 70 if modo == "short" else 62      # subtítulo karaoke más grande (15-nov-2026, petición del usuario)
     f = fuente("ComicNeue-Bold.ttf", tam)
     d = ImageDraw.Draw(fr)
     maxw = W * 0.9

@@ -75,6 +75,49 @@ def fichas(persona):
     return out
 
 
+# --- RECORTES TRATADOS (15-nov-2026, petición del usuario): la persona ya SIN FONDO (PNG transparente), tratada una vez,
+# para reutilizarla en MUCHOS fondos sin volver a llamar a OpenAI. Se guardan aparte, en <slug>/recortes/, y el índice va
+# en la clave "_recortes" del catálogo (las claves que empiezan por "_" no son personas). ---
+REC = "recortes"
+
+
+def guarda_recorte(persona, png_ruta, origen="", puntos=""):
+    """Guarda un recorte tratado (persona sin fondo, PNG) reutilizable. No repite (hash). Devuelve la ruta o None."""
+    png = Path(png_ruta)
+    if not png.exists():
+        return None
+    datos = png.read_bytes()
+    h = hashlib.sha1(datos).hexdigest()[:16]
+    slug = _slug(persona)
+    cat = _catalogo()
+    recs = cat.setdefault("_recortes", {}).setdefault(slug, [])
+    if any(r.get("hash") == h for r in recs):
+        return BIB / slug / REC / f"{h}.png"
+    carpeta = BIB / slug / REC
+    carpeta.mkdir(parents=True, exist_ok=True)
+    destino = carpeta / f"{h}.png"
+    shutil.copyfile(png, destino)
+    recs.append({"hash": h, "img": f"{slug}/{REC}/{h}.png", "persona": persona,
+                 "origen": origen, "puntos": puntos, "guardado": time.strftime("%Y-%m-%d")})
+    _guarda_catalogo(cat)
+    return destino
+
+
+def recortes(persona):
+    """Recortes tratados de la persona existentes en disco, de mejor a peor puntuación."""
+    slug = _slug(persona)
+    out = [r for r in _catalogo().get("_recortes", {}).get(slug, []) if (BIB / r["img"]).exists()]
+    out.sort(key=lambda r: -float(r.get("puntos") or 0))
+    return out
+
+
+def mejor_recorte(persona, usadas=()):
+    """RESPALDO reutilizable: (ruta, ficha) del mejor recorte tratado sin usar; si no quedan, el mejor igualmente."""
+    rs = recortes(persona)
+    frescos = [r for r in rs if r["hash"] not in set(usadas)] or rs
+    return (BIB / frescos[0]["img"], frescos[0]) if frescos else (None, None)
+
+
 def busca(persona, n=3, usadas=()):
     """RESPALDO: rutas de hasta n retratos de la biblioteca para esa persona, evitando las usadas (por hash); si no quedan
     sin usar, devuelve las mejores igualmente (mejor repetir que no tener foto). Devuelve [(ruta, ficha), ...]."""
@@ -89,7 +132,7 @@ def cuantas(persona=None):
     cat = _catalogo()
     if persona:
         return len(cat.get(_slug(persona), []))
-    return {s: len(v) for s, v in cat.items()}
+    return {s: len(v) for s, v in cat.items() if not s.startswith("_")}
 
 
 if __name__ == "__main__":
@@ -98,6 +141,8 @@ if __name__ == "__main__":
         print(f"{sys.argv[1]}: {cuantas(sys.argv[1])} fotos en la biblioteca")
     else:
         tot = cuantas()
-        print(f"Biblioteca de fotos: {sum(tot.values())} fotos de {len(tot)} personas")
+        rec = {s: len(v) for s, v in _catalogo().get("_recortes", {}).items()}
+        print(f"Biblioteca de fotos: {sum(tot.values())} fotos de {len(tot)} personas"
+              f"  ·  recortes tratados: {sum(rec.values())} de {len(rec)}")
         for s, n in sorted(tot.items(), key=lambda x: -x[1]):
-            print(f"  {s}: {n}")
+            print(f"  {s}: {n} fotos, {rec.get(s, 0)} recortes")
