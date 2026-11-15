@@ -1,7 +1,7 @@
 """SHORTS DEL DÍA (decisión del usuario del 5-nov-2026): tras subir el vídeo largo, hasta 3 Shorts verticales, uno por
 frase con más gancho, cada uno con su portada. Todo en el servidor, sin agentes (ahorro de tokens):
   1) shorts_guion.py elige y comprueba las frases (Gemini; si no responde, hoy no hay Shorts: son un extra);
-  2) short.py renderiza cada uno;
+  2) render_ambiente.py renderiza cada uno (estilo ambiente + Polaroid);
   3) deja shorts/hoja.png con 5 fotogramas de cada Short para la revisión visual antes de subir.
 Después, quien coordina mira hoja.png y, si está bien, sube con: python subir.py <fecha> shorts
 Uso: python shorts_dia.py AAAA-MM-DD [n=3]"""
@@ -52,7 +52,7 @@ def main(fecha, n=3):
     hechos = []
     for f in sorted(carpeta.glob("short_*.json"), key=lambda x: int(x.stem.split("_")[1])):
         k = f.stem.split("_")[1]
-        r = subprocess.run([PY, "short.py", fecha, k], cwd=RAIZ, capture_output=True, text=True)
+        r = subprocess.run([PY, "render_ambiente.py", fecha, k], cwd=RAIZ, capture_output=True, text=True)
         if r.returncode != 0 or not (carpeta / f"short_{k}.mp4").exists():
             print(f"short_{k}: FALLO al renderizar\n{r.stderr[-1500:]}")
             f.unlink()

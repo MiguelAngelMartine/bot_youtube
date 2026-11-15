@@ -344,9 +344,11 @@ class Jornada:
         return True
 
     def montaje(self):
-        if (self.dia / "episodio.mp4").exists() and (self.dia / "escenas.json").exists():
+        if (self.dia / "episodio.mp4").exists():
             return True
-        if self.py("largo.py", self.f, log="render.log", timeout=7200) != 0:
+        # 15-nov-2026 (petición del usuario): estilo vigente = escenas de ambiente + Polaroid (render_ambiente),
+        # ya no el tablero antiguo (largo.py).
+        if self.py("render_ambiente.py", self.f, "largo", log="render.log", timeout=7200) != 0:
             return False
         self.py("control_calidad.py", self.f, log="calidad.log")
         self.parte("montaje hecho y fotogramas de control sacados")
@@ -379,9 +381,9 @@ class Jornada:
         inf = (self.dia / "calidad" / "informe.md")
         if inf.exists() and "CORREGIR" in inf.read_text(encoding="utf-8"):
             (self.dia / "episodio.mp4").unlink(missing_ok=True)
-            self.claude("montador", "Arregla lo de calidad/informe.md y vuelve a montar con largo.py.",
+            self.claude("montador", "Arregla lo de calidad/informe.md y vuelve a montar con render_ambiente.py.",
                         (self.dia / "episodio.mp4").relative_to(RAIZ), motivo="hay que corregir el montaje")
-            if not (self.dia / "episodio.mp4").exists() and self.py("largo.py", self.f, log="render.log", timeout=7200) != 0:
+            if not (self.dia / "episodio.mp4").exists() and self.py("render_ambiente.py", self.f, "largo", log="render.log", timeout=7200) != 0:
                 return False
         return True
 

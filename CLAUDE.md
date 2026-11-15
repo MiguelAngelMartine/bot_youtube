@@ -199,3 +199,8 @@ Principio fijo: **todo recurso tiene su biblioteca local, en git y BIEN DOCUMENT
 
 ### Mejora de fotos (15-nov-2026)
 Las fotos salían flojas por dos bugs, ya arreglados: (1) `fotos.openverse` pedía `page_size` > 20 (máx anónimo) → daba 401 y 0 fotos, y ni se llamaba desde `mejores()`; ahora Openverse aporta ~16-20 fotos **comerciales** (CC-BY/BY-SA) por político, + Parlamento Europeo. (2) casi todas las fotos comerciales de políticos son de evento/grupo y se rechazaban por «no solo»; ahora se **recortan a primer plano** (`fotos.recorta_cara`) y valen. Solo licencias comerciales (nunca CC BY-NC-ND).
+
+## Jornada automática desde el 16-nov-2026 (decisión del usuario del 15-nov)
+- **Hora adelantada a las 10:30 de Madrid** (antes 12:00): el cron del servidor lanza `jornada.sh` a las 08:30 y 09:30 UTC con `--si-hora 10` (cubre el cambio de hora); el vigía de entrega pasa a las 14:30 (`--si-hora 14`). Ventaja: cuota de FLUX fresca y margen entero de las 5 h del plan de Claude.
+- **La jornada automática usa `jornada.py` (Gemini en cada puesto), no el skill de agentes de Claude**, para gastar el mínimo de tokens (objetivo ≤ 8 % semanal). Claude solo entra si Gemini/freellmpool fallan un puesto o un control de calidad. Hoy (15-nov) la monté a mano con el skill y agotó el límite de 5 h dos veces: no repetir, dejar que el cron use `jornada.sh`→`jornada.py`.
+- **`jornada.py` ya monta con el estilo vigente** (escenas de ambiente + Polaroid): el largo con `render_ambiente.py <fecha> largo` y los Shorts con `render_ambiente.py <fecha> N` (vía `shorts_dia.py`), en vez del `largo.py`/`short.py` antiguos (tablero). Integración aprobada por el usuario el 15-nov-2026.
