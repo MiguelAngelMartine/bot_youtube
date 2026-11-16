@@ -104,7 +104,8 @@ class Jornada:
         # frases hechas del usuario, que hay que USAR de verdad, y los ganchos de ejemplo).
         return [self.dia / "contexto.md", self.dia / "correcciones.md", self.dia / "ganchos_director.md",
                 self.dia / "encargo.json", RAIZ / "archivo" / "palabras_vetadas.json",   # lista negra de palabras para la voz
-                RAIZ / "oficina" / "GUION_ESTILO.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md"]
+                RAIZ / "oficina" / "GUION_ESTILO.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md",
+                RAIZ / "archivo" / "coletillas_evitar.txt"]   # coletillas usadas estos días: NO repetir (variedad)
 
     def escaleta(self):
         if self.json("escaleta.json"):
@@ -319,6 +320,12 @@ class Jornada:
             (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
             pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
             self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
+            try:                                           # registra las coletillas del largo y refresca el «a evitar» para los Shorts
+                import coletillas as COL
+                COL.registra(self.f, *(p.get("di", "") for s in E["secciones"] for p in s["pasos"]))
+                COL.escribe_evitar(RAIZ / "archivo" / "coletillas_evitar.txt")
+            except Exception:
+                pass
         return ok
 
     def grafica(self):
@@ -449,6 +456,11 @@ class Jornada:
                         "preguntas en el cuerpo, y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
                         "en comentarios» y suscríbete. No toques las citas «» ni los demás campos.",
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
+        try:                                               # registra las coletillas de los Shorts (variedad para mañana)
+            import coletillas as COL
+            COL.registra(self.f, *(_json.loads(j.read_text(encoding="utf-8")).get("voz", "") for j in jsons))
+        except Exception:
+            pass
         # 3) RENDER de cada Short con el motor de ambiente.
         hechos = []
         for j in jsons:
@@ -466,6 +478,11 @@ class Jornada:
 
     def corre(self):
         self.parte("coordinador en Python (Gemini; Claude solo de respaldo) en marcha")
+        try:                                               # coletillas usadas estos días -> el redactor NO las repite
+            import coletillas as COL
+            COL.escribe_evitar(RAIZ / "archivo" / "coletillas_evitar.txt")
+        except Exception:
+            pass
         for fase in (self.recogida, self.escaleta, self.redaccion, self.mesa, self.cierre, self.shorts, self.grafica,
                      self.montaje, self.miniatura, self.publicacion):
             if not fase():
