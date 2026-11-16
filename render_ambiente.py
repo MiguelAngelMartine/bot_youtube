@@ -624,7 +624,9 @@ def short(fecha, n):
     cab = SH._cabecera(fecha, S.get("categoria", ""))
     kick = SH._kicker((S.get("kicker") or S.get("quien", "")).upper())
     sub_chunks = _sub_chunks(0, texto[:k_fin] if k_fin >= 0 else texto, T)   # subtítulo karaoke al pie
-    cajas = {i: SH._caja(f.strip(), ancho=940, tam=40) for i, f in enumerate(frases)}   # recuadro de la frase (además del karaoke)
+    # 16-nov-2026 (usuario): recuadro de cita SOLO para frases cortas (gancho); en las citas largas, solo karaoke (si no,
+    # recuadro y karaoke muestran lo mismo a la vez y se pisan).
+    cajas = {i: (SH._caja(f.strip(), ancho=940, tam=40) if len(f.split()) <= 9 else None) for i, f in enumerate(frases)}
 
     # Polaroids de quien dice cada CITA (foto real, calidad + variedad), en armonía con el fondo; aparecen con la cita y se
     # quitan al acabarla; en un cruce, la anterior se queda pequeña al lado hasta que termina la segunda (como una charla).
@@ -681,10 +683,13 @@ def short(fecha, n):
         fr.alpha_composite(st, (0, 0))
         fr.alpha_composite(cab, (0, 0))
         _dibuja_polas(fr, t, quotes, pol_full, pol_small, "short", barras=barras, persona_dom=pdom)   # recorte integrado
-        caja = cajas[frase_idx(t)]                                   # recuadro de la frase (zona media-baja)
-        caja_y = AL - 400 - caja.height
-        fr.alpha_composite(kick, (50, caja_y - kick.height - 14))    # etiqueta (kicker) encima del recuadro, sin solaparse
-        fr.alpha_composite(caja, ((AN - caja.width) // 2, caja_y))
+        caja = cajas[frase_idx(t)]                                   # recuadro de la frase (solo si es corta)
+        if caja is not None:
+            caja_y = AL - 400 - caja.height
+            fr.alpha_composite(kick, (50, caja_y - kick.height - 14))  # etiqueta (kicker) encima del recuadro
+            fr.alpha_composite(caja, ((AN - caja.width) // 2, caja_y))
+        else:                                                        # cita larga: solo karaoke; el kicker, en sitio fijo
+            fr.alpha_composite(kick, (50, AL - 470))
         _dibuja_sub(fr, t, sub_chunks, "short")                      # subtítulo karaoke al pie (blanco + amarillo)
         d = ImageDraw.Draw(fr)
         d.text((AN // 2, AL - 70), f"Fuente: {S.get('fuente', '')}"[:70], font=fuente("Inter-SemiBold.ttf", 26),
@@ -804,7 +809,7 @@ def largo(fecha):
             if not cambios or ei != cambios[-1][1]:
                 cambios.append((te, ei))
         subs = _sub_chunks(c, btxt, T)                     # subtítulo karaoke al pie (tiempos absolutos del bloque)
-        cajas = [SH._caja(f.strip(), ancho=820, tam=52) for f in frases]    # recuadro de la frase, grande, a la derecha
+        cajas = [SH._caja(f.strip(), ancho=820, tam=52) if len(f.split()) <= 9 else None for f in frases]  # solo frases cortas
         # Recorte integrado (opción A) por CITA/escena: la foto real de quien dice la cita o de la persona referida.
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
@@ -855,10 +860,11 @@ def largo(fecha):
         _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo",
                       barras=bl.get("barras"), persona_dom=bl.get("persona_dom"))
         cajas, tf = bl.get("cajas") or [], bl.get("tf") or []
-        if cajas:                                           # recuadro de la frase a la DERECHA (opción A), además del karaoke
+        if cajas:                                           # recuadro de la frase a la DERECHA (solo frases cortas)
             fi = max([j for j, te in enumerate(tf) if te <= t] or [0])
             caja = cajas[min(fi, len(cajas) - 1)]
-            fr.alpha_composite(caja, (AN2 - caja.width - 70, 320))
+            if caja is not None:                            # cita larga -> solo karaoke (no se pisa con el recuadro)
+                fr.alpha_composite(caja, (AN2 - caja.width - 70, 320))
         _dibuja_sub(fr, t, bl.get("subs") or [], "largo")   # subtítulo karaoke al pie (blanco + amarillo)
         return fr
 
