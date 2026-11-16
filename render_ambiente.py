@@ -528,6 +528,22 @@ def _lib_elige(esc, usadas_lib):
     return got
 
 
+def _usadas_dia(dia):
+    """16-nov-2026 (usuario: «no hay variedad de fondos»): escenas de ambiente de la biblioteca ya usadas HOY por otros
+    vídeos de la jornada, para NO repetir el mismo fondo entre el largo y los Shorts."""
+    try:
+        return set(json.loads((Path(dia) / "escenas_usadas.json").read_text(encoding="utf-8")))
+    except (OSError, ValueError):
+        return set()
+
+
+def _guarda_usadas_dia(dia, usadas):
+    try:
+        (Path(dia) / "escenas_usadas.json").write_text(json.dumps(sorted(usadas), ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
+
+
 def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3, orient="16:9"):
     """Intenta SIEMPRE una imagen nueva con FLUX (máxima variedad); si FLUX falla, la mejor de la biblioteca de ambiente.
     Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None).
@@ -586,7 +602,7 @@ def short(fecha, n):
     # Si el guion trae su propio «ambiente» (lo escribe el redactor), se usa; si no, lo genera Gemini.
     # SIEMPRE se intenta una imagen nueva con FLUX (variedad); la nueva se guarda en la biblioteca; si FLUX falla, biblioteca.
     escenas_txt = [e for e in (S.get("ambiente") or []) if isinstance(e, str) and e.strip()][:5] or escenas_ambiente(S, 5)
-    rutas, descs, usadas_lib = [], [], set()
+    rutas, descs, usadas_lib = [], [], _usadas_dia(dia)   # no repetir fondos entre vídeos de la jornada
     mov = S.get("movimiento", "camera slowly pushes in, subtle natural motion, flags and banners sway")
     for k, esc in enumerate(escenas_txt):
         d = dia / "vinetas" / f"short{n}_env_{k}.jpg"
@@ -595,6 +611,7 @@ def short(fecha, n):
             rutas.append((r, origen)); descs.append(esc)
     if not rutas:
         raise SystemExit(f"short {n}: sin escenas de ambiente")
+    _guarda_usadas_dia(dia, usadas_lib)                    # registra las de la biblioteca usadas hoy (variedad entre vídeos)
     escenas = []
     for kk, ((r, origen), esc) in enumerate(zip(rutas, descs)):
         animar = origen == "lib_clip" or (origen == "nueva" and kk < 3)   # LTX en lo nuevo (cuota) o reusar el clip guardado
@@ -765,7 +782,7 @@ def largo(fecha):
     total = dur + 1.0
     import corto as _C
     # límites de bloque y escenas de ambiente por bloque
-    usadas_lib = set()                                     # ids de la biblioteca ya usados en TODO el vídeo (no repetir)
+    usadas_lib = _usadas_dia(dia)                          # ids ya usados HOY (no repetir fondos entre vídeos de la jornada)
     bloques, c = [], 0
     for i, s in enumerate(secs):
         btxt = " ".join(p["di"] for p in s["pasos"])
@@ -828,6 +845,7 @@ def largo(fecha):
                         "n": len(secs), "quotes": quotes, "pol_full": pol_full, "pol_small": pol_small,
                         "barras": barras, "persona_dom": pdom})
         c += len(btxt) + 1
+    _guarda_usadas_dia(dia, usadas_lib)                    # registra las de la biblioteca usadas hoy (variedad entre vídeos)
     for a, b in zip(bloques, bloques[1:]):
         a["t1"] = b["t0"]
     bloques[-1]["t1"] = total
