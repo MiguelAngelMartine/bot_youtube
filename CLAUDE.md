@@ -225,3 +225,6 @@ Estos estándares los sigue TODO lo que interviene en el vídeo: los agentes pri
 6. **Voz** Tristán HD 1,6; **miniatura** por OpenAI con la persona (recorte) cuando aplica; **jornada a las 10:30**; **Shorts antes del largo**; montaje con **render_ambiente**.
 
 El redactor debe indicar, por escena, **qué persona se ve** (quien dice la cita o la persona referida), para que el montaje nunca deje una escena sin personaje. El control-calidad marca CORREGIR si alguna escena sale sin personaje, si el karaoke no es TikTok, o si no se cumple cualquiera de estos estándares.
+
+## Fondo de las escenas: línea clara A COLOR PLENO (opción 1, estándar 15-nov-2026)
+Con el recorte real delante, el usuario eligió como estándar el fondo de **línea clara a todo color** (opción 1, el actual), NO el apagado ni el duotono. No se aplica ningún filtro de atenuación sobre la escena: el fondo va vivo, con luz clara y colores plenos, y la persona recortada va delante. `ia_vinetas.ESTILO_AMBIENTE` genera las escenas así (color pleno, luz clara). Los bloques sobrios (tragedias) siguen con su tratamiento propio aparte.
