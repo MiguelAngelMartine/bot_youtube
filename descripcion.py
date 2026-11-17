@@ -24,6 +24,8 @@ def escribe(fecha, forzar=False):
     secs = G["secciones"]
     t, cap = MARCA, ["0:00 Inicio"]
     for s in secs:
+        if not (not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", []))):
+            continue                                    # 17-nov: el sumario ya no se monta en el vídeo
         pal = sum(len(p.get("di", "").split()) for p in s.get("pasos", []))
         if t >= 10:
             cap.append(f"{int(t // 60)}:{int(t % 60):02d} {s.get('titulo', '')}")

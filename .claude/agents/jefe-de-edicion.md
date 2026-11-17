@@ -45,7 +45,7 @@ Decide la escaleta y escríbela en `dia/<fecha>/escaleta.json` (formato en `ofic
   - **imprescindible:** los hechos y versiones que no pueden faltar, incluida siempre la versión de cada parte implicada.
 - Una historia que sigue (por ejemplo, el día 4 de un accidente) solo entra si hay **novedades**, y el enfoque es la novedad, no repetir lo de ayer.
 - Si `correcciones.md` trae algo, marca `"correccion": true`.
-- Suma de segundos de los bloques: 130-160 (con sumario y despedida, 2:30-3:00). 5-6 bloques de 20-30 s y sin breves aparte; el PRIMERO, el cruce más fuerte del día.
+- Suma de segundos de los bloques: 140-170 (con la despedida, 2:30-3:00; desde el 17-nov-2026 no hay mini resumen al principio: el vídeo arranca con la primera pieza). 5-6 bloques de 20-30 s y sin breves aparte; el PRIMERO, el cruce más fuerte del día.
 - Los temas con un solo medio o sin hechos contrastados pueden ir como breve atribuido o quedarse fuera.
 - **Variedad:** si un tema domina (como una tragedia), divídelo en bloques con ángulos distintos (investigación, responsabilidad política...) en vez de un bloque enorme.
 

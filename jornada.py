@@ -317,7 +317,7 @@ class Jornada:
                          valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
         if ok:
             E = self.normaliza(self.json("episodio.json"))
-            pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
+            pal = sum(len(p["di"].split()) for s in E["secciones"] if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", [])) for p in s["pasos"])
             # 17-nov-2026 (formato «todo breves»): 2:30-3:00. Se corrige si se va de ese margen (antes: ampliar si < 3,8 min)
             if not 2.2 <= pal / 2.75 / 60 <= 3.2:
                 largo_ = pal / 2.75 / 60 > 3.2
@@ -349,7 +349,7 @@ class Jornada:
                     (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
             except Exception as ex:
                 self.parte(f"aviso: control de coletillas no aplicado ({type(ex).__name__})")
-            pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
+            pal = sum(len(p["di"].split()) for s in E["secciones"] if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", [])) for p in s["pasos"])
             self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
             try:                                           # registra las coletillas del largo y refresca el «a evitar» para los Shorts
                 import coletillas as COL

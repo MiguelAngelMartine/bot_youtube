@@ -241,3 +241,6 @@ En los Shorts (y las piezas del largo) la frase gancho abre el vídeo pero **no 
 
 ## Miniatura del largo: que se sepa QUIÉN dice la frase (17-nov-2026, petición del usuario)
 Además de la frase gancho, la miniatura identifica a quien la dice (`miniatura_auto.firma_persona`): a OpenAI se le pide dejar libre el tercio derecho (`imagen_fondo.miniatura_openai(..., hueco=True)`) y ahí se integra el **recorte curado** de la persona (biblioteca de recortes), grande, con el color y la luz de borde del fondo y sombra suave, más una **etiqueta roja** con quién lo dice (la `etiqueta` del sumario si la nombra, «ABASCAL, A SÁNCHEZ», o su apellido). Sin recorte: su retrato en un círculo con aro amarillo; sin foto, al menos la etiqueta. En la versión de respaldo (solo letras) va solo la etiqueta. Arreglado también el «««…»» doble de las comillas del titular.
+
+## Sin mini resumen al principio del largo (17-nov-2026, petición del usuario)
+El vídeo largo arranca directamente con la primera noticia (su gancho literal). La sección sumario de `episodio.json` se sigue escribiendo (de sus `items` salen la miniatura, el título y el director de arte) pero **no se narra ni se monta** (`render_ambiente.largo` la salta), no cuenta para la duración (`jornada.py`) ni sale en los capítulos (`descripcion.py`). Sustituye al «arranque con sumario de titulares» del 1-nov.

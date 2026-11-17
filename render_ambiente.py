@@ -362,14 +362,20 @@ def _dibuja_sub(fr, t, chunks, modo, zona=None):
     d = ImageDraw.Draw(fr)
     zx0, zx1 = zona or (0, W)
     maxw = (zx1 - zx0) * 0.94 if zona else W * 0.9
-    lineas, cur = [], []
-    for w in seg[2]:
-        prueba = " ".join([x[0] for x in cur] + [w])
-        if cur and d.textlength(prueba, font=f) > maxw:
-            lineas.append(cur); cur = []
-        cur.append((w, _sub_es_clave(w)))
-    if cur:
-        lineas.append(cur)
+    while True:
+        lineas, cur = [], []
+        for w in seg[2]:
+            prueba = " ".join([x[0] for x in cur] + [w])
+            if cur and d.textlength(prueba, font=f) > maxw:
+                lineas.append(cur); cur = []
+            cur.append((w, _sub_es_clave(w)))
+        if cur:
+            lineas.append(cur)
+        # 17-nov: en el largo, máximo 2 líneas (con 3-4 subía hasta tapar la cara del personaje): se reduce la letra
+        if not zona or len(lineas) <= 2 or tam <= 44:
+            break
+        tam -= 4
+        f = fuente("Inter-Black.ttf", tam)
     lh = int(tam * 1.22)
     y0 = (H - 165 - lh * len(lineas)) if modo == "short" else (H - 92 - lh * len(lineas))
     for li, linea in enumerate(lineas):
@@ -896,7 +902,9 @@ def _cabecera16(fecha, n, total, titulo, fuentes):
 def largo(fecha):
     dia = RAIZ / "dia" / fecha
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
-    secs = [s for s in G["secciones"] if any(p.get("di") for p in s["pasos"])]
+    # 17-nov-2026 (usuario): sin mini resumen al principio: el vídeo arranca directamente con la primera noticia. La sección
+    # sumario sigue en episodio.json (la usan la miniatura, el título y el director de arte), pero no se narra ni se monta.
+    secs = [s for s in G["secciones"] if any(p.get("di") for p in s["pasos"]) and not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", []))]
     tmp = dia / "tmp_largo_amb"
     tmp.mkdir(exist_ok=True)
     texto = " ".join(" ".join(p["di"] for p in s["pasos"]) for s in secs)
