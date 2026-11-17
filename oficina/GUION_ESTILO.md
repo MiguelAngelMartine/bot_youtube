@@ -101,7 +101,6 @@ De cosecha propia (adaptar al contexto):
 - Se barruntaba el percal.
 - No se veía venir el estacazo.
 - Estaba el asunto más negro que el sobaco de un grillo.
-- Se mascaba el pescao.
 - Ni el tato daba un duro.
 - Se ha quedado la cosa como un solar después de la guerra.
 - No había por dónde meterle mano al asunto.
