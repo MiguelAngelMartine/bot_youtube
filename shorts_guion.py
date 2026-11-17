@@ -269,7 +269,18 @@ def main(fecha, n=3):
             print(f"  gancho «{gancho[:40]}» sin su condición («{cond.group(1)}…»): va la cita entera")
             gancho = cita
         s["gancho"] = gancho
-        voz = (f"«{gancho}». " if gancho != cita else "") + f"{s['entrada'].rstrip(':').strip()}: «{cita}». {s['contexto'].strip()}"
+        # 17-nov-2026 (usuario: «repites la frase gancho muy seguido y queda redundante»): el gancho se dice UNA vez; si la
+        # cita empieza por él, después solo va el RESTO de la cita (no la cita entera otra vez).
+        resto = cita
+        if gancho != cita and cita.lower().startswith(gancho.lower()):
+            resto = cita[len(gancho):].lstrip(" ,;:.—-–").strip()
+        ent = s['entrada'].strip().rstrip(':?.').strip()
+        if gancho == cita:
+            voz = f"{ent}: «{cita}». {s['contexto'].strip()}"
+        elif len(resto.split()) >= 3:
+            voz = f"«{gancho}». {ent}. Y la explicación es esta: «{resto}». {s['contexto'].strip()}"
+        else:
+            voz = f"«{gancho}». {ent}. {s['contexto'].strip()}"
         segs = []
         for g in s.get("segmentos") or []:                     # 8-nov: varios ganchos en un Short
             if not isinstance(g, dict) or _norm(g.get("cita")) not in base or not g.get("contexto"):

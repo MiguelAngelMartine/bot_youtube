@@ -484,7 +484,10 @@ class Jornada:
                         "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
                         "oficina/GUION_ESTILO.md). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
                         "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
-                        "preguntas en el cuerpo, y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
+                        "preguntas en el cuerpo. El gancho se dice UNA SOLA VEZ: ni la entrada ni la cita que viene "
+                        "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita, p. ej. "
+                        "«Estamos como el perro del hortelano». Pedro Sánchez tira del refranero. Y la explicación es "
+                        "esta: según él, «el PP y Vox ni regulan ni dejan regular»); nada de «.:» ni «?:», y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
                         "en comentarios» y suscríbete. No toques las citas «» ni los demás campos.",
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)

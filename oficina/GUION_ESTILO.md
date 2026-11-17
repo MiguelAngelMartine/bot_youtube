@@ -23,6 +23,13 @@ La voz estándar es Tristán HD a **temperatura 1,6**, enérgica (sustituye a la
 - **NO chascarrillos de UNA palabra** tras una frase o cita («Toma.»): quedan mal. Usa **coletillas populares más largas y con gancho** («esto no lo has visto venir», «menudo zasca»…), actuales y sin tacos.
 Esto lo revisa el control de calidad.
 
+## El gancho, UNA sola vez (17-nov-2026, el usuario)
+El Short y cada pieza abren con la frase gancho literal, pero **no se repite enseguida**: ni la entrada ni la cita que viene
+después vuelven a decirla. Si la cita entera empieza por el gancho, después va solo **el resto** de la cita. Sin preguntas en el
+cuerpo: en vez de «¿Por qué?», «Y la explicación es esta:».
+- Mal: «Estamos como el perro del hortelano». Sánchez se compara con el perro del hortelano. ¿Por qué?: «Estamos como el perro del hortelano, el PP y Vox ni regulan ni dejan regular».
+- Bien: «Estamos como el perro del hortelano». Pedro Sánchez tira del refranero. Y la explicación es esta: según él, «el PP y Vox ni regulan ni dejan regular».
+
 ## Fluidez (para que Tristán no suene abrupto) — MUY IMPORTANTE
 Tristán respeta la puntuación: la coma es pausa corta, el punto pausa larga, los puntos suspensivos «…» una pausa natural.
 - **Frases de longitud variada**, no todas cortas de golpe: alterna alguna más larga que respire con remates cortos. NUNCA
