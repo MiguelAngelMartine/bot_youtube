@@ -49,6 +49,75 @@ def _forzar_persona(fecha, nombre, items, G, cred, img):
     return 0
 
 
+def _etiqueta_quien(it, persona):
+    """Texto de quién dice la frase: la etiqueta del sumario si nombra a la persona («Abascal, a Sánchez»), si no el apellido."""
+    ape = (persona or "").split()[-1] if persona else ""
+    et = (it.get("etiqueta") or "").strip()
+    return (et if ape and ape.lower() in et.lower() else ape).upper()
+
+
+def firma_persona(destino, persona, etiqueta, cred=None, img=None, solo_etiqueta=False):
+    """17-nov-2026 (el usuario: «que se sepa en la miniatura quién dice la frase»). Sobre la miniatura ya hecha integra al
+    que habla: su RECORTE curado sin fondo, grande a la derecha, con el color y una luz de borde del fondo y sombra suave;
+    si no hay recorte, su retrato en un círculo con aro; y siempre una etiqueta roja con quién lo dice.
+    Devuelve el modo usado ("recorte", "circulo", "etiqueta") o None si no pudo."""
+    from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
+    base = Image.open(destino).convert("RGBA")
+    W, H = base.size
+    zona = base.crop((int(W * 0.66), 0, W, H)).convert("RGB").resize((1, 1), Image.LANCZOS).getpixel((0, 0))
+    modo, x_et, y_et = "etiqueta", W - 40, H - 40
+    rec = None
+    try:
+        if solo_etiqueta:
+            raise LookupError("solo etiqueta")
+        import biblioteca_fotos as BF
+        r, _ = BF.mejor_recorte(persona)
+        if r and Path(r).exists():
+            rec = Image.open(r).convert("RGBA")
+    except Exception as e:
+        print(f"  (recorte de {persona}: {type(e).__name__})")
+    if rec is not None:
+        alto = int(H * 0.95)
+        rec = rec.resize((max(1, int(rec.width * alto / rec.height)), alto), Image.LANCZOS)
+        if rec.width > W * 0.48:
+            rec = rec.resize((int(W * 0.48), int(rec.height * W * 0.48 / rec.width)), Image.LANCZOS)
+        a = rec.getchannel("A")
+        rgb = Image.blend(rec.convert("RGB"), Image.new("RGB", rec.size, zona), 0.08)
+        luz = tuple(min(255, int(c * 0.5 + 255 * 0.5)) for c in zona)
+        borde = ImageChops.multiply(ImageChops.subtract(a, a.filter(ImageFilter.MinFilter(11)))
+                                    .filter(ImageFilter.GaussianBlur(5)).point(lambda v: int(v * 0.6)), a)
+        rec = Image.merge("RGBA", (*rgb.split(), a))
+        capa = Image.new("RGBA", rec.size, luz + (0,)); capa.putalpha(borde); rec.alpha_composite(capa)
+        x, y = W - rec.width + 10, H - rec.height + 12
+        som = Image.new("L", base.size); som.paste(a, (x - 22, y + 18))
+        som = som.filter(ImageFilter.GaussianBlur(26)).point(lambda v: int(v * 0.65))
+        base.alpha_composite(Image.merge("RGBA", (*Image.new("RGB", base.size).split(), som)))
+        base.alpha_composite(rec, (x, y))
+        modo, x_et, y_et = "recorte", W - 30, H - 34
+    elif not solo_etiqueta and cred is not None and img is not None and _retrato(cred, persona, img):
+        foto = Image.open(img / _retrato(cred, persona, img)).convert("RGB")
+        d_ = int(H * 0.46)
+        foto = ImageOps.fit(foto, (d_, d_), Image.LANCZOS, centering=(0.5, 0.3))
+        m = Image.new("L", (d_, d_)); ImageDraw.Draw(m).ellipse([0, 0, d_ - 1, d_ - 1], fill=255)
+        aro = Image.new("RGBA", (d_ + 24, d_ + 24)); ImageDraw.Draw(aro).ellipse([0, 0, d_ + 23, d_ + 23], fill=(250, 204, 21, 255))
+        x, y = W - d_ - 50, H - d_ - 120
+        base.alpha_composite(aro, (x - 12, y - 12)); base.paste(foto, (x, y), m)
+        modo, x_et, y_et = "circulo", W - 40, H - 40
+    if etiqueta:
+        f = ImageFont.truetype(str(RAIZ / "fuentes" / "Inter-Black.ttf"), 46)
+        tw = ImageDraw.Draw(base).textlength(etiqueta, font=f)
+        while tw > W * 0.44 and f.size > 28:
+            f = ImageFont.truetype(str(RAIZ / "fuentes" / "Inter-Black.ttf"), f.size - 2); tw = ImageDraw.Draw(base).textlength(etiqueta, font=f)
+        bw, bh = int(tw + 48), f.size + 30
+        chip = Image.new("RGBA", (bw, bh)); dc = ImageDraw.Draw(chip)
+        dc.rounded_rectangle([0, 0, bw - 1, bh - 1], radius=10, fill=(229, 37, 33, 255))
+        dc.text((24, bh // 2), etiqueta, font=f, fill=(255, 255, 255, 255), anchor="lm")
+        chip = chip.rotate(2, expand=True, resample=Image.BICUBIC)
+        base.alpha_composite(chip, (int(x_et - chip.width), int(y_et - chip.height)))
+    base.convert("RGB").save(destino, quality=93)
+    return modo
+
+
 def _retrato(cred, nombre, img):
     fs = [f for f, c in cred.items() if c.get("persona") == nombre and (img / f).exists() and "_recorte" not in f]
     return sorted(fs, key=lambda f: -float(cred[f].get("puntos_gemini", 0) or 0))[0] if fs else ""
@@ -74,8 +143,10 @@ def main(fecha):
     sec_txt = " ".join(p.get("di", "") for p in sec["pasos"])[:600] if sec else titular
     try:                                               # 13-nov (el usuario): la miniatura la hace OpenAI como PRIMERA opción,
         import imagen_fondo as IF                       # con el texto gancho incrustado y un fondo del contexto, sin caras
-        if titular and IF.miniatura_openai(titular, sec_txt, dia / "miniatura.png"):
-            print(f"miniatura: OpenAI · «{titular}»")
+        quien = it.get("persona", "")
+        if titular and IF.miniatura_openai(titular, sec_txt, dia / "miniatura.png", hueco=bool(quien)):
+            modo = firma_persona(dia / "miniatura.png", quien, _etiqueta_quien(it, quien), cred, img) if quien else None
+            print(f"miniatura: OpenAI · «{titular}»" + (f" · {quien} ({modo})" if quien else ""))
             return 0
         print("  (OpenAI no hizo la miniatura: la hace miniatura.py con el titular)")
     except Exception as e:
@@ -139,6 +210,8 @@ def main(fecha):
     if floja:
         shutil.copy(dia / hechas[0][1], dia / "miniatura.png")
     elegida = next((e for e, s in hechas if (dia / s).read_bytes() == (dia / "miniatura.png").read_bytes()), hechas[0][0])
+    if persona and elegida == "titular":               # 17-nov: sin foto en la composición, al menos QUIÉN lo dice
+        firma_persona(dia / "miniatura.png", persona, _etiqueta_quien(it, persona), solo_etiqueta=True)
     usados = (json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else [])
     REG.write_text(json.dumps((usados + [elegida])[-20:]), encoding="utf-8")
     print(f"miniatura: {elegida} · «{titular}» · {persona}" + (f" vs {rival}" if rival else ""))

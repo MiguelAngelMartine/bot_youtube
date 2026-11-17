@@ -33,7 +33,7 @@ def _openai(prompt, destino, size="1536x1024"):
     return True
 
 
-def miniatura_openai(gancho, contexto, destino):
+def miniatura_openai(gancho, contexto, destino, hueco=False):
     """13-nov-2026 (decisión del usuario): la miniatura la hace OpenAI como PRIMERA opción, con el texto gancho ya
     incrustado. Prompt exacto del usuario. `destino` queda en 1280x720. Devuelve True si OpenAI la generó, False si no
     (entonces la hace miniatura.py con el titular sobre una imagen)."""
@@ -45,8 +45,12 @@ def miniatura_openai(gancho, contexto, destino):
                if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
     if not key:
         return False
-    prompt = (f"genera una miniatura para un vídeo de YouTube con el texto: «{gancho.strip()}» con un fondo acorde con el "
+    gancho = gancho.strip().strip("«»\"“”'").strip()     # 17-nov: el titular ya trae «»; sin esto salían ««…»»
+    prompt = (f"genera una miniatura para un vídeo de YouTube con el texto: «{gancho}» con un fondo acorde con el "
               f"contexto de la noticia y sin caras de personas")
+    if hueco:                                              # 17-nov-2026: luego se integra la foto de quien lo dice
+        prompt += (". IMPORTANTE: coloca el texto en los DOS TERCIOS IZQUIERDOS de la imagen y deja el TERCIO DERECHO "
+                   "libre (solo fondo, sin texto ni objetos importantes): ahí irá después la foto de la persona que dice la frase")
     if contexto:
         prompt += f". Contexto de la noticia (solo para el fondo, no lo escribas): {contexto.strip()[:600]}"
     try:
