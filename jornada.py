@@ -189,6 +189,12 @@ class Jornada:
         minimo = 2 if (segundos or 99) <= 35 else 3        # 17-nov: piezas de 20-30 s (formato «todo breves»), 2 bastan
         if len(set(tipos)) < minimo and "breve" not in tipos:
             fallos.append(f"solo {len(set(tipos))} tipos de escena (mínimo {minimo})")
+        try:                                               # 17-nov: coletillas ya usadas estos días o repetidas en la pieza
+            import coletillas as COL
+            fallos += [f"coletilla: {x}; cámbiala por OTRA de la paleta que no esté en coletillas_evitar.txt"
+                       for x in COL.problemas(*(p.get("di", "") for p in pasos), excluir_fecha=self.f)]
+        except Exception:
+            pass
         if segundos:
             pal = sum(len(p.get("di", "").split()) for p in pasos)
             if pal < segundos * 2.75 * 0.75:
@@ -275,6 +281,8 @@ class Jornada:
         for f in (self.dia / "bloques").glob("*.json"):
             try:
                 b = json.loads(f.read_text(encoding="utf-8"))
+                if isinstance(b, list):                    # 17-nov: Claude a veces envuelve el bloque en una lista
+                    b = b[0] if b and isinstance(b[0], dict) else {}
                 fuentes[b.get("titulo")] = b.get("fuentes", [])
             except ValueError:
                 pass
@@ -323,6 +331,24 @@ class Jornada:
                             self.dia / "episodio.json", valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
                 E = self.normaliza(self.json("episodio.json"))
             (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
+            # 17-nov-2026 (usuario: «se mascaba el pescao» salió dos veces en el largo): las piezas se escriben en paralelo,
+            # así que el episodio ENTERO se revisa aquí: cada coletilla, una sola vez y no usada en los últimos días.
+            try:
+                import coletillas as COL
+                for _ in range(2):
+                    av = COL.problemas(*(p.get("di", "") for s in E["secciones"] for p in s["pasos"]), excluir_fecha=self.f)
+                    if not av:
+                        break
+                    self.parte(f"coletillas repetidas en el episodio: {'; '.join(av)}")
+                    self.claude("redactor", "En episodio.json cambia SOLO estas coletillas por otras distintas de la paleta de "
+                                "oficina/GUION_ESTILO.md que no estén en archivo/coletillas_evitar.txt ni en el resto del "
+                                f"episodio (cada coletilla, una sola vez en todo el vídeo); no toques nada más: {'; '.join(av)}",
+                                (self.dia / "episodio.json").relative_to(RAIZ), modelo="opus",
+                                motivo="coletillas repetidas en el episodio")
+                    E = self.normaliza(self.json("episodio.json"))
+                    (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
+            except Exception as ex:
+                self.parte(f"aviso: control de coletillas no aplicado ({type(ex).__name__})")
             pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
             self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
             try:                                           # registra las coletillas del largo y refresca el «a evitar» para los Shorts

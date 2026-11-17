@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 import cv2
-from PIL import Image, ImageDraw, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 
 import animar_ia
 import corto as C
@@ -112,7 +112,16 @@ def _acento(crop):
     return (int(r * 255), int(g * 255), int(b * 255))
 
 
+def _nombre_corto(n):
+    """Nombre que cabe en la barra/Polaroid: «Luiz Inácio Lula da Silva» -> «Lula da Silva»."""
+    w = (n or "").split()
+    if len(n or "") <= 20 or len(w) <= 2:
+        return n
+    return " ".join(w[-3:] if w[-2].islower() else w[-2:])
+
+
 def polaroid_armonica(foto, nombre, cargo, credito, ancho, acento, giro=-3):
+    nombre = _nombre_corto(nombre)
     """Polaroid con la FOTO REAL de quien dice la frase, marco en armonía con el fondo (color de acento). Sin celo, a doble
     tamaño que en los primeros vídeos. Devuelve RGBA ya inclinada (`giro` grados)."""
     alto_f = int(ancho * 0.80)
@@ -232,13 +241,27 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
 def _barra_nc(nombre, cargo, ancho=560):
     bar = Image.new("RGBA", (ancho, 80), (0, 0, 0, 0)); db = ImageDraw.Draw(bar)
     db.rounded_rectangle([0, 0, ancho, 80], radius=12, fill=(16, 26, 46, 240)); db.rectangle([0, 0, 9, 80], fill=ROJO + (255,))
-    db.text((26, 13), nombre.upper()[:24], font=fuente("Inter-Black.ttf", 30), fill=BLANCO)
+    db.text((26, 13), _nombre_corto(nombre).upper()[:24], font=fuente("Inter-Black.ttf", 30), fill=BLANCO)
     if cargo:
         db.text((26, 52), cargo.upper()[:36], font=fuente("Inter-SemiBold.ttf", 18), fill=AMARILLO + (255,))
     return bar
 
 
-def _recorte_integrado(nombre, alto):
+def _luz_de_escena(cut, color):
+    """17-nov-2026 (integración): el recorte toma un 7 % del color de la escena y una luz de borde suave de ese color,
+    para que parezca iluminado por el mismo ambiente y no pegado encima."""
+    a = cut.getchannel("A")
+    rgb = Image.blend(cut.convert("RGB"), Image.new("RGB", cut.size, color), 0.07)
+    luz = tuple(min(255, int(c * 0.55 + 255 * 0.45)) for c in color)
+    borde = ImageChops.subtract(a, a.filter(ImageFilter.MinFilter(9))).filter(ImageFilter.GaussianBlur(4))
+    borde = ImageChops.multiply(borde.point(lambda v: int(v * 0.5)), a)
+    out = Image.merge("RGBA", (*rgb.split(), a))
+    capa = Image.new("RGBA", cut.size, luz + (0,)); capa.putalpha(borde)
+    out.alpha_composite(capa)
+    return out
+
+
+def _recorte_integrado(nombre, alto, luz=None):
     """Opción A (ESTÁNDAR 15-nov): recorte real SIN FONDO de la persona, con sombra suave, para ir INTEGRADO delante de la
     escena (no Polaroid). Devuelve RGBA (con su sombra, pad incluido) o None si no hay recorte curado."""
     try:
@@ -248,6 +271,8 @@ def _recorte_integrado(nombre, alto):
             return None
         cut = Image.open(r).convert("RGBA")
         cut = cut.resize((max(1, int(cut.width * alto / cut.height)), alto), Image.LANCZOS)
+        if luz:                                            # solo el largo (17-nov): color y luz de la escena
+            cut = _luz_de_escena(cut, tuple(luz[:3]))
         pad = 60
         a = Image.new("L", (cut.width + 2 * pad, cut.height + 2 * pad)); a.paste(cut.getchannel("A"), (pad, pad))
         som = a.filter(ImageFilter.GaussianBlur(24)).point(lambda v: int(v * 0.6))
@@ -260,7 +285,7 @@ def _recorte_integrado(nombre, alto):
         return None
 
 
-def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, alto_rec=0):
+def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, alto_rec=0, luz=None):
     """Imagen de la persona para ir DELANTE de la escena (estándar «opción A», 15-nov). PRIMERO el recorte curado sin fondo
     (integrado, con sombra); si no hay, Polaroid de respaldo. Devuelve (full, small, barras): full/small = imágenes grande y
     pequeña; barras[n] = barra de nombre/cargo (None si la Polaroid ya la lleva baked)."""
@@ -270,7 +295,7 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, al
         if not n or n in full:
             continue
         cargo = cargos.get(n, "")
-        rec = _recorte_integrado(n, alto_rec) if alto_rec else None
+        rec = _recorte_integrado(n, alto_rec, luz=luz) if alto_rec else None
         if rec is not None:                                # opción A: recorte integrado + barra aparte
             full[n] = rec
             small[n] = rec.resize((int(rec.width * ancho_s / ancho_f), int(rec.height * ancho_s / ancho_f)), Image.LANCZOS)
@@ -321,7 +346,7 @@ def _sub_chunks(c0, btxt, T, nmax=4, cmax=26):
     return out
 
 
-def _dibuja_sub(fr, t, chunks, modo):
+def _dibuja_sub(fr, t, chunks, modo, zona=None):
     """Dibuja el subtítulo karaoke AL PIE (sin caja), texto del guion en BLANCO con las palabras clave en AMARILLO y borde
     negro para legibilidad. El trozo activo es el que contiene el instante t. Estándar en todos los vídeos."""
     if not chunks:
@@ -335,7 +360,8 @@ def _dibuja_sub(fr, t, chunks, modo):
     tam = 72 if modo == "short" else 64      # subtítulo karaoke más grande (15-nov-2026, petición del usuario)
     f = fuente("Inter-Black.ttf", tam)       # 15-nov-2026: ESTÁNDAR karaoke estilo TikTok (sans bold), no cómic
     d = ImageDraw.Draw(fr)
-    maxw = W * 0.9
+    zx0, zx1 = zona or (0, W)
+    maxw = (zx1 - zx0) * 0.94 if zona else W * 0.9
     lineas, cur = [], []
     for w in seg[2]:
         prueba = " ".join([x[0] for x in cur] + [w])
@@ -348,14 +374,118 @@ def _dibuja_sub(fr, t, chunks, modo):
     y0 = (H - 165 - lh * len(lineas)) if modo == "short" else (H - 92 - lh * len(lineas))
     for li, linea in enumerate(lineas):
         tot = d.textlength(" ".join(x[0] for x in linea), font=f)
-        x = (W - tot) / 2
+        x = zx0 + (zx1 - zx0 - tot) / 2
         y = y0 + li * lh
         for w, yel in linea:
             d.text((x, y), w, font=f, fill=(AMARILLO if yel else BLANCO) + (255,), stroke_width=7, stroke_fill=(0, 0, 0, 255))
             x += d.textlength(w + " ", font=f)
 
 
-def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None, barras=None, persona_dom=None):
+def _ease(x):
+    x = max(0.0, min(1.0, x))
+    return 1 - (1 - x) ** 3
+
+
+def _activa_largo(t, quotes, full, small, persona_dom, t_ini):
+    """(persona, persona_previa_en_cruce) en el instante t del largo; None antes del bloque."""
+    if t_ini is not None and t < t_ini:
+        return None, None
+    i = next((k for k, (a, b, p) in enumerate(quotes) if a - 0.12 <= t <= b), None)
+    if i is not None and quotes[i][2] in full:
+        a, b, p = quotes[i]
+        prev = quotes[i - 1] if i > 0 else None
+        conv = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in small)
+        return p, (prev[2] if conv else None)
+    return (persona_dom if persona_dom in full else None), None
+
+
+_BBOX = {}
+
+
+def _bbox_alfa(img):
+    k = id(img)
+    if k not in _BBOX:
+        _BBOX[k] = img.getchannel("A").point(lambda v: 255 if v > 140 else 0).getbbox() or (0, 0, img.width, img.height)
+    return _BBOX[k]
+
+
+def _con_alfa(img, f):
+    if f >= 0.995:
+        return img
+    o = img.copy(); o.putalpha(img.getchannel("A").point(lambda v: int(v * f))); return o
+
+
+def _dibuja_persona_largo(fr, t, quotes, full, small, barras, persona_dom, t_ini):
+    """17-nov-2026 (usuario: «el rótulo cae encima de ellos», «queda forzado, tiene que ser más fluido y profesional»).
+    El personaje del largo ENTRA deslizando con fundido (0,5 s, frenada suave), al cambiar de persona la anterior SALE
+    mientras entra la nueva, y mientras habla tiene un acercamiento lento y continuo (nunca congelado). El rótulo de
+    nombre/cargo va AL LADO del recorte (nunca encima de la cara o el cuerpo), entra 0,2 s después con un barrido y queda
+    por encima de la franja del karaoke."""
+    W, H = fr.size
+    barras = barras or {}
+    p, prevp = _activa_largo(t, quotes, full, small, persona_dom, t_ini)
+    # cuándo entró la persona actual y quién estaba antes (hasta 0,6 s atrás, a pasos de fotograma)
+    t_ent, saliente = None, None
+    for k in range(1, 19):
+        q, _ = _activa_largo(t - k / 30, quotes, full, small, persona_dom, t_ini)
+        if q != p:
+            t_ent = t - (k - 1) / 30
+            saliente = q
+            break
+    dt = 9.0 if t_ent is None else t - t_ent           # segundos desde que entró (9 = ya asentado)
+    if t_ent is None:                                   # entró hace más de 0,6 s: busca cuándo, para el acercamiento lento
+        dt = 0.6
+        for k in range(1, 40):
+            q, _ = _activa_largo(t - 0.6 - k * 0.25, quotes, full, small, persona_dom, t_ini)
+            if q != p:
+                break
+            dt = 0.6 + k * 0.25
+
+    def pinta(nombre, img, lado, prog, desde, con_barra):
+        e = _ease(prog)
+        ea = _ease(prog * 2.8)                                  # opaca enseguida: sin cara «fantasma» sobre el fondo
+        esc_ = (0.95 + 0.05 * e) * (1 + 0.025 * min(1.0, desde / 10.0))     # entra creciendo y luego acercamiento lento
+        im = img.resize((max(1, int(img.width * esc_)), max(1, int(img.height * esc_))), Image.BILINEAR) \
+            if abs(esc_ - 1) > 0.004 else img
+        im = _con_alfa(im, ea)
+        bx0, by0, bx1, by1 = _bbox_alfa(img)
+        bx0, bx1 = int(bx0 * esc_), int(bx1 * esc_)
+        if lado == "izq":
+            x = 30 - int((1 - e) * 220)
+        else:
+            x = W - im.width - 30 + int((1 - e) * 220)
+        y = H - im.height + 40 + int((1 - e) * 24)
+        fr.alpha_composite(im, (x, y))
+        b = barras.get(nombre)
+        if con_barra and b is not None:
+            eb = _ease((desde - 0.2) / 0.45) if prog >= 1 else 0.0
+            if eb > 0:
+                ancho = max(1, int(b.width * eb))
+                bb = _con_alfa(b.crop((0, 0, ancho, b.height)), min(1.0, eb * 1.4))
+                by = H - 395                                   # por encima de la franja del karaoke
+                if lado == "izq":
+                    bxp = min(x + bx1 - 20, W - b.width - 40)  # pegado al hombro derecho, sin pisar la figura
+                    fr.alpha_composite(bb, (bxp, by))
+                else:
+                    bxp = max(40, x + bx0 - b.width + 20)
+                    fr.alpha_composite(bb, (bxp + (b.width - ancho), by))
+
+    SAL, ENT = 0.22, 0.5
+    if saliente and saliente in full and dt < SAL:           # relevo: la anterior sale deslizando hacia fuera...
+        pinta(saliente, full[saliente], "izq", 1 - dt / SAL, 9.0, False)
+    if not p:
+        return
+    ret = SAL if saliente else 0.0                           # ...y la nueva entra cuando ya ha salido (sin fundir caras)
+    if dt < ret:
+        return
+    prog = min(1.0, (dt - ret) / ENT)
+    dt = dt - ret
+    # Siempre UNA persona y siempre a la izquierda (el recuadro de la cita va a la derecha): en un cruce, la que contesta
+    # releva a la anterior con el fundido de entrada/salida, en vez de amontonar dos recortes que pisaban el recuadro.
+    pinta(p, full[p], "izq", prog, dt, True)
+
+
+def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None, barras=None, persona_dom=None, t_ini=None):
     """ESTÁNDAR «opción A» (15-nov): SIEMPRE un personaje en la escena. Dibuja el recorte integrado (o Polaroid de respaldo)
     de la persona ACTIVA —la que dice la cita en el instante t, o la persona dominante/referida del bloque si no hay cita—,
     anclado abajo (largo: izquierda; short: arriba), con su barra de nombre/cargo. En un cruce, también la anterior."""
@@ -379,21 +509,10 @@ def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None, barras=None, pers
     def pop(a):
         return 0.9 + 0.1 * (1 - (1 - min(1.0, (t - a) / 0.4)) ** 2)
 
-    if estado == "none":
-        return
     if modo == "largo":
-        if estado == "double":
-            prev = quotes[i - 1]; cim = esc(full[p], pop(a_ini)); ps = small.get(prev[2])
-            if ps:
-                fr.alpha_composite(ps, (20, H - ps.height + 20))
-            fr.alpha_composite(cim, (W - cim.width - 10, H - cim.height + 20))
-            if barras.get(p) is not None:
-                fr.alpha_composite(barras[p], (W - cim.width + 30, H - 250))
-        else:
-            cim = esc(full[p], pop(a_ini))
-            fr.alpha_composite(cim, (20, H - cim.height + 20))
-            if barras.get(p) is not None:
-                fr.alpha_composite(barras[p], (40, H - 250))
+        _dibuja_persona_largo(fr, t, quotes, full, small, barras, persona_dom, t_ini)
+        return
+    if estado == "none":
         return
 
     # short (vertical): persona arriba
@@ -764,9 +883,13 @@ def _cabecera16(fecha, n, total, titulo, fuentes):
     d.text((40 + w + 24, 148), tt, font=ft, fill=BLANCO + (255,), anchor="lm",
            stroke_width=3, stroke_fill=(0, 0, 0, 255))
     if fuentes:
-        d.text((40, AL2 - 44), "FUENTES  ", font=fuente("Inter-Black.ttf", 24), fill=AMARILLO + (255,), anchor="lm")
-        x0 = 40 + fuente("Inter-Black.ttf", 24).getlength("FUENTES  ")
-        d.text((x0, AL2 - 44), fuentes[:90], font=fuente("Inter-SemiBold.ttf", 24), fill=(225, 230, 240, 255), anchor="lm")
+        # 17-nov: abajo a la DERECHA (abajo a la izquierda va el personaje y las tapaba)
+        fu = fuentes[:90]
+        lf = fuente("Inter-Black.ttf", 24).getlength("FUENTES  ") + fuente("Inter-SemiBold.ttf", 24).getlength(fu)
+        xf = AN2 - 40 - lf
+        d.text((xf, AL2 - 44), "FUENTES  ", font=fuente("Inter-Black.ttf", 24), fill=AMARILLO + (255,), anchor="lm")
+        x0 = xf + fuente("Inter-Black.ttf", 24).getlength("FUENTES  ")
+        d.text((x0, AL2 - 44), fu, font=fuente("Inter-SemiBold.ttf", 24), fill=(225, 230, 240, 255), anchor="lm")
     return cab
 
 
@@ -833,12 +956,14 @@ def largo(fecha):
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
         conocidas = _conocidas()
         quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
+        # 17-nov: recorte más contenido (64 % del alto, antes 82 %: tapaba la escena y el rótulo caía encima) y con la luz
+        # y el color de la escena para que se integre
         pol_full, pol_small, barras = _polas_persona(dia, fecha, quotes, acento, 560, 380, dict(conocidas),
-                                                      alto_rec=int(AL2 * 0.82))
+                                                      alto_rec=int(AL2 * 0.64), luz=acento)
         _qp = [p for *_, p in quotes if p]
         pdom = (max(_qp, key=_qp.count) if _qp else (s.get("persona") or quien))
         if pdom and pdom not in pol_full:                  # siempre un personaje: aunque no tenga cita, su recorte
-            rec = _recorte_integrado(pdom, int(AL2 * 0.82))
+            rec = _recorte_integrado(pdom, int(AL2 * 0.64), luz=acento)
             if rec is not None:
                 pol_full[pdom] = rec; barras[pdom] = _barra_nc(pdom, dict(conocidas).get(pdom, ""))
         bloques.append({"t0": t0, "i": i, "titulo": titulo, "fuentes": fuentes, "escenas": escenas,
@@ -877,14 +1002,14 @@ def largo(fecha):
         fr.alpha_composite(som, (0, AL2 - 430))
         fr.alpha_composite(bl["cab"], (0, 0))
         _dibuja_polas(fr, t, bl.get("quotes") or [], bl.get("pol_full") or {}, bl.get("pol_small") or {}, "largo",
-                      barras=bl.get("barras"), persona_dom=bl.get("persona_dom"))
+                      barras=bl.get("barras"), persona_dom=bl.get("persona_dom"), t_ini=bl["t0"])
         cajas, tf = bl.get("cajas") or [], bl.get("tf") or []
         if cajas:                                           # recuadro de la frase a la DERECHA (solo frases cortas)
             fi = max([j for j, te in enumerate(tf) if te <= t] or [0])
             caja = cajas[min(fi, len(cajas) - 1)]
             if caja is not None:                            # cita larga -> solo karaoke (no se pisa con el recuadro)
                 fr.alpha_composite(caja, (AN2 - caja.width - 70, 320))
-        _dibuja_sub(fr, t, bl.get("subs") or [], "largo")   # subtítulo karaoke al pie (blanco + amarillo)
+        _dibuja_sub(fr, t, bl.get("subs") or [], "largo", zona=(600, AN2 - 40))   # 17-nov: a la derecha del personaje
         return fr
 
     out = dia / "episodio.mp4"

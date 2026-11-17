@@ -94,7 +94,10 @@ def registra(fecha, *textos):
     return col
 
 
-def evitar(dias=2):
+VENTANA = 5   # 17-nov-2026 (usuario): una coletilla usada no se repite hasta pasados varios días (antes 2)
+
+
+def evitar(dias=VENTANA):
     hoy = date.today()
     limite = hoy - timedelta(days=dias)
     out = set()
@@ -108,7 +111,39 @@ def evitar(dias=2):
     return sorted(out)
 
 
-def escribe_evitar(ruta, dias=2):
+def cuenta(*textos):
+    """{coletilla: veces} en el conjunto de textos (para cazar repeticiones DENTRO del mismo vídeo)."""
+    from collections import Counter
+    n = Counter()
+    for t in textos:
+        tt = _norm(t)
+        for r, v in _RE:
+            n[v] += len(r.findall(tt))
+    return {k: v for k, v in n.items() if v}
+
+
+def problemas(*textos, dias=VENTANA, excluir_fecha=None):
+    """Coletillas repetidas en el vídeo o ya usadas en los últimos días (sin contar las de `excluir_fecha`, p. ej. hoy
+    si ya se registró este mismo vídeo). Devuelve una lista de avisos en llano; vacía si está limpio."""
+    usadas = set()
+    hoy = date.today()
+    for d in _carga():
+        try:
+            f = date.fromisoformat(d["fecha"])
+        except (ValueError, KeyError):
+            continue
+        if f >= hoy - timedelta(days=dias) and d["fecha"] != excluir_fecha:
+            usadas.add(d["coletilla"])
+    av = []
+    for c, n in cuenta(*textos).items():
+        if n > 1:
+            av.append(f"«{c}» sale {n} veces en el vídeo (máximo 1)")
+        elif c in usadas:
+            av.append(f"«{c}» ya se usó en los últimos {dias} días")
+    return av
+
+
+def escribe_evitar(ruta, dias=VENTANA):
     ev = evitar(dias)
     txt = ("COLETILLAS YA USADAS en los últimos días — NO las repitas, elige OTRAS de la paleta (GUION_ESTILO.md):\n"
            + ("\n".join(f"- {c}" for c in ev) if ev else "(ninguna; puedes usar cualquiera de la paleta)") + "\n")
