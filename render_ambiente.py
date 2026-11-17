@@ -72,11 +72,16 @@ def _vista(esc, t_scene, dur_scene, k, w=AN, h=AL):
     return MC.anima(base, None, t_scene, w, h, semilla=k, dur=dur_scene + 2).convert("RGBA")
 
 
-FALLBACK_ESC = ["an empty political campaign stage with a podium and microphones, Spanish flags and banners, confetti",
-                "a Spanish city street covered with election campaign posters on walls and lampposts, festive bunting",
-                "a wide empty outdoor rally venue with a distant empty stage and big screens, rows of empty chairs",
-                "a ballot box on a table in an empty Spanish polling station, a Spanish flag on the wall",
-                "the facade of a Spanish political party headquarters building with flags, empty street in front"]
+FALLBACK_ESC = ["the neoclassical facade of the Spanish Congress of Deputies with its lions and columns, empty street",
+                "the facade of the Spanish Senate building in Madrid with Spanish flags, sober daylight",
+                "an empty parliamentary chamber with curved rows of seats and a speaker's podium",
+                "a modern conference centre entrance with glass and steel, Spanish and European flags",
+                "the facade of a Spanish political party headquarters building with flags, empty street in front",
+                "an empty government press room with a podium, microphones and a Spanish flag"]
+# 17-nov-2026 (usuario): fondos de sitios relacionados con la política o paisajes urbanos sobrios; la búsqueda en la biblioteca
+# se inclina hacia lo institucional añadiendo estas palabras a la consulta.
+_LIB_POLITICA = ("parliament congress senate government palace ministry headquarters party city hall town hall "
+                 "chamber podium press conference institutional flag")
 
 
 def escenas_ambiente(S, n_esc=5):
@@ -85,9 +90,12 @@ def escenas_ambiente(S, n_esc=5):
         import gem
         base = f"Tema: {S.get('quien', '')}: «{S.get('cita', '')}». Contexto: {S.get('contexto', '')}"
         pr = (f"Para un vídeo de política española en estilo viñeta de línea clara, describe EN INGLÉS {n_esc} PLANOS DE "
-              "AMBIENTE (establishing shots) relacionados con el tema, SIN personas en primer plano y SIN caras: lugares, "
-              "edificios, objetos y símbolos (plazas, calles con carteles electorales, atriles y escenarios vacíos, urnas, "
-              "pancartas, el Congreso, sedes de partidos, banderas...). Cada uno una frase concreta y visual, sin texto "
+              "AMBIENTE (establishing shots) relacionados con el tema, SIN personas en primer plano y SIN caras, SIEMPRE de "
+              "LUGARES RELACIONADOS CON LA POLÍTICA (17-nov-2026, el usuario): el Senado, el Congreso de los Diputados, la "
+              "Moncloa, palacios de congresos, sedes de partidos, parlamentos autonómicos, ayuntamientos, ministerios, salas "
+              "de prensa, hemiciclos vacíos, atriles y escenarios de mitin, urnas, o paisajes urbanos SOBRIOS (avenidas y "
+              "plazas institucionales). NUNCA playas, puertos, terrazas de bar, mercados ni calles turísticas o pintorescas. "
+              "Cada uno una frase concreta y visual, sin texto "
               "legible. Responde SOLO JSON: {\"escenas\": [\"...\"]}.\n\n" + base)
         r = gem.pide(pr, como_json=True) or {}
         esc = [e.strip() for e in (r.get("escenas") or []) if isinstance(e, str) and e.strip()]
@@ -647,7 +655,7 @@ def _lib_elige(esc, usadas_lib):
             if e and e["id"] not in usadas_lib and (BIB.BIB / e["img"]).exists():
                 return BIB.BIB / e["img"], None, e["id"]
     malas = {e["id"] for k, e in cat.items() if k in _LIB_MALAS}
-    got = BIB.busca(esc, usadas=set(usadas_lib) | malas)
+    got = BIB.busca(f"{esc} {_LIB_POLITICA}", usadas=set(usadas_lib) | malas)   # 17-nov: prioridad a lo institucional
     if got and got[2] in malas:
         return None
     return got

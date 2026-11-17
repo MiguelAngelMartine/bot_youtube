@@ -16,19 +16,15 @@ import ia_vinetas as IA
 
 RAIZ = Path(__file__).parent
 
-LUGARES = [
-    "a quiet narrow street in {c} with tiled facades and balconies at midday",
-    "a grand plaza in {c} with a fountain and café terraces",
-    "the facade of the town hall of {c} with the Spanish flag",
-    "a market hall interior in {c} with iron columns and empty stalls",
-    "a tree-lined avenue in {c} with street lamps and benches",
-    "a riverside promenade in {c} at golden dusk",
-    "a train station concourse in {c} with a high glass roof and blank boards",
-    "a cathedral square in {c} with cobblestones",
-    "a modern business district in {c} with glass towers",
-    "a seaside boulevard in {c} with palm trees",
-    "a university courtyard in {c} with arcades",
-    "a theatre facade in {c} lit up at night",
+LUGARES = [   # 17-nov-2026 (usuario): solo sitios relacionados con la política o paisajes urbanos sobrios
+    "the facade of the town hall of {c} with the Spanish flag, sober daylight",
+    "the regional parliament building of {c} with flags, empty steps",
+    "a modern conference centre (palacio de congresos) in {c} with glass facade and flags",
+    "the headquarters building of a political party in {c}, flags, empty street in front",
+    "a sober institutional avenue in {c} with government buildings and flags",
+    "an official square in {c} in front of a government building, empty",
+    "a ministry or government delegation building in {c} with columns and a Spanish flag",
+    "an outdoor campaign rally stage with an empty podium in a square in {c}",
 ]
 CIUDADES = ["Madrid", "Barcelona", "Seville", "Valencia", "Bilbao", "Zaragoza", "Málaga", "Santiago de Compostela",
             "Granada", "Toledo", "San Sebastián", "Córdoba", "Salamanca", "Oviedo", "Pamplona"]

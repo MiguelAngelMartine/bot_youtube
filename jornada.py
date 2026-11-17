@@ -488,7 +488,10 @@ class Jornada:
                         "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita, p. ej. "
                         "«Estamos como el perro del hortelano». Pedro Sánchez tira del refranero. Y la explicación es "
                         "esta: según él, «el PP y Vox ni regulan ni dejan regular»); nada de «.:» ni «?:», y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
-                        "en comentarios» y suscríbete. No toques las citas «» ni los demás campos.",
+                        "en comentarios» y suscríbete. En «ambiente», SOLO sitios relacionados con la política (Senado, Congreso, "
+                        "Moncloa, palacios de congresos, sedes de partidos, parlamentos, ayuntamientos, ministerios, salas de "
+                        "prensa) o paisajes urbanos sobrios; nunca playas, puertos, terrazas ni calles turísticas. No toques "
+                        "las citas «» ni los demás campos.",
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)
             import coletillas as COL
