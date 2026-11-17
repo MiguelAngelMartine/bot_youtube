@@ -14,10 +14,10 @@ Te darán una fecha. Lee:
 Escribe `dia/<fecha>/episodio.json` con:
 1. **Sección 0, sumario** (decisión del usuario del 1-nov-2026: arranque directo y llamativo). Título «Lo más importante del día», tono normal.
    - **Sin presentación ni saludo:** nada de «Buenas noches», «soy Urni» ni «esto es El Hoyformativo»; el logo y la sintonía van después, en el golpe de marca.
-   - **Un solo paso:** una frase-titular corta y contundente por bloque principal, sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 45 y 70 palabras en total.
+   - **Un solo paso:** una frase-titular corta y contundente por bloque principal, sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 25 y 40 palabras en total (formato «todo breves» del 17-nov-2026: solo las 3 piezas más fuertes, arranque fulminante).
    - **El gancho es el salseo** (decisión del usuario del 3-nov-2026): **el primer titular es la frase más impactante del día, preferentemente de las redes oficiales de los políticos (`redes.md`, dossier `frases`)**, la acusación o la réplica más dura, la del cruce más fuerte (quién se lo dice a quién, con la cita literal), aunque su bloque no sea el primero. En los demás, si el bloque tiene cruce de declaraciones, su titular es la frase literal con más gancho y quién la dice («Abascal llama traidor a Sánchez; el PSOE responde: …»), no el dato frío. Descalificaciones políticas sí; tacos e insultos vejatorios, no (son los primeros 30 segundos). Mismo trato para todos: si sale la frase dura de un partido y hay réplica, que se oiga también (si no la hay, no se menciona).
      Ejemplo: «Sesenta y nueve fallecidos en Urda, y la investigación apunta a una cadena de fallos en el sistema de seguridad. Óscar Puente no dimite: me espera un calvario, dice. ...».
-   - Escena `sumario` con ≤ 4 items, uno por bloque y en su orden. Cada item sale a pantalla completa con el estilo de la miniatura, así que lleva:
+   - Escena `sumario` con ≤ 3 items, uno por pieza de las más fuertes y en su orden. Cada item sale a pantalla completa con el estilo de la miniatura, así que lleva:
      - `texto` (resumen, ≤ 70 caracteres) y `cuando` (literal del paso: donde empieza su frase);
      - `titular`: 2-5 palabras de gancho **literales** (mejor la cita textual de la confrontación entre «», si no el hecho del bloque), sin adjetivos propios; `destaca`: una palabra de él para el amarillo; la `etiqueta` dice quién lo dice («Abascal, a Sánchez»);
      - `etiqueta`: el tema en 1-3 palabras («Puente no dimite», «Blocus», «Elecciones»);
@@ -34,7 +34,7 @@ Escribe `dia/<fecha>/episodio.json` con:
 5. **`titulo_video`:** el de la escaleta, sin el nombre del canal ni la fecha (decisión del usuario del 4-nov-2026). **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:
-- el total de palabras (650-830, unos 4-5 min con la voz de Tristán; desde el 11-nov-2026). **Si pasa de 900 palabras (más de 5,5 min), devuelve al redactor el bloque más largo para que quite datos secundarios** (no conectores ni versiones de las partes) antes de cerrar;
+- el total de palabras (**410-500, unos 2:30-3:00 con la voz de Tristán; formato «todo breves» desde el 17-nov-2026**). **Si pasa de 520 palabras, recorta tú las piezas más largas quitando datos secundarios** (no las citas ni la réplica) antes de cerrar. Las transiciones entre piezas, de una frase corta;
 - que no se repitan datos entre bloques;
 - que todos los `cuando` estén literales en su texto.
 

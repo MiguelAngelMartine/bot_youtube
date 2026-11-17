@@ -792,7 +792,8 @@ def largo(fecha):
         quien = next((n2 for p in s["pasos"] if p.get("ve") for n2 in _C.personas_de(p["ve"])), "")
         pseudo = {"quien": quien, "cita": titulo, "contexto": btxt[:400]}
         amb_guion = [e for p in s["pasos"] for e in ((p.get("ve") or {}).get("ambiente") or []) if isinstance(e, str) and e.strip()]
-        escs_txt = amb_guion[:3] or escenas_ambiente(pseudo, 3)   # las que escribe el redactor o, si no, generadas
+        n_e = 2 if len(btxt.split()) < 90 else 3              # 17-nov: piezas cortas («todo breves»), 2 escenas (menos FLUX)
+        escs_txt = amb_guion[:n_e] or escenas_ambiente(pseudo, n_e)   # las que escribe el redactor o, si no, generadas
         # SIEMPRE imagen nueva con FLUX (variedad); se guarda en la biblioteca; si FLUX falla, la mejor de la biblioteca.
         pares, descs = [], []
         for k, esc in enumerate(escs_txt):

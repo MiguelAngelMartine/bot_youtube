@@ -186,8 +186,9 @@ class Jornada:
         if pasos and "«" not in pasos[0].get("di", "")[:200] and "breve" not in txt[:300]:
             fallos.append("el primer «di» no abre con la frase gancho literal entre «»")
         tipos = [(p.get("ve") or {}).get("tipo") for p in pasos if p.get("ve")]
-        if len(set(tipos)) < 3 and "breve" not in tipos:
-            fallos.append(f"solo {len(set(tipos))} tipos de escena (mínimo 3)")
+        minimo = 2 if (segundos or 99) <= 35 else 3        # 17-nov: piezas de 20-30 s (formato «todo breves»), 2 bastan
+        if len(set(tipos)) < minimo and "breve" not in tipos:
+            fallos.append(f"solo {len(set(tipos))} tipos de escena (mínimo {minimo})")
         if segundos:
             pal = sum(len(p.get("di", "").split()) for p in pasos)
             if pal < segundos * 2.75 * 0.75:
@@ -309,11 +310,15 @@ class Jornada:
         if ok:
             E = self.normaliza(self.json("episodio.json"))
             pal = sum(len(p["di"].split()) for s in E["secciones"] for p in s["pasos"])
-            if pal / 2.75 / 60 < 3.8:                   # 11-nov: 4-5 min; si falta, más contexto del dossier
-                self.parte(f"episodio corto (~{pal / 2.75 / 60:.1f} min): se amplía con contexto")
-                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 4-5: amplía los "
-                            f"bloques con más contexto de sus dossieres (antecedentes, datos, la versión de la otra parte), sin "
-                            f"inventar nada y sin tocar las citas. Devuelve el episodio.json completo.",
+            # 17-nov-2026 (formato «todo breves»): 2:30-3:00. Se corrige si se va de ese margen (antes: ampliar si < 3,8 min)
+            if not 2.2 <= pal / 2.75 / 60 <= 3.2:
+                largo_ = pal / 2.75 / 60 > 3.2
+                self.parte(f"episodio de ~{pal / 2.75 / 60:.1f} min: se {'recorta' if largo_ else 'amplía'} a 2:30-3:00")
+                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 2:30-3:00 (410-500 "
+                            + ("palabras): recorta las piezas más largas quitando datos secundarios, sin tocar las citas ni las "
+                               "réplicas, ritmo de breves." if largo_ else
+                               "palabras): amplía un poco las piezas con datos de sus dossieres, sin inventar nada y sin tocar las citas.")
+                            + " Devuelve el episodio.json completo.",
                             [self.dia / "episodio.json", *sorted((self.dia / "dossier").glob("*.md")), *self.comunes()],
                             self.dia / "episodio.json", valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
                 E = self.normaliza(self.json("episodio.json"))
