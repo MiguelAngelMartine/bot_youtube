@@ -247,6 +247,10 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
 
 
 def _barra_nc(nombre, cargo, ancho=560):
+    import re as _re
+    cargo = _re.sub(r"\s*\([^)]*\)", "", cargo or "").strip()      # 18-nov: sin notas internas «(cargo SIN VERIFICAR...)»
+    if "VERIFICAR" in cargo.upper():
+        cargo = ""
     bar = Image.new("RGBA", (ancho, 80), (0, 0, 0, 0)); db = ImageDraw.Draw(bar)
     db.rounded_rectangle([0, 0, ancho, 80], radius=12, fill=(16, 26, 46, 240)); db.rectangle([0, 0, 9, 80], fill=ROJO + (255,))
     db.text((26, 13), _nombre_corto(nombre).upper()[:24], font=fuente("Inter-Black.ttf", 30), fill=BLANCO)
@@ -293,6 +297,10 @@ def _recorte_integrado(nombre, alto, luz=None):
         return None
 
 
+def _es_institucion(n):
+    return bool(__import__("re").match(r"(?i)\s*(tribunal|supremo|gobierno|congreso|senado|audiencia|fiscal[ií]a|abogac[ií]a|junta|consejo|ministerio)\b", n or ""))
+
+
 def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, alto_rec=0, luz=None):
     """Imagen de la persona para ir DELANTE de la escena (estándar «opción A», 15-nov). PRIMERO el recorte curado sin fondo
     (integrado, con sombra); si no hay, Polaroid de respaldo. Devuelve (full, small, barras): full/small = imágenes grande y
@@ -301,6 +309,8 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, al
     full, small, barras = {}, {}, {}
     for n in dict.fromkeys(p for _, _, p in quotes):
         if not n or n in full:
+            continue
+        if _es_institucion(n):                             # 18-nov: instituciones sin retrato (salió un cuadro de El Salvador)
             continue
         cargo = cargos.get(n, "")
         rec = _recorte_integrado(n, alto_rec, luz=luz) if alto_rec else None
@@ -410,6 +420,9 @@ def _activa_largo(t, quotes, full, small, persona_dom, t_ini):
         prev = quotes[i - 1] if i > 0 else None
         conv = bool(prev and prev[2] != p and a - prev[1] < 1.4 and prev[2] in small)
         return p, (prev[2] if conv else None)
+    if isinstance(persona_dom, list):                    # 18-nov: la persona del PASO que suena (nunca la de otro paso)
+        pp = next((q for a, b, q in persona_dom if a - 0.12 <= t <= b), None)
+        return (pp if pp in full else None), None
     return (persona_dom if persona_dom in full else None), None
 
 
@@ -513,7 +526,7 @@ def _dibuja_polas(fr, t, quotes, full, small, modo, caja=None, barras=None, pers
         estado = "double" if conversa else "single"
         a_ini = a
     else:                                                  # cita sin atribuir o sin cita: la persona dominante (nunca vacío)
-        p = persona_dom if persona_dom in full else None
+        p = persona_dom if (not isinstance(persona_dom, list) and persona_dom in full) else None
         estado = "single" if p else "none"
         a_ini = t - 1.0
 
@@ -682,6 +695,7 @@ def _consigue_escena(destino, esc, usadas_lib, sobrio=False, intento=3, orient="
     Devuelve (ruta, origen) con origen en {"nueva","lib_clip","lib_simple"}, o (None, None).
     Excepción (EH_ESCENAS_OPENAI=1): se genera con OpenAI como primera opción (días sin cuota de FLUX/HF)."""
     import biblioteca_ambiente as BIB
+    Path(destino).parent.mkdir(parents=True, exist_ok=True)     # 18-nov: sin la carpeta, el guardado fallaba (FileNotFoundError) y todo caía a biblioteca
     if Path(destino).exists():
         return destino, "nueva"
     if os.environ.get("EH_ESCENAS_OPENAI"):
@@ -971,14 +985,45 @@ def largo(fecha):
         base0 = escenas[0][2]
         acento = _acento(base0.crop((0, int(base0.height * 0.45), int(base0.width * 0.4), base0.height)))
         conocidas = _conocidas()
+        _cargos_ep = {}
+        for pp_ in s["pasos"]:
+            ve_ = pp_.get("ve") or {}
+            for it_ in ([ve_["persona"]] if isinstance(ve_.get("persona"), dict) else []) + list(ve_.get("items") or []):
+                if isinstance(it_, dict) and it_.get("nombre") and it_.get("cargo"):
+                    _cargos_ep[it_["nombre"]] = it_["cargo"]
+        conocidas = [(n_, _cargos_ep.get(n_, c_)) for n_, c_ in conocidas] + [(n_, c_) for n_, c_ in _cargos_ep.items() if n_ not in dict(conocidas)]
         quotes = _citas_timeline(texto, c, btxt, T, conocidas, quien)
         # 17-nov: recorte más contenido (64 % del alto, antes 82 %: tapaba la escena y el rótulo caía encima) y con la luz
         # y el color de la escena para que se integre
         pol_full, pol_small, barras = _polas_persona(dia, fecha, quotes, acento, 560, 380, dict(conocidas),
                                                       alto_rec=int(AL2 * 0.64), luz=acento)
+        # 18-nov: la persona de cada PASO sale de su escena (ve), no de heurísticas del texto
+        import unicodedata as _ud
+        _n = lambda x: _ud.normalize("NFKD", x or "").encode("ascii", "ignore").decode().lower()
+        pasos_p, cc = [], c
+        for pp_ in s["pasos"]:
+            ve_ = pp_.get("ve") or {}
+            pa, pb = T.en(cc), T.en(cc + len(pp_["di"]))
+            cc += len(pp_["di"]) + 1
+            nom = None
+            try:
+                nom = (_C.personas_de(ve_) or [None])[0] if ve_.get("tipo") in ("persona", "citas") else None
+            except Exception:
+                nom = None
+            if nom and _es_institucion(nom):
+                nom = None
+            pasos_p.append((pa, pb, nom))
+            for q_ in quotes:                              # la cita de este paso la dice quien dice su escena
+                if pa - 0.2 <= q_[0] <= pb and nom and nom in dict(conocidas) | {nom: ""}:
+                    q_[2] = nom
+        for pa, pb, nom in pasos_p:
+            if nom and nom not in pol_full:
+                rec = _recorte_integrado(nom, int(AL2 * 0.64), luz=acento)
+                if rec is not None:
+                    pol_full[nom] = rec; barras[nom] = _barra_nc(nom, _cargos_ep.get(nom) or dict(conocidas).get(nom, ""))
         _qp = [p for *_, p in quotes if p]
-        pdom = (max(_qp, key=_qp.count) if _qp else (s.get("persona") or quien))
-        if pdom and pdom not in pol_full:                  # siempre un personaje: aunque no tenga cita, su recorte
+        pdom = pasos_p
+        if False and pdom not in pol_full:                  # siempre un personaje: aunque no tenga cita, su recorte
             rec = _recorte_integrado(pdom, int(AL2 * 0.64), luz=acento)
             if rec is not None:
                 pol_full[pdom] = rec; barras[pdom] = _barra_nc(pdom, dict(conocidas).get(pdom, ""))
