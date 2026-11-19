@@ -153,11 +153,11 @@ _MULETILLAS = ["segun el", "segun ella", "segun ellos", "lo suyo", "vuelve a la 
                "ojo", "mira", "agarrate", "y la explicacion es esta", "no se ha quedado callado", "le recuerda", "mientras tanto"]
 
 
-def repeticiones(voz, n=4):
+def repeticiones(voz, n=4, muletillas=True, cierre=True):
     """19-nov-2026 (usuario: «estás repitiendo partes»): trozos del guion que se dicen DOS veces. Devuelve la lista de
     expresiones repetidas (n-gramas de n palabras con al menos 2 con contenido), sin contar el cierre fijo (desde la
     pregunta final). También avisa si una misma cita «…» (o casi) sale dos veces."""
-    cuerpo = voz.rsplit("¿", 1)[0] if "¿" in voz else voz
+    cuerpo = voz.rsplit("¿", 1)[0] if (cierre and "¿" in voz) else voz
     t = _toks(cuerpo)
     vistos, reps = {}, []
     for i in range(len(t) - n + 1):
@@ -168,7 +168,7 @@ def repeticiones(voz, n=4):
             reps.append(" ".join(g))
         vistos.setdefault(g, i)
     plano = " " + " ".join(t) + " "
-    for m in _MULETILLAS:                                  # muletillas cortas que, dichas dos veces, suenan a repetición
+    for m in (_MULETILLAS if muletillas else []):                                  # muletillas cortas que, dichas dos veces, suenan a repetición
         if plano.count(f" {m} ") >= 2 and m not in reps:
             reps.append(m)
     citas = [" ".join(_toks(c)) for c in re.findall(r"«([^»]+)»", cuerpo)]

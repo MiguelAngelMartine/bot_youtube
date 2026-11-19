@@ -59,3 +59,6 @@ Te darán una fecha y un número de bloque (o «breves»).
 **Antes de entregar**, repasa tú mismo lo que comprueba `prechequeo.py` (lo pasa el coordinador y te devolverá el bloque si falla): ningún medio nombrado en la voz, nada de «no consta respuesta», cifras con letras en la voz, cada `cuando` literal en el `di`, frases de 30 palabras como mucho y ninguna palabra prohibida del libro de estilo. Así la mesa de control no gasta vueltas en lo mecánico.
 
 Responde con: número de palabras, duración estimada, escenas usadas y cualquier hecho del enfoque que no pudiste cubrir porque no estaba en el dossier.
+
+## Nada se dice dos veces (19-nov-2026, el usuario: «estás repitiendo partes»; vale para el largo y los Shorts)
+Cada dato, cita, idea y muletilla sale UNA sola vez en el guion: si la entrada ya lo cuenta, el contexto no lo repite; si la réplica ya se ha dicho, no se anuncia otra vez; nada de «según él» dos veces ni la misma cita en dos piezas. Varía los enlaces (nunca la misma fórmula, como «Y la explicación es esta», todos los días). Lo mide `shorts_guion.repeticiones` y, si hay repeticiones, el guion vuelve al redactor.

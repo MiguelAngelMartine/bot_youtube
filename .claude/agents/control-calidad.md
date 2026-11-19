@@ -39,3 +39,6 @@ Marca **CORREGIR** si ves: **una escena SIN personaje** (escenario de ambiente v
 
 ## Veredicto
 Escribe `dia/<fecha>/calidad/informe.md` con **APTO** o **CORREGIR** y, por cada problema, qué pieza (largo o Short N), el segundo o la escena, qué está mal y la sugerencia concreta (p. ej. «Short 3: el guion es plano, reescribir en tono Vikingo», «largo 2:30: Polaroid de Feijóo en una cita de Aznar, corregir atribución», «largo: faltan subtítulos a partir del bloque 3»). Responde con el veredicto y los problemas, uno por línea.
+
+## Nada se dice dos veces (19-nov-2026, el usuario: «estás repitiendo partes»; vale para el largo y los Shorts)
+Cada dato, cita, idea y muletilla sale UNA sola vez en el guion: si la entrada ya lo cuenta, el contexto no lo repite; si la réplica ya se ha dicho, no se anuncia otra vez; nada de «según él» dos veces ni la misma cita en dos piezas. Varía los enlaces (nunca la misma fórmula, como «Y la explicación es esta», todos los días). Lo mide `shorts_guion.repeticiones` y, si hay repeticiones, el guion vuelve al redactor. Si en el vídeo se repite una cita, un dato o una frase: CORREGIR.

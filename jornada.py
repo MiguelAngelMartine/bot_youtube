@@ -195,6 +195,13 @@ class Jornada:
                        for x in COL.problemas(*(p.get("di", "") for p in pasos), excluir_fecha=self.f)]
         except Exception:
             pass
+        try:                                               # 19-nov (usuario: «estás repitiendo partes»): nada dos veces
+            import shorts_guion as SG
+            reps = SG.repeticiones(" ".join(p.get("di", "") for p in pasos), n=5, cierre=False)
+            if reps:
+                fallos.append(f"repite partes ({'; '.join(reps[:8])}): cada dato, cita, idea y muletilla UNA sola vez")
+        except Exception:
+            pass
         if segundos:
             pal = sum(len(p.get("di", "").split()) for p in pasos)
             if pal < segundos * 2.75 * 0.75:
@@ -349,6 +356,28 @@ class Jornada:
                     (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
             except Exception as ex:
                 self.parte(f"aviso: control de coletillas no aplicado ({type(ex).__name__})")
+            # 19-nov-2026 (usuario: «estás repitiendo partes», «aplícalo en todo»): el episodio ENTERO, sin repetir lo mismo
+            # entre piezas (misma cita o mismo trozo de 5+ palabras); el sumario no se narra y no cuenta.
+            try:
+                import shorts_guion as SG
+                for _ in range(2):
+                    narr = " ".join(p.get("di", "") for s in E["secciones"]
+                                    if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", []))
+                                    for p in s["pasos"])
+                    reps = SG.repeticiones(narr, n=5, muletillas=False, cierre=False)
+                    if not reps:
+                        break
+                    self.parte(f"repeticiones en el episodio: {'; '.join(reps[:6])}")
+                    self.claude("redactor", "En episodio.json hay partes que se dicen DOS veces (entre piezas o dentro de "
+                                f"una): {'; '.join(reps)}. Reescribe SOLO lo necesario para que cada dato, cita e idea salga "
+                                "una sola vez en todo el vídeo, con el mismo tono Vikingo, las citas literales «» intactas y "
+                                "la misma duración aproximada; no toques nada más.",
+                                (self.dia / "episodio.json").relative_to(RAIZ), modelo="opus",
+                                motivo="repeticiones en el episodio")
+                    E = self.normaliza(self.json("episodio.json"))
+                    (self.dia / "episodio.json").write_text(json.dumps(E, ensure_ascii=False, indent=1), encoding="utf-8")
+            except Exception as ex:
+                self.parte(f"aviso: control de repeticiones no aplicado ({type(ex).__name__})")
             pal = sum(len(p["di"].split()) for s in E["secciones"] if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", [])) for p in s["pasos"])
             self.parte(f"cierre: episodio.json listo ({len(E['secciones'])} secciones, ~{pal / 2.75 / 60:.1f} min)")
             try:                                           # registra las coletillas del largo y refresca el «a evitar» para los Shorts
