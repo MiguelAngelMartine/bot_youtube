@@ -46,7 +46,7 @@ def ejecuta(puesto, fecha, encargo, ficheros, salida=None, formato="json", tope_
               f"tu puesto debe leer van al final; si alguno no está, trabaja con lo que hay.\n\n"
               f"### INSTRUCCIONES DE TU PUESTO\n{instrucciones(puesto)}\n\n### ENCARGO\nFecha {fecha}. {encargo}\n\n"
               f"### FORMATO DE LA RESPUESTA\n{salida_txt}\n\n### FICHEROS\n" + "\n\n".join(partes))
-    r = gem.pide(prompt, como_json=(formato == "json"), temperatura=0.3, pensar=pensar, limite_s=420,
+    r = gem.pide(prompt, como_json=(formato == "json"), temperatura=0.3, pensar=pensar, limite_s=900,   # 19-nov: antes 420 s, poco
                  modelos=[m for m in gem.MODELOS if "lite" not in m])   # el «lite» no redacta bien
     if r is None or (formato == "json" and not isinstance(r, (dict, list))) or (formato != "json" and not str(r).strip()):
         return None

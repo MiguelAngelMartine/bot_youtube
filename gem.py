@@ -14,8 +14,13 @@ from pathlib import Path
 import requests
 
 RAIZ = Path(__file__).parent
-MODELOS = ["gemini-3-flash-preview", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"]
+# 19-nov-2026: cada modelo tiene su PROPIA cuota gratuita diaria (pequeña) y los «preview» se saturan (503) en hora punta.
+# Con solo 4 modelos se agotaban a media jornada y todo acababa en Claude: ahora se reparte entre todos los «flash»
+# disponibles (los 2.5 ya no se admiten para cuentas nuevas: 404; los «pro» no tienen cuota gratuita: 429).
+MODELOS = ["gemini-3-flash-preview", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash",
+           "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-flash-lite-latest"]
 LIMITE_S = 180                                         # espera maxima por trabajo antes de pasarlo a Claude
+PRESUPUESTO = {"low": 1024, "medium": 4096, "high": 8192}   # tokens de pensamiento de los modelos que no son «gemini-3»
 
 
 def _clave():
@@ -52,10 +57,16 @@ def pide(partes, como_json=False, temperatura=0.2, pensar="low", limite_s=None, 
     claves = _claves()
     limite = time.time() + (limite_s or LIMITE_S)
     agotados = set()                                    # cuota diaria gastada: ese modelo con esa clave, fuera hasta mañana
-    for modelo, k in [(m, c) for m in (modelos or MODELOS) for c in claves] * 3:   # vueltas por modelos y claves mientras quede tiempo
+    lista = [(m, c) for m in (modelos or MODELOS) for c in claves]
+    for n, (modelo, k) in enumerate(lista * 3):         # vueltas por modelos y claves mientras quede tiempo
+        if n and n % len(lista) == 0:
+            time.sleep(15)                              # todos saturados: respiro breve antes de la vuelta siguiente
         if (modelo, k) in agotados:
             continue
-        cfg = dict(conf, thinkingConfig={"thinkingLevel": pensar}) if modelo.startswith("gemini-3") else conf   # mas rapido
+        # 19-nov-2026: sin tope, los modelos que no son «gemini-3» piensan sin límite (17.000-60.000 tokens) y tardan 400 s:
+        # se pasaba el tiempo y el trabajo acababa en Claude. Ahora, presupuesto de pensamiento acorde a «pensar».
+        cfg = (dict(conf, thinkingConfig={"thinkingLevel": pensar}) if modelo.startswith("gemini-3")
+               else dict(conf, thinkingConfig={"thinkingBudget": PRESUPUESTO.get(pensar, 2048)}))
         for intento in range(3):
             if time.time() > limite:                    # saturado: antes que Claude, los modelos gratuitos (10-nov)
                 return _pool(partes, como_json, temperatura)
@@ -79,12 +90,9 @@ def pide(partes, como_json=False, temperatura=0.2, pensar="low", limite_s=None, 
             if r.status_code == 429 and "quota" in r.text.lower():
                 agotados.add((modelo, k))               # sin cuota hoy: al siguiente modelo o clave, sin esperar
                 break
-            if r.status_code in (429, 500, 503):
-                if intento:                             # saturado dos veces: prueba otro modelo y vuelve luego
-                    break
-                time.sleep(8)
-                continue
-            if r.status_code == 400 and "thinking" in r.text.lower():
+            if r.status_code in (429, 500, 503):        # 19-nov: saturado («high demand», muy frecuente en los «preview»
+                break                                   # del plan gratuito): al siguiente modelo YA, sin esperar; se vuelve luego
+            if r.status_code == 400 and "thinking" in r.text.lower() and "thinkingConfig" in cfg:
                 cfg = conf                              # este modelo no admite el ajuste: sin el
                 continue
             break
