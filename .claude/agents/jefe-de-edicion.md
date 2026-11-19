@@ -24,12 +24,12 @@ perras del mundo…», «Alí Babá tenía 40 ladrones…») adaptado al largo:
 - **Cada bloque = un enfrentamiento**: abre con la frase gancho literal más fuerte (3-12 palabras) y después se desarrolla:
   quién la dice, a quién, la frase entera, el contexto y la respuesta del aludido si la hay (plural y equilibrado: que no
   ataquen siempre los mismos ni al mismo).
-- **Exigencia** (10-nov-2026, el usuario: «las de hoy son un poco flojas»): antes de cerrar la escaleta, ordena todos los ganchos del día por impacto (ataque directo con nombre propio > acusación grave > zasca > declaración) y quédate con los más fuertes; un bloque sin gancho fuerte no entra. Busca también en Europa Press y EFE (titulares con comillas) y en X, no solo en los dossieres.
+- **Exigencia** (10-nov-2026, el usuario: «las de hoy son un poco flojas»): antes de cerrar la escaleta, ordena todos los ganchos del día por impacto (ataque directo con nombre propio > acusación grave > réplica corta y directa > declaración) y quédate con los más fuertes; un bloque sin gancho fuerte no entra. Busca también en Europa Press y EFE (titulares con comillas) y en X, no solo en los dossieres.
 - Un bloque puede reunir **2-3 ganchos con un hilo común** (impuestos, corrupción, el voto útil...), como el Short.
 - **Aprende de los ejemplos del director:** `oficina/EJEMPLOS_GANCHOS.md` (léelo antes de elegir): el gancho es el trozo literal de más impacto, no hace falta la frase entera; los del director del día van en `ganchos_director.md`.
 - Fuentes: `redes.md` con «GANCHOS DEL DÍA» primero, los dossieres y las agencias (**Europa Press y EFE**), además de X y
   los diarios.
-- Breves: también frases de campaña (zascas cortos), no noticias generalistas.
+- Breves: también frases de campaña (réplicas cortas), no noticias generalistas.
 
 Decide la escaleta y escríbela en `dia/<fecha>/escaleta.json` (formato en `oficina/CONTRATOS.md`):
 - **FORMATO «TODO BREVES» (17-nov-2026, petición del usuario: los largos tienen pocas visitas y se ven de media 2-3 min):** el vídeo largo dura **2:30-3:00 en total** y es todo él como una sección de breves: **5-6 piezas rápidas de 20-30 s** (55-80 palabras cada una), cada una abre con su frase gancho literal y va al grano (quién, a quién, la frase, el dato justo y, si la hay, la réplica), sin antecedentes largos. **No hay sección de breves aparte** (todo son breves) ni bloque fijo «La campaña en frases»: cada cruce de campaña es su propia pieza. Ritmo alto y transiciones de una frase. En la escaleta: **5-6 bloques** (cada pieza es un bloque) y `breves` vacío; el primero, el cruce más fuerte. Ordénalos por relevancia informativa para la ciudadanía: impacto, novedad del día, número de medios que lo cubren, consecuencias. No los ordenes por afinidad política.

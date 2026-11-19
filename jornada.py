@@ -526,11 +526,12 @@ class Jornada:
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
         import shorts_guion as SG                          # 19-nov (usuario: «estás repitiendo partes»): control medible
         for j in jsons:
-            reps = SG.repeticiones(_json.loads(j.read_text(encoding="utf-8")).get("voz", ""))
+            voz_ = _json.loads(j.read_text(encoding="utf-8")).get("voz", "")
+            reps = SG.repeticiones(voz_) + SG.vetadas(voz_)        # 19-nov: y nunca «zasca»
             if reps:
-                self.parte(f"{j.name}: repeticiones en el guion ({'; '.join(reps[:6])}), vuelve a Opus")
-                self.claude("redactor", f"El campo \"voz\" de {j.name} REPITE partes: {'; '.join(reps)}. Reescríbelo "
-                            "para que cada dato, cita, idea y muletilla salga UNA sola vez, con el mismo tono Vikingo, las "
+                self.parte(f"{j.name}: repeticiones o palabras prohibidas en el guion ({'; '.join(reps[:6])}), vuelve a Opus")
+                self.claude("redactor", f"El campo \"voz\" de {j.name} REPITE partes o usa palabras prohibidas: {'; '.join(reps)}. "
+                            "Reescríbelo sin palabras prohibidas y para que cada dato, cita, idea y muletilla salga UNA sola vez, con el mismo tono Vikingo, las "
                             "mismas citas literales «» y el mismo cierre. No toques los demás campos.",
                             j.relative_to(RAIZ), modelo="opus", motivo="quitar repeticiones del guion del Short")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)

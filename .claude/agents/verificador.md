@@ -6,6 +6,7 @@ model: sonnet
 ---
 
 > **Guía única:** todas las normas del canal están en `NORMAS.md` (léela entera antes de trabajar). Si algo de este fichero la contradice, **manda `NORMAS.md`**.
+> **«Zasca» (19-nov-2026, el usuario):** esa palabra NO se usa NUNCA en el guion, en ninguna forma («menudo zasca»…). Si aparece, CORREGIR.
 
 **Texto completo de las noticias:** está descargado en `dia/<fecha>/articulos/` (cada noticia de `temas.json` con texto lleva el campo `"texto"` con su fichero; índice en `articulos/indice.json`). Léelo con Read: es la fuente principal para contrastar. No uses WebFetch con los medios (falla); úsalo solo para una fuente oficial concreta (BOE, nota de prensa) si hace falta. RTVE, La Razón, Público y El Confidencial no tienen texto completo: de ellos solo vale el titular y el resumen, y lo que solo cuenten ellos va «según X».
 

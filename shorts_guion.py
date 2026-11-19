@@ -51,7 +51,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   programa comprueba cada frase contra el material y quita las que no estén respaldadas. Sin adjetivos ni verbos valorativos propios (nada de «arremete», «carga», «estalla»: «critica», «defiende»,
   «pide», «acusa» si la fuente lo dice). No adelanta la réplica (la voz ya dice «X le responde»), no interpreta
   intenciones ni añade lo que la persona «considera» si no está en el material.
-- "categoria": el formato, uno de «POLÉMICA» (cruce de declaraciones entre políticos), «ZASCA» (respuesta corta y directa
+- "categoria": el formato, uno de «POLÉMICA» (cruce de declaraciones entre políticos), «RÉPLICA» (respuesta corta y directa
   en redes a otro político), «ÚLTIMA HORA» (un hecho noticioso de hoy: decisión, anuncio, dato) o «ANÁLISIS» (explica
   datos o antecedentes). Que sea verdad: «ÚLTIMA HORA» solo si el hecho es de hoy.
 - "pregunta": la pregunta final, de sí o no, ≤ 6 palabras, que NOMBRA por su apellido a quien dijo la frase y pregunta
@@ -151,6 +151,15 @@ def _toks(s):
 
 _MULETILLAS = ["segun el", "segun ella", "segun ellos", "lo suyo", "vuelve a la carga", "ha vuelto a la carga", "y claro",
                "ojo", "mira", "agarrate", "y la explicacion es esta", "no se ha quedado callado", "le recuerda", "mientras tanto"]
+
+
+VETADAS = [r"\bzasca"]   # 19-nov-2026 (usuario): «zasca» no se usa NUNCA en el guion (NORMAS.md §3)
+
+
+def vetadas(voz):
+    """Palabras prohibidas por la guía que aparecen en la voz (fuera de las citas literales «…»)."""
+    fuera = re.sub(r"«[^»]*»", " ", voz or "").lower()
+    return [f"«{v.replace(chr(92) + 'b', '')}» (palabra prohibida: no se usa nunca)" for v in VETADAS if re.search(v, fuera)]
 
 
 def repeticiones(voz, n=4, muletillas=True, cierre=True):

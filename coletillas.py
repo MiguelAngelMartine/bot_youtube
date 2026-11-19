@@ -57,7 +57,7 @@ CLAVES = {
     r"solar despues de la guerra": "como un solar después de la guerra",
     r"meterle mano al asunto": "no había por dónde meterle mano",
     r"revenio": "se ha descubierto el pastel y estaba revenío",
-    r"menudo zasca|vaya repaso": "menudo zasca / vaya repaso",
+    r"vaya repaso": "vaya repaso",       # («zasca» no es coletilla: está prohibida siempre, ver prechequeo.PROHIBIDAS)
     r"no lo has visto venir": "esto no lo has visto venir",
     r"de traca": "de traca",
 }
@@ -95,6 +95,7 @@ def registra(fecha, *textos):
 
 
 VENTANA = 5   # 17-nov-2026 (usuario): una coletilla usada no se repite hasta pasados varios días (antes 2)
+SOLO_VIDEO = set()   # coletillas con límite de 1 por vídeo pero sin ventana de días (ahora ninguna)
 
 
 def evitar(dias=VENTANA):
@@ -106,7 +107,7 @@ def evitar(dias=VENTANA):
             f = date.fromisoformat(d["fecha"])
         except (ValueError, KeyError):
             continue
-        if f >= limite:
+        if f >= limite and d["coletilla"] not in SOLO_VIDEO:
             out.add(d["coletilla"])
     return sorted(out)
 
@@ -132,7 +133,7 @@ def problemas(*textos, dias=VENTANA, excluir_fecha=None):
             f = date.fromisoformat(d["fecha"])
         except (ValueError, KeyError):
             continue
-        if f >= hoy - timedelta(days=dias) and d["fecha"] != excluir_fecha:
+        if f >= hoy - timedelta(days=dias) and d["fecha"] != excluir_fecha and d["coletilla"] not in SOLO_VIDEO:
             usadas.add(d["coletilla"])
     av = []
     for c, n in cuenta(*textos).items():

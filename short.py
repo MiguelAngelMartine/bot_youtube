@@ -122,7 +122,7 @@ def _fondo():
 
 
 
-CATEGORIAS = {"ÚLTIMA HORA": (ROJO, BLANCO), "POLÉMICA": (AMARILLO, (16, 28, 52)), "ZASCA": (AMARILLO, (16, 28, 52)),
+CATEGORIAS = {"ÚLTIMA HORA": (ROJO, BLANCO), "POLÉMICA": (AMARILLO, (16, 28, 52)), "RÉPLICA": (AMARILLO, (16, 28, 52)),
               "ANÁLISIS": ((30, 64, 140), BLANCO)}          # identidad EH (8-nov-2026)
 
 
@@ -138,6 +138,7 @@ def _cabecera(fecha, categoria=""):
     y, m, dd = (int(x) for x in fecha[:10].split("-"))
     fe = f"{dd} {['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][m - 1]}"
     cat = (categoria or "").upper().strip()
+    cat = {"ZASCA": "RÉPLICA"}.get(cat, cat)                # 19-nov-2026 (usuario): «zasca» no se usa nunca
     if cat in CATEGORIAS:                                   # etiqueta de formato (identidad EH, 8-nov-2026)
         fondo_c, letra_c = CATEGORIAS[cat]
         fc = fuente("Inter-Black.ttf", 34)

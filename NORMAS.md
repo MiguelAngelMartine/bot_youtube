@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 19-nov-2026.**
+**Última actualización: 19-nov-2026 («zasca», prohibido siempre).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -51,8 +51,10 @@ abogado de propiedad intelectual.
   El Confidencial, El Mundo, ABC, La Razón). Se elige la frase más fuerte de **cada** parte; ni la última palabra ni la frase
   más llamativa pueden ser siempre del mismo lado.
 - **Humor sobre todos por igual.** Ironía sobre la situación y el absurdo, nunca tomar partido.
-  - Prohibido declarar ganadores: «zasca», «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
-    («ZASCA» solo existe como etiqueta de formato de un Short, §5.)
+  - **La palabra «zasca» NO se usa NUNCA** (19-nov-2026, el usuario), en ninguna forma («menudo zasca», «zasca en toda
+    regla»…): ni en el guion, ni en pantalla, ni en títulos o etiquetas (la etiqueta de los Shorts es RÉPLICA, §5). Lo
+    comprueban `prechequeo.py` y `shorts_guion.vetadas`.
+  - Prohibido también declarar ganadores: «le dio un repaso», «humilla», «destroza», «le pone en su sitio», «se retrata».
   - Si la guasa cae solo sobre un lado, se **reequilibra** (se añade al otro), **nunca se borra**. La mesa de control vela
     por la pluralidad, **no toca el estilo** (sarcasmo, coletillas, frases hechas).
 - Los conectores no añaden lo que la fuente no dice: «por eso», «tras», «sin embargo»… solo si el dossier lo dice.
@@ -155,7 +157,7 @@ dejado a los sindicatos ver la realidad… la resaca de la gamba, en pleno Congr
 - No había por dónde meterle mano al asunto.
 - Se ha descubierto el pastel y encima estaba revenío.
 
-Fuera de la paleta, para siempre: tacos («me cago en la leche», «coño», «del copón», «almorrana»…) y lo que esté en
+Fuera de la paleta, para siempre: «zasca» en cualquier forma, tacos («me cago en la leche», «coño», «del copón», «almorrana»…) y lo que esté en
 `archivo/palabras_vetadas.json`.
 
 ## 5. Formatos y producción diaria
@@ -170,7 +172,7 @@ Fuera de la paleta, para siempre: tacos («me cago en la leche», «coño», «d
   Gracias por vernos. Mañana, más.» Tragedias: tono sobrio, sin ganchos llamativos, música baja.
 - **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
   (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras. Etiqueta de formato arriba a la derecha:
-  ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, ZASCA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
+  ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
 
 ## 6. Imagen
 - **Escenas de ambiente** de línea clara a **color pleno**, animadas (cámara 2,5D `motion_comic`; **LTX no**, inventa caras),
