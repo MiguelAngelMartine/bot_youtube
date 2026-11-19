@@ -324,7 +324,7 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, al
             continue
         if _es_institucion(n):                             # 18-nov: instituciones sin retrato (salió un cuadro de El Salvador)
             continue
-        cargo = cargos.get(n, "")
+        cargo = re.sub(r"\s*\([^)]*\)", "", cargos.get(n, "") or "").strip()   # 19-nov: sin notas internas «(dimisión…)»
         rec = _recorte_integrado(n, alto_rec, luz=luz) if alto_rec else None
         if rec is not None:                                # opción A: recorte integrado + barra aparte
             full[n] = rec
@@ -335,6 +335,7 @@ def _polas_persona(dia, fecha, quotes, acento, ancho_f, ancho_s, cargos=None, al
         if not foto:
             continue
         try:
+            cargo2 = re.sub(r"\s*\([^)]*\)", "", cargo2 or "").strip()
             full[n] = polaroid_armonica(foto, n, cargo2 or cargo, cred, ancho_f, acento, giro=-3)
             small[n] = polaroid_armonica(foto, n, cargo2 or cargo, cred, ancho_s, acento, giro=4)
             barras[n] = None
@@ -402,7 +403,8 @@ def _dibuja_sub(fr, t, chunks, modo, zona=None):
         if cur:
             lineas.append(cur)
         # 17-nov: en el largo, máximo 2 líneas (con 3-4 subía hasta tapar la cara del personaje): se reduce la letra
-        if not zona or len(lineas) <= 2 or tam <= 44:
+        # 19-nov: en los Shorts, máximo 3 líneas (con 4 tapaba la etiqueta roja)
+        if len(lineas) <= (2 if zona else 3) or tam <= 44:
             break
         tam -= 4
         f = fuente("Inter-Black.ttf", tam)
@@ -865,7 +867,7 @@ def short(fecha, n):
             fr.alpha_composite(kick, (50, caja_y - kick.height - 14))  # etiqueta (kicker) encima del recuadro
             fr.alpha_composite(caja, ((AN - caja.width) // 2, caja_y))
         else:                                                        # cita larga: solo karaoke; el kicker, en sitio fijo
-            fr.alpha_composite(kick, (50, AL - 470))
+            fr.alpha_composite(kick, (50, AL - 500))         # 19-nov: más arriba, libre del karaoke de 3 líneas
         _dibuja_sub(fr, t, sub_chunks, "short")                      # subtítulo karaoke al pie (blanco + amarillo)
         d = ImageDraw.Draw(fr)
         d.text((AN // 2, AL - 70), f"Fuente: {S.get('fuente', '')}"[:70], font=fuente("Inter-SemiBold.ttf", 26),
