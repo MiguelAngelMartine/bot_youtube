@@ -26,9 +26,18 @@ Esto lo revisa el control de calidad.
 ## El gancho, UNA sola vez (17-nov-2026, el usuario)
 El Short y cada pieza abren con la frase gancho literal, pero **no se repite enseguida**: ni la entrada ni la cita que viene
 después vuelven a decirla. Si la cita entera empieza por el gancho, después va solo **el resto** de la cita. Sin preguntas en el
-cuerpo: en vez de «¿Por qué?», «Y la explicación es esta:».
+cuerpo: en vez de «¿Por qué?», un enlace afirmativo (y que VARÍE: «Y remata:», «Y sigue:», «Y añade:»…; nunca la misma fórmula todos los días).
 - Mal: «Estamos como el perro del hortelano». Sánchez se compara con el perro del hortelano. ¿Por qué?: «Estamos como el perro del hortelano, el PP y Vox ni regulan ni dejan regular».
-- Bien: «Estamos como el perro del hortelano». Pedro Sánchez tira del refranero. Y la explicación es esta: según él, «el PP y Vox ni regulan ni dejan regular».
+- Bien: «Estamos como el perro del hortelano». Pedro Sánchez tira del refranero, y remata: «el PP y Vox ni regulan ni dejan regular».
+
+## NADA se dice dos veces (19-nov-2026, el usuario: «estás repitiendo partes»)
+Cada dato, cada cita, cada idea y cada muletilla salen **una sola vez** en el guion (Short o pieza del largo). Si la entrada ya
+cuenta quién dice qué, el contexto no lo repite; si la réplica ya se ha dicho, no se anuncia otra vez; nada de «según él»
+dos veces, ni «lo suyo… lo suyo». Fallos reales:
+- «Feijóo ha prometido una ley para que los exiliados… voten». + «Alberto Núñez Feijóo promete una ley para que los exiliados… voten».
+- «EH Bildu responde hablando de «Feivox»…». + «EH Bildu le responde: «Feivox»».
+- «lo suyo va contra «la podredumbre…»». + «…que lo suyo es con el partido».
+`shorts_guion.repeticiones` lo mide y, si hay repeticiones, el guion vuelve a Opus.
 
 ## Fluidez (para que Tristán no suene abrupto) — MUY IMPORTANTE
 Tristán respeta la puntuación: la coma es pausa corta, el punto pausa larga, los puntos suspensivos «…» una pausa natural.

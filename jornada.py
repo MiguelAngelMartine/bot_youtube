@@ -485,14 +485,25 @@ class Jornada:
                         "oficina/GUION_ESTILO.md). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
                         "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
                         "preguntas en el cuerpo. El gancho se dice UNA SOLA VEZ: ni la entrada ni la cita que viene "
-                        "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita, p. ej. "
-                        "«Estamos como el perro del hortelano». Pedro Sánchez tira del refranero. Y la explicación es "
-                        "esta: según él, «el PP y Vox ni regulan ni dejan regular»); nada de «.:» ni «?:», y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
+                        "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita). NADA SE "
+                        "DICE DOS VECES: cada dato, cada cita y cada idea, una sola vez; si la entrada ya lo cuenta, el "
+                        "contexto no lo vuelve a contar, y si la réplica ya está, no se anuncia otra vez. Tampoco repitas "
+                        "muletillas («según él», «lo suyo», «y claro»...) ni uses fórmulas fijas como «Y la explicación es "
+                        "esta»: varía los enlaces. Al terminar, relee el guion entero buscando repeticiones. Nada de «.:» ni «?:», y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
                         "en comentarios» y suscríbete. En «ambiente», SOLO sitios relacionados con la política (Senado, Congreso, "
                         "Moncloa, palacios de congresos, sedes de partidos, parlamentos, ayuntamientos, ministerios, salas de "
                         "prensa) o paisajes urbanos sobrios; nunca playas, puertos, terrazas ni calles turísticas. No toques "
                         "las citas «» ni los demás campos.",
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
+        import shorts_guion as SG                          # 19-nov (usuario: «estás repitiendo partes»): control medible
+        for j in jsons:
+            reps = SG.repeticiones(_json.loads(j.read_text(encoding="utf-8")).get("voz", ""))
+            if reps:
+                self.parte(f"{j.name}: repeticiones en el guion ({'; '.join(reps[:6])}), vuelve a Opus")
+                self.claude("redactor", f"El campo \"voz\" de {j.name} REPITE partes: {'; '.join(reps)}. Reescríbelo "
+                            "para que cada dato, cita, idea y muletilla salga UNA sola vez, con el mismo tono Vikingo, las "
+                            "mismas citas literales «» y el mismo cierre. No toques los demás campos.",
+                            j.relative_to(RAIZ), modelo="opus", motivo="quitar repeticiones del guion del Short")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)
             import coletillas as COL
             COL.registra(self.f, *(_json.loads(j.read_text(encoding="utf-8")).get("voz", "") for j in jsons))

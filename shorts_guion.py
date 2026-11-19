@@ -140,6 +140,59 @@ def enriquece_contexto(contexto, cita, G, objetivo=70):
     return out
 
 
+_VACIAS = set("el la los las un una unos unas de del al a y e o u que en con por para su sus se le les lo es son ha han "
+               "he hay como mas más pero ya no si sí este esta esto ese esa eso muy tan".split())
+
+
+def _toks(s):
+    s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+    return re.findall(r"[a-z0-9]+", s)
+
+
+_MULETILLAS = ["segun el", "segun ella", "segun ellos", "lo suyo", "vuelve a la carga", "ha vuelto a la carga", "y claro",
+               "ojo", "mira", "agarrate", "y la explicacion es esta", "no se ha quedado callado", "le recuerda", "mientras tanto"]
+
+
+def repeticiones(voz, n=4):
+    """19-nov-2026 (usuario: «estás repitiendo partes»): trozos del guion que se dicen DOS veces. Devuelve la lista de
+    expresiones repetidas (n-gramas de n palabras con al menos 2 con contenido), sin contar el cierre fijo (desde la
+    pregunta final). También avisa si una misma cita «…» (o casi) sale dos veces."""
+    cuerpo = voz.rsplit("¿", 1)[0] if "¿" in voz else voz
+    t = _toks(cuerpo)
+    vistos, reps = {}, []
+    for i in range(len(t) - n + 1):
+        g = tuple(t[i:i + n])
+        if sum(w not in _VACIAS and len(w) > 2 for w in g) < 2:
+            continue
+        if g in vistos and i - vistos[g] >= n and " ".join(g) not in " ".join(reps):
+            reps.append(" ".join(g))
+        vistos.setdefault(g, i)
+    plano = " " + " ".join(t) + " "
+    for m in _MULETILLAS:                                  # muletillas cortas que, dichas dos veces, suenan a repetición
+        if plano.count(f" {m} ") >= 2 and m not in reps:
+            reps.append(m)
+    citas = [" ".join(_toks(c)) for c in re.findall(r"«([^»]+)»", cuerpo)]
+    for a in range(len(citas)):
+        for b in range(a + 1, len(citas)):
+            if citas[a] and (citas[a] in citas[b] or citas[b] in citas[a]):
+                reps.append(f"cita repetida: «{citas[a][:40]}»")
+    return reps
+
+
+def _sin_repetir(contexto, ya):
+    """Quita del contexto las frases que vuelven a contar lo que ya dicen la entrada, la cita o la réplica (≥ 60 % de sus
+    palabras con contenido ya dichas)."""
+    dichas = {w for w in _toks(ya) if w not in _VACIAS and len(w) > 2}
+    fuera = []
+    for f in re.split(r"(?<=[.!…])\s+", (contexto or "").strip()):
+        cont = [w for w in _toks(f) if w not in _VACIAS and len(w) > 2]
+        if cont and sum(w in dichas for w in cont) / len(cont) >= 0.6:
+            continue
+        fuera.append(f)
+        dichas |= set(cont)
+    return " ".join(fuera).strip()
+
+
 def _norm(s):
     """Minúsculas y espacios uniformes. Las comillas se CONSERVAN (todas como "): si el medio solo entrecomilla una
     palabra («ve "irresponsable" decir...»), la frase entera no casa y no se atribuye como cita."""
@@ -275,12 +328,18 @@ def main(fecha, n=3):
         if gancho != cita and cita.lower().startswith(gancho.lower()):
             resto = cita[len(gancho):].lstrip(" ,;:.—-–").strip()
         ent = s['entrada'].strip().rstrip(':?.').strip()
+        # 19-nov-2026 (usuario: «estás repitiendo partes»): el contexto no vuelve a contar lo que ya dicen la entrada, la
+        # cita o la réplica, y el enlace con el resto de la cita varía (antes siempre «Y la explicación es esta:»).
+        rep_txt = (s.get("replica") or {}).get("cita", "") if isinstance(s.get("replica"), dict) else ""
+        ctx = _sin_repetir(s['contexto'], f"{ent} {cita} {rep_txt}")
+        enlaces = ["Y remata:", "Y sigue:", "Y lo completa así:", "Y añade:"]
+        enlace = enlaces[sum(map(ord, cita)) % len(enlaces)]
         if gancho == cita:
-            voz = f"{ent}: «{cita}». {s['contexto'].strip()}"
+            voz = f"{ent}: «{cita}». {ctx}"
         elif len(resto.split()) >= 3:
-            voz = f"«{gancho}». {ent}. Y la explicación es esta: «{resto}». {s['contexto'].strip()}"
+            voz = f"«{gancho}». {ent}. {enlace} «{resto}». {ctx}"
         else:
-            voz = f"«{gancho}». {ent}. {s['contexto'].strip()}"
+            voz = f"«{gancho}». {ent}. {ctx}"
         segs = []
         for g in s.get("segmentos") or []:                     # 8-nov: varios ganchos en un Short
             if not isinstance(g, dict) or _norm(g.get("cita")) not in base or not g.get("contexto"):
@@ -302,7 +361,7 @@ def main(fecha, n=3):
             s["segmentos"] = segs
         else:
             s.pop("segmentos", None)
-        if s.get("replica"):
+        if s.get("replica") and _norm(s['replica']['cita'])[:30] not in _norm(voz):   # 19-nov: si el contexto ya la cuenta, no se repite
             voz += f" {s['replica']['quien']} le responde: «{s['replica']['cita'].strip().rstrip('.')}»."
         preg = (s.get("pregunta") or "").strip()            # 10-nov: pregunta de sí o no que invite a comentar
         ape = (s.get("quien") or "").split()[-1] if s.get("quien") else ""
