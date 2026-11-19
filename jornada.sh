@@ -112,12 +112,13 @@ PYEOF
         sleep $((OBJ - $(date +%s)))
     done
     # 10-nov-2026: si la jornada se cortó (tope de 3 h, límite de uso) con el vídeo subido pero sin Shorts, se hacen aquí,
-    # con los programas (sin agentes ni tokens).
+    # 19-nov-2026: con la MISMA fase de jornada.py (guion de Opus + control de repeticiones), nunca con shorts_dia.py a
+    # secas: ese camino se saltaba a Opus y salieron Shorts con la réplica dicha dos veces.
     if [ -f "$DIA/youtube.json" ] && [ ! -f "$DIA/shorts/youtube.json" ]; then
-        echo "[$(date +%FT%T)] Faltan los Shorts: se hacen sin agente" >> "$LOG"
-        "$PY" notifica.py "$FECHA" --aviso "la jornada se cortó tras subir el vídeo: hago los Shorts sin agente" >> "$LOG" 2>&1
-        "$PY" -u shorts_dia.py "$FECHA" >> "$DIA/shorts.log" 2>&1 && "$PY" subir.py "$FECHA" shorts >> "$LOG" 2>&1
-        echo "$(date +%H:%M) Shorts hechos y subidos por jornada.sh (sin agente)" >> "$PARTE"
+        echo "[$(date +%FT%T)] Faltan los Shorts: se hacen con la fase de Shorts de jornada.py" >> "$LOG"
+        "$PY" notifica.py "$FECHA" --aviso "la jornada se cortó tras subir el vídeo: hago los Shorts ahora" >> "$LOG" 2>&1
+        EH_SIN_LTX=1 "$PY" -u -c "import jornada; jornada.Jornada('$FECHA').shorts()" >> "$DIA/shorts.log" 2>&1
+        echo "$(date +%H:%M) Shorts hechos por jornada.sh (fase de Shorts de jornada.py, guion de Opus)" >> "$PARTE"
     fi
     if [ "$COD" -ne 0 ]; then
         if [ "$COD" -eq 124 ]; then MSG="la jornada pasó de 3 horas y se ha cortado"; else MSG="la jornada terminó con un error (código $COD)"; fi
