@@ -1,5 +1,5 @@
 """VARIEDAD DE COLETILLAS (16-nov-2026, petición del usuario): las coletillas/chascarrillos de la paleta
-(oficina/GUION_ESTILO.md) no deben repetirse entre vídeos del mismo día o del día siguiente. Este módulo registra las que
+(NORMAS.md (§4)) no deben repetirse entre vídeos del mismo día o del día siguiente. Este módulo registra las que
 se usan (archivo/coletillas_usadas.json) y le da al redactor la lista de las que NO debe repetir (ventana de 2 días).
   - detecta(texto): coletillas de la paleta presentes en un texto.
   - registra(fecha, *textos): las apunta con su fecha.
@@ -145,7 +145,7 @@ def problemas(*textos, dias=VENTANA, excluir_fecha=None):
 
 def escribe_evitar(ruta, dias=VENTANA):
     ev = evitar(dias)
-    txt = ("COLETILLAS YA USADAS en los últimos días — NO las repitas, elige OTRAS de la paleta (GUION_ESTILO.md):\n"
+    txt = ("COLETILLAS YA USADAS en los últimos días — NO las repitas, elige OTRAS de la paleta (NORMAS.md, §4):\n"
            + ("\n".join(f"- {c}" for c in ev) if ev else "(ninguna; puedes usar cualquiera de la paleta)") + "\n")
     Path(ruta).write_text(txt, encoding="utf-8")
     return ev

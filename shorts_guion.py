@@ -17,7 +17,7 @@ RAIZ = Path(__file__).parent
 EJEMPLOS = (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").read_text(encoding="utf-8") if (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").exists() else ""   # EJEMPLOS_GANCHOS: aprende del director
 
 PROMPT = """Eres el guionista de Shorts de «El Hoyformativo»: política española en tono DESENFADADO Y CON OPINIÓN LIGERA, estilo «La
-Pulla» o «Vikingo Blanco» (lee oficina/GUION_ESTILO.md). Humor e ironía sobre TODOS por igual, SIN tomar partido. Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
+Pulla» o «Vikingo Blanco» (lee NORMAS.md (§4)). Humor e ironía sobre TODOS por igual, SIN tomar partido. Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
 para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - Prioriza los de la sección «GANCHOS DEL DÍA» (al principio del material; los «del director», primero): frases cortas
   con impacto, zascas y cruces con respuesta.

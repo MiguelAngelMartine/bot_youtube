@@ -100,11 +100,11 @@ class Jornada:
         return True
 
     def comunes(self):
-        # 15-nov-2026: GUION_ESTILO.md y EJEMPLOS_GANCHOS.md SIEMPRE van con el guionista (llevan la paleta de coletillas y
-        # frases hechas del usuario, que hay que USAR de verdad, y los ganchos de ejemplo).
+        # 19-nov-2026: NORMAS.md (la guía única: tono, paleta de coletillas, reglas del guion) y EJEMPLOS_GANCHOS.md SIEMPRE
+        # van con el guionista.
         return [self.dia / "contexto.md", self.dia / "correcciones.md", self.dia / "ganchos_director.md",
                 self.dia / "encargo.json", RAIZ / "archivo" / "palabras_vetadas.json",   # lista negra de palabras para la voz
-                RAIZ / "oficina" / "GUION_ESTILO.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md",
+                RAIZ / "NORMAS.md", RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md",
                 RAIZ / "archivo" / "coletillas_evitar.txt"]   # coletillas usadas estos días: NO repetir (variedad)
 
     def escaleta(self):
@@ -348,7 +348,7 @@ class Jornada:
                         break
                     self.parte(f"coletillas repetidas en el episodio: {'; '.join(av)}")
                     self.claude("redactor", "En episodio.json cambia SOLO estas coletillas por otras distintas de la paleta de "
-                                "oficina/GUION_ESTILO.md que no estén en archivo/coletillas_evitar.txt ni en el resto del "
+                                "NORMAS.md (§4) que no estén en archivo/coletillas_evitar.txt ni en el resto del "
                                 f"episodio (cada coletilla, una sola vez en todo el vídeo); no toques nada más: {'; '.join(av)}",
                                 (self.dia / "episodio.json").relative_to(RAIZ), modelo="opus",
                                 motivo="coletillas repetidas en el episodio")
@@ -511,7 +511,7 @@ class Jornada:
         for j in jsons:
             self.claude("redactor", f"Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
                         "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
-                        "oficina/GUION_ESTILO.md). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
+                        "NORMAS.md (§4)). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
                         "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
                         "preguntas en el cuerpo. El gancho se dice UNA SOLA VEZ: ni la entrada ni la cita que viene "
                         "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita). NADA SE "

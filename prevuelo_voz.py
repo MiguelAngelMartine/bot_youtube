@@ -147,15 +147,19 @@ def veta(palabra, alternativa="", motivo=""):
 
 
 def _paleta():
-    """Coletillas/expresiones elegidas a propósito (de oficina/GUION_ESTILO.md): no se marcan como 'raras'."""
-    f = RAIZ / "oficina" / "GUION_ESTILO.md"
+    """Coletillas/expresiones elegidas a propósito (paleta de NORMAS.md, §4): no se marcan como 'raras'."""
+    f = RAIZ / "NORMAS.md"
     try:
         lineas = f.read_text(encoding="utf-8").splitlines()
     except OSError:
         return set()
     out = set()
+    dentro = False
     for l in lineas:
-        m = re.match(r"\s*-\s+(.+)", l)
+        if l.startswith("#"):                          # solo la sección de la paleta, no el resto de la guía
+            dentro = "Paleta de coletillas" in l
+            continue
+        m = re.match(r"\s*-\s+(.+)", l) if dentro else None
         if m:
             out.add(re.sub(r"[.!¡¿?«»]", "", m.group(1)).strip().lower())
     return {e for e in out if 3 <= len(e) <= 60}

@@ -13,7 +13,7 @@ La redacción está descrita en [`oficina/ORGANIGRAMA.md`](oficina/ORGANIGRAMA.m
 - 15 puestos en `.claude/agents/`, del recopilador al editor de plataforma;
 - el jefe de producción, en `.claude/skills/edicion-diaria/`, lanzado con `/edicion-diaria [AAAA-MM-DD]`.
 
-Cada fase deja sus ficheros en `dia/AAAA-MM-DD/`, según [`oficina/CONTRATOS.md`](oficina/CONTRATOS.md). La voz, el estilo y el catálogo de escenas están en [`oficina/LIBRO_DE_ESTILO.md`](oficina/LIBRO_DE_ESTILO.md); las normas de YouTube y de derechos, en [`NORMAS.md`](NORMAS.md).
+Cada fase deja sus ficheros en `dia/AAAA-MM-DD/`, según [`oficina/CONTRATOS.md`](oficina/CONTRATOS.md). Todas las normas (voz, estilo, imagen, YouTube y derechos) están en la guía única [`NORMAS.md`](NORMAS.md); el catálogo de escenas, en `oficina/CONTRATOS.md`.
 
 | Herramienta | Qué hace |
 |---|---|

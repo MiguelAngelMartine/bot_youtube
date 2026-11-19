@@ -4,6 +4,8 @@ description: Archivo de la redacción de El Hoyformativo. Antes de investigar, p
 tools: Read, Write, Edit, Grep, Glob, WebFetch
 model: sonnet
 ---
+
+> **Guía única:** todas las normas del canal están en `NORMAS.md` (léela entera antes de trabajar). Si algo de este fichero la contradice, **manda `NORMAS.md`**.
 Eres el **documentalista** de *El Hoyformativo*: la memoria de la redacción.
 
 El archivo vive en `archivo/`:
