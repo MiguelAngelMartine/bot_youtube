@@ -195,6 +195,18 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
     nbt = _norm(btxt)
     nq = _re.sub(r"«[^»]*»", lambda x: " " * len(x.group()), nbt)   # sin el interior de las citas (para hallar la frase)
     apes = [(_norm(n.split()[-1]), n) for n, _ in conocidas if len(n.split()[-1]) >= 4]
+    # 19-nov-2026 (fallo real: Koldo García en la cita de José Ignacio García): si varios conocidos comparten apellido, solo
+    # vale el que tiene su NOMBRE DE PILA justo delante del apellido en el texto.
+    from collections import Counter as _Ct
+    _comp = _Ct(a for a, _ in apes)
+
+    def _pila_ok(n, p):
+        ape = _norm(n.split()[-1])
+        if _comp[ape] < 2:
+            return True
+        pila = {_norm(w) for w in n.split()[:-1]}
+        antes_ = nbt[max(0, p - 30):p].split()[-3:]
+        return bool(pila & set(antes_))
 
     def _destinatario(p):   # el apellido es el destinatario del ataque, no quien habla («a/contra Pedro Sánchez»)
         return bool(_re.search(r"\b(?:a|al|contra|hacia|sobre|para|que)\s+(?:\w+\s+){0,2}$", nbt[max(0, p - 26):p]))
@@ -208,7 +220,7 @@ def _citas_timeline(texto, c0, btxt, T, conocidas, quien_def):
         for ape, n in apes:
             for mm in _re.finditer(r"\b" + _re.escape(ape) + r"\b", nbt[:m.start()]):
                 p = mm.start()
-                if p < ini_f or _destinatario(p):
+                if p < ini_f or _destinatario(p) or not _pila_ok(n, p):
                     continue
                 despues = nbt[mm.end():mm.end() + 22]
                 antes = nbt[max(0, p - 18):p]
@@ -587,7 +599,7 @@ def _foto_persona(dia, fecha, nombre, cargo=""):
         print(f"  (recorte curado no disponible para {nombre}: {type(e).__name__})")
 
     def busca():
-        fs = [(f, c) for f, c in cred.items() if c.get("persona") == nombre and "_recorte" not in f
+        fs = [(f, c) for f, c in cred.items() if _norm(c.get("persona")) == _norm(nombre) and "_recorte" not in f
               and (dia / "imagenes" / f).exists()]
         fs.sort(key=lambda fc: -float(fc[1].get("puntos_gemini", 0) or 0))
         return fs[0] if fs else None

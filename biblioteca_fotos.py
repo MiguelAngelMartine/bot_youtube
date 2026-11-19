@@ -32,6 +32,18 @@ _DESAMBIGUA = {
 }
 
 
+def misma(pedida, ficha):
+    """19-nov-2026 (fallo real: en un Short salió Koldo García por José Ignacio García): la biblioteca se agrupa por
+    apellido, así que una ficha solo vale si es de LA MISMA persona. Si se pide solo el apellido, vale cualquiera;
+    si no, todos los nombres de pila pedidos tienen que estar en el nombre de la ficha (o al revés)."""
+    a = [_ascii(w) for w in (pedida or "").split()]
+    b = [_ascii(w) for w in (ficha or "").split()]
+    if len(a) <= 1 or not b:
+        return True
+    sa, sb = set(a), set(b)
+    return sa <= sb or sb <= sa or (a[0] == b[0] and a[-1] == b[-1])
+
+
 def _slug(nombre):
     base = _ascii((nombre or "").split()[-1]) or "otro"
     nom = _ascii(" ".join((nombre or "").split()[:-1]))     # nombre de pila (sin el apellido final)
@@ -85,7 +97,7 @@ def guarda(persona, ruta, credito=None, gesto=""):
 def fichas(persona):
     """Fichas (con img y crédito) de la persona en la biblioteca, existentes en disco, de mejor a peor puntuación."""
     slug = _slug(persona)
-    out = [f for f in _catalogo().get(slug, []) if (BIB / f["img"]).exists()]
+    out = [f for f in _catalogo().get(slug, []) if (BIB / f["img"]).exists() and misma(persona, f.get("persona"))]
     out.sort(key=lambda f: -float(f.get("puntos") or 0))
     return out
 
@@ -121,7 +133,7 @@ def guarda_recorte(persona, png_ruta, origen="", puntos=""):
 def recortes(persona):
     """Recortes tratados de la persona existentes en disco, de mejor a peor puntuación."""
     slug = _slug(persona)
-    out = [r for r in _catalogo().get("_recortes", {}).get(slug, []) if (BIB / r["img"]).exists()]
+    out = [r for r in _catalogo().get("_recortes", {}).get(slug, []) if (BIB / r["img"]).exists() and misma(persona, r.get("persona"))]
     out.sort(key=lambda r: -float(r.get("puntos") or 0))
     return out
 

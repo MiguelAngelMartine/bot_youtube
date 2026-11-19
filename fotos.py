@@ -409,6 +409,11 @@ def mejores(dia_txt, nombre, animo="serio", n=3, extra_q=None, solo=False, ignor
     ap = slug(nombre.split()[-1])
     cred_f = dia / "creditos.json"
     cred = json.loads(cred_f.read_text(encoding="utf-8")) if cred_f.exists() else {}
+    # 19-nov-2026: si ese día ya hay retratos de OTRA persona con el mismo apellido (Koldo García / José Ignacio García),
+    # el nombre del fichero lleva el nombre completo para no pisarle la foto.
+    if any(f.startswith(f"retrato_{ap}") and v.get("persona") and v.get("persona") != nombre
+           and slug(v["persona"]) != slug(nombre) for f, v in cred.items()):
+        ap = slug(nombre)
     (dia / "imagenes").mkdir(parents=True, exist_ok=True)
     guardadas = []
     for i in orden:
