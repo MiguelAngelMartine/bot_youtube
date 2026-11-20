@@ -357,6 +357,8 @@ def mejores_frases(fecha, pedidos, enc, G, guion, redes):
                   "contexto": " ".join(f["contexto"] for f in frases), "entrada": ent, "pregunta": preg, "voz": voz,
                   "mejores_frases": True})
         s.pop("segmentos")
+        if ape.upper() not in (s.get("kicker") or "").upper():   # 20-nov: el kicker de Sánchez salió «FEIJÓO, ...»
+            s["kicker"] = f"{ape.upper()}, EN EL CARA A CARA"
         s["titulo"] = AA.elige(s.get("titulo", ""), f"Las frases de {ape} en el cara a cara"[:95], f"{ape}: sus frases")
         s["portada"] = AA.elige(s.get("portada", ""), frases[0]["cita"], s.get("kicker", ""))
         buenos += 1
