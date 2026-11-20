@@ -100,7 +100,7 @@ _NOMBRE = {}
 
 
 def _nombre_archivo(p):
-    """«Feijoo_cuerpo_entero» → [feijoo]; «IsabelDiazAyuso» → [isabel, diaz, ayuso]; «Mariano Rajoy» → [mariano, rajoy]."""
+    """«Feijoo_cuerpo_entero» → [feijoo]; «PedroSanchez» → [pedro, sanchez]; «IsabelDiazAyuso» → [isabel, diaz, ayuso]; «Mariano Rajoy» → [mariano, rajoy]."""
     base = re.sub(r"-\d+$", "", p.stem.split("_")[0])
     return _n(re.sub(r"(?<=[a-záéíóúñü])(?=[A-ZÁÉÍÓÚÑ])", " ", base)).split()
 
