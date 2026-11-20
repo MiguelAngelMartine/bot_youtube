@@ -593,7 +593,10 @@ class Escena:
             if g["tipo"] != "Q":
                 continue
             fin_g = max(x["t1"] for x in self.grupos[g["grupo"]]) + 0.05
-            a = min(ease((t - (g["t0"] - 0.25)) / 0.35), 1 - ease((t - fin_g) / TRANS))
+            sig = next((x for x in self.grupos[g["grupo"]] if x["t0"] > g["t0"] and x["lado"] == g["lado"]), None)
+            if sig is not None:                       # la misma persona dice otra cita: este bocadillo se va antes
+                fin_g = min(fin_g, sig["t0"] - 0.55)
+            a = min(ease((t - (g["t0"] - 0.25)) / 0.35), 1 - ease((t - fin_g) / 0.3))
             if a <= 0.01:
                 continue
             activo = g["t0"] - 0.3 <= t <= g["t1"] + 0.3
@@ -771,6 +774,8 @@ def largo(fecha):
     for i, s in enumerate(secs):
         items = [it for p in s["pasos"] for it in ((p.get("ve") or {}).get("items") or []) if isinstance(it, dict)]
         ve_citas = [(p.get("ve") or {}) for p in s["pasos"] if isinstance((p.get("ve") or {}).get("cita"), str)]
+        ve_citas += [p["ve"]["persona"] for p in s["pasos"] if isinstance((p.get("ve") or {}).get("persona"), dict)
+                     and isinstance(p["ve"]["persona"].get("cita"), str)]   # ficha {"tipo": "persona", "persona": {...}}
         fichas = [it for it in items + ve_citas if it.get("cita")]
 
         def quien_de(c, fichas=fichas):
@@ -787,7 +792,9 @@ def largo(fecha):
         if isinstance(defecto, dict):
             defecto = defecto.get("nombre") or defecto.get("persona") or ""
         defecto = defecto if isinstance(defecto, str) else ""
-        trs = tramos_de(texto, defecto, conocidas, quien_de=quien_de)
+        # 20-nov-2026 (fallo real: «Es un dolor…» de Sánchez salió con el rótulo de Feijóo, el protagonista de la pieza):
+        # en el largo NUNCA se atribuye una cita por defecto; si no consta quién la dice, no sale nadie.
+        trs = tramos_de(texto, "", conocidas, quien_de=quien_de)
         for g in trs:
             if g["tipo"] == "Q":
                 it = next((x for x in fichas if _n(x["cita"]) and (_n(g["cita"]) in _n(x["cita"]) or _n(x["cita"]) in _n(g["cita"]))), {})
