@@ -85,14 +85,24 @@ def catalogo():
             (pres if len(ps) == 1 else laminas).extend(ps)   # las sueltas (más resolución) primero
     pres += laminas
     pols = {}
-    for p in sorted((IMG / "Políticos").glob("*.png")):
+    for p in sorted((IMG / "Políticos").rglob("*.png")):   # también subcarpetas (p. ej., «Nuevas»)
         im = Image.open(p)
         if not _alfa(im):
             continue                                   # sin fondo transparente (p. ej., fotos de grupo): no vale
-        clave = _n(p.stem.split("_")[0])
-        if clave and " " not in clave:
-            pols.setdefault(clave, []).append(p)
+        toks = _nombre_archivo(p)
+        if toks and len(toks) <= 4:
+            pols.setdefault(toks[-1], []).append(p)    # clave = apellido (última palabra del nombre)
+            _NOMBRE[p] = toks
     return fondos, pres, pols
+
+
+_NOMBRE = {}
+
+
+def _nombre_archivo(p):
+    """«Feijoo_cuerpo_entero» → [feijoo]; «IsabelDiazAyuso» → [isabel, diaz, ayuso]; «Mariano Rajoy» → [mariano, rajoy]."""
+    base = re.sub(r"-\d+$", "", p.stem.split("_")[0])
+    return _n(re.sub(r"(?<=[a-záéíóúñü])(?=[A-ZÁÉÍÓÚÑ])", " ", base)).split()
 
 
 def figura_de(nombre, pols, uso):
@@ -100,6 +110,11 @@ def figura_de(nombre, pols, uso):
     toks = _n(nombre).split()
     for clave, rutas in pols.items():
         if clave in toks:
+            # Apellidos comunes (Muñoz, Díaz…): si el archivo trae nombre de pila y la cita también, tienen que coincidir.
+            otros = set(_NOMBRE.get(rutas[0], [clave])[:-1])
+            resto = set(toks) - {clave}
+            if otros and resto and not (otros & resto):
+                continue
             k = uso.get(clave, 0)
             uso[clave] = k + 1
             return rutas[k % len(rutas)]

@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 20-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas).**
+**Última actualización: 20-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -203,8 +203,12 @@ y no se usa hasta nueva orden del usuario.**
     Europeo, podio de prensa…); en el largo, uno por pieza, sin repetir en piezas seguidas; cambia con un fundido.
   - `Imagenes/Presentador`: el **presentador** (personaje ficticio). Con varias poses (también láminas de varias poses), va
     cambiando de pose cada vez que vuelve.
-  - `Imagenes/Políticos`: cada político **sin fondo** (PNG transparente), nombrado `Apellido_….png`; si hay varias imágenes
-    de la misma persona, se alternan. Las imágenes con fondo (p. ej., grupos) no se usan.
+  - `Imagenes/Políticos` (y sus subcarpetas, p. ej. `Nuevas/`): cada político **sin fondo** (PNG transparente), nombrado
+    por la persona: `Apellido_….png`, `NombreApellido.png` o `Nombre Apellido.png` (la clave es el apellido, la última
+    palabra; si el archivo trae nombre de pila y la cita también, tienen que coincidir, para no confundir apellidos comunes).
+    Si hay varias imágenes de la misma persona, se alternan. Las imágenes con fondo (p. ej., grupos) no se usan; si el
+    fondo transparente viene «dibujado» (cuadros grises o blanco), se recorta con rembg (`isnet-general-use`), se revisa
+    sobre fondo de color y el original se guarda en `Imagenes/_originales/`.
 - **El presentador está a la IZQUIERDA mientras el narrador lee el guion** (es quien narra), con el subtítulo karaoke de lo
   que dice.
 - **Cita literal de un personaje:** el presentador **sale de forma elegante** (fundido + desliz, nunca brusco) y **entra el
