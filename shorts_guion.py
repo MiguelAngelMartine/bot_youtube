@@ -268,6 +268,15 @@ def _atribuida(nc, ape, textos_n, ajenas, radio=250):
     return False
 
 
+def citas_inventadas(fecha, voz):
+    """20-nov-2026: devuelve las citas «» de la voz que NO están literales (sin contar la puntuación) en el material del
+    día: guion aprobado, redes.md, noticias.json y artículos de los medios. Así Opus no puede cambiar ni completar una cita."""
+    import prechequeo as P
+    ep = RAIZ / "dia" / fecha / "episodio.json"
+    base = P._fuentes(fecha) + " " + (P._n(ep.read_text(encoding="utf-8")) if ep.exists() else "")
+    return [c for c in re.findall(r"«([^»]+)»", voz or "") if P._n(c) not in base]
+
+
 def mejores_frases(fecha, pedidos, enc, G, guion, redes):
     """20-nov-2026 (el usuario: «quiero dos [Shorts], uno de Feijóo con sus mejores frases y otro de Sánchez con sus
     mejores frases»): un Short por persona con sus 3 mejores frases LITERALES del tema del encargo (encargo.json →

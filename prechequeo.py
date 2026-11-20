@@ -28,6 +28,24 @@ COLETILLAS = [r"mira", r"\bojo\b", r"f[íi]jate", r"ag[áa]rrate", r"atenci[óo]
 COLETILLAS_RE = [re.compile(x, re.I) for x in COLETILLAS]
 
 
+def _n(t):
+    import unicodedata
+    t = unicodedata.normalize("NFKC", t or "").lower()
+    t = re.sub(r"[«»“”\"'‘’]", " ", t)
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", t)).strip()
+
+
+_FUENTES = {}
+
+
+def _fuentes(fecha):
+    if fecha not in _FUENTES:
+        dia = RAIZ / "dia" / fecha
+        fs = [*sorted((dia / "articulos").glob("*.txt")), dia / "redes.md", dia / "noticias.json"]
+        _FUENTES[fecha] = _n(" ".join(f.read_text(encoding="utf-8", errors="ignore") for f in fs if f.exists()))
+    return _FUENTES[fecha]
+
+
 def chequea(fecha, nn):
     b = json.loads((RAIZ / "dia" / fecha / "bloques" / f"{nn}.json").read_text(encoding="utf-8"))
     pasos = b.get("pasos") or [p for s in b.get("secciones", []) for p in s.get("pasos", [])]
@@ -49,6 +67,18 @@ def chequea(fecha, nn):
         for c in filter(None, textos):
             if c not in resto:
                 fallos.append(f"paso {k}: el «cuando» «{c}» no está literal en el di de este paso o los siguientes")
+    fuentes = _fuentes(fecha)                           # 20-nov-2026: un rótulo «completó» una cita parcial de Sánchez
+    if fuentes:
+        citas = re.findall(r"«([^»]+)»", voz)
+        for p in pasos:
+            ve = p.get("ve") or {}
+            citas += [x.get("cita") for x in [ve] + [it for it in ve.get("items", []) if isinstance(it, dict)]
+                      if isinstance(x.get("cita"), str)]
+        for c in citas:
+            c = c.strip().strip("«»\"“”").strip().rstrip(".")
+            if len(c.split()) >= 3 and _n(c) not in fuentes:
+                fallos.append(f"cita «{c[:70]}» no está LITERAL en las fuentes del día (artículos, redes): cópiala letra a "
+                              "letra como la publica el medio, sin completarla ni retocarla, o quítala")
     for frase in re.split(r"(?<=[.?!])\s+", voz):
         if len(frase.split()) > 34:
             fallos.append(f"frase de {len(frase.split())} palabras (máximo 30): «{frase[:60]}…»")

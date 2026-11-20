@@ -534,6 +534,7 @@ class Jornada:
             return True
         # 2) ESENCIA DEL CANAL: el GUION de cada Short lo escribe SIEMPRE Opus (tono ácido/Vikingo, coletillas, adaptado a
         # la voz), SOLO su propio tema (prohibido el bleed). Opus reescribe «voz» y «ambiente» de cada short_N.json.
+        borrador = {j: _json.loads(j.read_text(encoding="utf-8")).get("voz", "") for j in jsons}   # comprobado literal
         for j in jsons:
             mf = (_json.loads(j.read_text(encoding="utf-8")) or {}).get("mejores_frases")
             extra = (" Es un Short de LAS MEJORES FRASES de una sola persona (campo \"frases\"): salen TODAS sus frases "
@@ -564,6 +565,19 @@ class Jornada:
                             "Reescríbelo sin palabras prohibidas y para que cada dato, cita, idea y muletilla salga UNA sola vez, con el mismo tono Vikingo, las "
                             "mismas citas literales «» y el mismo cierre. No toques los demás campos.",
                             j.relative_to(RAIZ), modelo="opus", motivo="quitar repeticiones del guion del Short")
+        for j in jsons:                                    # 20-nov-2026: Opus no puede cambiar ni «completar» una cita
+            inv = SG.citas_inventadas(self.f, _json.loads(j.read_text(encoding="utf-8")).get("voz", ""))
+            if inv:
+                self.parte(f"{j.name}: citas que no están literales en las fuentes ({'; '.join(c[:40] for c in inv)}), vuelve a Opus")
+                self.claude("redactor", f"El campo \"voz\" de {j.name} trae citas «» que NO están literales en las fuentes: "
+                            f"{'; '.join(inv)}. Pon las citas EXACTAMENTE como están en el borrador comprobado, letra a letra "
+                            f"(sin completarlas ni retocarlas): {borrador[j]} No toques los demás campos.",
+                            j.relative_to(RAIZ), modelo="opus", motivo="cita no literal en el guion del Short")
+                S_ = _json.loads(j.read_text(encoding="utf-8"))
+                if SG.citas_inventadas(self.f, S_.get("voz", "")):
+                    S_["voz"] = borrador[j]               # sin arreglo: el borrador, que ya estaba comprobado
+                    j.write_text(_json.dumps(S_, ensure_ascii=False, indent=1), encoding="utf-8")
+                    self.parte(f"{j.name}: Opus sigue sin respetar las citas: va el borrador comprobado")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)
             import coletillas as COL
             COL.registra(self.f, *(_json.loads(j.read_text(encoding="utf-8")).get("voz", "") for j in jsons))
