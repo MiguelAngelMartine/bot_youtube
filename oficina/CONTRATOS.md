@@ -118,3 +118,10 @@ Cada escena dura desde el paso donde se pide hasta la siguiente. Los objetos apa
 | Badajoz | -6.97, 38.88 | Salamanca | -5.66, 40.96 | Logroño | -2.45, 42.47 |
 
 Canarias, Ceuta y Melilla quedan fuera del mapa dibujado: en esos casos se usa `claves` o `breve`.
+
+## Anexo: `encargo.json` del director (opcional, `dia/<fecha>/encargo.json`)
+- Frase pedida (7-nov-2026): `persona`, `frase`, `tema`, `canal`, `cuenta`, `enlace`, `para` → la comprueba `encargo.py`.
+- Shorts: `num_shorts`; `shorts_personas`: `[{"persona", "tema", "mejores_frases": true}]` (con `mejores_frases`, un Short
+  por persona con 2-3 frases suyas literales: `shorts_guion.mejores_frases`, campo `frases` en `short_N.json`).
+- Día monográfico (20-nov-2026): `"monografico": {"tema", "claves": [...], "instrucciones"}` → `jornada.py` investiga solo
+  los temas que casan con `claves` y el jefe de edición hace todos los bloques de ese tema (NORMAS.md §5).

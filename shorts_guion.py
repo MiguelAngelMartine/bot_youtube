@@ -210,6 +210,153 @@ def _norm(s):
     return re.sub(r"\s+", " ", s).strip(' ."')
 
 
+MEJORES = """Eres el guionista de Shorts de «El Hoyformativo» (tono Vikingo desenfadado, NEUTRAL: lee NORMAS.md §3-§4).
+El director quiere un Short de 25-40 s con LAS MEJORES FRASES de {persona} sobre «{tema}». Elige sus {k} frases con más
+impacto (las más comentadas por los medios, las más directas, las que más retratan el cara a cara), de más a menos. Reglas:
+- Cada frase tiene que ser de {persona} DICHA en «{tema}» (no de otro día ni de su entorno) y estar LITERAL en el material
+  de abajo, entre comillas del medio (cópiala letra a letra; un programa lo comprueba). Entera palabras suyas, 4+ palabras,
+  sin comillas dentro. Nada de tacos ni insultos vejatorios. NUNCA frases de su equipo, su entorno, «fuentes» o su
+  partido, ni dichas antes del debate. En "prueba" copia letra a letra el fragmento del material (20-60 palabras) que
+  muestra que {persona} la dijo en «{tema}» (con su nombre o apellido y la frase).
+- Para cada frase, "contexto": 1-2 frases coloquiales (15-30 palabras) que digan a qué venía (el bloque del debate, a qué
+  o a quién contestaba) SOLO con datos del material. Sin adjetivos ni verbos valorativos («arremete», «humilla»,
+  «destroza», «le pone en su sitio»...), sin decir quién ganó. Cifras en dígitos.
+- "entrada": cómo presenta la voz el Short tras la primera frase, ≤ 14 palabras, tono de bar («Así se despachó Feijóo
+  en el cara a cara»), sin «aseguró» ni «por su parte».
+- "pregunta": de sí o no, ≤ 6 palabras, con su apellido («¿Convenció Feijóo?», «¿Tiene razón Sánchez?»).
+- "escenas": 6 descripciones EN INGLÉS de viñetas de cómic animadas distintas (plató de debate de televisión, atriles,
+  mesa, focos, público anónimo en casa viendo la tele...; sin texto ni personas reales reconocibles).
+- "kicker": 2-4 palabras en mayúsculas («FEIJÓO, EN EL CARA A CARA»). "portada": 2-5 palabras LITERALES de la mejor frase.
+- "titulo": ≤ 70 caracteres, verbo neutro («Las frases de Feijóo en el cara a cara»), sin el nombre del canal.
+- "hashtags" 8-12 (#CaraACara, su apellido, su partido, #PolíticaEspañola, #NoticiasDeHoy, #ElHoyformativo...) y
+  "etiquetas" 15-25, solo de lo que sale.
+Responde SOLO con JSON: {{"quien": "{persona}", "cargo": "...", "partido": "...", "a_quien": "...", "categoria": "POLÉMICA",
+"kicker": "...", "entrada": "...", "frases": [{{"cita": "...", "destaca": "...", "fuente": "medio", "prueba": "...", "contexto": "..."}}],
+"pregunta": "¿...?", "escenas": ["..."], "portada": "...", "hashtags": ["#..."], "etiquetas": ["..."], "titulo": "..."}}
+
+MATERIAL APROBADO (guion del vídeo de hoy, ya verificado):
+{guion}
+
+LO QUE PUBLICAN LOS MEDIOS (artículos del día sobre el tema):
+{articulos}
+
+PUBLICACIONES OFICIALES DEL DÍA (redes.md):
+{redes}"""
+
+
+def _articulos_tema(dia, claves, tope=45000):
+    out, n = [], 0
+    for f in sorted((dia / "articulos").glob("*.txt")) if (dia / "articulos").exists() else []:
+        t = f.read_text(encoding="utf-8", errors="ignore")
+        if claves and not any(c.lower() in t.lower() for c in claves):
+            continue
+        out.append(t[:6000])
+        n += len(out[-1])
+        if n > tope:
+            break
+    return "\n\n".join(out)[:tope]
+
+
+def _atribuida(nc, ape, textos_n, ajenas, radio=250):
+    """La cita está en alguna fuente con el apellido de quien la dice cerca y sin «su entorno», «fuentes de»... cerca."""
+    na = _norm(ape)
+    for t in textos_n:
+        for m in re.finditer(re.escape(nc), t):
+            cerca = t[max(0, m.start() - radio): m.end() + 80]
+            if na in cerca and not any(x in t[max(0, m.start() - 120): m.start()] for x in ajenas):
+                return True
+    return False
+
+
+def mejores_frases(fecha, pedidos, enc, G, guion, redes):
+    """20-nov-2026 (el usuario: «quiero dos [Shorts], uno de Feijóo con sus mejores frases y otro de Sánchez con sus
+    mejores frases»): un Short por persona con sus 3 mejores frases LITERALES del tema del encargo (encargo.json →
+    shorts_personas [{persona, tema, mejores_frases: true}]). Cada frase se comprueba literal en el guion aprobado, en
+    redes.md o en los artículos de los medios del día; el contexto, contra ese mismo material."""
+    dia = RAIZ / "dia" / fecha
+    mono = enc.get("monografico") or {}
+    art = _articulos_tema(dia, mono.get("claves") or [])
+    material = guion + "\n" + art
+    base = _norm(guion + "\n" + redes + "\n" + art)
+    (dia / "shorts").mkdir(exist_ok=True)
+    (dia / "shorts" / "imagenes_usadas.json").unlink(missing_ok=True)
+    for viejo in (dia / "shorts").glob("short_*"):
+        if viejo.is_file():
+            viejo.unlink()
+    antes = ""                                         # lo publicado el día anterior: lo dicho ANTES del acontecimiento
+    try:
+        import datetime as _dt
+        prev = RAIZ / "dia" / (_dt.date.fromisoformat(fecha) - _dt.timedelta(days=1)).isoformat()
+        antes = _norm(" ".join(f.read_text(encoding="utf-8", errors="ignore") for f in
+                               [*(prev / "articulos").glob("*.txt"), prev / "redes.md", prev / "episodio.json"] if f.exists()))
+    except ValueError:
+        pass
+    ajenas = ("entorno", "equipo", "fuentes", "núcleo", "nucleo", "colaboradores", "dirección del", "en ferraz", "en génova")
+    textos_n = [_norm(t) for t in [guion, redes, *art.split("\n\nMEDIO: ")]]
+    buenos, usadas = 0, set()
+    for pd in pedidos:
+        persona, tema = pd.get("persona", ""), pd.get("tema") or mono.get("tema", "")
+        ape = persona.split()[-1] if persona else ""
+        r = None
+        for _ in range(2):
+            r = gem.pide(MEJORES.format(persona=persona, tema=tema, k=4, guion=guion[:30000], articulos=art,
+                                        redes=redes[:15000]), como_json=True)
+            if isinstance(r, dict) and r.get("frases"):
+                break
+        if not isinstance(r, dict) or not r.get("frases"):
+            print(f"  {persona}: Gemini no responde (sin Short de mejores frases)")
+            continue
+        frases = []
+        for f in r["frases"]:
+            c = (f.get("cita") or "").strip().strip("«»“”\"").strip().rstrip(".")
+            nc = _norm(c)
+            if len(c.split()) < 4 or re.search(r"[«»“”\"]", c):
+                print(f"  descartada: «{c[:60]}» (corta o parcial)")
+            elif nc not in base:
+                print(f"  descartada: «{c[:60]}» no está literal en el material")
+            elif any(nc in u or u in nc for u in usadas):
+                print(f"  descartada: «{c[:60]}» ya sale")
+            elif antes and nc in antes:
+                print(f"  descartada: «{c[:60]}» ya estaba publicada el día anterior (no es del acontecimiento)")
+            elif not _atribuida(nc, ape, textos_n, ajenas):
+                print(f"  descartada: «{c[:60]}» no aparece junto a {ape} en las fuentes (o es de su entorno)")
+            else:
+                ctx = f.get("contexto") or ""
+                malas = [w for w in VALORATIVAS if w in ctx.lower() and w not in ("respuesta", "responde", "respondi", "contesta")]
+                ctx = "" if malas else verifica_contexto(ctx, material, redes)
+                frases.append({"cita": c, "destaca": f.get("destaca", ""), "fuente": f.get("fuente", ""), "contexto": ctx})
+                usadas.add(nc)
+            if len(frases) >= 3:
+                break
+        if len(frases) < 2:
+            print(f"  {persona}: solo {len(frases)} frase(s) comprobada(s): sin Short")
+            continue
+        ent = (r.get("entrada") or f"Así habló {ape} en el cara a cara").strip().rstrip(":?.")
+        preg = (r.get("pregunta") or "").strip()
+        if not (preg.startswith("¿") and preg.endswith("?") and len(preg.split()) <= 8 and ape in preg):
+            preg = f"¿Convenció {ape}?"
+        enlaces = ["Y otra:", "Y no se quedó ahí:", "Y para rematar:"]
+        voz = f"«{frases[0]['cita']}». {ent}. {frases[0]['contexto']}".strip()
+        for i, f in enumerate(frases[1:]):
+            voz += f" {enlaces[i % len(enlaces)]} «{f['cita']}». {f['contexto']}".rstrip()
+        voz += f" {preg} Te leo en comentarios. Y dale a suscribirte, que he visto que aún no lo has hecho."
+        voz = re.sub(r"\s+", " ", voz).strip()
+        import apto_anuncios as AA
+        s = dict(r)
+        s.update({"quien": persona, "frases": frases, "cita": frases[0]["cita"], "gancho": frases[0]["cita"],
+                  "destaca": frases[0]["destaca"], "fuente": frases[0]["fuente"], "replica": None, "segmentos": None,
+                  "contexto": " ".join(f["contexto"] for f in frases), "entrada": ent, "pregunta": preg, "voz": voz,
+                  "mejores_frases": True})
+        s.pop("segmentos")
+        s["titulo"] = AA.elige(s.get("titulo", ""), f"Las frases de {ape} en el cara a cara"[:95], f"{ape}: sus frases")
+        s["portada"] = AA.elige(s.get("portada", ""), frases[0]["cita"], s.get("kicker", ""))
+        buenos += 1
+        (dia / "shorts" / f"short_{buenos}.json").write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"short_{buenos}: {s.get('kicker', '')} · {len(frases)} frases · ~{len(voz.split()) / 2.75:.0f} s")
+    if not buenos:
+        sys.exit(1)
+
+
 def main(fecha, n=3):
     dia = RAIZ / "dia" / fecha
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
@@ -227,6 +374,8 @@ def main(fecha, n=3):
         quien_p, tema_p = pd.get("persona", ""), pd.get("tema", "")
         obligada += (f"\n\nOBLIGATORIO: el Short {i + 1} es {quien_p}" + (f", sobre {tema_p}" if tema_p else "") +
                      f", con su frase más fuerte del día (comprobada literal en el material) y {quien_p} de protagonista.")
+    if pedidos and all(pd.get("mejores_frases") for pd in pedidos):    # 20-nov: Shorts de «mejores frases»
+        return mejores_frases(fecha, pedidos, enc, G, guion, redes)
     if enc.get("evita_temas"):
         obligada += f"\n\nEVITA estos temas (ya tratados o que no quiere el director): {', '.join(enc['evita_temas'])}."
     if enc.get("verificada") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado

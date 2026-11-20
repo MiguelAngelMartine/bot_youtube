@@ -67,6 +67,9 @@ def main(fecha):
         print("sin encargo del director")
         return 2
     e = json.loads(f.read_text(encoding="utf-8"))
+    if not e.get("frase") or not e.get("persona"):      # 20-nov: encargo sin frase (p. ej., solo día monográfico)
+        print("encargo sin frase que comprobar")
+        return 2
     ok, prueba = (por_enlace(e) if e.get("enlace") else (None, ""))
     if ok is False and e.get("enlace"):                 # el tuit dice otra cosa o es de otra cuenta: nunca se usa
         e.pop("comprobada_a_mano", None)

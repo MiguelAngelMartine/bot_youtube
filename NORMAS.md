@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 19-nov-2026 («zasca», prohibido siempre).**
+**Última actualización: 20-nov-2026 (día monográfico y Shorts de «mejores frases» por encargo).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -170,6 +170,11 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, tacos («me cago
   alimenta miniatura y título), sin sección de breves aparte, nada de noticias generalistas. Corrección (si la hay) al final,
   antes de la despedida: «Si te ha servido, suscríbete y dale a la campanita. Y si no, también, hombre, que no cuesta nada.
   Gracias por vernos. Mañana, más.» Tragedias: tono sobrio, sin ganchos llamativos, música baja.
+- **Día monográfico por encargo del director** (20-nov-2026, el usuario): si `encargo.json` trae `monografico`, el largo y
+  los Shorts de ese día tratan SOLO ese tema (mismo formato «todo breves» de 2:30-3:00, sus bloques = sus cruces), con
+  equilibrio estricto de frases y tiempo entre las partes. Los Shorts pueden ser de **«mejores frases»** de una persona
+  (`shorts_personas` → `mejores_frases`): 2-3 frases suyas literales del tema, cada una con su contexto breve, sin declarar
+  ganador; si se hace de una, se hace igual de la otra parte. Todas las demás normas no cambian.
 - **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
   (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras. Etiqueta de formato arriba a la derecha:
   ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).

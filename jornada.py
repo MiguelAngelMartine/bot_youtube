@@ -86,6 +86,15 @@ class Jornada:
         enc_ok = (self.dia / "encargo.json").exists() and self.py("encargo.py", self.f, log="recogida.log") == 0
         temas = self.json("temas.json") or []
         ids = [t["id"] for t in temas[:6]]
+        mono = self.monografico()
+        if mono:                                         # 20-nov-2026 (el usuario): día monográfico, solo ESE tema
+            claves = [c.lower() for c in mono.get("claves", [])]
+            suyos = [t["id"] for t in temas if any(c in json.dumps(t, ensure_ascii=False).lower() for c in claves)]
+            if suyos:
+                ids, enc_ok = suyos[:6], False
+                self.parte(f"día monográfico ({mono.get('tema', '')}): {len(ids)} temas del día sobre él")
+            else:
+                self.parte(f"AVISO: día monográfico pero ningún tema de hoy casa con {claves}: sigue la jornada normal")
         if enc_ok:
             e = self.json("encargo.json") or {}
             extra = next((t["id"] for t in temas if any(w.lower() in json.dumps(t, ensure_ascii=False).lower()
@@ -98,6 +107,23 @@ class Jornada:
                             self.dia / "dossier" / f"{i}.md", "md")
         self.parte(f"recogida y dossieres listos ({len(list((self.dia / 'dossier').glob('*.md')))} temas)")
         return True
+
+    def monografico(self):
+        """20-nov-2026 (el usuario: «los vídeos y shorts de hoy tienen que ser exclusivos del cara a cara»): si
+        encargo.json trae "monografico", el largo y los Shorts del día tratan SOLO ese tema (ver NORMAS.md §5)."""
+        e = self.json("encargo.json") if (self.dia / "encargo.json").exists() else None
+        m = (e or {}).get("monografico")
+        return m if isinstance(m, dict) and m.get("tema") else None
+
+    def encargo_escaleta(self):
+        m = self.monografico()
+        if not m:
+            return ""
+        return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json → monografico, manda sobre la línea editorial habitual): "
+                f"HOY EL VÍDEO ES MONOGRÁFICO: TODOS los bloques tratan SOLO de «{m['tema']}»; ningún otro tema del día "
+                f"entra. {m.get('instrucciones', '')} Mismo formato «todo breves» de 2:30-3:00 y breves vacío. El campo "
+                "\"id\" de cada bloque tiene que ser el nombre de un dossier que exista en dossier/ (varios bloques pueden "
+                "compartir dossier). Equilibrio estricto entre los dos protagonistas (mismo número de frases y de tiempo).")
 
     def comunes(self):
         # 19-nov-2026: NORMAS.md (la guía única: tono, paleta de coletillas, reglas del guion) y EJEMPLOS_GANCHOS.md SIEMPRE
@@ -112,10 +138,10 @@ class Jornada:
             return True
         fs = [self.dia / "temas.json", self.dia / "redes.md"] + sorted((self.dia / "dossier").glob("*.md")) + self.comunes()
         # 10-nov (calidad): elegir las noticias es la decisión que más pesa; la hace Claude Opus (una sola llamada)
-        ok = self.claude("jefe-de-edicion", "Haz el consejo de redacción.", (self.dia / "escaleta.json").relative_to(RAIZ),
+        ok = self.claude("jefe-de-edicion", "Haz el consejo de redacción." + self.encargo_escaleta(), (self.dia / "escaleta.json").relative_to(RAIZ),
                          modelo="opus", motivo="consejo de redacción (decisión editorial clave)") and bool(self.json("escaleta.json"))
         if not ok:
-            ok = self.puesto("jefe-de-edicion", "Haz el consejo de redacción y escribe escaleta.json.", fs,
+            ok = self.puesto("jefe-de-edicion", "Haz el consejo de redacción y escribe escaleta.json." + self.encargo_escaleta(), fs,
                              self.dia / "escaleta.json", valida=lambda r: isinstance(r, dict) and r.get("bloques"))
         if ok:
             e = self.json("escaleta.json")
@@ -509,7 +535,11 @@ class Jornada:
         # 2) ESENCIA DEL CANAL: el GUION de cada Short lo escribe SIEMPRE Opus (tono ácido/Vikingo, coletillas, adaptado a
         # la voz), SOLO su propio tema (prohibido el bleed). Opus reescribe «voz» y «ambiente» de cada short_N.json.
         for j in jsons:
-            self.claude("redactor", f"Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
+            mf = (_json.loads(j.read_text(encoding="utf-8")) or {}).get("mejores_frases")
+            extra = (" Es un Short de LAS MEJORES FRASES de una sola persona (campo \"frases\"): salen TODAS sus frases "
+                     "literales «», en ese orden, cada una con su contexto breve, sin declarar ganador ni valorar quién "
+                     "estuvo mejor (NORMAS.md §3).") if mf else ""
+            self.claude("redactor", extra.strip() + f" Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
                         "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
                         "NORMAS.md (§4)). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
                         "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
