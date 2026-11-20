@@ -417,6 +417,18 @@ class Jornada:
     def grafica(self):
         if (self.dia / "vinetas" / "hoja.png").exists() or (self.dia / "grafica_hecha").exists():
             return True
+        # 20-nov-2026 (el usuario): formato «presentador» SIEMPRE (NORMAS.md §6). Ya no se buscan fotos ni se generan viñetas
+        # con FLUX: el montaje usa solo Imagenes/ (fondos, presentador y políticos). La fase solo avisa de quién no tiene imagen.
+        if True:
+            import presentador as PR
+            G = self.json("episodio.json")
+            _, _, pols = PR.catalogo()
+            quienes = {it.get("nombre") or it.get("persona") for s in G["secciones"] for p in s["pasos"]
+                       for it in ((p.get("ve") or {}).get("items") or []) if isinstance(it, dict) and it.get("cita")}
+            sin = sorted(q for q in quienes if q and not PR.figura_de(q, pols, {}))
+            (self.dia / "grafica_hecha").touch()
+            self.parte("gráfica: formato presentador" + (f"; sin imagen en Imagenes/Políticos: {', '.join(sin)}" if sin else ""))
+            return True
         import corto as C
         import fotos
         G = self.json("episodio.json")
@@ -441,7 +453,13 @@ class Jornada:
             return True
         # 15-nov-2026 (petición del usuario): estilo vigente = escenas de ambiente + Polaroid (render_ambiente),
         # ya no el tablero antiguo (largo.py).
-        if self.py("render_ambiente.py", self.f, "largo", log="render.log", timeout=7200) != 0:
+        # 20-nov-2026: control de lectura del largo (prevuelo_voz): lo que suene raro queda en el parte para revisar.
+        if self.py("prevuelo_voz.py", self.f, log="calidad.log", timeout=1800) == 0 and (self.dia / "calidad" / "prevuelo_voz.md").exists():
+            txt = (self.dia / "calidad" / "prevuelo_voz.md").read_text(encoding="utf-8")
+            if "«" in txt:
+                self.parte("control de lectura del largo: hay palabras a revisar (calidad/prevuelo_voz.md)")
+        # 20-nov-2026 (el usuario): formato «presentador» SIEMPRE (presentador.py; NORMAS.md §6).
+        if self.py("presentador.py", self.f, "largo", log="render.log", timeout=7200) != 0:
             return False
         # render_ambiente no deja escenas.json: las hojas de contacto para el control visual (Gemini) las saca hojas.py
         # muestreando el mp4.
@@ -543,7 +561,9 @@ class Jornada:
             self.claude("redactor", extra.strip() + f" Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
                         "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
                         "NORMAS.md (§4)). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
-                        "PROHIBIDO colar material de otros Shorts o bloques (bleed). Abre con el gancho literal, sin "
+                        "PROHIBIDO colar material de otros Shorts o bloques (bleed). Escribe para el formato PRESENTADOR "
+                        "(NORMAS.md §4 «Escribir para el presentador»: cada cita literal sola, con quién la dice JUSTO antes, "
+                        "y una frase del presentador entre cita y cita). Abre con el gancho literal, sin "
                         "preguntas en el cuerpo. El gancho se dice UNA SOLA VEZ: ni la entrada ni la cita que viene "
                         "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita). NADA SE "
                         "DICE DOS VECES: cada dato, cada cita y cada idea, una sola vez; si la entrada ya lo cuenta, el "
@@ -578,6 +598,24 @@ class Jornada:
                     S_["voz"] = borrador[j]               # sin arreglo: el borrador, que ya estaba comprobado
                     j.write_text(_json.dumps(S_, ensure_ascii=False, indent=1), encoding="utf-8")
                     self.parte(f"{j.name}: Opus sigue sin respetar las citas: va el borrador comprobado")
+        try:                                               # 20-nov-2026: CONTROL DE LECTURA (prevuelo_voz) de cada Short
+            import prevuelo_voz as PV
+            for j in jsons:
+                S_ = _json.loads(j.read_text(encoding="utf-8"))
+                v = PV.revisa(S_.get("voz", ""))
+                fuera = [p for p in v.get("problemas", []) if p.get("fuente") != "whisper (pista)"]
+                if fuera:
+                    lista = "; ".join(f"«{p['texto']}» ({p.get('detalle', '')}; mejor «{p.get('alternativa', '')}»)" for p in fuera)
+                    self.parte(f"{j.name}: la voz no lee bien {lista[:200]}, vuelve a Opus")
+                    self.claude("redactor", f"En el campo \"voz\" de {j.name} la locución no suena natural en: {lista}. "
+                                "Cambia SOLO esas palabras (fuera de las citas «») por otras naturales que Tristán lea bien. "
+                                "No toques las citas ni los demás campos.", j.relative_to(RAIZ), modelo="opus",
+                                motivo="la voz no lee bien una palabra del Short")
+                if v.get("en_citas"):
+                    self.parte(f"{j.name}: AVISO, dentro de una cita literal suena raro: "
+                               + "; ".join(f"«{p['texto']}»" for p in v["en_citas"])[:200] + " (revisa el Short antes de publicar)")
+        except Exception as ex:
+            self.parte(f"control de lectura de los Shorts sin hacer ({type(ex).__name__})")
         try:                                               # registra las coletillas de los Shorts (variedad para mañana)
             import coletillas as COL
             COL.registra(self.f, *(_json.loads(j.read_text(encoding="utf-8")).get("voz", "") for j in jsons))
@@ -587,7 +625,7 @@ class Jornada:
         hechos = []
         for j in jsons:
             k = j.stem.split("_")[1]
-            if self.py("render_ambiente.py", self.f, k, log="shorts.log", timeout=1800) == 0 and (carpeta / f"short_{k}.mp4").exists():
+            if self.py("presentador.py", self.f, k, log="shorts.log", timeout=1800) == 0 and (carpeta / f"short_{k}.mp4").exists():
                 hechos.append(k)
         if hechos:
             import shorts_dia

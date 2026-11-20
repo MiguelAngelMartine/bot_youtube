@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 20-nov-2026 (día monográfico y Shorts de «mejores frases» por encargo).**
+**Última actualización: 20-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -94,6 +94,20 @@ abogado de propiedad intelectual.
 - Cierre de los Shorts: pregunta de sí o no **nombrando a quien dijo la frase** («¿Tiene razón Ayuso?»), sin tomar partido,
   y «Te leo en comentarios» + suscríbete.
 
+### Escribir para el presentador (formato de §6, desde el 20-nov-2026)
+- El narrador es el **presentador**: cuenta, presenta y da paso. Cada **cita literal** (4+ palabras) va **sola, como su propia
+  frase**, y **justo antes** se dice quién la dice y a quién («Y Feijóo le suelta a Sánchez:», «Sánchez le contesta:»), nunca
+  después («…», dijo Feijóo), porque en pantalla el personaje entra al empezar su cita. Única excepción: el **gancho que
+  abre** la pieza o el Short va primero y quién lo dice, en la frase **inmediatamente siguiente** («…». Sánchez ataca a
+  Feijóo). En la frase que introduce una cita, que no haya otro posible hablante como sujeto: si el montaje no sabe con
+  seguridad de quién es la cita, no saca a nadie.
+- **Cruce:** ataque literal → puente muy corto (≤ 8 palabras: «Y Sánchez le devuelve:») → réplica literal → el presentador
+  vuelve con el chascarrillo o sigue. Nada de narración larga entre el ataque y la réplica (si no, se rompe el cruce).
+- Tras cada cita o cruce, **una frase del presentador** (chascarrillo de la paleta o seguir el hilo) antes de la siguiente
+  cita: así el vídeo alterna presentador y personajes con ritmo. Las pausas entre tramos las pone el montaje; no hay que
+  escribir silencios.
+- Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
+
 ### La voz: Tristán HD «1,6» enérgica
 - **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,6**, velocidad normal, filtro «radio»
   (`voz.py`). Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
@@ -107,8 +121,10 @@ abogado de propiedad intelectual.
 - **Compatibilidad con Tristán:** cifras en **dígitos** («35 a 34», «el 41 por ciento»); nombre completo la primera vez y
   luego el apellido; siglas raras desarrolladas la primera vez (las que lee mal se corrigen solas con `voz.SIGLAS`); una
   exclamación o interrogación por frase; texto plano, sin Markdown, sin paréntesis, barras ni direcciones web; nada de «.:».
-- Antes de montar, **prevuelo de la voz** (`prevuelo_voz.py`): si un oído (Gemini/OpenAI y Whisper) marca algo que no suena
-  natural, se reescribe con Opus y se repite. Las palabras descartadas van a `archivo/palabras_vetadas.json` y **no se usan**.
+- Antes de montar, **prevuelo de la voz** (`prevuelo_voz.py`, conectado a la jornada desde el 20-nov-2026): si un oído
+  (Gemini/OpenAI y Whisper) marca algo que no suena natural, se reescribe con Opus y se repite. Las palabras descartadas van a
+  `archivo/palabras_vetadas.json` y **no se usan** (tampoco se eligen citas que las lleven, p. ej. «mitin/mitines», que la
+  voz lee raro).
 
 ### Ejemplo de calibración
 Entrada: «Ayuso en redes: "Espero que a partir del 29 de noviembre haya una huelga eterna para el PSOE". Sayas pregunta en la
@@ -142,7 +158,6 @@ dejado a los sindicatos ver la realidad… la resaca de la gamba, en pleno Congr
 - ¡Qué movida más gorda!
 - ¡Ni tan mal!
 - Se nos está yendo de las manos.
-- ¡Virgen del camino seco!
 - ¡Qué barbaridad!
 - ¡Estamos apañados!
 - Cada palo que aguante su vela.
@@ -157,7 +172,7 @@ dejado a los sindicatos ver la realidad… la resaca de la gamba, en pleno Congr
 - No había por dónde meterle mano al asunto.
 - Se ha descubierto el pastel y encima estaba revenío.
 
-Fuera de la paleta, para siempre: «zasca» en cualquier forma, tacos («me cago en la leche», «coño», «del copón», «almorrana»…) y lo que esté en
+Fuera de la paleta, para siempre: «zasca» en cualquier forma, «ladrillazo va, ladrillazo viene» (la voz no la lee bien, 20-nov-2026), «¡Virgen del camino seco!» (queda forzada, 20-nov-2026), tacos («me cago en la leche», «coño», «del copón», «almorrana»…) y lo que esté en
 `archivo/palabras_vetadas.json`.
 
 ## 5. Formatos y producción diaria
@@ -176,38 +191,52 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, tacos («me cago
   (`shorts_personas` → `mejores_frases`): 2-3 frases suyas literales del tema, cada una con su contexto breve, sin declarar
   ganador; si se hace de una, se hace igual de la otra parte. Todas las demás normas no cambian.
 - **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
-  (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras. Etiqueta de formato arriba a la derecha:
+  (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras, en el formato presentador (§6). Etiqueta de formato arriba a la derecha:
   ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
 
-## 6. Imagen
-- **Escenas de ambiente** de línea clara a **color pleno**, animadas (cámara 2,5D `motion_comic`; **LTX no**, inventa caras),
-  a pantalla completa, **sin personas en primer plano** y **siempre de lugares políticos**: Congreso, Senado, Moncloa, sedes,
-  parlamentos, ayuntamientos, ministerios, salas de prensa, atriles, urnas o avenidas institucionales sobrias. Nunca playas,
-  puertos, terrazas, mercados ni calles turísticas. Primero imagen nueva con FLUX (se guarda en `biblioteca_ambiente`); si
-  falla, la biblioteca; OpenAI solo como excepción los días sin cuota.
-- **Siempre un personaje en la escena:** el recorte real (sin fondo) de quien dice la cita o, si no hay cita, de la persona de
-  la que se habla. Primero los recortes curados del usuario, luego `fotos.mejores` / `biblioteca_fotos`. Largo: una sola
-  persona, abajo a la izquierda, con el rótulo de nombre y cargo al lado del hombro (cargo real, nunca notas internas); en un
-  relevo sale la anterior y entra la nueva, nunca dos caras fundidas. Shorts: la persona arriba y la cita debajo.
-- **Karaoke SIEMPRE** (largo y Shorts), estilo TikTok: Inter Black, blanco con palabras clave (citas, nombres, cifras) en
-  amarillo, borde negro grueso, sincronizado con la voz; como mucho 3 líneas y sin tapar la etiqueta ni el rótulo.
-- **Variedad:** ninguna foto ni viñeta se repite en 7 días (`variedad.py`); ninguna imagen se repite entre los Shorts del día.
-- **Fotos siempre a color**, en alta resolución y con licencia (§8). Sin foto libre de una persona: ilustración de su ámbito,
-  sin caras inventadas.
-- **Miniatura del largo:** la genera OpenAI con la frase gancho incrustada y un fondo del contexto, sin caras inventadas, más
-  el **recorte real de quien dice la frase** a la derecha y una **etiqueta roja** con quién lo dice. Respaldo: titular gigante
-  en 3 líneas con brochas (`miniatura_titular`). **Los Shorts no llevan miniatura**: la elige el usuario en Studio.
-- Todo lo hecho con IA lleva «Ilustración IA» en pantalla.
+## 6. Imagen: formato «presentador» (SIEMPRE, desde el 20-nov-2026, decisión del usuario)
+Motor: `presentador.py` (`largo` horizontal 1920×1080 y Shorts verticales 1080×1920). Lo de antes (escenas de ambiente con
+FLUX, `biblioteca_ambiente`, fotos de `fotos.mejores`/`biblioteca_fotos`, Polaroids, `render_ambiente.py`) **queda descartado
+y no se usa hasta nueva orden del usuario.**
+- **Imágenes: SOLO las de `Imagenes/`**, que amplía el usuario:
+  - `Imagenes/Fondos`: se usa **el fondo que mejor corresponde a cada noticia** (Moncloa, Congreso, hemiciclo, Parlamento
+    Europeo, podio de prensa…); en el largo, uno por pieza, sin repetir en piezas seguidas; cambia con un fundido.
+  - `Imagenes/Presentador`: el **presentador** (personaje ficticio). Con varias poses (también láminas de varias poses), va
+    cambiando de pose cada vez que vuelve.
+  - `Imagenes/Políticos`: cada político **sin fondo** (PNG transparente), nombrado `Apellido_….png`; si hay varias imágenes
+    de la misma persona, se alternan. Las imágenes con fondo (p. ej., grupos) no se usan.
+- **El presentador está a la IZQUIERDA mientras el narrador lee el guion** (es quien narra), con el subtítulo karaoke de lo
+  que dice.
+- **Cita literal de un personaje:** el presentador **sale de forma elegante** (fundido + desliz, nunca brusco) y **entra el
+  personaje** (QUIETO en pantalla: sin balanceo ni «respiración»; solo se mueve al entrar y salir) con su frase literal en un bocadillo (karaoke: la palabra que suena en amarillo) y su rótulo rojo con nombre,
+  cargo real y «según [medio]». Citas de menos de 4 palabras se quedan en la narración.
+- **Cruce de declaraciones:** el que ataca **se queda a la izquierda** y **el que replica entra por la DERECHA** con su
+  réplica. Los dos bocadillos se ajustan al hueco entre ellos sin taparse ni tapar a nadie (en el largo, el del ataque arriba
+  y la réplica abajo; en los Shorts, los dos encima de los personajes). Al acabar sus citas **salen y vuelve el presentador**
+  con su chascarrillo o siguiendo el guion. Nunca dos figuras fundidas en el mismo sitio: primero sale una y luego entra la otra.
+- **Ritmo:** la voz se graba **por tramos** (narración / cita) y entre tramos hay **pausas medidas** (≈0,55 s antes de una
+  cita, 0,4 s entre ataque y réplica, 0,6 s al volver el presentador, 0,5 s entre noticias) para que cada cambio de imagen
+  caiga en un silencio. El guion se escribe para ello (§4, «Escribir para el presentador»).
+- **Sin imagen del personaje** en `Imagenes/Políticos`: el presentador se queda y sale solo el bocadillo con el rótulo
+  (nunca una foto de otra fuente ni una cara inventada).
+- **Largo:** logo «EL HOYFORMATIVO» arriba a la derecha y título de la pieza arriba a la izquierda. **Shorts:** cabecera del
+  canal con la etiqueta de formato, kicker rojo, personajes en la mitad de abajo, bocadillo o subtítulo encima, y cierre con
+  la pregunta y suscríbete.
+- **Sin fondos borrosos.** Una viñeta oscura suave en los bordes para que se lea el texto.
+- **Miniatura del largo:** la genera OpenAI con la frase gancho incrustada y un fondo del contexto, más el recorte de quien
+  dice la frase y una etiqueta roja con quién lo dice. **Los Shorts no llevan miniatura**: la elige el usuario en Studio.
 
 ## 7. Monetización (todo lo que se sube tiene que serlo)
 - **Riesgo n.º 1: «contenido no auténtico».** Guion original cada día con narrativa propia, estructura variable, imágenes que
   no se repiten, metadatos únicos.
-- Licencia comercial de todo: voz Azure, música propia, fotos libres (§8), FLUX (Apache 2.0) u OpenAI, tipografías OFL. Si
-  falta algo, **no se sube**.
+- Licencia comercial de todo: voz Azure, música propia, imágenes de `Imagenes/` (las aporta el usuario para uso en el canal),
+  OpenAI (miniatura), tipografías OFL. Si falta algo, **no se sube**.
 - Anuncios: nada de detalles gráficos de víctimas, cuerpos ni violencia; miniatura y título sin morbo ni gritos.
 - Elecciones: nunca dar como cierto algo falso sobre cómo, cuándo o dónde votar.
-- IA: la descripción dice que hay voz sintética y ayuda de IA; si una imagen dibuja a una persona real, el vídeo se marca como
-  «contenido alterado o sintético» (`subir.py`). Las descripciones dicen que las frases están comprobadas y que el equipo
+- IA: la descripción dice que hay voz sintética y ayuda de IA, que los fondos, el presentador (ficticio) y las ilustraciones
+  de los políticos son de IA y que las frases que se les atribuyen son citas literales publicadas por los medios. Como salen
+  personas reales ilustradas, el vídeo se marca como «contenido alterado o sintético» (`subir.py`). Un personaje ilustrado
+  **solo «dice» frases literales suyas comprobadas** (§2), nunca una paráfrasis. Las descripciones dicen que las frases están comprobadas y que el equipo
   editorial revisa antes de publicar (es verdad: publica el usuario).
 - Metadatos: vídeo con 35-45 etiquetas y 12-15 hashtags; Shorts con 15-25 etiquetas y 8-12 hashtags; solo de personas y temas
   que salen; títulos con verbos neutros.
@@ -219,7 +248,8 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, tacos («me cago
   que permiten reutilizar citando (Moncloa, Congreso, Senado); CC BY-SA con «foto adaptada» en la descripción. **Nunca** fotos
   de periódicos, agencias (EFE, Europa Press…), Getty ni capturas de televisión, ni con licencia NC o ND. Nunca víctimas ni
   personas ajenas a la noticia.
-- Dibujar a una persona con IA solo a partir de fotos CC0, de dominio público o CC BY, y solo por algo que dijo o hizo.
+- Las ilustraciones de políticos son las de `Imagenes/Políticos` (las aporta el usuario); se usan solo para mostrar algo que
+  dijeron de verdad (frase literal comprobada) y nunca para hacerles «decir» o «hacer» otra cosa.
 - Música propia: sin reclamaciones de Content ID.
 
 ## 9. Proceso y control de calidad

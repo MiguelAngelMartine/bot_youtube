@@ -171,6 +171,11 @@ def _fuera_de_citas(texto, palabra):
     return (palabra or "").strip().lower() in sin_citas.lower()
 
 
+def _whisper_citas(wf, texto):
+    """Pistas de Whisper que caen dentro de una cita literal."""
+    return [p for p in wf if p.get("texto") and not _fuera_de_citas(texto, p["texto"])]
+
+
 def revisa(texto, auto_veta=False):
     """Genera la locución y la revisa. Oído subjetivo: Gemini (gratis) y, si no responde, OpenAI (fiable). Oído objetivo:
     Whisper. Devuelve {ok, problemas, oido}. Con auto_veta, añade a la lista negra lo que marque el oído subjetivo."""
@@ -189,13 +194,18 @@ def revisa(texto, auto_veta=False):
         w = (p["texto"] or "").strip().lower()
         return (not _fuera_de_citas(texto, p["texto"])    # dentro de una cita literal
                 or any(w in expr or expr in w for expr in pal))   # es (parte de) una coletilla de la paleta
+    # 20-nov-2026 («mitines» sonaba raro DENTRO de una cita y no se avisó): lo de dentro de las citas no se reescribe (es
+    # literal), pero se devuelve aparte en "en_citas" para cambiar de frase o avisar.
+    en_citas = [p for p in (sub or []) if not _fuera_de_citas(texto, p["texto"])]
     sub = [p for p in (sub or []) if not protegida(p)]     # oído subjetivo (Gemini/OpenAI): manda en el veredicto
     oido, wf = _whisper(wav, texto)                        # Whisper: solo PISTA (no dicta el veredicto por sí solo)
+    wf_todas = list(wf)
     wf = [dict(p, fuente="whisper (pista)") for p in wf if not protegida(p)]
     if auto_veta:
         for p in sub:
             veta(p["texto"], p.get("alternativa", ""), f"no suena natural ({p['fuente']})")
-    return {"ok": not sub, "problemas": sub + wf, "oido_subjetivo": oido_usado, "oido": oido}
+    en_citas += [dict(p, fuente="whisper (pista)") for p in _whisper_citas(wf_todas, texto)]
+    return {"ok": not sub, "problemas": sub + wf, "en_citas": en_citas, "oido_subjetivo": oido_usado, "oido": oido}
 
 
 def _piezas(fecha):

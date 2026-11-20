@@ -70,8 +70,8 @@ def firma_persona(destino, persona, etiqueta, cred=None, img=None, solo_etiqueta
     try:
         if solo_etiqueta:
             raise LookupError("solo etiqueta")
-        import biblioteca_fotos as BF
-        r, _ = BF.mejor_recorte(persona)
+        import presentador as PR                       # 20-nov-2026: SOLO las imágenes de Imagenes/Políticos (NORMAS §6)
+        r = PR.figura_de(persona, PR.catalogo()[2], {})
         if r and Path(r).exists():
             rec = Image.open(r).convert("RGBA")
     except Exception as e:

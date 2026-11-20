@@ -56,7 +56,11 @@ def chequea(fecha, nn):
             fallos.append(f"la voz nombra un medio: «{m}» (va en pantalla con «según», no en el di)")
     for m in SILENCIO.finditer(voz):
         fallos.append(f"anuncia un silencio: «{m.group(0)}» (si no hay respuesta, solo la cita)")
-    for w in PROHIBIDAS:
+    try:                                                 # 20-nov-2026: y las de archivo/palabras_vetadas.json (la voz las lee mal)
+        vet = [x["palabra"] for x in json.loads((RAIZ / "archivo" / "palabras_vetadas.json").read_text(encoding="utf-8"))]
+    except (OSError, ValueError, KeyError, TypeError):
+        vet = []
+    for w in PROHIBIDAS + vet:
         if w.lower() in voz.lower():
             fallos.append(f"palabra o muletilla prohibida: «{w}»")
     for k, p in enumerate(pasos):
@@ -79,6 +83,9 @@ def chequea(fecha, nn):
             if len(c.split()) >= 3 and _n(c) not in fuentes:
                 fallos.append(f"cita «{c[:70]}» no está LITERAL en las fuentes del día (artículos, redes): cópiala letra a "
                               "letra como la publica el medio, sin completarla ni retocarla, o quítala")
+    for m in re.finditer(r"»[,.]?\s+(?:dijo|dice|afirmó|afirma|aseguró|asegura|según|ha dicho|ha afirmado|añadió|sentenció)\b", voz):
+        fallos.append(f"atribución DESPUÉS de la cita («{m.group(0)}»): en el formato presentador quién la dice va JUSTO "
+                      "antes de la cita (NORMAS.md §4, «Escribir para el presentador»)")
     for frase in re.split(r"(?<=[.?!])\s+", voz):
         if len(frase.split()) > 34:
             fallos.append(f"frase de {len(frase.split())} palabras (máximo 30): «{frase[:60]}…»")

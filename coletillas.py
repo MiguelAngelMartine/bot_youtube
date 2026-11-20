@@ -43,7 +43,6 @@ CLAVES = {
     r"movida mas gorda": "qué movida más gorda",
     r"ni tan mal": "ni tan mal",
     r"yendo de las manos": "se nos está yendo de las manos",
-    r"camino seco": "virgen del camino seco",
     r"estamos apanados|apanados": "estamos apañados",
     r"aguante su vela": "cada palo que aguante su vela",
     r"poco aprieta": "quien mucho abarca, poco aprieta",

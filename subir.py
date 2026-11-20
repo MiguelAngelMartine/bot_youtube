@@ -81,6 +81,13 @@ def borra_anterior(yt, dia):
 
 def personas_dibujadas(dia):
     """Personas reales dibujadas por IA que salen en el video (viñetas aceptadas con retrato, vinetas/origen.json)."""
+    pp = dia / "personajes_presentador.json"           # 21-nov-2026: formato presentador (políticos ilustrados)
+    if pp.exists():
+        try:
+            if json.loads(pp.read_text(encoding="utf-8")):
+                return json.loads(pp.read_text(encoding="utf-8"))
+        except ValueError:
+            pass
     o = dia / "vinetas" / "origen.json"
     if not o.exists():
         return []
@@ -224,6 +231,9 @@ def subir_shorts(dia_txt):
         if any("viñetas del tema" in c for c in cr):
             partes += ["Las viñetas son ilustraciones generadas con IA a partir de los hechos contados; las personas "
                        "dibujadas salen de fotos con licencia libre."]
+        if S.get("personajes"):                         # 21-nov-2026: formato presentador
+            partes += ["El fondo, el presentador (un personaje ficticio) y las ilustraciones de los políticos están "
+                       "generados con IA; las frases que se les atribuyen son citas literales publicadas por los medios."]
         hs, vistos = [], set()                          # 7-nov: más hashtags (máx. 15: con más, YouTube los ignora)
         for h in ["#Shorts"] + list(S.get("hashtags") or []) + ["#PolíticaEspañola", "#NoticiasDeHoy", "#ElHoyformativo"]:
             h = "#" + re.sub(r"[\s#]+", "", str(h))

@@ -30,14 +30,22 @@ def escribe(fecha, forzar=False):
         if t >= 10:
             cap.append(f"{int(t // 60)}:{int(t % 60):02d} {s.get('titulo', '')}")
         t += pal / WPS + 1.0
+    cj_ = dia / "capitulos.json"                       # 20-nov-2026: tiempos reales del montaje (presentador.py)
+    if cj_.exists():
+        try:
+            caps = json.loads(cj_.read_text(encoding="utf-8"))
+            cap = ["0:00 Inicio"] + [f"{int(c['t'] // 60)}:{int(c['t'] % 60):02d} {c['titulo']}" for c in caps if c["t"] >= 10]
+        except (ValueError, KeyError, TypeError):
+            pass
     fuentes = sorted({x for s in secs for x in s.get("fuentes", []) if x})
     desc = (f"{G['titulo_video']}\n\n{G2.MARCA.title().replace(' En ', ' en ')}: lo más relevante de la política española "
             f"del {G['fecha'].lower()}, con datos, citas textuales y la fuente de cada información.\n\n"
             f"Capítulos:\n" + "\n".join(cap) + f"\n\nFuentes: {', '.join(fuentes)}.\n\n"
             "Resumen informativo elaborado con ayuda de inteligencia artificial a partir de noticias publicadas por los "
             "medios citados, y revisado por el equipo editorial antes de su publicación. Voz sintética con licencia "
-            "comercial. Música original del canal. Las escenas de ambiente son ilustraciones generadas con IA (estilo "
-            "línea clara); no representan a personas reales.")
+            "comercial. Música original del canal. Los fondos, el presentador (un personaje ficticio) y las ilustraciones de "
+            "los políticos están generados con IA; las frases que se les atribuyen en pantalla son citas literales "
+            "publicadas por los medios que se indican.")
     cj = dia / "creditos.json"
     if cj.exists():
         try:

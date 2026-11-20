@@ -159,7 +159,14 @@ VETADAS = [r"\bzasca"]   # 19-nov-2026 (usuario): «zasca» no se usa NUNCA en e
 def vetadas(voz):
     """Palabras prohibidas por la guía que aparecen en la voz (fuera de las citas literales «…»)."""
     fuera = re.sub(r"«[^»]*»", " ", voz or "").lower()
-    return [f"«{v.replace(chr(92) + 'b', '')}» (palabra prohibida: no se usa nunca)" for v in VETADAS if re.search(v, fuera)]
+    out = [f"«{v.replace(chr(92) + 'b', '')}» (palabra prohibida: no se usa nunca)" for v in VETADAS if re.search(v, fuera)]
+    try:                                                 # 20-nov-2026: y las de archivo/palabras_vetadas.json
+        for x in json.loads((RAIZ / "archivo" / "palabras_vetadas.json").read_text(encoding="utf-8")):
+            if x["palabra"].lower() in fuera:
+                out.append(f"«{x['palabra']}» (vetada: {x.get('motivo', '')}; usa {x.get('alternativa', 'otra')})")
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return out
 
 
 def repeticiones(voz, n=4, muletillas=True, cierre=True):
@@ -325,6 +332,8 @@ def mejores_frases(fecha, pedidos, enc, G, guion, redes):
                 print(f"  descartada: «{c[:60]}» no está literal en el material")
             elif any(nc in u or u in nc for u in usadas):
                 print(f"  descartada: «{c[:60]}» ya sale")
+            elif vetadas(f"«{c}»".replace("«", "").replace("»", "")):
+                print(f"  descartada: «{c[:60]}» lleva una palabra que la voz lee mal (archivo/palabras_vetadas.json)")
             elif antes and nc in antes:
                 print(f"  descartada: «{c[:60]}» ya estaba publicada el día anterior (no es del acontecimiento)")
             elif not _atribuida(nc, ape, textos_n, ajenas):

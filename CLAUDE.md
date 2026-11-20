@@ -38,11 +38,11 @@
 - **Guion:** agentes de `.claude/agents/`, `prechequeo.py`, `coletillas.py`, `shorts_guion.py` (`repeticiones`),
   `prevuelo_voz.py`. LLM: `gem.py` (Gemini, dos claves) → freellmpool (`~/.local/bin/freellmpool`) → Claude.
 - **Voz:** `voz.py` (Azure Tristán HD, caché en `cache/voz`, Whisper para tiempos). Clave con `clave_azure.py`.
-- **Montaje:** `render_ambiente.py <fecha> largo|N` (flags `EH_SIN_LTX=1`, `EH_ESCENAS_OPENAI=1`), `ia_vinetas.py`,
-  `motion_comic.py`, `biblioteca_ambiente.py`, `fotos.py` (`mejores`), `biblioteca_fotos.py`, `importar_png.py`,
-  `variedad.py`, `musica.py`. Miniatura: `miniatura_auto.py`, `imagen_fondo.py`, `miniatura.py`, `director_arte.py`.
+- **Montaje (formato «presentador», SIEMPRE desde el 20-nov-2026):** `presentador.py <fecha> largo|N` con SOLO las imágenes
+  de `Imagenes/` (`Fondos`, `Presentador`, `Políticos`; las amplía el usuario; `presentador.py catalogo` las lista) y
+  `musica.py`. Descartado hasta nueva orden: `render_ambiente.py`, `ia_vinetas.py`, `motion_comic.py`,
+  `biblioteca_ambiente.py`, `fotos.py`, `biblioteca_fotos.py` (siguen en el repo, sin usarse). Miniatura: `miniatura_auto.py`, `imagen_fondo.py`, `miniatura.py`, `director_arte.py`.
 - **Publicación:** `subir.py <fecha> [shorts]` (privado; `autorizar` si caduca el token), `descripcion.py`,
   `plataforma.py`, `apto_anuncios.py`, `comenta.py` (cron horario), `notifica.py`, `analitica.py`, `informe_semanal.py`.
 - **Pendientes conocidos:** consulta con un abogado de propiedad intelectual antes de monetizar; avatar y banner EH a mano;
-  «Vídeo relacionado» y miniatura de cada Short a mano en Studio; TikTok aparcado (solo API oficial, en borrador); prueba de
-  telediario con presentador (fuera del proyecto, en estudio).
+  «Vídeo relacionado» y miniatura de cada Short a mano en Studio; TikTok aparcado (solo API oficial, en borrador).

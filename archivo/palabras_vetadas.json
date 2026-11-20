@@ -16,5 +16,23 @@
   "alternativa": "otra coletilla de la paleta (oficina/GUION_ESTILO.md)",
   "motivo": "retirada de la paleta por el usuario (17-nov-2026): no usarla nunca",
   "fecha": "2026-11-17"
+ },
+ {
+  "palabra": "ladrillazo va, ladrillazo viene",
+  "alternativa": "otra coletilla de la paleta (NORMAS.md §4)",
+  "motivo": "la voz no la lee bien (el usuario, 20-nov-2026): no usarla nunca",
+  "fecha": "2026-11-20"
+ },
+ {
+  "palabra": "virgen del camino seco",
+  "alternativa": "otra coletilla de la paleta (NORMAS.md §4)",
+  "motivo": "queda muy forzada (el usuario, 20-nov-2026): retirada de la paleta",
+  "fecha": "2026-11-20"
+ },
+ {
+  "palabra": "mitin",
+  "alternativa": "acto, acto de campaña (y no elegir citas que la lleven)",
+  "motivo": "la voz no la lee bien: «mitin/mitines» suena raro (el usuario, 20-nov-2026)",
+  "fecha": "2026-11-20"
  }
 ]
