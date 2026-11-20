@@ -97,6 +97,8 @@ def catalogo():
 
 
 _NOMBRE = {}
+# Apellidos que llevan varios políticos conocidos: solo se pone imagen si la cita trae también el nombre de pila.
+APELLIDOS_AMBIGUOS = {"montero", "munoz", "garcia", "lopez", "martin", "perez", "gonzalez", "fernandez", "rodriguez"}
 
 
 def _nombre_archivo(p):
@@ -113,6 +115,8 @@ def figura_de(nombre, pols, uso):
             # Apellidos comunes (Muñoz, Díaz…): si el archivo trae nombre de pila y la cita también, tienen que coincidir.
             otros = set(_NOMBRE.get(rutas[0], [clave])[:-1])
             resto = set(toks) - {clave}
+            if clave in APELLIDOS_AMBIGUOS and not resto:
+                continue                               # «Montero» a secas puede ser Irene o María Jesús: sin imagen
             if otros and resto and not (otros & resto):
                 continue
             k = uso.get(clave, 0)

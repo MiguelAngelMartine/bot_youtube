@@ -205,7 +205,9 @@ y no se usa hasta nueva orden del usuario.**
     cambiando de pose cada vez que vuelve.
   - `Imagenes/Políticos` (y sus subcarpetas, p. ej. `Nuevas/`): cada político **sin fondo** (PNG transparente), nombrado
     por la persona: `Apellido_….png`, `NombreApellido.png` o `Nombre Apellido.png` (la clave es el apellido, la última
-    palabra; si el archivo trae nombre de pila y la cita también, tienen que coincidir, para no confundir apellidos comunes).
+    palabra; si el archivo trae nombre de pila y la cita también, tienen que coincidir, para no confundir apellidos comunes;
+    con apellidos que llevan varios políticos —Montero, Muñoz, García…, `presentador.APELLIDOS_AMBIGUOS`— la cita tiene que
+    traer el nombre de pila o no sale imagen).
     Si hay varias imágenes de la misma persona, se alternan. Las imágenes con fondo (p. ej., grupos) no se usan; si el
     fondo transparente viene «dibujado» (cuadros grises o blanco), se recorta con rembg (`isnet-general-use`), se revisa
     sobre fondo de color y el original se guarda en `Imagenes/_originales/`.
