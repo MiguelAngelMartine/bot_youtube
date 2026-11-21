@@ -563,20 +563,21 @@ class Jornada:
         self.py("descripcion.py", self.f, log="publicacion.log")
         if not (self.dia / "publicacion.md").exists() and self.py("plataforma.py", self.f, log="publicacion.log") != 0:
             self.claude("editor-plataforma", "Prepara publicacion.md.", self.dia.relative_to(RAIZ) / "publicacion.md")
-        if not (self.dia / "youtube.json").exists():
+        # 21-nov-2026 (el usuario): NO se sube a YouTube sin su OK. Se le manda por Telegram y se sube cuando lo aprueba
+        # (`subir.py FECHA`), así no se gastan subidas en versiones que luego se rehacen (límite diario de YouTube).
+        if not (self.dia / "youtube.json").exists() and not (self.dia / "revision.json").exists():
             self.py("control_calidad.py", self.f, "--ligero")
-            if self.py("subir.py", self.f, log="publicacion.log", timeout=3600) != 0:
-                self.parte("SUBIDA FALLIDA: mira publicacion.log")
+            if self.py("notifica.py", self.f, "--pide-ok", "largo") != 0:
+                self.parte("NO SE PUDO MANDAR EL VÍDEO POR TELEGRAM")
                 return False
-            self.py("notifica.py", self.f)
-            self.parte("vídeo subido como privado")
+            self.parte("vídeo enviado por Telegram para revisar; se sube a YouTube cuando el usuario dé el OK")
         return True
 
     def shorts(self):
         # 16-nov-2026 (petición del usuario): los Shorts se hacen y suben ANTES que el vídeo largo. Solo dependen del
         # cierre (episodio.json), no del largo. La cuota de FLUX es fresca a las 10:30; si se agota, la biblioteca cubre.
         carpeta = self.dia / "shorts"
-        if (carpeta / "youtube.json").exists():
+        if (carpeta / "youtube.json").exists() or (carpeta / "revision.json").exists():
             return True
         import json as _json
         import time
@@ -693,8 +694,8 @@ class Jornada:
         if hechos:
             import shorts_dia
             shorts_dia.hoja(carpeta)
-            self.py("subir.py", self.f, "shorts", log="publicacion.log", timeout=3600)
-            self.parte(f"{len(hechos)} Shorts (guion Opus) subidos como privados, antes del largo")
+            self.py("notifica.py", self.f, "--pide-ok", "shorts")      # 21-nov-2026: sin el OK del usuario no se suben
+            self.parte(f"{len(hechos)} Shorts (guion Opus) enviados por Telegram para revisar; se suben con el OK del usuario")
         else:
             self.parte("hoy sin Shorts (fallo al renderizar)")
         return True

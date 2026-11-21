@@ -29,12 +29,12 @@ lanza)
     # Un solo lanzamiento a la vez.
     exec 9>"$RAIZ/.jornada.lock"
     if ! flock -n 9; then echo "[$(date +%FT%T)] Ya hay una jornada en marcha" >> "$LOG"; exit 0; fi
-    if [ -f "$DIA/youtube.json" ]; then echo "[$(date +%FT%T)] $FECHA ya está subido; no se repite" >> "$LOG"; exit 0; fi
+    if [ -f "$DIA/youtube.json" ] || [ -f "$DIA/revision.json" ]; then echo "[$(date +%FT%T)] $FECHA ya está hecho (subido o enviado para revisar); no se repite" >> "$LOG"; exit 0; fi
 
     # Hasta 3 intentos: si se agota el límite de uso del plan de Claude (se comparte con las sesiones del día),
     # espera a que se renueve y retoma (la skill salta las fases ya hechas). Nunca empieza un intento después de las 21:00.
     # Aviso por Telegram de que empieza el vídeo del día (petición del usuario del 4-nov-2026)
-    "$PY" notifica.py "$FECHA" --aviso "empieza la jornada: me pongo con el vídeo de hoy. Te aviso cuando esté subido (unas 2 h)." >> "$LOG" 2>&1
+    "$PY" notifica.py "$FECHA" --aviso "empieza la jornada: me pongo con el vídeo de hoy. Te lo mando por Telegram para tu OK cuando esté listo (unas 2 h)." >> "$LOG" 2>&1
     # 10-nov-2026 (petición del usuario): cada fase que se completa (cada línea nueva del parte del día) se avisa por
     # Telegram, para saber que todo sigue adelante. Lo hace este vigía, sin gastar tokens; un mensaje por minuto como mucho.
     PARTE="$DIA/parte_del_dia.md"
@@ -61,7 +61,7 @@ $NUEVAS" >> "$LOG" 2>&1
     COD=$?
     echo "[$(date +%FT%T)] jornada.py terminó con código $COD" >> "$LOG"
     for INTENTO in 1 2 3; do
-        if [ -f "$DIA/youtube.json" ] && [ -f "$DIA/shorts/youtube.json" ]; then COD=0; break; fi
+        if { [ -f "$DIA/youtube.json" ] || [ -f "$DIA/revision.json" ]; } && { [ -f "$DIA/shorts/youtube.json" ] || [ -f "$DIA/shorts/revision.json" ]; }; then COD=0; break; fi
         echo "[$(date +%FT%T)] Empieza la jornada $FECHA, intento $INTENTO ($(claude --version))" >> "$LOG"
         ANTES=$(wc -l < "$LOG")
         # Tope de 3 h para que una jornada atascada no se quede colgada.
@@ -92,7 +92,7 @@ with f.open("a", encoding="utf-8") as fh:
 PYEOF
         echo "[$(date +%FT%T)] Fin (código $COD)" >> "$LOG"
         if [ "$COD" -eq 0 ]; then
-            [ -f "$DIA/youtube.json" ] && break
+            { [ -f "$DIA/youtube.json" ] || [ -f "$DIA/revision.json" ]; } && break
             # Claude terminó sin subir el vídeo (el 3-nov dejó un montaje corriendo en segundo plano y cerró su turno):
             # se espera a que acabe cualquier montaje en marcha y se retoma la jornada donde se quedó.
             [ "$INTENTO" -eq 3 ] || [ "$(date +%H)" -ge 21 ] && { COD=3; break; }
@@ -114,9 +114,9 @@ PYEOF
     # 10-nov-2026: si la jornada se cortó (tope de 3 h, límite de uso) con el vídeo subido pero sin Shorts, se hacen aquí,
     # 19-nov-2026: con la MISMA fase de jornada.py (guion de Opus + control de repeticiones), nunca con shorts_dia.py a
     # secas: ese camino se saltaba a Opus y salieron Shorts con la réplica dicha dos veces.
-    if [ -f "$DIA/youtube.json" ] && [ ! -f "$DIA/shorts/youtube.json" ]; then
+    if { [ -f "$DIA/youtube.json" ] || [ -f "$DIA/revision.json" ]; } && [ ! -f "$DIA/shorts/youtube.json" ] && [ ! -f "$DIA/shorts/revision.json" ]; then
         echo "[$(date +%FT%T)] Faltan los Shorts: se hacen con la fase de Shorts de jornada.py" >> "$LOG"
-        "$PY" notifica.py "$FECHA" --aviso "la jornada se cortó tras subir el vídeo: hago los Shorts ahora" >> "$LOG" 2>&1
+        "$PY" notifica.py "$FECHA" --aviso "la jornada se cortó con el vídeo hecho: hago los Shorts ahora" >> "$LOG" 2>&1
         EH_SIN_LTX=1 "$PY" -u -c "import jornada; jornada.Jornada('$FECHA').shorts()" >> "$DIA/shorts.log" 2>&1
         echo "$(date +%H:%M) Shorts hechos por jornada.sh (fase de Shorts de jornada.py, guion de Opus)" >> "$PARTE"
     fi
@@ -126,9 +126,9 @@ PYEOF
     fi
     ;;
 vigila)
-    if [ ! -f "$DIA/youtube.json" ]; then
+    if [ ! -f "$DIA/youtube.json" ] && [ ! -f "$DIA/revision.json" ]; then
         ULTIMA="$(tail -n 1 "$DIA/parte_del_dia.md" 2>/dev/null | cut -c1-200)"
-        "$PY" notifica.py "$FECHA" --error "son las $(date +%H:%M) y el vídeo de hoy aún no está subido. Última línea del parte: ${ULTIMA:-sin parte todavía}" >> "$LOG" 2>&1
+        "$PY" notifica.py "$FECHA" --error "son las $(date +%H:%M) y el vídeo de hoy aún no está listo para revisar. Última línea del parte: ${ULTIMA:-sin parte todavía}" >> "$LOG" 2>&1
     fi
     ;;
 *)

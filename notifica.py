@@ -123,6 +123,41 @@ def aviso_shorts(dia_txt, hechos):
             manda_video(api, chat, v, f"Short {k}: {h['titulo']}")
 
 
+def pide_ok(dia_txt, cual="largo"):
+    """21-nov-2026 (el usuario: «para evitar bloqueos, los vídeos se suben a YouTube cuando yo los revise en Telegram y
+    les dé el OK»): manda el vídeo para revisar y deja la marca de «pendiente de OK». NO sube nada."""
+    import json as _j
+    import time as _t
+    tok, chat = credenciales()
+    api = f"https://api.telegram.org/bot{tok}"
+    dia = RAIZ / "dia" / dia_txt
+    if cual == "largo":
+        envia(api, "sendMessage", timeout=30, data={"chat_id": chat, "text":
+              f"🗳️ El Hoyformativo · {dia_txt}: vídeo largo listo para revisar. NO está en YouTube: se sube (privado) "
+              f"cuando me des el OK."})
+        if (dia / "miniatura.png").exists():
+            with open(dia / "miniatura.png", "rb") as fh:
+                envia(api, "sendPhoto", data={"chat_id": chat, "caption": "Miniatura"}, files={"photo": fh}, timeout=60)
+        v = dia / "episodio_720p.mp4"
+        manda_video(api, chat, v if v.exists() else dia / "episodio.mp4", "Vídeo largo (para tu OK)")
+        marca = dia / "revision.json"
+    else:
+        carpeta = dia / "shorts"
+        mp4s = sorted(carpeta.glob("short_*.mp4"), key=lambda f: int("".join(c for c in f.stem if c.isdigit()) or 0))
+        envia(api, "sendMessage", timeout=30, data={"chat_id": chat, "text":
+              f"📱 El Hoyformativo · {dia_txt}: {len(mp4s)} Shorts listos para revisar. NO están en YouTube: se suben "
+              f"(privados) cuando me des el OK, de todos o de los que digas."})
+        for v in mp4s:
+            try:
+                titulo = _j.loads(v.with_suffix(".json").read_text(encoding="utf-8")).get("titulo", "")
+            except (OSError, ValueError):
+                titulo = ""
+            manda_video(api, chat, v, f"{v.stem.replace('_', ' ').capitalize()}: {titulo}")
+        marca = carpeta / "revision.json"
+    marca.write_text(_j.dumps({"enviado": _t.strftime("%Y-%m-%d %H:%M"), "estado": "pendiente de OK"}), encoding="utf-8")
+    print(f"enviado para revisar ({cual}); pendiente del OK del usuario")
+
+
 def aviso(dia_txt, texto):
     """Mensaje corto informativo (por ejemplo, que empieza la jornada)."""
     tok, chat = credenciales()
@@ -145,6 +180,9 @@ if __name__ == "__main__":
     a = sys.argv
     if "--audio" in a:                                   # notifica.py FECHA --audio ruta.mp3 "texto"
         manda_audio(a[1], a[a.index("--audio") + 1], a[a.index("--audio") + 2] if len(a) > a.index("--audio") + 2 else "")
+        sys.exit()
+    if "--pide-ok" in a:                                 # notifica.py FECHA --pide-ok largo|shorts
+        pide_ok(a[1], a[a.index("--pide-ok") + 1] if len(a) > a.index("--pide-ok") + 1 else "largo")
         sys.exit()
     if "--aviso" in a:
         aviso(a[1], a[a.index("--aviso") + 1])

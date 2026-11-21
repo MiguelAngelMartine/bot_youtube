@@ -22,7 +22,8 @@
 - **Informar sin que pregunte:** en las tareas largas (renders, jornadas), avisar al terminar, también si falla. Por Telegram
   (`notifica.py`), en lenguaje llano.
 - **Revisar antes de entregar:** mirar los fotogramas de cada escena antes de mandar un vídeo; no darlo por bueno sin verlo.
-- **Nunca publicar:** se sube como privado y publica el usuario. Antes de rehacer algo, comprobar en YouTube si ya está
+- **Nada se sube sin el OK del usuario** (21-nov-2026): los vídeos se le mandan por Telegram (`notifica.py FECHA --pide-ok
+  largo|shorts`) y solo con su OK se suben a YouTube. **Nunca publicar:** se sube como privado y publica el usuario. Antes de rehacer algo, comprobar en YouTube si ya está
   publicado: lo publicado no se toca.
 - Las búsquedas web sencillas se pueden delegar en un ayudante barato; el diseño, el análisis y los cambios de código, nunca.
 - No proponer de nuevo lo que el usuario ya descartó (está en `oficina/HISTORIAL_DECISIONES.md`): ritmo «TikTok» de cortes

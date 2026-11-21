@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -302,6 +302,10 @@ y no se usa hasta nueva orden del usuario.**
 - **Antes de entregar cualquier vídeo se miran sus fotogramas.** El control de calidad marca CORREGIR si: el tono es plano;
   falta el karaoke o no es TikTok; una escena sale sin personaje o con la cara equivocada; hay repeticiones; un fondo no es
   político; o se incumple cualquier punto de esta guía.
+- **Nada se sube a YouTube sin el OK del usuario** (21-nov-2026, para no agotar el límite diario de subidas con
+  versiones que luego se rehacen): la jornada le manda cada vídeo por Telegram (`notifica.py FECHA --pide-ok largo|shorts`)
+  y solo cuando lo aprueba se sube (`subir.py FECHA`, `subir.py FECHA shorts [N]`). La versión anterior se borra después
+  de subir la nueva, nunca antes.
 - **Todo se sube como PRIVADO** (`subir.py`); **publicar es siempre decisión del usuario**. De cada día queda solo la última
   versión (se borra la anterior si sigue privada). **Antes de rehacer algo se comprueba si ya está publicado: lo publicado no
   se toca.**
