@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -119,9 +119,10 @@ abogado de propiedad intelectual.
 - **Nunca se estira ni se encoge la voz ya grabada** para igualar velocidades (usuario, 21-nov-2026: «suena con eco o
   distorsionada»), ni se corrige frase a frase con `<prosody>` dentro del trozo (la prueba tampoco convenció).
 - **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
-  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitin, mitines, enterarais). Cada
+  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitin, mitines). Si con SAPI no sale, se le **escribe** la palabra de otra forma solo para la voz (`voz.ESCRIBE`, p. ej. «enterarais» → «enterárais», aprobado por el usuario el 21-nov-2026); el texto en pantalla no cambia. Cada
   palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram.
-  **Solo puntual** (decisión del usuario, 21-nov-2026): nunca para todas las palabras; dictar todo quita naturalidad. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
+  **Solo puntual** (decisión del usuario, 21-nov-2026): nunca para todas las palabras; dictar todo quita naturalidad.
+  Las tomas aprobadas se conservan: añadir una palabra al diccionario solo vuelve a grabar los trozos que la llevan. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
   nada (edge-tts no tiene licencia comercial; solo pruebas a mano). Ni voz propia ni clonada.
 - El guion se escribe **para esa energía**: ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción.
 - **Sin preguntas en el cuerpo** (Tristán no las entona): la única pregunta es la final. En el cuerpo, en afirmativo.

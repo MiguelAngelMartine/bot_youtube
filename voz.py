@@ -155,8 +155,15 @@ SIGLAS = {k: v for k, v in SIGLAS.items() if k != v and not v.startswith("la ")}
 PRONUNCIA = {
     "mitines": "m i t i 1 n e s",
     "mitin": "m i 1 t i n",
-    "enterarais": "e n t e r a 1 r a i s",          # 21-nov: salía «enteraráis»
 }
+# Palabras que basta con escribirle a la voz de otra forma (con tilde, por ejemplo) para que las diga bien. El texto en
+# pantalla no cambia. 21-nov-2026: «enterarais» salía «enteraráis» y con SAPI tampoco; con tilde, el usuario la aprueba.
+ESCRIBE = {
+    "enterarais": "enterárais",
+}
+# Versión del procesado de la voz: entra en la clave de la caché. Se sube SOLO cuando cambia cómo se genera la voz (no al
+# añadir palabras al diccionario: esas entran en la clave de los trozos que las llevan).
+VERSION_VOZ = "2026-11-21"
 
 
 def _pronuncia_ssml(texto):
@@ -165,7 +172,16 @@ def _pronuncia_ssml(texto):
         texto = re.sub(r"(?<![\wÁÉÍÓÚÑáéíóúñ<'=])(" + re.escape(pal) + r")(?![\wÁÉÍÓÚÑáéíóúñ])",
                        lambda m: f"<phoneme alphabet='sapi' ph='{PRONUNCIA[pal]}'>{m.group(1)}</phoneme>", texto,
                        flags=re.I)
+    for pal in sorted(ESCRIBE, key=len, reverse=True):
+        texto = re.sub(r"(?<![\wÁÉÍÓÚÑáéíóúñ<'=])(" + re.escape(pal) + r")(?![\wÁÉÍÓÚÑáéíóúñ])",
+                       lambda m: f"<sub alias='{ESCRIBE[pal]}'>{m.group(1)}</sub>", texto, flags=re.I)
     return texto
+
+
+def dicc_de(texto):
+    """Entradas del diccionario de pronunciación que afectan a este texto (para la clave de la caché)."""
+    t = texto.lower()
+    return sorted([k, v] for d in (PRONUNCIA, ESCRIBE) for k, v in d.items() if k.lower() in t)
 
 
 def _siglas_ssml(texto_escapado):
@@ -315,10 +331,12 @@ def locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     import hashlib
     import json
     import shutil
-    fuentes = "".join((Path(__file__).parent / m).read_text(encoding="utf-8") for m in ("voz.py", "pausas.py"))
-    cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO] if motor() == "azure" else []   # la config de voz entra en la clave
-    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, fuentes, motor()] + cfg,
-                                    ensure_ascii=False).encode()).hexdigest()[:20]
+    # 21-nov-2026: la clave ya no lleva el código entero (cualquier cambio regrababa TODO, también las tomas aprobadas):
+    # lleva la config, VERSION_VOZ y las palabras del diccionario que salen en el texto.
+    texto = " ".join(p["di"] for p in pasos)
+    cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO, AZURE_TEMP_CIERRE, RITMO, RITMO_TOL] if motor() == "azure" else []
+    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, VERSION_VOZ,
+                                    motor(), dicc_de(texto)] + cfg, ensure_ascii=False).encode()).hexdigest()[:20]
     wav_c, meta_c = CACHE / f"{clave}.wav", CACHE / f"{clave}.json"
     if wav_c.exists() and meta_c.exists():
         shutil.copyfile(wav_c, wav_salida)
