@@ -115,7 +115,8 @@ abogado de propiedad intelectual.
 - **Ritmo igual en todo:** cada trozo se mide al generarlo y se corrige si se aparta más de un 10 % (ver el control de voz).
 - **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
   alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`). Cada
-  palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
+  palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram.
+  **Solo puntual** (decisión del usuario, 21-nov-2026): nunca para todas las palabras; dictar todo quita naturalidad. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
   nada (edge-tts no tiene licencia comercial; solo pruebas a mano). Ni voz propia ni clonada.
 - El guion se escribe **para esa energía**: ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción.
 - **Sin preguntas en el cuerpo** (Tristán no las entona): la única pregunta es la final. En el cuerpo, en afirmativo.
