@@ -214,6 +214,17 @@ def main(fecha, horas=30):
             notifica.main(fecha, "X no ha devuelto ningún tuit (¿sesión caducada o bloqueada?). La jornada sigue con las demás fuentes; hay que renovar X_AUTH_TOKEN y X_CT0 en el .env.")
         except Exception as e:
             print(f"(no se pudo avisar: {type(e).__name__})")
+    ef = dia / "encargo.json"                          # 21-nov-2026: material extra del encargo del director
+    bx = (json.loads(ef.read_text(encoding="utf-8")).get("busca_x") or {}) if ef.exists() else {}
+    if bx:
+        try:
+            xe, fe = x_oficiales.encargo(bx.get("cuentas", {}), bx.get("busqueda", []), int(bx.get("horas", 48)))
+        except Exception as e:
+            xe, fe = [], [f"todo ({type(e).__name__})"]
+        ya = {x["enlace"].split("/")[-1] for x in xs}
+        xe = [x for x in xe if x["enlace"].split("/")[-1] not in ya]
+        resumen.insert(0, f"- X (encargo del director): {len(xe)} tuits" + (f"; fallan: {', '.join(fe)}" if fe else ""))
+        xs = xe + xs
     enlaces = {x["enlace"].split("/")[-1] for x in xs}
     tx = [x for x in tx if x["enlace"].split("/")[-1] not in enlaces]
     datos = xs + tx + datos                             # los tuits, primero: son los que más gancho tienen

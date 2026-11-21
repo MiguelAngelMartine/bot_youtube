@@ -150,6 +150,50 @@ def recientes(horas=30, por_cuenta=5):
     return por_turnos(datos), fallos
 
 
+async def _encargo(cuentas, busqueda, horas, por_cuenta):
+    """21-nov-2026: material extra del encargo del director (encargo.json → "busca_x"): los tuits recientes de las
+    cuentas del encargo (comprobadas como en _de_cuenta: nombre exacto y 10.000+ seguidores) y, si hay búsqueda, los
+    tuits que la contienen SOLO de esas cuentas o de las de la lista cerrada (nunca de cuentas anónimas)."""
+    api = await sesion()
+    desde = datetime.now(timezone.utc) - timedelta(hours=horas)
+    datos, fallos = [], []
+    for n, h in cuentas.items():
+        try:
+            datos += await asyncio.wait_for(_de_cuenta(api, n, h, desde, por_cuenta), TOPE_CUENTA)
+        except Exception as ex:
+            fallos.append(f"@{h} ({type(ex).__name__})")
+    validas = {h.lower(): n for n, h in {**CUENTAS, **cuentas}.items()}
+    for q in busqueda:
+        try:
+            async def _busca():
+                out = []
+                async for t in api.search(q, limit=60):
+                    h = t.user.username.lower()
+                    if h in validas and not t.retweetedTweet and t.date >= desde and t.user.followersCount >= MIN_SEGUIDORES:
+                        texto = t.rawContent
+                        if t.quotedTweet:
+                            texto += f" [cita a @{t.quotedTweet.user.username}: {t.quotedTweet.rawContent}]"
+                        out.append({"quien": f"{validas[h]} (@{t.user.username})", "canal": f"X, búsqueda «{q}»",
+                                    "fecha": t.date.astimezone(MADRID).isoformat(), "texto": texto[:600], "enlace": t.url})
+                return out
+            datos += await asyncio.wait_for(_busca(), TOPE_CUENTA * 2)
+        except Exception as ex:
+            fallos.append(f"búsqueda «{q}» ({type(ex).__name__})")
+    vistos, out = set(), []
+    for x in datos:
+        if x["enlace"] not in vistos:
+            vistos.add(x["enlace"])
+            out.append(x)
+    return out, fallos
+
+
+def encargo(cuentas, busqueda=(), horas=48, por_cuenta=8):
+    """(tuits, fallos) del encargo del director; sin sesión de X, nada."""
+    if "X_AUTH_TOKEN" not in env():
+        return [], ["sin sesión de X"]
+    return asyncio.run(_encargo(dict(cuentas), list(busqueda), horas, por_cuenta))
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a[:1] == ["verifica"]:

@@ -97,8 +97,9 @@ class Jornada:
                 self.parte(f"AVISO: día monográfico pero ningún tema de hoy casa con {claves}: sigue la jornada normal")
         if enc_ok:
             e = self.json("encargo.json") or {}
+            claves = e.get("claves") or e.get("persona", "").split()[-1:] or ["@@"]   # 21-nov: o las claves del cruce
             extra = next((t["id"] for t in temas if any(w.lower() in json.dumps(t, ensure_ascii=False).lower()
-                                                        for w in (e.get("persona", "").split()[-1:] or ["@@"]))), None)
+                                                        for w in claves)), None)
             if extra and extra not in ids:
                 ids.append(extra)
         for i in ids + ["frases"]:
@@ -121,6 +122,11 @@ class Jornada:
             # 21-nov-2026: Short pedido por el director con frase comprobada (encargo.py): su noticia entra también en el
             # largo, para que el Short tenga el contexto del guion aprobado.
             e = (self.json("encargo.json") if (self.dia / "encargo.json").exists() else None) or {}
+            if e.get("verificada") and e.get("tema") and e.get("cruce"):      # 21-nov: Short de cruce por encargo
+                quienes = ", ".join(dict.fromkeys(x["persona"] for x in e["cruce"] if x.get("verificada")))
+                return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json): hoy hay un Short de cruce de declaraciones "
+                        f"sobre «{e['tema']}» ({quienes}; frases comprobadas en encargo.json). Incluye un bloque sobre esa "
+                        "noticia en el largo (con su dossier), con la frase, las réplicas y la contrarréplica.")
             if e.get("verificada") and e.get("tema") and e.get("persona"):
                 return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json): hoy hay un Short dedicado a «{e['tema']}» con "
                         f"la frase comprobada de {e['persona']} «{e['frase']}». Incluye un bloque sobre esa noticia en el "

@@ -398,7 +398,19 @@ def main(fecha, n=3):
         return mejores_frases(fecha, pedidos, enc, G, guion, redes)
     if enc.get("evita_temas"):
         obligada += f"\n\nEVITA estos temas (ya tratados o que no quiere el director): {', '.join(enc['evita_temas'])}."
-    if enc.get("verificada") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
+    if enc.get("verificada") and enc.get("cruce") and "short" in enc.get("para", ["short"]):
+        # 21-nov-2026 (el usuario): Short de CRUCE DE DECLARACIONES por encargo: la frase que lo enciende y sus réplicas,
+        # todas comprobadas (encargo.py); el material nuevo del día (redes.md, búsqueda en X del encargo) puede sumar más.
+        buenas = [x for x in enc["cruce"] if x.get("verificada")]
+        redes = "".join(f"- **{x['persona']}** ({x.get('partido', '')}; {x.get('canal', 'X')}; {x.get('papel', '')}): "
+                        f"{x['frase']} ({x.get('enlace', '')}) [comprobado: {x.get('prueba', '')[:160]}]\n" for x in buenas) + redes
+        obligada = (f"\n\nOBLIGATORIO (lo pide el director y está comprobado): el PRIMER Short es un CRUCE DE DECLARACIONES "
+                    f"sobre «{enc['tema']}» ({enc.get('argumento', '')}), DEDICADO SOLO A ESA NOTICIA. Formato: "
+                    f"{enc.get('formato', 'frase y réplica')}. Empieza por la frase que lo desata (\"cita\"), sigue con "
+                    "las réplicas más fuertes (\"replica\" y, si hay más, \"segmentos\") y, si existe, la contrarréplica; "
+                    "solo frases LITERALES de la lista de arriba o del material, con su autor real. Las dos partes con su "
+                    "voz; sin declarar ganador." + "".join(f" OJO: {x['ojo']}" for x in buenas if x.get("ojo")))
+    elif enc.get("verificada") and enc.get("persona") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
         redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
                 f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes
         obligada = (f"\n\nOBLIGATORIO (lo pide el director y está comprobado): el PRIMER Short es la frase «{enc['frase']}» "
@@ -551,7 +563,7 @@ def main(fecha, n=3):
         maximo = 170 if s.get("segmentos") else 115          # 10-nov: 25-40 s (40-60 s con varios ganchos)
         if palabras > maximo:
             print(f"  AVISO: «{s['cita'][:40]}» sale de ~{palabras / 2.75:.0f} s (objetivo ≤ {maximo / 2.75:.0f} s)")
-        if enc.get("verificada") and buenos == 1 and _norm(enc["frase"]) in _norm(s["cita"]):   # 9-nov: la del director
+        if enc.get("verificada") and enc.get("frase") and buenos == 1 and _norm(enc["frase"]) in _norm(s["cita"]):   # 9-nov: la del director
             s["portada"] = enc["frase"]                          # es la portada y el gancho principal
             if not s.get("segmentos"):
                 s["gancho"] = enc["frase"]

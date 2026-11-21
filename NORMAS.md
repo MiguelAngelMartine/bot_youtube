@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -224,6 +224,13 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, «ladrillazo va,
   equilibrio estricto de frases y tiempo entre las partes. Los Shorts pueden ser de **«mejores frases»** de una persona
   (`shorts_personas` → `mejores_frases`): 2-3 frases suyas literales del tema, cada una con su contexto breve, sin declarar
   ganador; si se hace de una, se hace igual de la otra parte. Todas las demás normas no cambian.
+- **Short de cruce de declaraciones por encargo del director** (21-nov-2026, el usuario): si `encargo.json` trae `cruce`
+  (tuits o frases con su enlace), cada frase se comprueba por separado (`encargo.py`: autor y texto literal por oEmbed) y
+  solo se usan las comprobadas; con `busca_x` la recogida de ese día trae además los tuits recientes de esas cuentas y la
+  búsqueda en X (solo de cuentas oficiales, nunca anónimas) y el tema entra en los dossieres (`claves`). El primer Short es
+  ese cruce: quien lanza la frase, a la izquierda con su cita; quien replica, a la derecha con la suya; el presentador da el
+  contexto entre medias, con la contrarréplica si la hay y sin declarar ganador. Su noticia entra también en el largo. Si
+  varias fuentes citan la frase con palabras distintas, se usa la literal (vídeo o noticia) y nunca una paráfrasis.
 - **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
   (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras, en el formato presentador (§6). Etiqueta de formato arriba a la derecha:
   ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
