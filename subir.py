@@ -182,9 +182,10 @@ def _sube(yt, ruta, cuerpo):
 MAX_SHORTS = 3        # cuota de la API: ~6 subidas al día; el vídeo largo y sus repeticiones van primero
 
 
-def subir_shorts(dia_txt):
+def subir_shorts(dia_txt, solo=None):
     """Shorts del día (decisión del usuario del 5-nov-2026), PRIVADOS como el vídeo largo: el usuario los revisa y
-    publica. De cada día queda solo la última tanda: los anteriores que sigan privados se borran."""
+    publica. De cada día queda solo la última tanda: los anteriores que sigan privados se borran.
+    solo=N (21-nov-2026): rehace solo el Short N; se borra su versión anterior (si sigue privada) y los demás no se tocan."""
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
     dia = RAIZ / "dia" / dia_txt
@@ -196,17 +197,29 @@ def subir_shorts(dia_txt):
         pass
     shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))[:maximo]
     shorts = [f for f in shorts if f.with_suffix(".mp4").exists()]
+    previos = json.loads(reg.read_text(encoding="utf-8")) if (reg := carpeta / "youtube.json").exists() else []
+    for i, v in enumerate(previos):                      # los registros viejos no guardaban su Short: va por orden
+        v.setdefault("short", shorts[i].stem if i < len(shorts) else "")
+    if solo:
+        shorts = [f for f in shorts if f.stem == f"short_{solo}"]
     if not shorts:
         raise SystemExit("no hay Shorts renderizados")
     yt = build("youtube", "v3", credentials=credenciales())
-    reg = carpeta / "youtube.json"
-    for v in (json.loads(reg.read_text(encoding="utf-8")) if reg.exists() else []):
+    quedan = []
+    for v in previos:
+        if solo and v["short"] != f"short_{solo}":
+            quedan.append(v)
+            continue
         r = yt.videos().list(part="status", id=v["id"]).execute().get("items", [])
-        if r and r[0]["status"]["privacyStatus"] == "private":
+        if r and r[0]["status"]["privacyStatus"] != "private":
+            if solo:
+                raise SystemExit(f"El {v['short']} ({v['id']}) está {r[0]['status']['privacyStatus']}: no se toca. Decide tú.")
+            continue
+        if r:
             yt.videos().delete(id=v["id"]).execute()
             print(f"short anterior {v['id']} (privado) borrado")
     largo = json.loads((dia / "youtube.json").read_text(encoding="utf-8")) if (dia / "youtube.json").exists() else {}
-    hechos = []
+    hechos = list(quedan)
     for f in shorts:
         S = json.loads(f.read_text(encoding="utf-8"))
         titulo = S["titulo"].strip()
@@ -262,8 +275,9 @@ def subir_shorts(dia_txt):
                 yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(portada), mimetype="image/png")).execute()
             except Exception as e:
                 aviso = f"miniatura no puesta ({type(e).__name__})"
-        hechos.append({"id": vid, "url": f"https://youtube.com/shorts/{vid}", "titulo": titulo,
+        hechos.append({"short": f.stem, "id": vid, "url": f"https://youtube.com/shorts/{vid}", "titulo": titulo,
                        "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada)})
+        hechos.sort(key=lambda v: int(re.sub(r"\D", "", v.get("short", "")) or 0))
         reg.write_text(json.dumps(hechos, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(hechos, ensure_ascii=False, indent=1))
     try:                                                # 8-nov: lo publicado no se repite en 7 días
@@ -273,7 +287,7 @@ def subir_shorts(dia_txt):
         print(f"(variedad: {type(e).__name__})")
     try:
         import notifica
-        notifica.aviso_shorts(dia_txt, hechos)
+        notifica.aviso_shorts(dia_txt, [h for h in hechos if h not in quedan])   # solo los recién subidos
         print("aviso por Telegram enviado")
     except (SystemExit, Exception) as e:
         print(f"AVISO: no se pudo avisar por Telegram ({e})")
@@ -283,6 +297,6 @@ if __name__ == "__main__":
     if sys.argv[1:2] == ["autorizar"]:
         autorizar()
     elif sys.argv[2:3] == ["shorts"]:
-        subir_shorts(sys.argv[1])
+        subir_shorts(sys.argv[1], sys.argv[3] if len(sys.argv) > 3 else None)
     else:
         subir(sys.argv[1])

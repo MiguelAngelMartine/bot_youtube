@@ -53,6 +53,10 @@ REGISTRO = {                                       # (velocidad %, tono Hz)
 # acelera: «¡Venga, que nos vamos!» salía a 9-10 sílabas por segundo con el resto a 6,7.
 RITMO = 6.0                                          # sílabas por segundo de Tristán (temp. 1,6) con los tiempos de alinea(), medido el 21-nov
 RITMO_TOL = 0.10
+# 21-nov-2026 (el usuario): el CIERRE de los Shorts (la pregunta y «Te leo en comentarios. Y dale a suscribirte…») se locuta
+# como en los días anteriores: temperatura 1,6 y sin corregir el ritmo. Ese era su tono y su estilo.
+CIERRE = "Te leo en comentarios"
+AZURE_TEMP_CIERRE = "1.6"
 PAUSA, COMA = 0.40, 0.24                          # opcion B: pausa entre frases y ante comas largas, sin cola de sala
 NUMEROS = re.compile(r"\b(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|veint\w*|"
                      r"treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien\w*|doscient\w*|trescient\w*|"
@@ -151,6 +155,7 @@ SIGLAS = {k: v for k, v in SIGLAS.items() if k != v and not v.startswith("la ")}
 PRONUNCIA = {
     "mitines": "m i t i 1 n e s",
     "mitin": "m i 1 t i n",
+    "enterarais": "e n t e r a 1 r a i s",          # 21-nov: salía «enteraráis»
 }
 
 
@@ -174,11 +179,11 @@ def _siglas_ssml(texto_escapado):
     return out
 
 
-def _azure_mp3(texto, mp3, vel=None):
+def _azure_mp3(texto, mp3, vel=None, temp=None):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={temp or AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
@@ -355,6 +360,9 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
             cur = ""
             for f in frases(txt):
                 aparte = bool(exclama.search(f.strip()))
+                if cur and f.strip().startswith(CIERRE):     # el cierre de los Shorts, siempre en su propio trozo
+                    partidos.append((cur, r))
+                    cur = ""
                 if cur and (aparte or len(cur) + len(f) + 1 > AZURE_MAX):
                     partidos.append((cur, r))
                     cur = ""
@@ -365,18 +373,22 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
             if cur:
                 partidos.append((cur, r))
         trozos = partidos
+    k_cierre = next((j for j, (txt, _) in enumerate(trozos) if txt.strip().startswith(CIERRE)), None) if azure else None
+    if k_cierre and trozos[k_cierre - 1][0].rstrip("»\"' ").endswith("?"):
+        k_cierre -= 1                                 # la pregunta del final también es parte del cierre
     audio, palabras, t, sr = [], [], 0.0, 48000
     for j, (txt, r) in enumerate(trozos):
         mp3, wav = Path(f"{tmp}_{j}.mp3"), Path(f"{tmp}_{j}.wav")
+        cierre = k_cierre is not None and j >= k_cierre
         if azure:
-            _azure_mp3(txt, mp3)
+            _azure_mp3(txt, mp3, temp=AZURE_TEMP_CIERRE if cierre else None)
         else:
             pal = asyncio.run(_sintetiza(txt, r, mp3))
         subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
         if azure:
             pal = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
             v = ritmo_de(pal)
-            if v and abs(v / RITMO - 1) > RITMO_TOL:     # va más rápido o más lento que el resto: se pide otra vez
+            if v and abs(v / RITMO - 1) > RITMO_TOL and not cierre:     # va más rápido o más lento que el resto: se pide otra vez
                 pct = int(round(max(-30, min(30, (RITMO / v - 1) * 100))))
                 _azure_mp3(txt, mp3, vel=f"{pct:+d}%")
                 subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)

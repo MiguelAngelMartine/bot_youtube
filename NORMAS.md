@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -113,8 +113,13 @@ abogado de propiedad intelectual.
   frente a la 1,6 enérgica: más regular, menos variación de una lectura a otra), velocidad normal, filtro «radio» (`voz.py`).
   Es la combinación para todos los vídeos desde entonces.
 - **Ritmo igual en todo:** cada trozo se mide al generarlo y se corrige si se aparta más de un 10 % (ver el control de voz).
+- **Cierre de los Shorts como siempre** (usuario, 21-nov-2026): la pregunta final y «Te leo en comentarios. Y dale a
+  suscribirte, que he visto que aún no lo has hecho» se locutan con el tono y el estilo de los días anteriores: temperatura
+  1,6 y sin corregir el ritmo (`voz.CIERRE`, `voz.AZURE_TEMP_CIERRE`).
+- **Nunca se estira ni se encoge la voz ya grabada** para igualar velocidades (usuario, 21-nov-2026: «suena con eco o
+  distorsionada»), ni se corrige frase a frase con `<prosody>` dentro del trozo (la prueba tampoco convenció).
 - **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
-  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`). Cada
+  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitin, mitines, enterarais). Cada
   palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram.
   **Solo puntual** (decisión del usuario, 21-nov-2026): nunca para todas las palabras; dictar todo quita naturalidad. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
   nada (edge-tts no tiene licencia comercial; solo pruebas a mano). Ni voz propia ni clonada.
