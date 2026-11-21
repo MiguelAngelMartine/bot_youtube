@@ -56,6 +56,11 @@ RITMO_TOL = 0.10
 # 21-nov-2026 (el usuario): el CIERRE de los Shorts (la pregunta y «Te leo en comentarios. Y dale a suscribirte…») se locuta
 # como en los días anteriores: temperatura 1,6 y sin corregir el ritmo. Ese era su tono y su estilo.
 CIERRE = "Te leo en comentarios"
+# 21-nov-2026 (decisión del usuario, ESTÁNDAR desde entonces): «LECTURA ENTERA». La voz lee el guion de corrido, de una
+# vez por pieza (un Short, una sección del largo), y LAS PAUSAS LAS GESTIONA EL GUION con su puntuación (más la pausa de
+# las comillas). Sin correcciones de velocidad, sin trozos por frase ni por exclamación, sin estirar el audio. Solo la
+# pregunta final y el «Te leo en comentarios…» van aparte, con su estilo de siempre (temperatura 1,6).
+LECTURA_ENTERA = True
 AZURE_TEMP_CIERRE = "1.6"
 PAUSA, COMA = 0.40, 0.24                          # opcion B: pausa entre frases y ante comas largas, sin cola de sala
 NUMEROS = re.compile(r"\b(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|veint\w*|"
@@ -216,6 +221,8 @@ def clave_de(pasos, tono_seccion, modo, cola):
     texto = " ".join(p["di"] for p in pasos)
     cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO, AZURE_TEMP_CIERRE, RITMO, RITMO_TOL] if motor() == "azure" else []
     extra = [["pausas citas", PAUSA_FIN_CITA, PAUSA_INI_CITA]] if pausas_citas(texto) != texto else []
+    if LECTURA_ENTERA:
+        extra.append("lectura entera")
     return hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, VERSION_VOZ,
                         motor(), dicc_de(texto)] + cfg + extra, ensure_ascii=False).encode()).hexdigest()[:20]
 
@@ -398,8 +405,11 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         exclama = re.compile(r"[?!][»\"”']*\.?$")       # 11-nov: preguntas y exclamaciones, en su propio trozo
         for txt, r in trozos:
             cur = ""
-            for f in frases(txt):
+            fs = frases(txt)
+            for i_f, f in enumerate(fs):
                 aparte = bool(exclama.search(f.strip()))
+                if LECTURA_ENTERA:                   # solo va aparte la pregunta del cierre
+                    aparte = aparte and i_f + 1 < len(fs) and fs[i_f + 1].strip().startswith(CIERRE)
                 if cur and f.strip().startswith(CIERRE):     # el cierre de los Shorts, siempre en su propio trozo
                     partidos.append((cur, r))
                     cur = ""
@@ -428,7 +438,7 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         if azure:
             pal = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
             v = ritmo_de(pal)
-            if v and abs(v / RITMO - 1) > RITMO_TOL and not cierre:     # va más rápido o más lento que el resto: se pide otra vez
+            if v and abs(v / RITMO - 1) > RITMO_TOL and not cierre and not LECTURA_ENTERA:   # va rápido o lento: otra vez
                 pct = int(round(max(-30, min(30, (RITMO / v - 1) * 100))))
                 _azure_mp3(txt, mp3, vel=f"{pct:+d}%")
                 subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
@@ -449,6 +459,8 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         x = x[int(ini * sr):int(fin * sr)]
         palabras += [(a - ini + t, b - ini + t, w) for a, b, w in pal]
         hueco = (0.22 if azure else PAUSA) if j + 1 < len(trozos) else cola   # 11-nov: entre trozos, 0,22 s
+        if azure and LECTURA_ENTERA and j + 1 < len(trozos) and not (k_cierre is not None and j + 1 >= k_cierre):
+            hueco = PAUSA                          # texto muy largo partido (más de AZURE_MAX): la pausa de un punto
         audio += [x, np.zeros((int(hueco * sr), 2), dtype=np.float32)]
         t += len(x) / sr + hueco
         mp3.unlink(missing_ok=True)

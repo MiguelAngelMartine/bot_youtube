@@ -260,6 +260,49 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
     return out
 
 
+def sin_imagen(tr):
+    """21-nov-2026 (el usuario): una cita con globo va SIEMPRE con el personaje que la dice. Si no hay imagen de esa
+    persona en Imagenes/Políticos, la lee el presentador SIN globo (como narración) y se avisa por Telegram de la imagen
+    que falta. Además, la misma persona escrita de dos formas («Feijóo», «Alberto Núñez Feijóo») es UNA sola: con dos
+    nombres salía dos veces en pantalla, a cada lado, con los globos encima. Devuelve los nombres sin imagen."""
+    _, _, pols = catalogo()
+    uso, faltan, canon = {}, [], {}
+    for g in tr:
+        if g["tipo"] != "Q":
+            continue
+        r = figura_de(g["quien"], pols, uso)
+        if r is None:
+            g["tipo"], g["sin_imagen"] = "P", g["quien"]
+            faltan.append(g["quien"])
+            continue
+        tk = _n(g["quien"]).split()                      # la PERSONA (no la imagen: hay dos de Feijóo y se alternan)
+        g["pid"] = " ".join(tk) if tk and tk[-1] in APELLIDOS_AMBIGUOS else (tk[-1] if tk else str(r))
+        if len(g["quien"]) > len(canon.get(g["pid"], "")):
+            canon[g["pid"]] = g["quien"]
+    for g in tr:
+        if g.get("pid"):
+            g["quien"] = canon[g["pid"]]
+        g.pop("puente", None)
+    for i, g in enumerate(tr):                           # puentes otra vez, con las citas que quedan
+        if g["tipo"] == "P" and 0 < i < len(tr) - 1 and tr[i - 1]["tipo"] == "Q" and tr[i + 1]["tipo"] == "Q" \
+                and len(g["di"].split()) <= 12 and not tr[i - 1].get("seccion_fin") and not g.get("seccion_fin"):
+            g["puente"] = True                           # nunca de una noticia a otra
+    return sorted(set(faltan))
+
+
+def avisa_sin_imagen(fecha, pieza, faltan):
+    if not faltan:
+        return
+    txt = (f"{pieza}: falta la imagen de {', '.join(faltan)} en Imagenes/Políticos. Su cita la ha leído el presentador "
+           f"sin globo. Si la añades, se rehace con su personaje.")
+    print("AVISO:", txt)
+    try:
+        import notifica
+        notifica.aviso(fecha, "🖼️ " + txt)
+    except (SystemExit, Exception) as e:
+        print(f"(Telegram: {e})")
+
+
 def _ordena_lados(tr):
     """Marca cada cita con su lado y su grupo: un grupo es una cita y sus réplicas seguidas (con puentes cortos)."""
     grupo = -1
@@ -280,8 +323,57 @@ def _ordena_lados(tr):
 
 
 # ---------------------------------------------------------------- voz por tramos
+def _locuta_entero(tramos, tmp, t_ini=0.0):
+    """21-nov-2026 (estándar del usuario): la voz lee de corrido cada bloque (un Short, una sección del largo; el cierre
+    aparte) y los tramos se sacan de los tiempos de sus palabras. Las pausas las pone el guion (y las comillas)."""
+    import voz
+    bloques, cur = [], []
+    for g in tramos:
+        if g.get("cierre") and cur:
+            bloques.append(cur)
+            cur = []
+        cur.append(g)
+        if g.get("seccion_fin") or g.get("cierre"):
+            bloques.append(cur)
+            cur = []
+    if cur:
+        bloques.append(cur)
+    sr, ch, trozos, t = 48000, 2, [], t_ini
+    for k, bl in enumerate(bloques):
+        wav = tmp / f"bloque_{k:03d}.wav"
+        texto = " ".join(g["di"] for g in bl)
+        pal, _ = voz.locuta([{"di": texto}], "normal", wav, cola=0.0)
+        with wave.open(str(wav)) as w:
+            sr, ch = w.getframerate(), w.getnchannels()
+            x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).reshape(-1, ch)
+        amp = np.abs(x[:, 0].astype(np.int32))
+        fin = int(np.nonzero(amp > 300)[0][-1]) + int(0.08 * sr) if (amp > 300).any() else len(x)
+        x = x[:min(len(x), fin)]
+        i = 0
+        for g in bl:
+            n = len(g["di"].split())
+            ps = pal[i:i + n] or pal[-1:]
+            i += n
+            g.update({"t0": t + ps[0][0], "t1": t + ps[-1][1], "pal": [(p[2], t + p[0], t + p[1]) for p in ps]})
+        dur = len(x) / sr
+        sig = bloques[k + 1][0] if k + 1 < len(bloques) else None
+        pausa = 0.0 if sig is None else (0.3 if sig.get("cierre") else PAUSA["seccion"])
+        trozos += [x, np.zeros((int(pausa * sr), ch), dtype=np.int16)]
+        t += dur + pausa
+    audio = np.concatenate(trozos)
+    with wave.open(str(tmp / "voz.wav"), "wb") as w:
+        w.setnchannels(audio.shape[1]); w.setsampwidth(2); w.setframerate(sr); w.writeframes(audio.tobytes())
+    env = np.abs(audio[:, 0].astype(np.float32))
+    n = int(sr / FPS)
+    env = np.array([env[i * n:(i + 1) * n].mean() if i * n < len(env) else 0 for i in range(len(env) // n + 2)])
+    env = np.convolve(env / (env.max() + 1e-6), np.ones(4) / 4, "same")
+    return t, env
+
+
 def locuta_tramos(tramos, tmp, t_ini=0.0):
     import voz
+    if getattr(voz, "LECTURA_ENTERA", False):
+        return _locuta_entero(tramos, tmp, t_ini)
     sr, trozos, t = 48000, [], t_ini
     for k, g in enumerate(tramos):
         wav = tmp / f"tramo_{k:03d}.wav"
@@ -615,6 +707,9 @@ class Escena:
             sig = next((x for x in self.grupos[g["grupo"]] if x["t0"] > g["t0"] and x["lado"] == g["lado"]), None)
             if sig is not None:                       # la misma persona dice otra cita: este bocadillo se va antes
                 fin_g = min(fin_g, sig["t0"] - 0.55)
+            otro = next((x for x in self.tr if x["tipo"] == "Q" and x["t0"] > g["t0"] and x["grupo"] != g["grupo"]), None)
+            if otro is not None:                      # 21-nov: el globo de otra cita no entra hasta que este se ha ido
+                fin_g = min(fin_g, otro["t0"] - 0.6)
             a = min(ease((t - (g["t0"] - 0.25)) / 0.35), 1 - ease((t - fin_g) / 0.3))
             if a <= 0.01:
                 continue
@@ -743,6 +838,7 @@ def short(fecha, n):
                                                                             rep.get("cargo", "")))
     if cierre:
         tr.append({"tipo": "P", "di": cierre, "cierre": True})
+    faltan = sin_imagen(tr)
     _ordena_lados(tr)
     total, env = locuta_tramos(tr, tmp)
     total += 1.2
@@ -776,6 +872,7 @@ def short(fecha, n):
     _render(esc, total, out, tmp / "audio.wav", encabezado)
     import shutil
     shutil.rmtree(tmp, ignore_errors=True)
+    avisa_sin_imagen(fecha, f"Short {n}", faltan)
     print(f"SHORT {n} (presentador): {total:.1f} s -> {out} · " +
           " | ".join(f"{g['tipo']}{'·' + g['quien'].split()[-1] if g['tipo'] == 'Q' else ''} {g['t0']:.1f}" for g in tr))
 
@@ -836,6 +933,7 @@ def largo(fecha):
         if g["tipo"] == "Q":
             g["quien"] = canon.get(_n(g["quien"]), g["quien"])
             cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos))
+    faltan = sin_imagen(tr)
     _ordena_lados(tr)
     total, env = locuta_tramos(tr, tmp)
     total += 1.0
@@ -873,6 +971,7 @@ def largo(fecha):
     _render(esc, total, out, tmp / "audio.wav", encabezado)
     import shutil
     shutil.rmtree(tmp, ignore_errors=True)
+    avisa_sin_imagen(fecha, "Vídeo largo", faltan)
     print(f"LARGO (presentador): {total:.1f} s -> {out} en {(time.time() - t_ini) / 60:.1f} min")
 
 

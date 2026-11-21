@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -104,25 +104,24 @@ abogado de propiedad intelectual.
 - **Cruce:** ataque literal → puente muy corto (≤ 8 palabras: «Y Sánchez le devuelve:») → réplica literal → el presentador
   vuelve con el chascarrillo o sigue. Nada de narración larga entre el ataque y la réplica (si no, se rompe el cruce).
 - Tras cada cita o cruce, **una frase del presentador** (chascarrillo de la paleta o seguir el hilo) antes de la siguiente
-  cita: así el vídeo alterna presentador y personajes con ritmo. Las pausas entre tramos las pone el montaje; no hay que
-  escribir silencios.
+  cita: así el vídeo alterna presentador y personajes con ritmo. **Las pausas las pone el guion** con su puntuación (punto,
+  coma, dos puntos, puntos suspensivos): la voz lee de corrido lo que está escrito (ver «Lectura entera»).
 - Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
 
-### La voz: Tristán HD «1,2» + ritmo corregido + diccionario de pronunciación (combinación «A3 + B3», 21-nov-2026)
-- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2** (el usuario la eligió el 21-nov-2026
-  frente a la 1,6 enérgica: más regular, menos variación de una lectura a otra), velocidad normal, filtro «radio» (`voz.py`).
-  Es la combinación para todos los vídeos desde entonces.
-- **Ritmo igual en todo:** cada trozo se mide al generarlo y se corrige si se aparta más de un 10 % (ver el control de voz).
-- **Pausa en las comillas** (usuario, 21-nov-2026): las citas que van dentro de la narración (sin imagen del político,
-  cortas o seguidas) llevan una pausa de medio segundo al cerrar las comillas y de 0,3 s antes de abrirlas tras «:»
-  (`voz.pausas_citas`, `<break>` de la propia voz; el audio no se toca). Sin ella, la frase siguiente (una coletilla, por
-  ejemplo) sonaba pegada a la cita y acelerada. Las citas con imagen ya tienen su pausa de montaje (0,55-0,6 s).
-- **Las coletillas no se separan en su propio trozo** (prueba del 21-nov-2026: sonaba peor que antes).
-- **Cierre de los Shorts como siempre** (usuario, 21-nov-2026): la pregunta final y «Te leo en comentarios. Y dale a
-  suscribirte, que he visto que aún no lo has hecho» se locutan con el tono y el estilo de los días anteriores: temperatura
-  1,6 y sin corregir el ritmo (`voz.CIERRE`, `voz.AZURE_TEMP_CIERRE`).
-- **Nunca se estira ni se encoge la voz ya grabada** para igualar velocidades (usuario, 21-nov-2026: «suena con eco o
-  distorsionada»), ni se corrige frase a frase con `<prosody>` dentro del trozo (la prueba tampoco convenció).
+### La voz: Tristán HD «1,2», LECTURA ENTERA (estándar del usuario desde el 21-nov-2026) + diccionario de pronunciación
+- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2**, velocidad normal, filtro «radio» en
+  todo el vídeo, coletillas incluidas (`voz.py`).
+- **Lectura entera** (decisión del usuario del 21-nov-2026, estándar para todos los vídeos): la voz lee el guion **de
+  corrido, de una vez por pieza** (un Short entero; en el largo, cada sección) y **el guion gestiona las pausas** con su
+  puntuación. Nada de partir la voz por frases, por exclamaciones ni por citas, ni de corregirle la velocidad, ni de
+  estirar o encoger el audio, ni de meter `<prosody>`: todo eso se probó ese día y sonaba con distintos ritmos o con eco.
+  El montaje saca de los tiempos de cada palabra cuándo entra y sale cada personaje (`voz.LECTURA_ENTERA`,
+  `presentador._locuta_entero`). Si algo suena acelerado o arrastrado, se arregla **en el guion** (una coma, un punto, un
+  punto y seguido, partir la frase), nunca en el audio.
+- **Pausa en las comillas:** medio segundo al cerrar una cita y 0,3 s antes de abrirla tras «:» (`voz.pausas_citas`,
+  `<break>` de la propia voz). Sin ella, la frase siguiente (una coletilla, por ejemplo) sonaba pegada a la cita.
+- **Cierre de los Shorts como siempre:** la pregunta final y «Te leo en comentarios. Y dale a suscribirte, que he visto
+  que aún no lo has hecho» van aparte, con su estilo de siempre (temperatura 1,6; `voz.CIERRE`, `voz.AZURE_TEMP_CIERRE`).
 - **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
   alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitin, mitines). Si con SAPI no sale, se le **escribe** la palabra de otra forma solo para la voz (`voz.ESCRIBE`, p. ej. «enterarais» → «enterárais», aprobado por el usuario el 21-nov-2026); el texto en pantalla no cambia. Cada
   palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram.
@@ -151,9 +150,8 @@ abogado de propiedad intelectual.
     parte. Lo que está dentro de una cita o es un nombre propio no se reescribe: se avisa en el parte.
   - Gemini, si tiene cuota, es un oído más; OpenAI (de pago) ya no se usa.
   - **Mismo ritmo en todo** (21-nov-2026, el usuario: «no quiero que la voz cambie de ritmo con las frases hechas ni
-    coletillas»): `voz.py` mide la velocidad de cada trozo al generarlo y, si se aparta más de un 10 % del ritmo de Tristán
-    (6,0 sílabas por segundo con sus tiempos), lo vuelve a pedir con la velocidad corregida. El control marca como
-    «cambio de ritmo» cualquier tramo, por corto que sea, que vaya un 18 % más rápido o más lento que el resto.
+    coletillas»): el control marca como «cambio de ritmo» cualquier tramo que vaya un 18 % más rápido o más lento que el
+    resto, y se arregla **en el guion** (puntuación, partir la frase), porque la voz lee de corrido (lectura entera).
   - **El oído del usuario manda:** el 21-nov suspendió las cinco pruebas que el control daba por buenas o malas («mitines»
     mal acentuado; «¡Venga, que nos vamos!» más rápido que el resto). Las pruebas de sonido se le mandan por Telegram
     (`notifica.py FECHA --audio ruta.mp3 "texto"`) antes de dar por bueno un cambio de voz.
@@ -256,11 +254,15 @@ y no se usa hasta nueva orden del usuario.**
   réplica. Los dos bocadillos se ajustan al hueco entre ellos sin taparse ni tapar a nadie (en el largo, el del ataque arriba
   y la réplica abajo; en los Shorts, los dos encima de los personajes). Al acabar sus citas **salen y vuelve el presentador**
   con su chascarrillo o siguiendo el guion. Nunca dos figuras fundidas en el mismo sitio: primero sale una y luego entra la otra.
-- **Ritmo:** la voz se graba **por tramos** (narración / cita) y entre tramos hay **pausas medidas** (≈0,55 s antes de una
-  cita, 0,4 s entre ataque y réplica, 0,6 s al volver el presentador, 0,5 s entre noticias) para que cada cambio de imagen
-  caiga en un silencio. El guion se escribe para ello (§4, «Escribir para el presentador»).
-- **Sin imagen del personaje** en `Imagenes/Políticos`: el presentador se queda y sale solo el bocadillo con el rótulo
-  (nunca una foto de otra fuente ni una cara inventada).
+- **Ritmo:** la voz lee de corrido cada pieza (lectura entera, §4) y los cambios de imagen caen en las pausas que marca el
+  guion; entre noticias del largo, 0,5 s.
+- **Globos de cita SIEMPRE con su personaje** (usuario, 21-nov-2026): una cita con globo sale solo con la imagen de quien
+  la dice. **Sin imagen** de esa persona en `Imagenes/Políticos`, la cita la lee el presentador **sin globo** (como
+  narración, con subtítulo) y se avisa al usuario por Telegram de la imagen que falta (`presentador.sin_imagen`). Nunca
+  el presentador con un globo de otro, ni una foto de otra fuente ni una cara inventada.
+- **Nunca dos globos superpuestos ni un globo encima de un personaje:** el globo de una cita se va antes de que entre el
+  de la siguiente; la misma persona escrita de dos formas («Feijóo» / «Alberto Núñez Feijóo») es una sola figura (antes
+  salía dos veces, una a cada lado, con los globos encima).
 - **Largo:** logo «EL HOYFORMATIVO» arriba a la derecha y título de la pieza arriba a la izquierda. **Shorts:** cabecera del
   canal con la etiqueta de formato, kicker rojo, personajes en la mitad de abajo, bocadillo o subtítulo encima, y cierre con
   la pregunta y suscríbete.

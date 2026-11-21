@@ -59,9 +59,10 @@ def bloque(md, seccion):
     return (m.group(1) if m else tramo.group(1)).strip()      # sin bloque ```: el texto de la seccion (2-nov)
 
 
-def borra_anterior(yt, dia):
+def borra_anterior(yt, dia, solo_mirar=False):
     """Regla del usuario (1-nov-2026): de cada dia se queda solo la ultima version. Si ya se subio una antes y sigue
-    PRIVADA, se borra. Si el usuario ya la hizo publica u oculta, no se toca nunca."""
+    PRIVADA, se borra. Si el usuario ya la hizo publica u oculta, no se toca nunca. solo_mirar: comprueba sin borrar
+    (21-nov-2026: se borra DESPUÉS de subir la nueva, por si YouTube corta la subida por el límite diario)."""
     f = dia / "youtube.json"
     if not f.exists():
         return None
@@ -74,6 +75,8 @@ def borra_anterior(yt, dia):
     estado = r[0]["status"]["privacyStatus"]
     if estado != "private":
         raise SystemExit(f"La version anterior ({vid}) esta {estado}: no se borra ni se sube otra. Decide tu.")
+    if solo_mirar:
+        return vid
     yt.videos().delete(id=vid).execute()
     print(f"version anterior {vid} (privada) borrada")
     return vid
@@ -111,7 +114,7 @@ def subir(dia_txt):
     if not titulo or not descripcion:
         raise SystemExit("publicacion.md no tiene titulo o descripcion en el formato esperado")
     yt = build("youtube", "v3", credentials=credenciales())
-    anterior = borra_anterior(yt, dia)
+    anterior = borra_anterior(yt, dia, solo_mirar=True)
     cuerpo = {"snippet": {"title": titulo, "description": descripcion[:5000], "tags": etiquetas, "categoryId": "25",
                           "defaultLanguage": "es", "defaultAudioLanguage": "es"},
               "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
@@ -124,6 +127,9 @@ def subir(dia_txt):
             print(f"  subido {int(estado.progress() * 100)} %", flush=True)
     vid = respuesta["id"]
     print(f"video {vid} subido como PRIVADO")
+    if anterior:
+        yt.videos().delete(id=anterior).execute()
+        print(f"version anterior {anterior} (privada) borrada")
     avisos = []
     mini = dia / "miniatura.png"
     if mini.exists():
@@ -205,7 +211,7 @@ def subir_shorts(dia_txt, solo=None):
     if not shorts:
         raise SystemExit("no hay Shorts renderizados")
     yt = build("youtube", "v3", credentials=credenciales())
-    quedan = []
+    quedan, a_borrar = [], []
     for v in previos:
         if solo and v["short"] != f"short_{solo}":
             quedan.append(v)
@@ -215,9 +221,8 @@ def subir_shorts(dia_txt, solo=None):
             if solo:
                 raise SystemExit(f"El {v['short']} ({v['id']}) está {r[0]['status']['privacyStatus']}: no se toca. Decide tú.")
             continue
-        if r:
-            yt.videos().delete(id=v["id"]).execute()
-            print(f"short anterior {v['id']} (privado) borrado")
+        if r:                                            # 21-nov-2026: se borra DESPUÉS de subir el nuevo (si YouTube
+            a_borrar.append(v["id"])                     # corta la subida por el límite diario, el anterior sigue ahí)
     largo = json.loads((dia / "youtube.json").read_text(encoding="utf-8")) if (dia / "youtube.json").exists() else {}
     hechos = list(quedan)
     for f in shorts:
@@ -279,6 +284,9 @@ def subir_shorts(dia_txt, solo=None):
                        "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada)})
         hechos.sort(key=lambda v: int(re.sub(r"\D", "", v.get("short", "")) or 0))
         reg.write_text(json.dumps(hechos, ensure_ascii=False, indent=1), encoding="utf-8")
+    for vid_viejo in a_borrar:
+        yt.videos().delete(id=vid_viejo).execute()
+        print(f"short anterior {vid_viejo} (privado) borrado")
     print(json.dumps(hechos, ensure_ascii=False, indent=1))
     try:                                                # 8-nov: lo publicado no se repite en 7 días
         import variedad
