@@ -46,6 +46,12 @@ REGISTRO = {                                       # (velocidad %, tono Hz)
     "matiz": (8, 2),                              # advertencias y contrapesos: pausado
     "sobrio": (6, 1),                             # tragedias: lento y grave
 }
+# 21-nov-2026 (el usuario: «no quiero que la voz cambie de ritmo con las frases hechas ni coletillas»): cada trozo se mide al
+# generarlo y, si va más de un 10 % más rápido o más lento que el ritmo de Tristán, se vuelve a pedir con la velocidad
+# corregida (<prosody rate>). Las exclamaciones van en su propio trozo (11-nov, para la entonación) y solas Tristán las
+# acelera: «¡Venga, que nos vamos!» salía a 9-10 sílabas por segundo con el resto a 6,7.
+RITMO = 6.0                                          # sílabas por segundo de Tristán (temp. 1,6) con los tiempos de alinea(), medido el 21-nov
+RITMO_TOL = 0.10
 PAUSA, COMA = 0.40, 0.24                          # opcion B: pausa entre frases y ante comas largas, sin cola de sala
 NUMEROS = re.compile(r"\b(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|veint\w*|"
                      r"treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien\w*|doscient\w*|trescient\w*|"
@@ -150,11 +156,11 @@ def _siglas_ssml(texto_escapado):
     return out
 
 
-def _azure_mp3(texto, mp3):
+def _azure_mp3(texto, mp3, vel=None):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
@@ -223,6 +229,21 @@ def _reparte(tt, toks, i1, i2, ini, fin):
     for k, p in zip(range(i1, i2), pesos):
         tt[k] = (t, t + paso * p)
         t += paso * p
+
+
+def silabas(w):
+    return max(1, len(re.findall(r"[aeiouáéíóúü]+", w.lower()))) if re.search(r"\w", w) else 0
+
+
+def ritmo_de(pal, hueco_max=0.15):
+    """Sílabas por segundo de habla (sin contar las pausas de más de hueco_max s). None si es muy corto para medir."""
+    pal = [p for p in pal if silabas(p[2])]
+    if len(pal) < 3:
+        return None
+    habla = sum(b - a for a, b, _ in pal) + sum(min(pal[i + 1][0] - pal[i][1], hueco_max) for i in range(len(pal) - 1)
+                                              if pal[i + 1][0] - pal[i][1] > 0)
+    sil = sum(silabas(p[2]) for p in pal)
+    return sil / habla if habla > 0.3 else None
 
 
 def a_silencios(x, sr, pal, umbral_db=-38):
@@ -336,6 +357,19 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
         if azure:
             pal = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
+            v = ritmo_de(pal)
+            if v and abs(v / RITMO - 1) > RITMO_TOL:     # va más rápido o más lento que el resto: se pide otra vez
+                pct = int(round(max(-30, min(30, (RITMO / v - 1) * 100))))
+                _azure_mp3(txt, mp3, vel=f"{pct:+d}%")
+                subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
+                pal2 = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
+                v2 = ritmo_de(pal2)
+                print(f"  ritmo: «{txt[:40]}» iba a {v:.1f} síl/s, pedido a {pct:+d}% → {v2 or 0:.1f}", file=sys.stderr)
+                if v2 and abs(v2 / RITMO - 1) > abs(v / RITMO - 1):    # salió peor: el primero
+                    _azure_mp3(txt, mp3)
+                    subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)
+                    pal2 = a_silencios(pausas.lee(wav)[0], sr, alinea(wav, txt))
+                pal = pal2
         if not azure:                              # 11-nov-2026 (voz 3b): con Azure, las pausas que marca Tristán, sin añadir
             pal, _ = pausas.naturaliza(wav, pal, PAUSA, COMA, sala=False)
         x, _ = pausas.lee(wav)

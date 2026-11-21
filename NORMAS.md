@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -133,6 +133,13 @@ abogado de propiedad intelectual.
     frase; las citas «» no se tocan (si Opus cambia una, vuelve el texto anterior). Se escucha otra vez y lo que quede, al
     parte. Lo que está dentro de una cita o es un nombre propio no se reescribe: se avisa en el parte.
   - Gemini, si tiene cuota, es un oído más; OpenAI (de pago) ya no se usa.
+  - **Mismo ritmo en todo** (21-nov-2026, el usuario: «no quiero que la voz cambie de ritmo con las frases hechas ni
+    coletillas»): `voz.py` mide la velocidad de cada trozo al generarlo y, si se aparta más de un 10 % del ritmo de Tristán
+    (6,0 sílabas por segundo con sus tiempos), lo vuelve a pedir con la velocidad corregida. El control marca como
+    «cambio de ritmo» cualquier tramo, por corto que sea, que vaya un 18 % más rápido o más lento que el resto.
+  - **El oído del usuario manda:** el 21-nov suspendió las cinco pruebas que el control daba por buenas o malas («mitines»
+    mal acentuado; «¡Venga, que nos vamos!» más rápido que el resto). Las pruebas de sonido se le mandan por Telegram
+    (`notifica.py FECHA --audio ruta.mp3 "texto"`) antes de dar por bueno un cambio de voz.
   - El control no lo caza todo (el acento o un tono raro de una palabra bien dicha, como «mitines»), así que lo que el
     usuario oiga mal va a `archivo/palabras_vetadas.json` y **no se usa** (tampoco se eligen citas que lo lleven).
 

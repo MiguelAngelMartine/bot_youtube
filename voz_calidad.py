@@ -34,6 +34,7 @@ PLANO_ST = 1.6          # desviación del tono (semitonos) por debajo de la cual
 SILABAS_MAX = 8.2       # sílabas por segundo: más, atropellado (Tristán va a ~6,5-7)
 SILABAS_MIN = 3.2       # menos, arrastrado
 PAUSA_RARA = 0.75       # pausa a mitad de frase (sin signo) más larga que esto
+CAMBIO_RITMO = 0.18     # un tramo (también una coletilla corta) un 18 % más rápido o lento que la mediana de la pieza
 
 # Sonidos que, para este control, valen lo mismo (alófonos del español y diferencias que no se oyen como error).
 _IGUALES = {"β": "b", "ð": "d", "ɣ": "g", "ɡ": "g", "ʝ": "j", "ʎ": "j", "ɟ": "j", "ɛ": "e", "ɔ": "o", "v": "b",
@@ -244,6 +245,17 @@ def ritmo(y, texto, pals):
         if len(tr) >= 5 and sil < SILABAS_MIN:
             problemas.append({"tipo": "arrastrado", "texto": texto_tr, "t": round(t0, 2),
                               "detalle": f"{sil:.1f} sílabas por segundo", "pausa_tras": None})
+    # 21-nov-2026 (el usuario: «no quiero que la voz cambie de ritmo con las frases hechas ni coletillas»): un tramo, por
+    # corto que sea, que va claramente más rápido o más lento que el resto de la pieza.
+    validos = [m["silabas_s"] for m in medidas if m["pal"] >= 4]
+    if len(validos) >= 3:
+        mediana = float(np.median(validos))
+        for m, tr in zip(medidas, tramos):
+            if m["pal"] >= 3 and abs(m["silabas_s"] / mediana - 1) > CAMBIO_RITMO:
+                problemas.append({"tipo": "cambio de ritmo", "texto": m["texto"], "t": m["t"],
+                                  "detalle": f"{m['silabas_s']:.1f} sílabas por segundo frente a {mediana:.1f} del resto "
+                                             f"({'más rápido' if m['silabas_s'] > mediana else 'más lento'})",
+                                  "pausa_tras": None})
     # pausas largas a mitad de frase (donde el guion no tiene signo)
     con_signo = {_sin_tildes(p["w"].lower()) for p in pals if p["signo"]}
     for a_, b_ in zip(ws, ws[1:]):
@@ -343,7 +355,10 @@ def analiza(wav, texto):
               "detalle": f"se entiende con poca seguridad ({d['prob']:.0%})", "alternativa": "otra palabra más clara"}
         (en_citas if _en_cita(texto, d["texto"]) else problemas).append(it)
     for p in prosodia:
-        if p["tipo"] in ("sin respirar", "plano", "atropellado") and p.get("pausa_tras"):
+        if p["tipo"] == "cambio de ritmo":
+            p["alternativa"] = ("la voz cambia de velocidad aquí: vuelve a generar la voz (voz.py corrige el ritmo de cada "
+                                "trozo); si se repite, cambia la coletilla por otra o intégrala en la frase anterior")
+        elif p["tipo"] in ("sin respirar", "plano", "atropellado") and p.get("pausa_tras"):
             p["alternativa"] = (f"la voz no para: pon una pausa (coma, dos puntos o punto y seguido) después de «{p['pausa_tras']}» "
                                 "o parte la frase en dos" if p["tipo"] != "atropellado" else
                                 f"se lee atropellado: acorta la frase o pon una coma después de «{p['pausa_tras']}»")
