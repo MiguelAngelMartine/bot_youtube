@@ -28,8 +28,9 @@ import pausas
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
 AZURE_VEL = "+0%"
-AZURE_TEMP = "1.6"                                 # 14-nov-2026: voz «1,6» ENERGÉTICA (elegida por el usuario entre muestras;
-#                                                    velocidad normal + filtro «radio»). Sustituye a la «A» de 1,0, que sonaba apagada.
+AZURE_TEMP = "1.2"                                 # 21-nov-2026: el usuario elige la muestra «A3» (1,2: más regular, menos
+#                                                    variación entre lecturas) con el ritmo corregido por trozos y filtro «radio».
+#                                                    Antes, 1,6 (14-nov, energética) y 1,0 («A», apagada).
 RADIO = ("highpass=f=70,equalizer=f=150:t=q:w=1.0:g=4,equalizer=f=350:t=q:w=1.5:g=1.5,"
          "equalizer=f=5500:t=q:w=2.0:g=-5,lowpass=f=12500,"
          "acompressor=threshold=-16dB:ratio=3:attack=4:release=130,alimiter=limit=0.92")   # 12-nov: filtro «radio»
@@ -145,9 +146,26 @@ SIGLAS = {"CCOO": "Comisiones Obreras", "CC.OO.": "Comisiones Obreras", "TVE": "
 SIGLAS = {k: v for k, v in SIGLAS.items() if k != v and not v.startswith("la ")}   # solo las que cambian la lectura
 
 
+# 21-nov-2026 (el usuario elige «B3»): DICCIONARIO DE PRONUNCIACIÓN. Las palabras que Tristán acentúa o dice mal se le dictan
+# con el alfabeto fonético SAPI de Azure (sílaba tónica con «1» tras la vocal). Cada palabra que el usuario oiga mal, aquí.
+PRONUNCIA = {
+    "mitines": "m i t i 1 n e s",
+    "mitin": "m i 1 t i n",
+}
+
+
+def _pronuncia_ssml(texto):
+    import re
+    for pal in sorted(PRONUNCIA, key=len, reverse=True):
+        texto = re.sub(r"(?<![\wÁÉÍÓÚÑáéíóúñ<'=])(" + re.escape(pal) + r")(?![\wÁÉÍÓÚÑáéíóúñ])",
+                       lambda m: f"<phoneme alphabet='sapi' ph='{PRONUNCIA[pal]}'>{m.group(1)}</phoneme>", texto,
+                       flags=re.I)
+    return texto
+
+
 def _siglas_ssml(texto_escapado):
     import re
-    out = texto_escapado
+    out = _pronuncia_ssml(texto_escapado)
     for sigla in sorted(SIGLAS, key=len, reverse=True):
         out = re.sub(r"(?<![\wÁÉÍÓÚÑáéíóúñ])" + re.escape(sigla) + r"(?![\wÁÉÍÓÚÑáéíóúñ])",
                      f"<sub alias='{SIGLAS[sigla]}'>{sigla}</sub>", out)

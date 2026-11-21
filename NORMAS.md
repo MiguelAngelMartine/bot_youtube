@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -108,9 +108,14 @@ abogado de propiedad intelectual.
   escribir silencios.
 - Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
 
-### La voz: Tristán HD «1,6» enérgica
-- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,6**, velocidad normal, filtro «radio»
-  (`voz.py`). Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
+### La voz: Tristán HD «1,2» + ritmo corregido + diccionario de pronunciación (combinación «A3 + B3», 21-nov-2026)
+- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2** (el usuario la eligió el 21-nov-2026
+  frente a la 1,6 enérgica: más regular, menos variación de una lectura a otra), velocidad normal, filtro «radio» (`voz.py`).
+  Es la combinación para todos los vídeos desde entonces.
+- **Ritmo igual en todo:** cada trozo se mide al generarlo y se corrige si se aparta más de un 10 % (ver el control de voz).
+- **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
+  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`). Cada
+  palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
   nada (edge-tts no tiene licencia comercial; solo pruebas a mano). Ni voz propia ni clonada.
 - El guion se escribe **para esa energía**: ritmo, frases algo más cortas y punzantes, arranques rápidos, verbos de acción.
 - **Sin preguntas en el cuerpo** (Tristán no las entona): la única pregunta es la final. En el cuerpo, en afirmativo.

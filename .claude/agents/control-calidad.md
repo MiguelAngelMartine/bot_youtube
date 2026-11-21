@@ -17,7 +17,7 @@ Te darán una fecha. `control_calidad.py` deja en `dia/<fecha>/calidad/` un foto
 ## 1. Guion y TONO (léelo, no solo lo mires)
 Lee el `voz` de `dia/<fecha>/shorts/short_N.json` y los `pasos` de `dia/<fecha>/episodio.json`. Marca **CORREGIR** si:
 - el tono NO es **Vikingo / La Pulla** (desenfadado, coloquial, con chascarrillos y conectores orales «Mira…», «Agárrate…», «Y claro…»); si suena a **lector de titulares plano** o meramente informativo, está mal;
-- el guion **no tiene RITMO acorde a la voz «1,6» enérgica** (frases cortas y punzantes, arranques rápidos, verbos de acción, remates): si va lento, con frases largas y arrastradas que dejan la voz apagada, está mal (el guion debe sacar el potencial de la voz enérgica);
+- el guion **no tiene RITMO acorde a la voz (Tristán HD «1,2», 21-nov-2026)** (frases cortas y punzantes, arranques rápidos, verbos de acción, remates): si va lento, con frases largas y arrastradas que dejan la voz apagada, está mal (el guion debe sacar el potencial de la voz enérgica);
 - hay **preguntas en el cuerpo** del guion (Tristán no las entona bien): solo vale la pregunta FINAL del cierre;
 - hay **chascarrillos o interjecciones de UNA palabra** tras una frase o cita («Toma.», «Ahí va.»): deben ser coletillas populares más largas y con gancho;
 - hay **ráfagas de frases de una palabra**, tacos o insultos vejatorios, o doble puntuación «.:»;
