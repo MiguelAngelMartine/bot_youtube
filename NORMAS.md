@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -146,7 +146,9 @@ abogado de propiedad intelectual.
     mal acentuado; «¡Venga, que nos vamos!» más rápido que el resto). Las pruebas de sonido se le mandan por Telegram
     (`notifica.py FECHA --audio ruta.mp3 "texto"`) antes de dar por bueno un cambio de voz.
   - El control no lo caza todo (el acento o un tono raro de una palabra bien dicha, como «mitines»), así que lo que el
-    usuario oiga mal va a `archivo/palabras_vetadas.json` y **no se usa** (tampoco se eligen citas que lo lleven).
+    usuario oiga mal se arregla primero con el **diccionario de pronunciación** (`voz.PRONUNCIA`, prueba por Telegram); si
+    no tiene arreglo (una expresión entera que suena forzada), va a `archivo/palabras_vetadas.json` y **no se usa**
+    (tampoco se eligen citas que la lleven). «Mitin/mitines» salió de la lista negra el 21-nov-2026 al entrar en el diccionario.
 
 ### Ejemplo de calibración
 Entrada: «Ayuso en redes: "Espero que a partir del 29 de noviembre haya una huelga eterna para el PSOE". Sayas pregunta en la
