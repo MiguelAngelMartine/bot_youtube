@@ -453,11 +453,12 @@ class Jornada:
             return True
         # 15-nov-2026 (petición del usuario): estilo vigente = escenas de ambiente + Polaroid (render_ambiente),
         # ya no el tablero antiguo (largo.py).
-        # 20-nov-2026: control de lectura del largo (prevuelo_voz): lo que suene raro queda en el parte para revisar.
-        if self.py("prevuelo_voz.py", self.f, log="calidad.log", timeout=1800) == 0 and (self.dia / "calidad" / "prevuelo_voz.md").exists():
-            txt = (self.dia / "calidad" / "prevuelo_voz.md").read_text(encoding="utf-8")
-            if "«" in txt:
-                self.parte("control de lectura del largo: hay palabras a revisar (calidad/prevuelo_voz.md)")
+        # 21-nov-2026 (el usuario): control de calidad de VOZ Y GUION también en el largo (voz_calidad, local y gratis).
+        # Lo que no suena natural vuelve a Opus (palabra, pausa o partir la frase); las citas no se tocan.
+        self.control_voz_largo()
+        if self.py("prevuelo_voz.py", self.f, "largo", log="calidad.log", timeout=3600) != 0 and \
+                (self.dia / "calidad" / "prevuelo_voz.md").exists():
+            self.parte("control de voz del largo: tras corregir aún hay cosas a revisar (calidad/prevuelo_voz.md)")
         # 20-nov-2026 (el usuario): formato «presentador» SIEMPRE (presentador.py; NORMAS.md §6).
         if self.py("presentador.py", self.f, "largo", log="render.log", timeout=7200) != 0:
             return False
@@ -466,6 +467,44 @@ class Jornada:
         self.py("hojas.py", self.f, log="calidad.log")
         self.parte("montaje hecho y fotogramas de control sacados")
         return self.control_visual()
+
+    def control_voz_largo(self):
+        import re as _re
+        ep = self.dia / "episodio.json"
+        try:
+            import prechequeo as PQ
+            import prevuelo_voz as PV
+            G = json.loads(ep.read_text(encoding="utf-8"))
+            lista = []
+            for s_ in G.get("secciones", []):
+                txt = " ".join(p.get("di", "") for p in s_.get("pasos", []))
+                if txt.strip():
+                    v = PV.revisa(txt)
+                    lista += [f"[sección «{s_.get('titulo', '')[:30]}»] [{p.get('tipo', 'oído')}] «{p['texto'][:90]}»: "
+                              f"{p.get('detalle', '')} → {p.get('alternativa', '')}" for p in v["problemas"]]
+            if not lista:
+                self.parte("control de voz del largo: suena natural")
+                return
+            self.parte(f"control de voz del largo: {len(lista)} cosas que no suenan naturales, vuelven a Opus")
+            antes = ep.read_text(encoding="utf-8")
+            citas = lambda t: sorted(PQ._n(c) for c in _re.findall(r"«([^»]+)»", " ".join(
+                p.get("di", "") for s_ in json.loads(t).get("secciones", []) for p in s_.get("pasos", []))))
+            self.claude("redactor", f"Control de calidad de VOZ Y GUION del vídeo largo (dia/{self.f}/episodio.json): la "
+                        f"locución no suena natural en: {'; '.join(lista)}. Arregla CADA punto en el texto \"di\" de su "
+                        "paso: cambia la palabra que la voz no dice bien por otra natural, o pon la pausa (coma, dos puntos "
+                        "o punto y seguido) donde se indica, o parte la frase en dos. Las citas «» se quedan letra a letra. "
+                        "No cambies nada más del fichero.", ep.relative_to(RAIZ), modelo="opus",
+                        motivo="control de calidad de voz del largo")
+            try:
+                ok = citas(ep.read_text(encoding="utf-8")) == citas(antes)
+            except ValueError:
+                ok = False
+            if not ok:
+                ep.write_text(antes, encoding="utf-8")
+                self.parte("control de voz del largo: Opus tocó una cita o rompió el fichero; se queda el guion anterior")
+        except Exception as ex:
+            ep_ok = ep.exists()
+            self.parte(f"control de voz del largo sin hacer ({type(ex).__name__}{'' if ep_ok else ', sin episodio.json'})")
 
     def control_visual(self):
         """10-nov (calidad): Gemini mira las hojas de contacto como el agente de control de calidad; si ve problemas,
@@ -602,15 +641,32 @@ class Jornada:
             import prevuelo_voz as PV
             for j in jsons:
                 S_ = _json.loads(j.read_text(encoding="utf-8"))
-                v = PV.revisa(S_.get("voz", ""))
-                fuera = [p for p in v.get("problemas", []) if p.get("fuente") != "whisper (pista)"]
+                antes = S_.get("voz", "")
+                v = PV.revisa(antes)
+                fuera = v.get("problemas", [])
                 if fuera:
-                    lista = "; ".join(f"«{p['texto']}» ({p.get('detalle', '')}; mejor «{p.get('alternativa', '')}»)" for p in fuera)
-                    self.parte(f"{j.name}: la voz no lee bien {lista[:200]}, vuelve a Opus")
-                    self.claude("redactor", f"En el campo \"voz\" de {j.name} la locución no suena natural en: {lista}. "
-                                "Cambia SOLO esas palabras (fuera de las citas «») por otras naturales que Tristán lea bien. "
-                                "No toques las citas ni los demás campos.", j.relative_to(RAIZ), modelo="opus",
-                                motivo="la voz no lee bien una palabra del Short")
+                    # 21-nov-2026: control de VOZ Y GUION (voz_calidad): palabra mal dicha, tramo sin respirar, plano o
+                    # atropellado. Se arregla escribiendo: otra palabra, una pausa (coma, dos puntos, punto) o partir la frase.
+                    lista = "; ".join(f"[{p.get('tipo', 'oído')}] «{p['texto'][:90]}»: {p.get('detalle', '')} → {p.get('alternativa', '')}"
+                                      for p in fuera)
+                    self.parte(f"{j.name}: control de voz: {lista[:240]}, vuelve a Opus")
+                    self.claude("redactor", f"Control de calidad de VOZ Y GUION del campo \"voz\" de {j.name}: la locución no "
+                                f"suena natural en: {lista}. Arregla CADA punto como se indica: cambia la palabra que la voz "
+                                "no dice bien por otra natural, o pon la pausa (coma, dos puntos o punto y seguido) donde se "
+                                "indica, o parte la frase en dos. Fuera de las citas «» (las citas, letra a letra como están). "
+                                "No toques los demás campos.", j.relative_to(RAIZ), modelo="opus",
+                                motivo="control de calidad de voz del Short")
+                    S2 = _json.loads(j.read_text(encoding="utf-8"))
+                    if SG.citas_inventadas(self.f, S2.get("voz", "")):
+                        S2["voz"] = antes                 # Opus tocó una cita: vuelve el texto anterior (ya comprobado)
+                        j.write_text(_json.dumps(S2, ensure_ascii=False, indent=1), encoding="utf-8")
+                        self.parte(f"{j.name}: Opus cambió una cita al arreglar la voz; se queda el texto anterior")
+                    elif S2.get("voz", "") != antes:
+                        v2 = PV.revisa(S2["voz"])           # segunda escucha
+                        if v2.get("problemas"):
+                            self.parte(f"{j.name}: AVISO, tras corregir aún suena raro: "
+                                       + "; ".join(f"«{p['texto'][:40]}» ({p.get('tipo')})" for p in v2["problemas"])[:200])
+                        v = v2
                 if v.get("en_citas"):
                     self.parte(f"{j.name}: AVISO, dentro de una cita literal suena raro: "
                                + "; ".join(f"«{p['texto']}»" for p in v["en_citas"])[:200] + " (revisa el Short antes de publicar)")

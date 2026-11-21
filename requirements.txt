@@ -14,3 +14,10 @@ google-api-python-client   # subida a YouTube (subir.py)
 google-auth-oauthlib
 gradio_client
 twscrape==0.21.0
+# control de calidad de voz y guion (voz_calidad.py, 21-nov-2026), todo local y gratis. torch en versión CPU:
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+torch
+transformers     # wav2vec2 fonético facebook/wav2vec2-xlsr-53-espeak-cv-ft (se descarga la primera vez, ~1,2 GB)
+phonemizer
+espeakng-loader  # espeak-ng sin apt (cómo debería sonar el guion)
+librosa          # tono (pyin) para la entonación

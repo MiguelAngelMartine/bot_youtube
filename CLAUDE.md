@@ -36,7 +36,7 @@
 - **Recogida:** `recopila.py`, `temas.py`/`temas_gemini.py`, `investiga.py` (dossieres con Gemini), `redes.py`,
   `x_oficiales.py` (lista cerrada de cuentas comprobadas, cookies en `.env`), `ganchos.py`.
 - **Guion:** agentes de `.claude/agents/`, `prechequeo.py`, `coletillas.py`, `shorts_guion.py` (`repeticiones`),
-  `prevuelo_voz.py`. LLM: `gem.py` (Gemini, dos claves) → freellmpool (`~/.local/bin/freellmpool`) → Claude.
+  `prevuelo_voz.py` + `voz_calidad.py` (control de calidad de voz y guion, local y gratis). LLM: `gem.py` (Gemini, dos claves) → freellmpool (`~/.local/bin/freellmpool`) → Claude.
 - **Voz:** `voz.py` (Azure Tristán HD, caché en `cache/voz`, Whisper para tiempos). Clave con `clave_azure.py`.
 - **Montaje (formato «presentador», SIEMPRE desde el 20-nov-2026):** `presentador.py <fecha> largo|N` con SOLO las imágenes
   de `Imagenes/` (`Fondos`, `Presentador`, `Políticos`; las amplía el usuario; `presentador.py catalogo` las lista) y

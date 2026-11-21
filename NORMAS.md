@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 20-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «mitin» y «¡Virgen del camino seco!» vetadas; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -121,10 +121,20 @@ abogado de propiedad intelectual.
 - **Compatibilidad con Tristán:** cifras en **dígitos** («35 a 34», «el 41 por ciento»); nombre completo la primera vez y
   luego el apellido; siglas raras desarrolladas la primera vez (las que lee mal se corrigen solas con `voz.SIGLAS`); una
   exclamación o interrogación por frase; texto plano, sin Markdown, sin paréntesis, barras ni direcciones web; nada de «.:».
-- Antes de montar, **prevuelo de la voz** (`prevuelo_voz.py`, conectado a la jornada desde el 20-nov-2026): si un oído
-  (Gemini/OpenAI y Whisper) marca algo que no suena natural, se reescribe con Opus y se repite. Las palabras descartadas van a
-  `archivo/palabras_vetadas.json` y **no se usan** (tampoco se eligen citas que las lleven, p. ej. «mitin/mitines», que la
-  voz lee raro).
+- **Control de calidad de VOZ Y GUION** (21-nov-2026, el usuario: «que la voz suene lo más humana posible»; es control del
+  guion porque la voz lee lo que el guion escribe). En los Shorts y en el largo, antes de montar, `prevuelo_voz.py` genera la
+  locución tal como sale en el vídeo (por tramos, con sus pausas) y la escucha `voz_calidad.py`, **100 % local y gratis**:
+  - **Pronunciación:** fonemas oídos (wav2vec2) frente a los esperados (espeak-ng); y Whisper «small» sin el guion delante
+    (si entiende otra palabra, p. ej. «ladrillazo» → «trilazova», o la oye con poca seguridad).
+  - **Ritmo y entonación:** tramo de más de ~5 s y 15 palabras sin respirar (la voz se «come» un punto o una coma), tramo
+    con la entonación plana, frase atropellada (más de ~8 sílabas por segundo) o arrastrada, y silencios raros a mitad de
+    frase. Para cada uno propone **dónde poner la pausa**.
+  - Lo que se puede reescribir vuelve a **Opus**: otra palabra, una pausa (coma, dos puntos, punto y seguido) o partir la
+    frase; las citas «» no se tocan (si Opus cambia una, vuelve el texto anterior). Se escucha otra vez y lo que quede, al
+    parte. Lo que está dentro de una cita o es un nombre propio no se reescribe: se avisa en el parte.
+  - Gemini, si tiene cuota, es un oído más; OpenAI (de pago) ya no se usa.
+  - El control no lo caza todo (el acento o un tono raro de una palabra bien dicha, como «mitines»), así que lo que el
+    usuario oiga mal va a `archivo/palabras_vetadas.json` y **no se usa** (tampoco se eligen citas que lo lleven).
 
 ### Ejemplo de calibración
 Entrada: «Ayuso en redes: "Espero que a partir del 29 de noviembre haya una huelga eterna para el PSOE". Sayas pregunta en la

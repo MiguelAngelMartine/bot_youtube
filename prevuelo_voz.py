@@ -8,6 +8,9 @@ Si hay problemas, el redactor (Opus) reescribe esas palabras por otras naturales
 solo entonces se monta el vídeo.
 Uso:  from prevuelo_voz import revisa;  v = revisa(texto)  -> {"ok": bool, "problemas": [...], "oido": str}
 CLI:  python prevuelo_voz.py <fecha>   -> revisa el largo y los Shorts, deja dia/<fecha>/calidad/prevuelo_voz.md
+21-nov-2026 (el usuario: «100 % gratuito», y que la voz suene lo más humana posible): el oído principal es voz_calidad.py
+(local: fonemas wav2vec2 + espeak, Whisper small, ritmo y entonación) sobre la locución por tramos tal como sale en el
+vídeo. Gemini queda como oído extra cuando tiene cuota; OpenAI (de pago) ya no se usa.
 """
 from __future__ import annotations
 
@@ -39,6 +42,20 @@ def _audio(texto):
     voz._azure_mp3(texto, crudo)                           # síntesis directa (sin alinear), rápido
     wav = tmp / "v.wav"
     subprocess.run([V.FF, "-y", "-loglevel", "error", "-i", str(crudo), "-af", voz.RADIO, "-ar", "48000", str(wav)], check=True)
+    mp3 = tmp / "v.mp3"
+    subprocess.run([V.FF, "-y", "-loglevel", "error", "-i", str(wav), "-b:a", "96k", str(mp3)], check=True)
+    return wav, mp3
+
+
+def _audio_tramos(texto):
+    """21-nov-2026: la locución TAL COMO SALE EN EL VÍDEO (formato presentador: un tramo por cita, con sus pausas medidas).
+    Usa la caché de voz, así que el montaje la reutiliza sin volver a sintetizar."""
+    import genera_video as V
+    import presentador as PR
+    tmp = Path(tempfile.mkdtemp(prefix="prevuelo_"))
+    tr = PR.tramos_de(texto, "?")                          # toda cita de 5+ palabras, su propio tramo (como en los Shorts)
+    PR.locuta_tramos(tr, tmp)
+    wav = tmp / "voz.wav"
     mp3 = tmp / "v.mp3"
     subprocess.run([V.FF, "-y", "-loglevel", "error", "-i", str(wav), "-b:a", "96k", str(mp3)], check=True)
     return wav, mp3
@@ -177,35 +194,33 @@ def _whisper_citas(wf, texto):
 
 
 def revisa(texto, auto_veta=False):
-    """Genera la locución y la revisa. Oído subjetivo: Gemini (gratis) y, si no responde, OpenAI (fiable). Oído objetivo:
-    Whisper. Devuelve {ok, problemas, oido}. Con auto_veta, añade a la lista negra lo que marque el oído subjetivo."""
-    wav, mp3 = _audio(texto)
+    """CONTROL DE CALIDAD DE VOZ Y GUION (21-nov-2026): genera la locución como sale en el vídeo y la escucha con el oído
+    LOCAL Y GRATUITO de voz_calidad (fonemas, Whisper small, ritmo y entonación). Gemini, si tiene cuota, es un oído más.
+    Devuelve {ok, problemas, en_citas, oido}: «problemas» se arreglan reescribiendo el guion (palabra, pausa o frase);
+    «en_citas» no se pueden reescribir (cita literal o nombre propio) y se avisan."""
+    import voz_calidad as VC
+    wav, mp3 = _audio_tramos(texto)
+    r = VC.analiza(wav, texto)
     sub = None
     try:
-        sub = _gemini(mp3, texto)                          # 1º Gemini (gratis)
+        sub = _gemini(mp3, texto)                          # oído extra, solo si Gemini responde (gratis)
     except Exception as e:
         print(f"  (Gemini oído falla: {type(e).__name__})", file=sys.stderr)
-    oido_usado = "gemini"
-    if sub is None:                                        # 2º OpenAI (saturó Gemini)
-        sub = _openai(mp3, texto)
-        oido_usado = "openai"
-    pal = _paleta()                                        # coletillas elegidas a propósito: NO se tocan
+    oido_extra = "gemini" if sub is not None else "ninguno (Gemini sin cuota)"
+    pal = _paleta()                                        # coletillas elegidas a propósito: su palabra NO se cambia
     def protegida(p):
         w = (p["texto"] or "").strip().lower()
-        return (not _fuera_de_citas(texto, p["texto"])    # dentro de una cita literal
-                or any(w in expr or expr in w for expr in pal))   # es (parte de) una coletilla de la paleta
-    # 20-nov-2026 («mitines» sonaba raro DENTRO de una cita y no se avisó): lo de dentro de las citas no se reescribe (es
-    # literal), pero se devuelve aparte en "en_citas" para cambiar de frase o avisar.
-    en_citas = [p for p in (sub or []) if not _fuera_de_citas(texto, p["texto"])]
-    sub = [p for p in (sub or []) if not protegida(p)]     # oído subjetivo (Gemini/OpenAI): manda en el veredicto
-    oido, wf = _whisper(wav, texto)                        # Whisper: solo PISTA (no dicta el veredicto por sí solo)
-    wf_todas = list(wf)
-    wf = [dict(p, fuente="whisper (pista)") for p in wf if not protegida(p)]
+        return p.get("tipo") in ("pronunciación", "dudosa", "se oye otra cosa", None) and \
+            any(w in expr or expr in w for expr in pal)
+    en_citas = list(r["en_citas"]) + [p for p in (sub or []) if not _fuera_de_citas(texto, p["texto"])]
+    sub = [p for p in (sub or []) if _fuera_de_citas(texto, p["texto"]) and not protegida(p)]
+    problemas = [p for p in r["problemas"] if not protegida(p)] + sub
     if auto_veta:
-        for p in sub:
-            veta(p["texto"], p.get("alternativa", ""), f"no suena natural ({p['fuente']})")
-    en_citas += [dict(p, fuente="whisper (pista)") for p in _whisper_citas(wf_todas, texto)]
-    return {"ok": not sub, "problemas": sub + wf, "en_citas": en_citas, "oido_subjetivo": oido_usado, "oido": oido}
+        for p in problemas:
+            if p.get("tipo") in ("pronunciación", "se oye otra cosa"):
+                veta(p["texto"], p.get("alternativa", ""), f"la voz no la dice bien ({p['fuente']})")
+    return {"ok": not problemas, "problemas": problemas, "en_citas": en_citas, "oido": r["oido"],
+            "oido_subjetivo": oido_extra, "medidas": r["medidas"]}
 
 
 def _piezas(fecha):
@@ -228,17 +243,21 @@ def _piezas(fecha):
     return piezas
 
 
-def main(fecha):
+def main(fecha, solo=None):
     dia = RAIZ / "dia" / fecha
     (dia / "calidad").mkdir(parents=True, exist_ok=True)
     md = [f"# Control de humanidad de la voz · {fecha}", ""]
     total = 0
     for nombre, txt in _piezas(fecha):
+        if solo == "largo" and not nombre.startswith("largo"):
+            continue                                       # los Shorts ya se revisaron en su fase
         v = revisa(txt)
         total += len(v["problemas"])
         md.append(f"## {nombre}: {'✅ natural' if v['ok'] else '⚠️ REVISAR'}")
         for p in v["problemas"]:
-            md.append(f"- «{p['texto']}» — {p['detalle']} _({p['fuente']})_")
+            md.append(f"- [{p.get('tipo', 'oído')}] «{p['texto']}» — {p['detalle']} → {p.get('alternativa', '')} _({p['fuente']})_")
+        for p in v.get("en_citas", []):
+            md.append(f"- (aviso, no se reescribe) [{p.get('tipo', 'oído')}] «{p['texto']}» — {p['detalle']}")
         md.append("")
         print(f"{nombre}: {'OK' if v['ok'] else str(len(v['problemas'])) + ' problemas'}", flush=True)
     (dia / "calidad" / "prevuelo_voz.md").write_text("\n".join(md), encoding="utf-8")
@@ -247,4 +266,4 @@ def main(fecha):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None))
