@@ -409,7 +409,9 @@ def main(fecha, n=3):
                     f"{enc.get('formato', 'frase y réplica')}. Empieza por la frase que lo desata (\"cita\"), sigue con "
                     "las réplicas más fuertes (\"replica\" y, si hay más, \"segmentos\") y, si existe, la contrarréplica; "
                     "solo frases LITERALES de la lista de arriba o del material, con su autor real. Las dos partes con su "
-                    "voz; sin declarar ganador." + "".join(f" OJO: {x['ojo']}" for x in buenas if x.get("ojo")))
+                    "voz; sin declarar ganador." + "".join(f" OJO: {x['ojo']}" for x in buenas if x.get("ojo"))
+                    + "".join(f" CONTEXTO: {c}." for c in enc.get("contexto", []))
+                    + (f" EQUILIBRIO: {enc['equilibrio']}." if enc.get("equilibrio") else ""))
     elif enc.get("verificada") and enc.get("persona") and "short" in enc.get("para", ["short"]):     # encargo del director, ya comprobado
         redes = f"- **{enc['persona']}** ({enc.get('canal', 'X')}, @{enc.get('cuenta', '')}): {enc['frase']} " \
                 f"({enc.get('enlace', '')}) [comprobado: {enc.get('prueba', '')}]\n" + redes
