@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -113,6 +113,11 @@ abogado de propiedad intelectual.
   frente a la 1,6 enérgica: más regular, menos variación de una lectura a otra), velocidad normal, filtro «radio» (`voz.py`).
   Es la combinación para todos los vídeos desde entonces.
 - **Ritmo igual en todo:** cada trozo se mide al generarlo y se corrige si se aparta más de un 10 % (ver el control de voz).
+- **Pausa en las comillas** (usuario, 21-nov-2026): las citas que van dentro de la narración (sin imagen del político,
+  cortas o seguidas) llevan una pausa de medio segundo al cerrar las comillas y de 0,3 s antes de abrirlas tras «:»
+  (`voz.pausas_citas`, `<break>` de la propia voz; el audio no se toca). Sin ella, la frase siguiente (una coletilla, por
+  ejemplo) sonaba pegada a la cita y acelerada. Las citas con imagen ya tienen su pausa de montaje (0,55-0,6 s).
+- **Las coletillas no se separan en su propio trozo** (prueba del 21-nov-2026: sonaba peor que antes).
 - **Cierre de los Shorts como siempre** (usuario, 21-nov-2026): la pregunta final y «Te leo en comentarios. Y dale a
   suscribirte, que he visto que aún no lo has hecho» se locutan con el tono y el estilo de los días anteriores: temperatura
   1,6 y sin corregir el ritmo (`voz.CIERRE`, `voz.AZURE_TEMP_CIERRE`).

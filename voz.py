@@ -195,11 +195,36 @@ def _siglas_ssml(texto_escapado):
     return out
 
 
+PAUSA_FIN_CITA, PAUSA_INI_CITA = 500, 300            # ms. 21-nov-2026 (aprobado por el usuario): las citas que van dentro
+#                                                      de la narración se leían pegadas a la frase siguiente («…que os
+#                                                      enterarais». Esto tiene una pinta regulera: 0,08 s) y la coletilla
+#                                                      parecía parte de la cita. La pausa la hace la propia voz (<break>).
+
+
+def pausas_citas(ssml):
+    """Pausa al cerrar las comillas (y una más corta antes de abrirlas tras «:»)."""
+    s = re.sub(r"(»[.;…]?)\s+(?=\S)", rf"\1<break time='{PAUSA_FIN_CITA}ms'/> ", ssml)
+    s = re.sub(r"(»,)\s+(?=\S)", rf"\1<break time='{PAUSA_INI_CITA}ms'/> ", s)
+    return re.sub(r":\s+«", rf":<break time='{PAUSA_INI_CITA}ms'/> «", s)
+
+
+def clave_de(pasos, tono_seccion, modo, cola):
+    """Clave de la caché de voz: texto, config, VERSION_VOZ y los ajustes que afectan a ESTE texto (diccionario, pausas
+    de las citas). Así un ajuste nuevo solo vuelve a grabar los trozos a los que afecta."""
+    import hashlib
+    import json
+    texto = " ".join(p["di"] for p in pasos)
+    cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO, AZURE_TEMP_CIERRE, RITMO, RITMO_TOL] if motor() == "azure" else []
+    extra = [["pausas citas", PAUSA_FIN_CITA, PAUSA_INI_CITA]] if pausas_citas(texto) != texto else []
+    return hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, VERSION_VOZ,
+                        motor(), dicc_de(texto)] + cfg + extra, ensure_ascii=False).encode()).hexdigest()[:20]
+
+
 def _azure_mp3(texto, mp3, vel=None, temp=None):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}' parameters='temperature={temp or AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{_siglas_ssml(escape(texto))}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={temp or AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{pausas_citas(_siglas_ssml(escape(texto)))}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
@@ -333,10 +358,7 @@ def locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
     import shutil
     # 21-nov-2026: la clave ya no lleva el código entero (cualquier cambio regrababa TODO, también las tomas aprobadas):
     # lleva la config, VERSION_VOZ y las palabras del diccionario que salen en el texto.
-    texto = " ".join(p["di"] for p in pasos)
-    cfg = [AZURE_VOZ, AZURE_TEMP, AZURE_VEL, RADIO, AZURE_TEMP_CIERRE, RITMO, RITMO_TOL] if motor() == "azure" else []
-    clave = hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, VERSION_VOZ,
-                                    motor(), dicc_de(texto)] + cfg, ensure_ascii=False).encode()).hexdigest()[:20]
+    clave = clave_de(pasos, tono_seccion, modo, cola)
     wav_c, meta_c = CACHE / f"{clave}.wav", CACHE / f"{clave}.json"
     if wav_c.exists() and meta_c.exists():
         shutil.copyfile(wav_c, wav_salida)
