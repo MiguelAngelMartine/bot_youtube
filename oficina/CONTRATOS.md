@@ -121,6 +121,8 @@ Canarias, Ceuta y Melilla quedan fuera del mapa dibujado: en esos casos se usa `
 
 ## Anexo: `encargo.json` del director (opcional, `dia/<fecha>/encargo.json`)
 - Frase pedida (7-nov-2026): `persona`, `frase`, `tema`, `canal`, `cuenta`, `enlace`, `para` → la comprueba `encargo.py`.
+  Desde el 21-nov-2026, si queda verificada, su noticia entra también en el largo (`jornada.encargo_escaleta`), para que el
+  Short tenga contexto.
 - Shorts: `num_shorts`; `shorts_personas`: `[{"persona", "tema", "mejores_frases": true}]` (con `mejores_frases`, un Short
   por persona con 2-3 frases suyas literales: `shorts_guion.mejores_frases`, campo `frases` en `short_N.json`).
 - Día monográfico (20-nov-2026): `"monografico": {"tema", "claves": [...], "instrucciones"}` → `jornada.py` investiga solo

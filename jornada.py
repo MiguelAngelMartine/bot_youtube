@@ -118,6 +118,13 @@ class Jornada:
     def encargo_escaleta(self):
         m = self.monografico()
         if not m:
+            # 21-nov-2026: Short pedido por el director con frase comprobada (encargo.py): su noticia entra también en el
+            # largo, para que el Short tenga el contexto del guion aprobado.
+            e = (self.json("encargo.json") if (self.dia / "encargo.json").exists() else None) or {}
+            if e.get("verificada") and e.get("tema") and e.get("persona"):
+                return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json): hoy hay un Short dedicado a «{e['tema']}» con "
+                        f"la frase comprobada de {e['persona']} «{e['frase']}». Incluye un bloque sobre esa noticia en el "
+                        "largo (con su dossier), con las reacciones de las otras partes si las hay.")
             return ""
         return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json → monografico, manda sobre la línea editorial habitual): "
                 f"HOY EL VÍDEO ES MONOGRÁFICO: TODOS los bloques tratan SOLO de «{m['tema']}»; ningún otro tema del día "

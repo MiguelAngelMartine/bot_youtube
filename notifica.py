@@ -3,7 +3,7 @@ copia ligera del episodio; o un video suelto (un corto) con --video.
 Usa el canal KRAKEN del proyecto anterior (TELEGRAM_KRAKEN_TOKEN y TELEGRAM_KRAKEN_CHAT_ID), elegido por el usuario el
 1-nov-2026. Lo busca en el .env de este proyecto o en el del proyecto Kraken (en el PC, ../kraken-futures-bot; en el
 servidor, ../kraken_bot/allweather_bot). Nunca imprime las claves.
-Uso: python notifica.py AAAA-MM-DD [--error "texto"] [--video ruta.mp4 ["texto"]]"""
+Uso: python notifica.py AAAA-MM-DD [--error "texto"] [--video ruta.mp4 ["texto"]] [--audio ruta.mp3 "texto"] [--aviso "texto"]"""
 from __future__ import annotations
 import json
 
@@ -131,8 +131,21 @@ def aviso(dia_txt, texto):
     print("aviso enviado")
 
 
+def manda_audio(dia_txt, ruta, texto):
+    """21-nov-2026: pruebas de sonido (control de calidad de voz) para que el director las escuche y dé el visto bueno."""
+    tok, chat = credenciales()
+    with open(ruta, "rb") as fh:
+        envia(f"https://api.telegram.org/bot{tok}", "sendAudio", files={"audio": fh}, timeout=120,
+              data={"chat_id": chat, "caption": f"🎧 El Hoyformativo · {dia_txt}: {texto}"[:1000],
+                    "title": Path(ruta).stem})
+    print("audio enviado")
+
+
 if __name__ == "__main__":
     a = sys.argv
+    if "--audio" in a:                                   # notifica.py FECHA --audio ruta.mp3 "texto"
+        manda_audio(a[1], a[a.index("--audio") + 1], a[a.index("--audio") + 2] if len(a) > a.index("--audio") + 2 else "")
+        sys.exit()
     if "--aviso" in a:
         aviso(a[1], a[a.index("--aviso") + 1])
         sys.exit()
