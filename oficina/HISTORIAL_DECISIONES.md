@@ -257,3 +257,4 @@ Cada dato, cita, idea y muletilla sale una sola vez (fallos reales: Feijóo «pr
 - 22-nov-2026: el Short de cruce Morant / PP («ha salido perfecto») queda como modelo: NORMAS.md §4 «El Short de cruce modelo».
 - 22-nov-2026: en el Short 3 rehecho (cruce del cara a cara) el presentador y Rufián coincidían en pantalla al relevarse. El usuario: «no se puede solapar nada… esto es importantísimo». El montaje alarga el silencio en cada cambio de escena (HUECO_ESCENA 0,85 s).
 - 22-nov-2026: la jornada rehízo el largo con render_ambiente (descartado) en la vuelta de corrección; parada con OK del usuario y montado con presentador.py. En la revisión, dos citas con el personaje equivocado: se deja de adivinar el hablante.
+- 22-nov-2026: el usuario aprueba X como fuente de los cruces aunque no haya noticia, y los cruces también en el largo. La recogida lee las respuestas entre cuentas oficiales (antes no) y saca los cruces aparte; 12 cuentas nuevas en la lista cerrada.

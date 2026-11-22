@@ -26,6 +26,11 @@ CUENTAS = {
     "Carles Puigdemont": "KRLS", "Oriol Junqueras": "junqueras", "Arnaldo Otegi": "ArnaldoOtegi", "Ana Pontón": "anaponton",
     "PSOE": "PSOE", "PP": "ppopular", "Vox": "vox_es", "Sumar": "sumar", "Podemos": "PODEMOS", "ERC": "Esquerra_ERC",
     "Junts": "JuntsXCat", "PNV": "eajpnv", "EH Bildu": "ehbildu", "BNG": "obloque", "Compromís": "compromis", "Más Madrid": "MasMadrid__",
+    # 22-nov-2026: cuentas de los cruces de declaraciones (comprobadas con «verifica» antes de entrar)
+    "Ester Muñoz": "EsterMunoz85", "Miguel Tellado": "Mtelladof", "Diana Morant": "dianamorantr",
+    "Cayetana Álvarez de Toledo": "cayetanaAT", "Ada Colau": "AdaColau", "Irene Montero": "IreneMontero",
+    "Mariano Rajoy": "marianorajoy", "Jorge Buxadé": "Jorgebuxade", "Félix Bolaños": "felixbolanosg",
+    "Carlos Cuerpo": "carlos_cuerpo", "Míriam Nogueras": "miriamnoguerasM", "Alfonso Fernández Mañueco": "alferma1",
 }
 
 
@@ -91,20 +96,63 @@ async def tuits(cuenta, dia=None):
     print(f"{vistos} tuits ese día")
 
 
+def _oficial_de(handle):
+    """Nombre de la lista cerrada para una cuenta (sin distinguir mayúsculas), o None."""
+    h = (handle or "").lower()
+    return next((n for n, x in CUENTAS.items() if x.lower() == h), None)
+
+
 async def _de_cuenta(api, n, h, desde, por_cuenta):
+    """22-nov-2026: también sus RESPUESTAS, pero solo a otra cuenta oficial (un cruce de declaraciones) o a sí misma (un
+    hilo): ahí es donde los políticos se contestan. Cada cruce lleva el tuit al que responde o que cita (responde_a)."""
     u = await api.user_by_login(h)
     if u is None or u.username.lower() != h.lower() or u.followersCount < MIN_SEGUIDORES:
         raise ValueError(f"@{h} no parece la cuenta oficial")
     out = []
-    async for t in api.user_tweets(u.id, limit=20):
+    async for t in api.user_tweets_and_replies(u.id, limit=40):
         if t.user.id != u.id or t.retweetedTweet or t.date < desde:      # sin retuits: no son palabras suyas
             continue
+        otro = None
+        if t.inReplyToTweetId:
+            dest = _oficial_de(t.inReplyToScreenName or (t.inReplyToUser.username if t.inReplyToUser else ""))
+            if dest is None:
+                continue                         # respuesta a un particular: no es un cruce ni noticia
+            if dest != n:
+                try:
+                    pt = await asyncio.wait_for(api.tweet_details(t.inReplyToTweetId), 20)
+                except Exception:
+                    pt = None
+                if pt is not None and _oficial_de(pt.user.username) == dest:
+                    otro = {"quien": f"{dest} (@{pt.user.username})", "texto": pt.rawContent[:600], "enlace": pt.url,
+                            "fecha": pt.date.astimezone(MADRID).isoformat(), "como": "responde"}
         texto = t.rawContent
         if t.quotedTweet:                        # si cita otro tuit, sin él no se entiende lo que dice
             texto += f" [cita a @{t.quotedTweet.user.username}: {t.quotedTweet.rawContent}]"
-        out.append({"quien": f"{n} (@{u.username})", "canal": "X, cuenta oficial", "fecha": t.date.astimezone(MADRID).isoformat(),
-                    "texto": texto[:600], "enlace": t.url})
-    return sorted(out, key=lambda x: x["fecha"], reverse=True)[:por_cuenta]
+            dest = _oficial_de(t.quotedTweet.user.username)
+            if otro is None and dest and dest != n:
+                q = t.quotedTweet
+                otro = {"quien": f"{dest} (@{q.user.username})", "texto": q.rawContent[:600], "enlace": q.url,
+                        "fecha": q.date.astimezone(MADRID).isoformat(), "como": "cita"}
+        d = {"quien": f"{n} (@{u.username})", "canal": "X, cuenta oficial", "fecha": t.date.astimezone(MADRID).isoformat(),
+             "texto": texto[:600], "enlace": t.url}
+        if otro:
+            d["responde_a"] = otro
+        out.append(d)
+    out.sort(key=lambda x: x["fecha"], reverse=True)
+    cruces = [x for x in out if x.get("responde_a")]
+    resto = [x for x in out if not x.get("responde_a")]
+    return (cruces + resto)[:max(por_cuenta, len(cruces))]   # los cruces no se recortan
+
+
+def cruces(tuits):
+    """Los intercambios reales entre dos cuentas oficiales distintas (uno responde o cita al otro), sin repetir."""
+    vistos, out = set(), []
+    for x in tuits:
+        r = x.get("responde_a")
+        if r and x["enlace"] not in vistos:
+            vistos.add(x["enlace"])
+            out.append({"de": r, "replica": {k: x[k] for k in ("quien", "texto", "enlace", "fecha")}})
+    return out
 
 
 async def _recientes(horas, por_cuenta):

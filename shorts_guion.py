@@ -428,7 +428,7 @@ def main(fecha, n=3):
         _, _, pols_ = PR.catalogo()
         con_imagen = sorted({" ".join(PR._NOMBRE.get(r_, [k_])).title() for k_, rs_ in pols_.items() for r_ in rs_})
         obligada += ("\n\nPERSONAJES CON IMAGEN (las citas y réplicas, SOLO de ellos; sin imagen no sale su cara): "
-                     + ", ".join(con_imagen) + ". Prefiere los CRUCES (cita + réplica literal de otro partido).")
+                     + ", ".join(con_imagen) + ". Prefiere los CRUCES (cita + réplica literal de otro partido); la sección «CRUCES DE DECLARACIONES EN X» de las redes trae intercambios reales entre cuentas oficiales y vale como fuente aunque no haya noticia (fuente «X (@cuenta)»).")
     except Exception as ex:
         print(f"  (sin lista de imágenes: {type(ex).__name__})")
     r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)

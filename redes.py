@@ -229,7 +229,30 @@ def main(fecha, horas=30):
     tx = [x for x in tx if x["enlace"].split("/")[-1] not in enlaces]
     datos = xs + tx + datos                             # los tuits, primero: son los que más gancho tienen
     (dia / "redes.json").write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
+    # 22-nov-2026 (el usuario: X como fuente de los cruces de declaraciones, en Shorts y en el largo): los intercambios
+    # REALES entre dos cuentas oficiales (uno responde o cita al otro) van aparte y primero, y se guardan como fuente
+    # (articulos/x_cruces.txt) para que el control de citas los reconozca.
+    cz = x_oficiales.cruces(xs)
+    (dia / "cruces_x.json").write_text(json.dumps(cz, ensure_ascii=False, indent=1), encoding="utf-8")
+    resumen.insert(0, f"- X: {len(cz)} cruces de declaraciones entre cuentas oficiales")
     md = [f"# Lo que publican los partidos (últimas {horas} h, fuentes oficiales)", "", *resumen, ""]
+    if cz:
+        md += ["## CRUCES DE DECLARACIONES EN X (verificados: uno responde o cita al otro, cuentas oficiales)",
+               "Material preferente para un cruce (Short o largo): cita literal de cada tuit, nombrando a quien la dice "
+               "justo antes, y fuente «X (@cuenta)». Sin noticia detrás, el presentador no añade hechos que no estén "
+               "en los tuits.", ""]
+        txt = []
+        for c in cz:
+            a, b = c["de"], c["replica"]
+            md += [f"- **{a['quien']}** ({a['fecha'][:16].replace('T', ' ')}): {a['texto']} ({a['enlace']})",
+                   f"  ↳ **{b['quien']}** le {'responde' if a.get('como') == 'responde' else 'cita'} "
+                   f"({b['fecha'][:16].replace('T', ' ')}): {b['texto']} ({b['enlace']})", ""]
+            for x in (a, b):
+                txt += [f"{x['quien']} en X ({x['fecha'][:16]}): {x['texto']}", f"ENLACE: {x['enlace']}", ""]
+        (dia / "articulos").mkdir(exist_ok=True)
+        (dia / "articulos" / "x_cruces.txt").write_text(
+            "MEDIO: X (cuentas oficiales)\nTITULAR: Cruces de declaraciones en X\n\n" + "\n".join(txt), encoding="utf-8")
+        md.append("## Todo lo publicado")
     for x in datos:
         md.append(f"- **{x['quien']}** ({x['canal']}, {x['fecha'][:16].replace('T', ' ')}): {x['texto']} ({x['enlace']})")
     (dia / "redes.md").write_text("\n".join(md) + "\n", encoding="utf-8")

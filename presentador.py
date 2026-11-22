@@ -874,12 +874,28 @@ def _cargo_de(nombre, cargos):
     return next((c for n, c in cargos.items() if _n(n).split()[-1:] == [ape]), "")
 
 
+def _fuente_x(dia):
+    """22-nov-2026: si una cita sale literal de un tuit de cuenta oficial (redes.json), su globo dice «X (@cuenta)»:
+    es la fuente primaria. Devuelve una función cita -> fuente o None."""
+    try:
+        tuits = [x for x in json.loads((dia / "redes.json").read_text(encoding="utf-8")) if "(@" in x.get("quien", "")]
+    except (OSError, ValueError):
+        tuits = []
+    textos = [(_n(x["texto"]), "X (@" + x["quien"].split("(@")[1].rstrip(")") + ")") for x in tuits]
+
+    def de(cita):
+        c = _n(cita)
+        return next((f for t, f in textos if len(c) > 12 and c in t), None)
+    return de
+
+
 # ---------------------------------------------------------------- Short (vertical)
 def short(fecha, n):
     import musica
     import short as SH
     dia = RAIZ / "dia" / fecha
     S = json.loads((dia / "shorts" / f"short_{n}.json").read_text(encoding="utf-8"))
+    fx = _fuente_x(dia)
     tmp = dia / "shorts" / f"tmp_pres_{n}"
     tmp.mkdir(parents=True, exist_ok=True)
     texto = S["voz"]
@@ -902,7 +918,8 @@ def short(fecha, n):
     tr = tramos_de(cuerpo, quien, conocidas, quien_de=quien_de)
     for g in tr:
         if g["tipo"] == "Q":
-            g["medio"] = medio_cita.get(_n(g["cita"])) or citas_medio.get(_n(g["cita"]), medios.get(g["quien"], ""))
+            g["medio"] = medio_cita.get(_n(g["cita"])) or fx(g["cita"]) or \
+                citas_medio.get(_n(g["cita"]), medios.get(g["quien"], ""))
             cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos) or (S.get("cargo") if g["quien"] == quien else
                                                                             rep.get("cargo", "")))
     if cierre:
@@ -951,6 +968,7 @@ def largo(fecha):
     import musica
     dia = RAIZ / "dia" / fecha
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    fx = _fuente_x(dia)
     secs = [s for s in G["secciones"] if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", []))]
     tmp = dia / "tmp_presentador"
     tmp.mkdir(exist_ok=True)
@@ -983,7 +1001,8 @@ def largo(fecha):
         for g in trs:
             if g["tipo"] == "Q":
                 it = next((x for x in fichas if _n(x["cita"]) and (_n(g["cita"]) in _n(x["cita"]) or _n(x["cita"]) in _n(g["cita"]))), {})
-                g["medio"] = re.sub(r"^según\s+", "", it.get("medio") or (s.get("fuentes") or [""])[0] or "", flags=re.I)
+                g["medio"] = fx(g["cita"]) or \
+                    re.sub(r"^según\s+", "", it.get("medio") or (s.get("fuentes") or [""])[0] or "", flags=re.I)
                 if it.get("cargo"):
                     cargos.setdefault(g["quien"], re.sub(r"\s*\([^)]*\)", "", it["cargo"]).strip())
                 cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos))

@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -107,6 +107,20 @@ abogado de propiedad intelectual.
   cita: así el vídeo alterna presentador y personajes con ritmo. **Las pausas las pone el guion** con su puntuación (punto,
   coma, dos puntos, puntos suspensivos): la voz lee de corrido lo que está escrito (ver «Lectura entera»).
 - Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
+
+### X como fuente y cruces también en el largo (22-nov-2026, el usuario: «la mayor fuente de cruce de declaraciones es X»; «también se pueden usar en los vídeos largos»)
+- **Un tuit de cuenta oficial vale como fuente de una cita aunque no haya noticia detrás**, con estas condiciones:
+  1. Solo cuentas de la lista cerrada de `x_oficiales.py` (comprobadas con `verifica`: nombre, ≥ 10.000 seguidores);
+     nunca parodias, cuentas de fans ni capturas que circulan.
+  2. Cita literal del propio tuit (se guarda en `articulos/x_cruces.txt` con enlace y fecha, por si lo borran).
+  3. **El cruce es real:** uno responde o cita al otro (`cruces_x.json`, sección «CRUCES DE DECLARACIONES EN X» al
+     principio de `redes.md`). Nunca se juntan dos tuits sueltos para que parezca que discuten.
+  4. Sin noticia detrás, el presentador no añade hechos que no estén en los propios tuits.
+  5. Si el tuit se borra antes de publicar, la cita se cae.
+  6. El globo dice su fuente: «según X (@cuenta)» (lo pone el montaje solo si la cita está literal en un tuit).
+  7. Neutralidad de siempre (las dos partes, remate sin ganador) e interés informativo: cargos o candidatos con peso.
+- **Cruces en el largo igual que en los Shorts:** los dos personajes a la vez, uno a cada lado con su globo, cuando el
+  guion nombra a quien habla justo antes de su cita y entre las dos citas hay un puente de 12 palabras como mucho.
 
 ### El Short de cruce modelo (22-nov-2026, el usuario: «ha salido perfecto, guarda las directrices como norma para todos»)
 Referencia: `dia/2026-11-22/shorts/short_1.json` (Morant y las «cuatro bofetadas»). Todo Short o pieza con cruce sigue esto:
