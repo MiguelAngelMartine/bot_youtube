@@ -254,3 +254,4 @@ Cada dato, cita, idea y muletilla sale una sola vez (fallos reales: Feijóo «pr
 - 21-nov-2026: YouTube cortó las subidas por el límite diario tras rehacer varias veces el mismo día. Desde entonces nada se sube sin el OK del usuario por Telegram.
 - 21-nov-2026: el usuario encarga para el 22-nov un Short de cruce de declaraciones (Morant, «cuatro bofetadas» a Feijóo, y las réplicas del PP) a partir de sus tuits: nace el encargo «cruce» con búsqueda en X.
 - 22-nov-2026: el usuario pide «un punto más de velocidad» al presentador: +8 % (prosody de la pieza entera, no por frases), el cierre sin tocar. «Mitin» con SAPI sonaba «mitón»: fuera del diccionario.
+- 22-nov-2026: el Short de cruce Morant / PP («ha salido perfecto») queda como modelo: NORMAS.md §4 «El Short de cruce modelo».

@@ -423,6 +423,14 @@ def main(fecha, n=3):
     fijo = enc.get("short_fijo") if enc.get("verificada") else None   # 8-nov: guion del Short escrito y comprobado a mano
     if fijo:
         obligada = ""
+    try:                                                 # 22-nov-2026 (Short de cruce modelo): solo personajes con imagen
+        import presentador as PR
+        _, _, pols_ = PR.catalogo()
+        con_imagen = sorted({" ".join(PR._NOMBRE.get(r_, [k_])).title() for k_, rs_ in pols_.items() for r_ in rs_})
+        obligada += ("\n\nPERSONAJES CON IMAGEN (las citas y réplicas, SOLO de ellos; sin imagen no sale su cara): "
+                     + ", ".join(con_imagen) + ". Prefiere los CRUCES (cita + réplica literal de otro partido).")
+    except Exception as ex:
+        print(f"  (sin lista de imágenes: {type(ex).__name__})")
     r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
     if isinstance(r, list):                              # a veces devuelve la lista sin envolver
         r = {"shorts": r}

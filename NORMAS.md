@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -101,12 +101,29 @@ abogado de propiedad intelectual.
   abre** la pieza o el Short va primero y quién lo dice, en la frase **inmediatamente siguiente** («…». Sánchez ataca a
   Feijóo). En la frase que introduce una cita, que no haya otro posible hablante como sujeto: si el montaje no sabe con
   seguridad de quién es la cita, no saca a nadie.
-- **Cruce:** ataque literal → puente muy corto (≤ 8 palabras: «Y Sánchez le devuelve:») → réplica literal → el presentador
+- **Cruce:** ataque literal → puente muy corto (≤ 12 palabras: «Y Sánchez le devuelve:») → réplica literal → el presentador
   vuelve con el chascarrillo o sigue. Nada de narración larga entre el ataque y la réplica (si no, se rompe el cruce).
 - Tras cada cita o cruce, **una frase del presentador** (chascarrillo de la paleta o seguir el hilo) antes de la siguiente
   cita: así el vídeo alterna presentador y personajes con ritmo. **Las pausas las pone el guion** con su puntuación (punto,
   coma, dos puntos, puntos suspensivos): la voz lee de corrido lo que está escrito (ver «Lectura entera»).
 - Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
+
+### El Short de cruce modelo (22-nov-2026, el usuario: «ha salido perfecto, guarda las directrices como norma para todos»)
+Referencia: `dia/2026-11-22/shorts/short_1.json` (Morant y las «cuatro bofetadas»). Todo Short o pieza con cruce sigue esto:
+- **Abre con la frase literal que lo desata**, entera, de la fuente más fiel (transcripción del vídeo o de la noticia, nunca
+  la paráfrasis de un rival); quién la dice, en la frase siguiente y muy breve («Lo dijo Morant en un mitin.»).
+- **Dos cruces como mucho, de dos personajes cada uno**: el que lanza la frase a la IZQUIERDA y el que replica a la DERECHA,
+  con un puente de ≤ 12 palabras que nombra al que replica justo antes de su cita («Ester Muñoz, del PP:», «Y Morant le
+  contesta por escrito:»). Entre un cruce y el siguiente, el **presentador** da el contexto (quién es, dónde y cuándo lo dijo,
+  si rectifica o no) con una coletilla. El segundo cruce puede ser la réplica de un tercero y la **contrarréplica** del
+  primero, que así tiene su voz (equilibrio).
+- **Solo personajes con imagen** en `Imagenes/Políticos`; de los demás no se elige cita (no se mete un cruce sin cara).
+- **Remate neutral** del presentador sin declarar ganador («Y aquí cada uno entiende la metáfora a su manera.») y **pregunta
+  corta con el nombre** de quien dijo la frase («¿Se pasó Morant?»): tiene que caber en una línea del cierre.
+- **≤ 60 s** (con la voz a +8 %, unas 145 palabras con el cierre); si pasa, se quita narración, nunca citas.
+- **En pantalla**: los dos globos del cruce, uno arriba (izquierda) y otro debajo (derecha), sin pisarse entre ellos ni
+  tapar a los personajes ni al subtítulo; cada globo con el cargo limpio y **su fuente** («según The Objective», «según X
+  (@cuenta)»: `fuentes_citas`). Se revisan los fotogramas de cada cruce antes de mandarlo.
 
 ### La voz: Tristán HD «1,2», LECTURA ENTERA (estándar del usuario desde el 21-nov-2026) + diccionario de pronunciación
 - **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2**, **velocidad +8 %** (22-nov-2026, el usuario: «un punto más de
