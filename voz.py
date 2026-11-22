@@ -27,7 +27,7 @@ import pausas
 
 RAIZ = Path(__file__).parent
 AZURE_VOZ = "es-ES-Tristan:DragonHDLatestNeural"    # muestra D, elegida el 2-nov-2026
-AZURE_VEL = "+0%"
+AZURE_VEL = "+8%"                                  # 22-nov-2026 (el usuario): «un punto más de velocidad»; el cierre, sin tocar
 AZURE_TEMP = "1.2"                                 # 21-nov-2026: el usuario elige la muestra «A3» (1,2: más regular, menos
 #                                                    variación entre lecturas) con el ritmo corregido por trozos y filtro «radio».
 #                                                    Antes, 1,6 (14-nov, energética) y 1,0 («A», apagada).
@@ -159,8 +159,7 @@ SIGLAS = {k: v for k, v in SIGLAS.items() if k != v and not v.startswith("la ")}
 # con el alfabeto fonético SAPI de Azure (sílaba tónica con «1» tras la vocal). Cada palabra que el usuario oiga mal, aquí.
 PRONUNCIA = {
     "mitines": "m i t i 1 n e s",
-    "mitin": "m i 1 t i n",
-}
+}   # 22-nov-2026: «mitin» fuera: con SAPI sonaba «mitón»; sin entrada la dice bien
 # Palabras que basta con escribirle a la voz de otra forma (con tilde, por ejemplo) para que las diga bien. El texto en
 # pantalla no cambia. 21-nov-2026: «enterarais» salía «enteraráis» y con SAPI tampoco; con tilde, el usuario la aprueba.
 ESCRIBE = {
@@ -431,7 +430,7 @@ def _locuta(pasos, tono_seccion, wav_salida, modo="plano", cola=0.7):
         mp3, wav = Path(f"{tmp}_{j}.mp3"), Path(f"{tmp}_{j}.wav")
         cierre = k_cierre is not None and j >= k_cierre
         if azure:
-            _azure_mp3(txt, mp3, temp=AZURE_TEMP_CIERRE if cierre else None)
+            _azure_mp3(txt, mp3, temp=AZURE_TEMP_CIERRE if cierre else None, vel="+0%" if cierre else None)
         else:
             pal = asyncio.run(_sintetiza(txt, r, mp3))
         subprocess.run([V1.FF, "-y", "-loglevel", "error", "-i", str(mp3), "-ar", str(sr), "-ac", "2", str(wav)], check=True)

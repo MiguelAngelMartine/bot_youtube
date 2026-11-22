@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -109,7 +109,8 @@ abogado de propiedad intelectual.
 - Una cita = una persona: no mezclar dos voces dentro de las mismas comillas.
 
 ### La voz: Tristán HD «1,2», LECTURA ENTERA (estándar del usuario desde el 21-nov-2026) + diccionario de pronunciación
-- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2**, velocidad normal, filtro «radio» en
+- **Tristán HD de Azure** (`es-ES-Tristan:DragonHDLatestNeural`), **temperatura 1,2**, **velocidad +8 %** (22-nov-2026, el usuario: «un punto más de
+  velocidad»; `voz.AZURE_VEL`, la misma para toda la pieza), filtro «radio» en
   todo el vídeo, coletillas incluidas (`voz.py`).
 - **Lectura entera** (decisión del usuario del 21-nov-2026, estándar para todos los vídeos): la voz lee el guion **de
   corrido, de una vez por pieza** (un Short entero; en el largo, cada sección) y **el guion gestiona las pausas** con su
@@ -121,9 +122,10 @@ abogado de propiedad intelectual.
 - **Pausa en las comillas:** medio segundo al cerrar una cita y 0,3 s antes de abrirla tras «:» (`voz.pausas_citas`,
   `<break>` de la propia voz). Sin ella, la frase siguiente (una coletilla, por ejemplo) sonaba pegada a la cita.
 - **Cierre de los Shorts como siempre:** la pregunta final y «Te leo en comentarios. Y dale a suscribirte, que he visto
-  que aún no lo has hecho» van aparte, con su estilo de siempre (temperatura 1,6; `voz.CIERRE`, `voz.AZURE_TEMP_CIERRE`).
+  que aún no lo has hecho» van aparte, con su estilo de siempre (temperatura 1,6 y velocidad normal, sin el +8 %; `voz.CIERRE`,
+  `voz.AZURE_TEMP_CIERRE`).
 - **Diccionario de pronunciación** (`voz.PRONUNCIA`): las palabras que Tristán acentúa o dice mal se le dictan con el
-  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitin, mitines). Si con SAPI no sale, se le **escribe** la palabra de otra forma solo para la voz (`voz.ESCRIBE`, p. ej. «enterarais» → «enterárais», aprobado por el usuario el 21-nov-2026); el texto en pantalla no cambia. Cada
+  alfabeto fonético **SAPI** de Azure (la tónica con «1» tras la vocal; p. ej., «mitines» = `m i t i 1 n e s`; en el diccionario: mitines; «mitin» salió el 22-nov-2026 porque con SAPI sonaba «mitón» y sin entrada la dice bien). Si con SAPI no sale, se le **escribe** la palabra de otra forma solo para la voz (`voz.ESCRIBE`, p. ej. «enterarais» → «enterárais», aprobado por el usuario el 21-nov-2026); el texto en pantalla no cambia. Cada
   palabra que el usuario oiga mal se añade ahí y se le manda la prueba por Telegram.
   **Solo puntual** (decisión del usuario, 21-nov-2026): nunca para todas las palabras; dictar todo quita naturalidad.
   Las tomas aprobadas se conservan: añadir una palabra al diccionario solo vuelve a grabar los trozos que la llevan. Licencia comercial. **Sin voz de reserva en producción:** si Azure falla, se reintenta y, si sigue, no se sube
