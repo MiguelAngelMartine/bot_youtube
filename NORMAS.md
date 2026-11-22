@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; «Ester» se le escribe «Estér» a la voz).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -119,6 +119,11 @@ abogado de propiedad intelectual.
   5. Si el tuit se borra antes de publicar, la cita se cae.
   6. El globo dice su fuente: «según X (@cuenta)» (lo pone el montaje solo si la cita está literal en un tuit).
   7. Neutralidad de siempre (las dos partes, remate sin ganador) e interés informativo: cargos o candidatos con peso.
+- **Qué es un cruce (22-nov-2026, el usuario):** no hace falta que uno conteste al otro. Vale juntar **varios personajes
+  con su postura sobre la misma historia** (tuits, mítines, entrevistas), aunque no sea una respuesta directa y **aunque
+  no quede equilibrado**: lo que importa es que las declaraciones estén relacionadas con la historia principal y tengan
+  calidad para el contenido. Lo que nunca se hace: presentar como respuesta («le contesta») algo que no lo es, ni
+  sacar una frase de su contexto. La recogida agrupa estas voces en «VARIAS VOCES SOBRE LA MISMA HISTORIA» (`redes.md`).
 - **Cruces en el largo igual que en los Shorts:** los dos personajes a la vez, uno a cada lado con su globo, cuando el
   guion nombra a quien habla justo antes de su cita y entre las dos citas hay un puente de 12 palabras como mucho.
 

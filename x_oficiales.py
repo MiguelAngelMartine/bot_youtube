@@ -144,6 +144,55 @@ async def _de_cuenta(api, n, h, desde, por_cuenta):
     return (cruces + resto)[:max(por_cuenta, len(cruces))]   # los cruces no se recortan
 
 
+_VACIAS = set("""Gobierno España Sánchez Feijóo Abascal Congreso PSOE Vox Partido Popular Presidente Madrid Hoy Este Esta
+Estos Estas Para Pero Porque Cuando Todo Todos Hay Hoy Gracias Nuestro Nuestra Nosotros Vamos Ahora Aquí Allí Elecciones
+VotaPSOE LaFuerzaDeLaGente Entrevista Necesario Gente Gracias Buenos Feliz Directo""".split())
+
+
+def voces(tuits, minimo=2):
+    """22-nov-2026 (el usuario: «aunque no sea un cruce directo, también sirven comentarios relacionados con la historia
+    principal»): agrupa los tuits de cuentas DISTINTAS que hablan de la misma historia: comparten un nombre propio o una
+    etiqueta poco frecuente ese día (no a principio de frase, ni de los que salen en todo: Sánchez, Feijóo...).
+    Devuelve [(claves, [tuits])], de más voces a menos."""
+    import re
+    from collections import Counter
+
+    def claves(t):
+        t = re.sub(r"https?://\S+|@\w+", " ", t.split(" [cita a ")[0])
+        out = set()
+        for m in re.finditer(r"(#?)([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{3,})\b", t):
+            antes = t[:m.start()].rstrip()
+            if not m.group(1) and (not antes or antes[-1] in ".!?:¿¡«\"\n"):
+                continue                                   # mayúscula de principio de frase
+            if m.group(2) not in _VACIAS:
+                out.add(m.group(2))
+        return out
+    ks = [claves(x["texto"]) for x in tuits]
+    df = Counter(w for k in ks for w in k)
+    tope = max(3, len(tuits) // 12)                        # lo que sale en todo no identifica una historia
+    por_pal = {}
+    for i, k in enumerate(ks):
+        for w in k:
+            if df[w] <= tope:
+                por_pal.setdefault(w, set()).add(i)
+    grupos = []                                            # [palabras, índices]; se unen si comparten casi los mismos tuits
+    for w, idx in sorted(por_pal.items(), key=lambda z: -len(z[1])):
+        if len({tuits[i]["quien"] for i in idx}) < minimo:
+            continue
+        g = next((g for g in grupos if len(g[1] & idx) / len(g[1] | idx) >= 0.5), None)
+        if g:
+            g[0].append(w); g[1] |= idx
+        else:
+            grupos.append([[w], set(idx)])
+    out, usados = [], set()
+    for ws, idx in sorted(grupos, key=lambda g: -len({tuits[i]["quien"] for i in g[1]})):
+        if idx <= usados:
+            continue
+        usados |= idx
+        out.append((ws, [tuits[i] for i in sorted(idx)]))
+    return out
+
+
 def cruces(tuits):
     """Los intercambios reales entre dos cuentas oficiales distintas (uno responde o cita al otro), sin repetir."""
     vistos, out = set(), []

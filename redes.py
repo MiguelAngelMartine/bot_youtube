@@ -252,6 +252,14 @@ def main(fecha, horas=30):
         (dia / "articulos").mkdir(exist_ok=True)
         (dia / "articulos" / "x_cruces.txt").write_text(
             "MEDIO: X (cuentas oficiales)\nTITULAR: Cruces de declaraciones en X\n\n" + "\n".join(txt), encoding="utf-8")
+    vs = x_oficiales.voces(xs)
+    if vs:
+        md += ["## VARIAS VOCES SOBRE LA MISMA HISTORIA (cuentas oficiales; no hace falta que se respondan)", ""]
+        for k, grupo in vs[:8]:
+            md.append(f"### {', '.join(k[:6])}")
+            md += [f"- **{x['quien']}** ({x['fecha'][:16].replace('T', ' ')}): {x['texto']} ({x['enlace']})" for x in grupo]
+            md.append("")
+    if cz or vs:
         md.append("## Todo lo publicado")
     for x in datos:
         md.append(f"- **{x['quien']}** ({x['canal']}, {x['fecha'][:16].replace('T', ' ')}): {x['texto']} ({x['enlace']})")
