@@ -164,6 +164,7 @@ PRONUNCIA = {
 # pantalla no cambia. 21-nov-2026: «enterarais» salía «enteraráis» y con SAPI tampoco; con tilde, el usuario la aprueba.
 ESCRIBE = {
     "enterarais": "enterárais",
+    "Ester": "Estér",          # 22-nov-2026: Ester Muñoz; el usuario elige la prueba B
 }
 # Versión del procesado de la voz: entra en la clave de la caché. Se sube SOLO cuando cambia cómo se genera la voz (no al
 # añadir palabras al diccionario: esas entran en la clave de los trozos que las llevan).
