@@ -254,14 +254,24 @@ def subir_shorts(dia_txt, solo=None):
         if S.get("personajes"):                         # 21-nov-2026: formato presentador
             partes += ["El fondo, el presentador (un personaje ficticio) y las ilustraciones de los políticos están "
                        "generados con IA; las frases que se les atribuyen son citas literales publicadas por los medios."]
+        try:                                            # 22-nov-2026: búsquedas REALES de YouTube que describen el Short
+            import palabras_clave as PK
+            busc, hs_busc = PK.para_video(" ".join(str(S.get(k) or "") for k in ("voz", "titulo", "contexto", "kicker")),
+                                          S.get("personajes") or [], temas=[h for h in (S.get("hashtags") or [])
+                                                                            if "hoyformativo" not in h.lower()])
+        except Exception as e:
+            print(f"(palabras clave sin datos: {type(e).__name__})")
+            busc, hs_busc = [], []
         hs, vistos = [], set()                          # 7-nov: más hashtags (máx. 15: con más, YouTube los ignora)
-        for h in ["#Shorts"] + list(S.get("hashtags") or []) + ["#PolíticaEspañola", "#NoticiasDeHoy", "#ElHoyformativo"]:
+        propios = list(S.get("hashtags") or [])
+        for h in ["#Shorts"] + propios[:2] + hs_busc + propios[2:] + ["#PolíticaEspañola", "#NoticiasDeHoy", "#ElHoyformativo"]:
             h = "#" + re.sub(r"[\s#]+", "", str(h))
             if len(h) > 1 and h.lower() not in vistos:
                 vistos.add(h.lower())
                 hs.append(h)
-        partes += ["", " ".join(hs[:15])]
-        tags = list(dict.fromkeys([t.strip() for t in (S.get("etiquetas") or []) if str(t).strip()] +
+        hs = hs[:15] if "#elhoyformativo" in {h.lower() for h in hs[:15]} else hs[:14] + ["#ElHoyformativo"]
+        partes += ["", " ".join(hs)]
+        tags = list(dict.fromkeys(busc + [t.strip() for t in (S.get("etiquetas") or []) if str(t).strip()] +
                                   [S["quien"], (S.get("replica") or {}).get("quien", ""), S.get("partido", ""),
                                    "política española", "noticias de hoy", "Shorts", "El Hoyformativo"]))
         tags = [t for t in tags if t]

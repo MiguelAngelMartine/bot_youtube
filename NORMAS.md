@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; etiquetas y hashtags con las búsquedas reales de YouTube).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -347,6 +347,13 @@ y no se usa hasta nueva orden del usuario.**
   editorial revisa antes de publicar (es verdad: publica el usuario).
 - Metadatos: vídeo con 35-45 etiquetas y 12-15 hashtags; Shorts con 15-25 etiquetas y 8-12 hashtags; solo de personas y temas
   que salen; títulos con verbos neutros.
+- **Búsquedas reales primero** (usuario, 22-nov-2026: «llegar al máximo posible de búsquedas»): `palabras_clave.py` investiga lo
+  que más se busca en YouTube sobre política española (autocompletado de YouTube en España para cada político, partido y
+  tema, y etiquetas de los vídeos más vistos del mes) y lo guarda en `archivo/palabras_clave.json` (se refresca cada 3 días;
+  la parte de la API, a mano: `palabras_clave.py investiga`). Al publicar, `para_video()` elige las búsquedas que describen
+  ESE vídeo (todas sus palabras salen en él; un apellido ambiguo suelto no vale; nada de «en directo», «entrevista»... si no
+  lo es) y pregunta en directo por los temas del día. Van primero en las etiquetas; los hashtags más buscados, tras los 3
+  visibles; en la descripción, solo dentro de frases naturales (una lista de palabras clave es spam para YouTube).
 
 ## 8. Derechos de autor
 - Los hechos se cuentan con **palabras propias**; nunca se lee ni se muestra un artículo, titular o captura de un medio.

@@ -45,7 +45,14 @@ def main(fecha):
     dia = RAIZ / "dia" / fecha
     G = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
     guion = "\n\n".join(f"[{s.get('titulo', '')}]\n" + " ".join(p.get("di", "") for p in s["pasos"]) for s in G["secciones"])
-    r = gem.pide(PROMPT + guion, como_json=True)
+    # 22-nov-2026 (el usuario: llegar al máximo de búsquedas): las búsquedas REALES de YouTube que describen este vídeo
+    import palabras_clave as PK
+    PK.carga(max_dias=3, refrescar=True)
+    temas = [s.get("titulo", "") for s in G["secciones"]]
+    busc, hs_busc = PK.para_video(guion, temas=re.findall(r"[A-ZÁÉÍÓÚÑ][\wáéíóúñ]{3,}", " ".join(temas))[:6], max_tags=30)
+    extra = ("\n\nBÚSQUEDAS REALES DE YOUTUBE que describen este vídeo (de más a menos buscadas; úsalas tal cual en "
+             "etiquetas y, cuando encajen de forma natural, en las «lineas» y el título): " + "; ".join(busc)) if busc else ""
+    r = gem.pide(PROMPT + guion + extra, como_json=True)
     if not isinstance(r, dict) or not r.get("titulo"):
         print("Gemini no responde: usa el agente editor-plataforma")
         sys.exit(2)
@@ -58,6 +65,9 @@ def main(fecha):
                    + "\n\nEl Hoyformativo: la actualidad, en un minuto. Frases literales y comprobadas en su fuente, con todas "
                    "las partes. Contenido revisado por el equipo editorial antes de publicarse.")
     etiquetas = [e.strip() for e in r.get("etiquetas", []) if e.strip()]
+    vist = {PK._n(e) for e in etiquetas}                # las búsquedas reales, primero; luego las del redactor
+    etiquetas = [b for b in busc if PK._n(b) not in vist] + etiquetas
+    etiquetas = list(dict.fromkeys(etiquetas))
     while len(", ".join(etiquetas)) > 480:
         etiquetas.pop()
     for mal, bien in ((r"\b(carga|cargan|arremete|arremeten|estalla|estallan) contra\b", "critica a"),
@@ -72,7 +82,9 @@ def main(fecha):
     except Exception as e:
         print(f"(experto sin respuesta: {type(e).__name__})")
     vistos, hs = set(), []
-    for h in r.get("hashtags", []):                    # máximo 15 (con más, YouTube los ignora todos), sin repetir
+    rh = list(r.get("hashtags", []))
+    rh = rh[:3] + [h for h in hs_busc if h.lower() not in {x.lower() for x in rh}] + rh[3:]   # los más buscados, tras los 3 visibles
+    for h in rh:                                       # máximo 15 (con más, YouTube los ignora todos), sin repetir
         h = "#" + re.sub(r"[\s#]+", "", str(h))
         if len(h) > 1 and h.lower() not in vistos:
             vistos.add(h.lower())
