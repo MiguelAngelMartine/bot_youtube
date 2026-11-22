@@ -682,7 +682,12 @@ class Escena:
         if g and not g.get("cierre"):
             if self.vertical:
                 s = subtitulo(g, t, W - 120, 62)
-                fr.alpha_composite(s, ((W - s.width) // 2, int(H * 0.39) - s.height))
+                # 22-nov: el puente DENTRO de un cruce va en el hueco del globo derecho (que aún no ha entrado): arriba
+                # pisaba el globo izquierdo
+                dentro = any(self.cruce.get(k) and min(x["t0"] for x in gr) < g["t0"] < max(x["t0"] for x in gr)
+                             for k, gr in self.grupos.items())
+                if not (dentro and t > g["t1"] - 0.3):  # se va antes: el globo derecho entra 0,25 s antes de la cita
+                    fr.alpha_composite(s, ((W - s.width) // 2, int(H * 0.30) if dentro else int(H * 0.39) - s.height))
             else:
                 s = subtitulo(g, t, 1050, 56)
                 fr.alpha_composite(s, (int(W * 0.40), H - s.height - 80))
