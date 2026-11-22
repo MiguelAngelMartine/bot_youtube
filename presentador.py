@@ -335,6 +335,11 @@ def _ordena_lados(tr):
         else:
             grupo += 1
             g["lado"], g["grupo"] = "izq", grupo
+    # 22-nov-2026: un tramo corto entre citas de GRUPOS distintos no es un puente: lo dice el presentador en pantalla
+    # (si no, el escenario se quedaba vacío con el subtítulo hasta que entraba el siguiente)
+    for i, g in enumerate(tr):
+        if g.get("puente") and 0 < i < len(tr) - 1 and tr[i - 1].get("grupo") != tr[i + 1].get("grupo"):
+            g.pop("puente")
     return tr
 
 
@@ -669,6 +674,20 @@ class Escena:
         self.V = V
         self.grupos = grupos
 
+    def _escala_cruce(self, quien):
+        """Escala común de los cruces en los que sale `quien`: la que hace que el más ancho de cada pareja quepa en su
+        mitad de la pantalla (0,47 del ancho), sin pasar de 0,88."""
+        if not hasattr(self, "_esc_cruce"):
+            self._esc_cruce = {}
+            for k, gr in self.grupos.items():
+                if not self.cruce.get(k):
+                    continue
+                figs = [self.figs.get(x["quien"]) for x in gr]
+                e = min([0.88] + [0.47 * self.W / f.width for f in figs if f is not None])
+                for x in gr:
+                    self._esc_cruce[x["quien"]] = min(e, self._esc_cruce.get(x["quien"], 0.88))
+        return self._esc_cruce.get(quien, 0.88)
+
     def _fig(self, clave, pose):
         return self.poses[pose % len(self.poses)] if clave == "P" else self.figs[clave]
 
@@ -682,7 +701,7 @@ class Escena:
         W, H = self.W, self.H
         if self.vertical:
             if g_cruce:
-                return (0.27 if lado == "izq" else 0.73) * W
+                return (0.25 if lado == "izq" else 0.75) * W
             return 0.38 * W
         if clave == "P" or not g_cruce:
             return (0.19 if lado == "izq" else 0.81) * W
@@ -721,6 +740,8 @@ class Escena:
             # 20-nov-2026 (el usuario: «parece que están temblando, las quiero estáticas»): los personajes están QUIETOS en
             # pantalla; solo se mueven al entrar y salir (desliz + fundido). Nada de «respirar» ni de balanceo al hablar.
             s = 0.88 if (self.vertical and en_cruce) else 1.0
+            if self.vertical and en_cruce:                # 22-nov-2026: en un cruce cada figura cabe en SU mitad (con los
+                s = min(s, self._escala_cruce(clave))     # brazos abiertos se pisaban), y las dos a la MISMA escala
             if s != 1.0:
                 k_ = (clave, pose % len(self.poses) if clave == "P" else 0, s)
                 if k_ not in self.sombras:
@@ -881,7 +902,9 @@ def _fuente_x(dia):
         tuits = [x for x in json.loads((dia / "redes.json").read_text(encoding="utf-8")) if "(@" in x.get("quien", "")]
     except (OSError, ValueError):
         tuits = []
-    textos = [(_n(x["texto"]), "X (@" + x["quien"].split("(@")[1].rstrip(")") + ")") for x in tuits]
+    # solo el texto PROPIO del tuit: el tuit que cita va entre «[cita a @…]» y es de otro (fallo real del 22-nov: la frase de
+    # Sánchez salió «según X (@Mtelladof)» porque Tellado citaba su tuit)
+    textos = [(_n(x["texto"].split(" [cita a @")[0]), "X (@" + x["quien"].split("(@")[1].rstrip(")") + ")") for x in tuits]
 
     def de(cita):
         c = _n(cita)

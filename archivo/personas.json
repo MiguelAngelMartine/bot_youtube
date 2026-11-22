@@ -1,110 +1,668 @@
 {
-  "Oscar Puente": {"cargo": "Dimitido como ministro de Transportes (dimision anunciada el 3-nov)", "partido": "PSOE", "fuente": "El Mundo, elDiario.es, La Vanguardia, ABC, 20minutos (episodio 4-nov); antes ministro (contexto 1-nov)", "verificado": "2026-11-04"},
-  "Santiago Abascal": {"cargo": "Lider de Vox", "partido": "Vox", "fuente": "20minutos (contexto 1-nov); tarjeta 3-nov (20minutos)", "verificado": "2026-11-01"},
-  "Alma Ezcurra": {"cargo": "Vicesecretaria del PP (Coordinacion Sectorial)", "partido": "PP", "fuente": "El Mundo, ABC; 20minutos dice 'Regeneracion Institucional' (discrepancia, se uso El Mundo/ABC)", "verificado": "2026-11-01"},
-  "Alberto Nunez Feijoo": {"cargo": "Presidente del PP", "partido": "PP", "fuente": "ABC, El Mundo (contexto 1-nov); tarjetas 3-nov (Europa Press, El Mundo, El Pais)", "verificado": "2026-11-01"},
-  "Pedro Sanchez": {"cargo": "Presidente del Gobierno", "partido": "PSOE", "fuente": "El Mundo, ABC (contexto 1-nov); tarjeta 3-nov (El Pais)", "verificado": "2026-11-01"},
-  "Veronica Martinez Barbero": {"cargo": "Coordinadora general de Movimiento Sumar y candidata del Frente Amplio", "partido": "Frente Amplio", "fuente": "20minutos (contexto 1-nov); el 3-nov La Vanguardia llama a Ada Colau candidata a la Presidencia del Gobierno del Frente Amplio: discrepancia sin aclarar", "verificado": "2026-11-01"},
-  "Miriam Nogueras": {"cargo": "Candidata de Junts al Congreso", "partido": "Junts", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
-  "Maribel Vaquero": {"cargo": "Portavoz del PNV en el Congreso", "partido": "PNV", "fuente": "20minutos (contexto 1-nov); usada en la tarjeta 'Quien pide su salida' del 3-nov (La Vanguardia)", "verificado": "2026-11-01"},
-  "Irene Montero": {"cargo": "Numero 1 de Podemos al Congreso y eurodiputada", "partido": "Podemos", "fuente": "20minutos (contexto 1-nov); tarjeta 3-nov (La Vanguardia)", "verificado": "2026-11-01"},
-  "Nestor Rego": {"cargo": "Diputado del BNG y candidato", "partido": "BNG", "fuente": "20minutos (contexto 1-nov)", "verificado": "2026-11-01"},
-  "Salvador Illa": {"cargo": "Presidente de la Generalitat", "partido": "PSC", "fuente": "contexto 1-nov (texto 113); tarjeta con cita en X", "verificado": "2026-11-01"},
-  "Alvise Perez": {"cargo": "Eurodiputado y lider de Se Acabo La Fiesta", "partido": "SALF", "fuente": "elDiario.es", "verificado": "2026-11-01"},
-  "Jaume Collboni": {"cargo": "Alcalde de Barcelona", "partido": "PSC", "fuente": "Tarjeta del episodio del 1-nov (cita en El Mundo); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Nuria Parlon": {"cargo": "Consellera de Interior", "partido": "PSC", "fuente": "Tarjeta del episodio del 1-nov (cita en elDiario.es); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Diego Martin": {"cargo": "Secretario general de SEMAF", "partido": "Institucion (sindicato)", "fuente": "Tarjeta del episodio del 1-nov (cita en El Pais); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Francisco Cerro": {"cargo": "Arzobispo de Toledo", "partido": "n/a", "fuente": "ABC (misa del 1-nov, citado en el episodio); no estaba en el contexto previo. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Andres Lopez": {"cargo": "Comandante de la Guardia Civil", "partido": "n/a", "fuente": "Citado en el episodio (Europa Press); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Pedro Casares": {"cargo": "Delegado del Gobierno en Cantabria", "partido": "PSOE", "fuente": "Europa Press (articulos/085.txt), contexto 3-nov; tarjeta 3-nov (La Vanguardia)", "verificado": "2026-11-03"},
-  "David Setien": {"cargo": "Concejal y portavoz del PP en Ruesga", "partido": "PP", "fuente": "Europa Press (articulos/085.txt y 086.txt), contexto 3-nov; cargo de portavoz segun el episodio 3-nov", "verificado": "2026-11-03"},
-  "Juanma Moreno": {"cargo": "Presidente de la Junta de Andalucia", "partido": "PP", "fuente": "Tarjeta del episodio del 3-nov (cita en ABC); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Pepe Alvarez": {"cargo": "Secretario general de UGT", "partido": "UGT (sindicato)", "fuente": "Tarjeta del episodio del 3-nov (cita en ABC); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Unai Sordo": {"cargo": "Lider de CCOO", "partido": "CCOO (sindicato)", "fuente": "Tarjeta del episodio del 3-nov (cita en elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Alicia del Rio": {"cargo": "Portavoz del Sindicato de Inquilinas", "partido": "Institucion", "fuente": "Tarjeta del episodio del 3-nov (cita en elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Rebeca Torro": {"cargo": "Secretaria de Organizacion", "partido": "PSOE", "fuente": "Tarjeta del episodio del 3-nov (cita en El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Elma Saiz": {"cargo": "Ministra portavoz del Gobierno", "partido": "PSOE", "fuente": "Citada en la voz del episodio del 3-nov (elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Aitor Esteban": {"cargo": "Presidente del PNV", "partido": "PNV", "fuente": "Voz y vineta del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Elisenda Alamany": {"cargo": "Portavoz de ERC", "partido": "ERC", "fuente": "Voz del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ivan Picos": {"cargo": "Alcalde de Hoyocasero (Avila)", "partido": "PP", "fuente": "Voz y vineta del episodio del 3-nov (El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Carlos Cuerpo": {"cargo": "Vicepresidente primero y ministro de Economia; asume las competencias de Transportes (transitorio)", "partido": "Sin carne del PSOE (segun el episodio 4-nov)", "fuente": "El Pais, ABC, elDiario.es, Europa Press (episodio 4-nov)", "verificado": "2026-11-04"},
-  "Ada Colau": {"cargo": "Candidata del Frente Amplio", "partido": "Frente Amplio", "fuente": "Episodio 4-nov (Europa Press, elDiario.es); La Vanguardia 3-nov la llama candidata a la Presidencia: discrepancia con Veronica Martinez Barbero sin aclarar", "verificado": "2026-11-04"},
-  "Pablo Llarena": {"cargo": "Juez instructor del Supremo", "partido": "Institucion", "fuente": "El Mundo, La Vanguardia, 20minutos, ABC, Europa Press (episodio 4-nov)", "verificado": "2026-11-04"},
-  "Ester Muñoz": {"cargo": "Portavoz del PP en el Congreso", "partido": "PP", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Jose Manuel Albares": {"cargo": "Ministro de Asuntos Exteriores", "partido": "Gobierno", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Pepa Millan": {"cargo": "Portavoz de Vox en el Congreso", "partido": "Vox", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Jose Ramon Gomez Besteiro": {"cargo": "Lider del PSdeG", "partido": "PSOE", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Alfonso Rueda": {"cargo": "Presidente de la Xunta y del PP gallego", "partido": "PP", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ana Pontón": {"cargo": "Portavoz nacional del BNG", "partido": "BNG", "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Monica Sales": {"cargo": "Presidenta del grupo de Junts en el Parlament", "partido": "Junts", "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Gabriel Rufian": {"cargo": "Portavoz y cabeza de lista de ERC", "partido": "ERC", "fuente": "Europa Press (vineta 4-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Miguel Tellado": {"cargo": "Secretario general del PP (4-nov, elDiario.es); la tarjeta del 6-nov lo llama 'Dirigente del PP' (web del PP)", "partido": "PP", "fuente": "elDiario.es (breve 4-nov); tarjeta 6-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Luis Pedro Marco de la Peña": {"cargo": "Presidente de Adif (dimitido el 4-nov)", "partido": "Institucion", "fuente": "20minutos, RTVE, elDiario.es, El Pais, La Razon (episodio 5-nov)", "verificado": "2026-11-05"},
-  "Ione Belarra": {"cargo": "Podemos (cargo SIN VERIFICAR)", "partido": "Podemos", "fuente": "Voz del episodio 5-nov; cargo no indicado en el episodio", "verificado": "SIN VERIFICAR"},
-  "Ana Redondo": {"cargo": "Cabeza de lista del PSOE por Valladolid (sustituye a Puente)", "partido": "PSOE", "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Mario Samper": {"cargo": "Presidente de la Asociacion de Victimas de Adamuz", "partido": "Institucion", "fuente": "La Vanguardia, 4-nov (tarjeta 5-nov); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Javier Hernandez": {"cargo": "Magistrado del Supremo", "partido": "Institucion", "fuente": "Voz del episodio 5-nov (El Pais, El Mundo, ABC); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Carmen Lamela": {"cargo": "Magistrada (Supremo)", "partido": "Institucion", "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Koldo Garcia": {"cargo": "Exasesor de Abalos", "partido": "Institucion", "fuente": "Tarjeta del episodio 6-nov (audio, segun El Pais); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Isabel Diaz Ayuso": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjeta del episodio 6-nov (ABC); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Javier Milei": {"cargo": "Presidente de Argentina", "partido": "Institucion", "fuente": "Tarjeta del episodio 6-nov (El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Andres Allamand": {"cargo": "Secretario general iberoamericano", "partido": "Institucion", "fuente": "Voz y viñeta del episodio 6-nov (El Pais, El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ismael Moreno": {"cargo": "Juez de la Audiencia Nacional", "partido": "Institucion", "fuente": "Voz del episodio 6-nov (El Pais); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Alberto Duran": {"cargo": "Abogado del PP (segun Koldo Garcia)", "partido": "PP", "fuente": "Voz del episodio 6-nov; atribucion de Koldo, SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
-  "Pedro Sanchez (7-nov)": {"cargo": "Presidente del Gobierno", "partido": "PSOE", "fuente": "Tarjetas del episodio 7-nov (El Pais)", "verificado": "2026-11-01"},
-  "Ester Muñoz (7-nov)": {"cargo": "Portavoz del PP en el Congreso (la voz del 7-nov en Koldo la llama portavoz de campaña del PP)", "partido": "PP", "fuente": "Tarjetas 7-nov (Europa Press, elDiario.es); discrepancia de cargo sin aclarar", "verificado": "SIN VERIFICAR"},
-  "Manuel Cobo": {"cargo": "Dirigente del PP", "partido": "PP", "fuente": "Tarjeta 7-nov (elDiario.es); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Diana Morant": {"cargo": "Ministra de Ciencia", "partido": "PSOE", "fuente": "Tarjeta 7-nov (TVE, segun El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Raul de las Hoz": {"cargo": "PP (cargo SIN VERIFICAR; eurodiputado segun la nota, no confirmado)", "partido": "PP", "fuente": "Nota de cifra 7-nov (La Razon); SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
-  "Aitor Esteban (7-nov)": {"cargo": "Sin cargo en la tarjeta (en el archivo: Presidente del PNV, SIN VERIFICAR)", "partido": "PNV", "fuente": "Tarjeta 7-nov (web del PNV)", "verificado": "SIN VERIFICAR"},
-  "Alicia Garcia": {"cargo": "PP (cargo SIN VERIFICAR; tarjeta sin cargo)", "partido": "PP", "fuente": "Tarjeta 7-nov (web del PP)", "verificado": "SIN VERIFICAR"},
-  "Mikel Otero": {"cargo": "EH Bildu (cargo SIN VERIFICAR; tarjeta sin cargo)", "partido": "EH Bildu", "fuente": "Tarjeta 7-nov (Telegram de EH Bildu)", "verificado": "SIN VERIFICAR"},
-  "Santiago Abascal (7-nov)": {"cargo": "Sin cargo en la tarjeta (archivo: Lider de Vox)", "partido": "Vox", "fuente": "Tarjeta 7-nov (20minutos)", "verificado": "2026-11-01"},
-  "Isabel Diaz Ayuso (7-nov)": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjeta 7-nov (X @IdiazAyuso, El Español); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Fernando Clavijo": {"cargo": "Presidente de Canarias", "partido": "CC", "fuente": "Voz 7-nov (El Mundo, Publico); partido no indicado en el episodio: SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
-  "Fernando Grande-Marlaska": {"cargo": "Ministro (Interior, SIN VERIFICAR)", "partido": "Gobierno", "fuente": "Voz 7-nov; SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
-  "Luis Pastor": {"cargo": "Fiscal (Anticorrupcion, SIN VERIFICAR)", "partido": "Institucion", "fuente": "Voz 7-nov (El Pais, El Mundo)", "verificado": "SIN VERIFICAR"},
-  "Isabel Pardo de Vera": {"cargo": "Expresidenta de Adif", "partido": "Institucion", "fuente": "Voz 7-nov (El Mundo, El Pais)", "verificado": "SIN VERIFICAR"},
-  "Alberto Nunez Feijoo (8-nov)": {"cargo": "Presidente del PP", "partido": "PP", "fuente": "Tarjetas 8-nov (El Mundo, El Pais); coincide con el archivo", "verificado": "2026-11-01"},
-  "Pedro Sanchez (8-nov)": {"cargo": "Presidente del Gobierno", "partido": "PSOE", "fuente": "Tarjetas 8-nov (Cadena SER, El Mundo, La Vanguardia); coincide con el archivo", "verificado": "2026-11-01"},
-  "Santiago Abascal (8-nov)": {"cargo": "Lider de Vox (tarjeta de Guadalajara y de la campaña); 'Presidente de Vox' en la tarjeta de El Hierro: discrepancia de formula", "partido": "Vox", "fuente": "Tarjetas 8-nov (El Mundo, 20minutos, RTVE)", "verificado": "2026-11-01"},
-  "Salvador Illa (8-nov)": {"cargo": "Presidente de la Generalitat", "partido": "PSC", "fuente": "Tarjeta 8-nov (elDiario.es); coincide con el archivo", "verificado": "2026-11-01"},
-  "Irene Montero (8-nov)": {"cargo": "Candidata de Podemos (archivo: Numero 1 de Podemos al Congreso y eurodiputada)", "partido": "Podemos", "fuente": "Tarjetas 8-nov (Europa Press, elDiario.es)", "verificado": "2026-11-01"},
-  "Isabel Diaz Ayuso (8-nov)": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjetas 8-nov (El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ester Muñoz (8-nov)": {"cargo": "Portavoz del PP en el Congreso", "partido": "PP", "fuente": "Tarjeta 8-nov (X @EsterMunoz85); discrepancia de cargo con 7-nov sin aclarar", "verificado": "SIN VERIFICAR"},
-  "Fernando Clavijo (8-nov)": {"cargo": "Presidente de Canarias", "partido": "CC", "fuente": "Tarjeta 8-nov (El Mundo); partido SIN VERIFICAR en fuente", "verificado": "SIN VERIFICAR"},
-  "Alpidio Armas": {"cargo": "Presidente del Cabildo de El Hierro", "partido": "Institucion", "fuente": "Tarjeta 8-nov (La Vanguardia); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Valeria Racu": {"cargo": "Portavoz del Sindicato de Inquilinas", "partido": "Institucion", "fuente": "Tarjeta 8-nov (El Pais); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Cayetana Alvarez de Toledo": {"cargo": "PP (cargo SIN VERIFICAR; solo aludida)", "partido": "PP", "fuente": "Voz 8-nov (elDiario.es)", "verificado": "SIN VERIFICAR"},
-  "Ada Colau (8-nov)": {"cargo": "Candidata del Frente Amplio", "partido": "Frente Amplio", "fuente": "Tarjeta 8-nov (elDiario.es)", "verificado": "2026-11-04"},
-  "Gabriel Rufian (8-nov)": {"cargo": "Cabeza de lista de ERC por Barcelona", "partido": "ERC", "fuente": "Tarjeta 8-nov (El Mundo); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Emilio Delgado": {"cargo": "Cabeza de lista del Frente Amplio por Madrid", "partido": "Frente Amplio", "fuente": "Tarjeta 8-nov (Europa Press); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Magnus Brunner": {"cargo": "Comisario europeo de Interior y Migracion", "partido": "Institucion", "fuente": "Voz 8-nov (El Mundo, RTVE); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Isabel Diaz Ayuso (12-nov)": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjeta 12-nov (X)", "verificado": "SIN VERIFICAR"},
-  "Sergio Sayas": {"cargo": "Diputado", "partido": "PP", "fuente": "Tarjeta 12-nov (20minutos); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Unai Sordo (12-nov)": {"cargo": "Secretario general de CCOO (el 3-nov: 'Lider de CCOO')", "partido": "CCOO (sindicato)", "fuente": "Tarjeta 12-nov (20minutos)", "verificado": "SIN VERIFICAR"},
-  "Miguel Tellado (12-nov)": {"cargo": "Secretario general (del PP)", "partido": "PP", "fuente": "Tarjeta 12-nov (El Mundo, elDiario.es, 20minutos)", "verificado": "SIN VERIFICAR"},
-  "Pepe Alvarez (12-nov)": {"cargo": "UGT (en la voz: de la Union General de Trabajadores; tarjeta sin cargo)", "partido": "UGT (sindicato)", "fuente": "Tarjeta 12-nov (El Mundo, elDiario.es)", "verificado": "SIN VERIFICAR"},
-  "Isabel Rodriguez": {"cargo": "Ministra (cartera SIN VERIFICAR)", "partido": "PSOE", "fuente": "Tarjeta 12-nov; la voz solo dice 'la ministra'", "verificado": "SIN VERIFICAR"},
-  "Ione Belarra (12-nov)": {"cargo": "Secretaria general de Podemos", "partido": "Podemos", "fuente": "Tarjeta 12-nov (Europa Press)", "verificado": "SIN VERIFICAR"},
-  "Irene Montero (12-nov)": {"cargo": "Cabeza de lista de Podemos", "partido": "Podemos", "fuente": "Tarjeta 12-nov (El Mundo, Europa Press)", "verificado": "2026-11-01"},
-  "Emilio Delgado (12-nov)": {"cargo": "Candidato de Frente Amplio", "partido": "Frente Amplio", "fuente": "Tarjeta 12-nov (El Mundo, Europa Press); el 8-nov: cabeza de lista por Madrid", "verificado": "SIN VERIFICAR"},
-  "Felix Bolaños": {"cargo": "Ministro de la Presidencia", "partido": "PSOE", "fuente": "Tarjetas 12-nov (El Mundo, Europa Press); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Santiago Abascal (12-nov)": {"cargo": "Lider de Vox (tarjeta: 'Lider')", "partido": "Vox", "fuente": "Tarjetas 12-nov (Europa Press)", "verificado": "2026-11-01"},
-  "Alberto Nunez Feijoo (12-nov)": {"cargo": "Presidente (del PP)", "partido": "PP", "fuente": "Tarjeta 12-nov (El Pais)", "verificado": "2026-11-01"},
-  "Tesh Sidi": {"cargo": "Frente Amplio (cargo SIN VERIFICAR; tarjeta sin cargo)", "partido": "Frente Amplio", "fuente": "Tarjeta 12-nov (Europa Press, 20minutos)", "verificado": "SIN VERIFICAR"},
-  "Gabriel Rufian (12-nov)": {"cargo": "Sin cargo en la tarjeta (archivo: cabeza de lista de ERC por Barcelona)", "partido": "ERC", "fuente": "Tarjeta 12-nov (Europa Press, 20minutos)", "verificado": "SIN VERIFICAR"},
-  "Jordi Wild": {"cargo": "Presentador de podcast (SIN VERIFICAR)", "partido": "n/a", "fuente": "Breve 12-nov (La Vanguardia)", "verificado": "SIN VERIFICAR"},
-  "Leire Diez": {"cargo": "Autora de un libro; exmilitante socialista (SIN VERIFICAR)", "partido": "n/a", "fuente": "Breve 12-nov (elDiario.es)", "verificado": "SIN VERIFICAR"},
-  "Toni Comin":{"cargo": "Junts (cargo SIN VERIFICAR)", "partido": "Junts", "fuente": "Titular de La Razon (tarjeta 4-nov); SIN VERIFICAR", "verificado": "SIN VERIFICAR"},
-  "Carles Puigdemont (19-nov)": {"cargo": "Lider de Junts", "partido": "Junts", "fuente": "Tarjeta 19-nov (El Mundo, Europa Press); cargo no contrastado en el archivo", "verificado": "SIN VERIFICAR"},
-  "Oscar Puente (19-nov)": {"cargo": "Socialista (tarjeta; el archivo lo da como dimitido de Transportes)", "partido": "PSOE", "fuente": "Tarjeta 19-nov (X cuenta oficial de Puente)", "verificado": "2026-11-04"},
-  "Alberto Nunez Feijoo (19-nov)": {"cargo": "Presidente del PP", "partido": "PP", "fuente": "Tarjeta 19-nov (20minutos, La Vanguardia, El Mundo, Antena 3); coincide con el archivo", "verificado": "2026-11-01"},
-  "Pedro Sanchez (19-nov)": {"cargo": "Presidente del Gobierno", "partido": "PSOE", "fuente": "Tarjetas 19-nov (La Vanguardia, Antena 3, El Mundo); coincide con el archivo", "verificado": "2026-11-01"},
-  "Isabel Diaz Ayuso (19-nov)": {"cargo": "Presidenta de la Comunidad de Madrid", "partido": "PP", "fuente": "Tarjeta 19-nov (EFE, La Vanguardia); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Jose Ignacio Garcia": {"cargo": "Portavoz de Adelante Andalucia", "partido": "Adelante Andalucia", "fuente": "Tarjeta 19-nov (La Vanguardia); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Idoia Sagastizabal": {"cargo": "Cabeza de lista del PNV por Bizkaia", "partido": "PNV", "fuente": "Tarjeta 19-nov (La Vanguardia)", "verificado": "SIN VERIFICAR"},
-  "Oskar Matute": {"cargo": "Cabeza de lista de EH Bildu por Bizkaia", "partido": "EH Bildu", "fuente": "Tarjeta 19-nov (El Mundo, La Vanguardia)", "verificado": "SIN VERIFICAR"},
-  "Gabriel Rufian (19-nov)": {"cargo": "Candidato de ERC", "partido": "ERC", "fuente": "Tarjeta 19-nov (La Vanguardia); SIN VERIFICAR de forma independiente", "verificado": "SIN VERIFICAR"},
-  "Ada Colau (19-nov)": {"cargo": "Candidata de Frente Amplio", "partido": "Frente Amplio", "fuente": "Correccion 19-nov (EFE)", "verificado": "SIN VERIFICAR"}
+ "Oscar Puente": {
+  "cargo": "Dimitido como ministro de Transportes (dimision anunciada el 3-nov)",
+  "partido": "PSOE",
+  "fuente": "El Mundo, elDiario.es, La Vanguardia, ABC, 20minutos (episodio 4-nov); antes ministro (contexto 1-nov)",
+  "verificado": "2026-11-04"
+ },
+ "Santiago Abascal": {
+  "cargo": "Lider de Vox",
+  "partido": "Vox",
+  "fuente": "20minutos (contexto 1-nov); tarjeta 3-nov (20minutos)",
+  "verificado": "2026-11-01"
+ },
+ "Alma Ezcurra": {
+  "cargo": "Vicesecretaria del PP (Coordinacion Sectorial)",
+  "partido": "PP",
+  "fuente": "El Mundo, ABC; 20minutos dice 'Regeneracion Institucional' (discrepancia, se uso El Mundo/ABC)",
+  "verificado": "2026-11-01"
+ },
+ "Alberto Nunez Feijoo": {
+  "cargo": "Presidente del PP",
+  "partido": "PP",
+  "fuente": "ABC, El Mundo (contexto 1-nov); tarjetas 3-nov (Europa Press, El Mundo, El Pais)",
+  "verificado": "2026-11-01"
+ },
+ "Pedro Sanchez": {
+  "cargo": "Presidente del Gobierno",
+  "partido": "PSOE",
+  "fuente": "El Mundo, ABC (contexto 1-nov); tarjeta 3-nov (El Pais)",
+  "verificado": "2026-11-01"
+ },
+ "Veronica Martinez Barbero": {
+  "cargo": "Coordinadora general de Movimiento Sumar y candidata del Frente Amplio",
+  "partido": "Frente Amplio",
+  "fuente": "20minutos (contexto 1-nov); el 3-nov La Vanguardia llama a Ada Colau candidata a la Presidencia del Gobierno del Frente Amplio: discrepancia sin aclarar",
+  "verificado": "2026-11-01"
+ },
+ "Miriam Nogueras": {
+  "cargo": "Candidata de Junts al Congreso",
+  "partido": "Junts",
+  "fuente": "20minutos (contexto 1-nov)",
+  "verificado": "2026-11-01"
+ },
+ "Maribel Vaquero": {
+  "cargo": "Portavoz del PNV en el Congreso",
+  "partido": "PNV",
+  "fuente": "20minutos (contexto 1-nov); usada en la tarjeta 'Quien pide su salida' del 3-nov (La Vanguardia)",
+  "verificado": "2026-11-01"
+ },
+ "Irene Montero": {
+  "cargo": "Numero 1 de Podemos al Congreso y eurodiputada",
+  "partido": "Podemos",
+  "fuente": "20minutos (contexto 1-nov); tarjeta 3-nov (La Vanguardia)",
+  "verificado": "2026-11-01"
+ },
+ "Nestor Rego": {
+  "cargo": "Diputado del BNG y candidato",
+  "partido": "BNG",
+  "fuente": "20minutos (contexto 1-nov)",
+  "verificado": "2026-11-01"
+ },
+ "Salvador Illa": {
+  "cargo": "Presidente de la Generalitat",
+  "partido": "PSC",
+  "fuente": "contexto 1-nov (texto 113); tarjeta con cita en X",
+  "verificado": "2026-11-01"
+ },
+ "Alvise Perez": {
+  "cargo": "Eurodiputado y lider de Se Acabo La Fiesta",
+  "partido": "SALF",
+  "fuente": "elDiario.es",
+  "verificado": "2026-11-01"
+ },
+ "Jaume Collboni": {
+  "cargo": "Alcalde de Barcelona",
+  "partido": "PSC",
+  "fuente": "Tarjeta del episodio del 1-nov (cita en El Mundo); no estaba en el contexto previo. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Nuria Parlon": {
+  "cargo": "Consellera de Interior",
+  "partido": "PSC",
+  "fuente": "Tarjeta del episodio del 1-nov (cita en elDiario.es); no estaba en el contexto previo. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Diego Martin": {
+  "cargo": "Secretario general de SEMAF",
+  "partido": "Institucion (sindicato)",
+  "fuente": "Tarjeta del episodio del 1-nov (cita en El Pais); no estaba en el contexto previo. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Francisco Cerro": {
+  "cargo": "Arzobispo de Toledo",
+  "partido": "n/a",
+  "fuente": "ABC (misa del 1-nov, citado en el episodio); no estaba en el contexto previo. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Andres Lopez": {
+  "cargo": "Comandante de la Guardia Civil",
+  "partido": "n/a",
+  "fuente": "Citado en el episodio (Europa Press); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Pedro Casares": {
+  "cargo": "Delegado del Gobierno en Cantabria",
+  "partido": "PSOE",
+  "fuente": "Europa Press (articulos/085.txt), contexto 3-nov; tarjeta 3-nov (La Vanguardia)",
+  "verificado": "2026-11-03"
+ },
+ "David Setien": {
+  "cargo": "Concejal y portavoz del PP en Ruesga",
+  "partido": "PP",
+  "fuente": "Europa Press (articulos/085.txt y 086.txt), contexto 3-nov; cargo de portavoz segun el episodio 3-nov",
+  "verificado": "2026-11-03"
+ },
+ "Juanma Moreno": {
+  "cargo": "Presidente de la Junta de Andalucia",
+  "partido": "PP",
+  "fuente": "Tarjeta del episodio del 3-nov (cita en ABC); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Pepe Alvarez": {
+  "cargo": "Secretario general de UGT",
+  "partido": "UGT (sindicato)",
+  "fuente": "Tarjeta del episodio del 3-nov (cita en ABC); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Unai Sordo": {
+  "cargo": "Lider de CCOO",
+  "partido": "CCOO (sindicato)",
+  "fuente": "Tarjeta del episodio del 3-nov (cita en elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alicia del Rio": {
+  "cargo": "Portavoz del Sindicato de Inquilinas",
+  "partido": "Institucion",
+  "fuente": "Tarjeta del episodio del 3-nov (cita en elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Rebeca Torro": {
+  "cargo": "Secretaria de Organizacion",
+  "partido": "PSOE",
+  "fuente": "Tarjeta del episodio del 3-nov (cita en El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Elma Saiz": {
+  "cargo": "Ministra portavoz del Gobierno",
+  "partido": "PSOE",
+  "fuente": "Citada en la voz del episodio del 3-nov (elDiario.es); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Aitor Esteban": {
+  "cargo": "Presidente del PNV",
+  "partido": "PNV",
+  "fuente": "Voz y vineta del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Elisenda Alamany": {
+  "cargo": "Portavoz de ERC",
+  "partido": "ERC",
+  "fuente": "Voz del episodio del 3-nov (La Vanguardia); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ivan Picos": {
+  "cargo": "Alcalde de Hoyocasero (Avila)",
+  "partido": "PP",
+  "fuente": "Voz y vineta del episodio del 3-nov (El Mundo); no estaba en el contexto. SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Carlos Cuerpo": {
+  "cargo": "Vicepresidente primero y ministro de Economia; asume las competencias de Transportes (transitorio)",
+  "partido": "Sin carne del PSOE (segun el episodio 4-nov)",
+  "fuente": "El Pais, ABC, elDiario.es, Europa Press (episodio 4-nov)",
+  "verificado": "2026-11-04"
+ },
+ "Ada Colau": {
+  "cargo": "Candidata del Frente Amplio",
+  "partido": "Frente Amplio",
+  "fuente": "Episodio 4-nov (Europa Press, elDiario.es); La Vanguardia 3-nov la llama candidata a la Presidencia: discrepancia con Veronica Martinez Barbero sin aclarar",
+  "verificado": "2026-11-04"
+ },
+ "Pablo Llarena": {
+  "cargo": "Juez instructor del Supremo",
+  "partido": "Institucion",
+  "fuente": "El Mundo, La Vanguardia, 20minutos, ABC, Europa Press (episodio 4-nov)",
+  "verificado": "2026-11-04"
+ },
+ "Ester Muñoz": {
+  "cargo": "Portavoz del PP en el Congreso",
+  "partido": "PP",
+  "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Jose Manuel Albares": {
+  "cargo": "Ministro de Asuntos Exteriores",
+  "partido": "Gobierno",
+  "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Pepa Millan": {
+  "cargo": "Portavoz de Vox en el Congreso",
+  "partido": "Vox",
+  "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Jose Ramon Gomez Besteiro": {
+  "cargo": "Lider del PSdeG",
+  "partido": "PSOE",
+  "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alfonso Rueda": {
+  "cargo": "Presidente de la Xunta y del PP gallego",
+  "partido": "PP",
+  "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ana Pontón": {
+  "cargo": "Portavoz nacional del BNG",
+  "partido": "BNG",
+  "fuente": "ABC (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Monica Sales": {
+  "cargo": "Presidenta del grupo de Junts en el Parlament",
+  "partido": "Junts",
+  "fuente": "La Vanguardia (tarjeta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Gabriel Rufian": {
+  "cargo": "Portavoz y cabeza de lista de ERC",
+  "partido": "ERC",
+  "fuente": "Europa Press (vineta 4-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Miguel Tellado": {
+  "cargo": "Secretario general del PP (4-nov, elDiario.es); la tarjeta del 6-nov lo llama 'Dirigente del PP' (web del PP)",
+  "partido": "PP",
+  "fuente": "elDiario.es (breve 4-nov); tarjeta 6-nov; SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Luis Pedro Marco de la Peña": {
+  "cargo": "Presidente de Adif (dimitido el 4-nov)",
+  "partido": "Institucion",
+  "fuente": "20minutos, RTVE, elDiario.es, El Pais, La Razon (episodio 5-nov)",
+  "verificado": "2026-11-05"
+ },
+ "Ione Belarra": {
+  "cargo": "Podemos (cargo SIN VERIFICAR)",
+  "partido": "Podemos",
+  "fuente": "Voz del episodio 5-nov; cargo no indicado en el episodio",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ana Redondo": {
+  "cargo": "Cabeza de lista del PSOE por Valladolid (sustituye a Puente)",
+  "partido": "PSOE",
+  "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Mario Samper": {
+  "cargo": "Presidente de la Asociacion de Victimas de Adamuz",
+  "partido": "Institucion",
+  "fuente": "La Vanguardia, 4-nov (tarjeta 5-nov); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Javier Hernandez": {
+  "cargo": "Magistrado del Supremo",
+  "partido": "Institucion",
+  "fuente": "Voz del episodio 5-nov (El Pais, El Mundo, ABC); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Carmen Lamela": {
+  "cargo": "Magistrada (Supremo)",
+  "partido": "Institucion",
+  "fuente": "Voz del episodio 5-nov; SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Koldo Garcia": {
+  "cargo": "Exasesor de Abalos",
+  "partido": "Institucion",
+  "fuente": "Tarjeta del episodio 6-nov (audio, segun El Pais); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Isabel Diaz Ayuso": {
+  "cargo": "Presidenta de la Comunidad de Madrid",
+  "partido": "PP",
+  "fuente": "Tarjeta del episodio 6-nov (ABC); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Javier Milei": {
+  "cargo": "Presidente de Argentina",
+  "partido": "Institucion",
+  "fuente": "Tarjeta del episodio 6-nov (El Mundo); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Andres Allamand": {
+  "cargo": "Secretario general iberoamericano",
+  "partido": "Institucion",
+  "fuente": "Voz y viñeta del episodio 6-nov (El Pais, El Mundo); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ismael Moreno": {
+  "cargo": "Juez de la Audiencia Nacional",
+  "partido": "Institucion",
+  "fuente": "Voz del episodio 6-nov (El Pais); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alberto Duran": {
+  "cargo": "Abogado del PP (segun Koldo Garcia)",
+  "partido": "PP",
+  "fuente": "Voz del episodio 6-nov; atribucion de Koldo, SIN VERIFICAR",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Pedro Sanchez (7-nov)": {
+  "cargo": "Presidente del Gobierno",
+  "partido": "PSOE",
+  "fuente": "Tarjetas del episodio 7-nov (El Pais)",
+  "verificado": "2026-11-01"
+ },
+ "Ester Muñoz (7-nov)": {
+  "cargo": "Portavoz del PP en el Congreso (la voz del 7-nov en Koldo la llama portavoz de campaña del PP)",
+  "partido": "PP",
+  "fuente": "Tarjetas 7-nov (Europa Press, elDiario.es); discrepancia de cargo sin aclarar",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Manuel Cobo": {
+  "cargo": "Dirigente del PP",
+  "partido": "PP",
+  "fuente": "Tarjeta 7-nov (elDiario.es); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Diana Morant": {
+  "cargo": "Ministra de Ciencia",
+  "partido": "PSOE",
+  "fuente": "Tarjeta 7-nov (TVE, segun El Mundo); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Raul de las Hoz": {
+  "cargo": "PP (cargo SIN VERIFICAR; eurodiputado segun la nota, no confirmado)",
+  "partido": "PP",
+  "fuente": "Nota de cifra 7-nov (La Razon); SIN VERIFICAR",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Aitor Esteban (7-nov)": {
+  "cargo": "Sin cargo en la tarjeta (en el archivo: Presidente del PNV, SIN VERIFICAR)",
+  "partido": "PNV",
+  "fuente": "Tarjeta 7-nov (web del PNV)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alicia Garcia": {
+  "cargo": "PP (cargo SIN VERIFICAR; tarjeta sin cargo)",
+  "partido": "PP",
+  "fuente": "Tarjeta 7-nov (web del PP)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Mikel Otero": {
+  "cargo": "EH Bildu (cargo SIN VERIFICAR; tarjeta sin cargo)",
+  "partido": "EH Bildu",
+  "fuente": "Tarjeta 7-nov (Telegram de EH Bildu)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Santiago Abascal (7-nov)": {
+  "cargo": "Sin cargo en la tarjeta (archivo: Lider de Vox)",
+  "partido": "Vox",
+  "fuente": "Tarjeta 7-nov (20minutos)",
+  "verificado": "2026-11-01"
+ },
+ "Isabel Diaz Ayuso (7-nov)": {
+  "cargo": "Presidenta de la Comunidad de Madrid",
+  "partido": "PP",
+  "fuente": "Tarjeta 7-nov (X @IdiazAyuso, El Español); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Fernando Clavijo": {
+  "cargo": "Presidente de Canarias",
+  "partido": "CC",
+  "fuente": "Voz 7-nov (El Mundo, Publico); partido no indicado en el episodio: SIN VERIFICAR",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Fernando Grande-Marlaska": {
+  "cargo": "Ministro (Interior, SIN VERIFICAR)",
+  "partido": "Gobierno",
+  "fuente": "Voz 7-nov; SIN VERIFICAR",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Luis Pastor": {
+  "cargo": "Fiscal (Anticorrupcion, SIN VERIFICAR)",
+  "partido": "Institucion",
+  "fuente": "Voz 7-nov (El Pais, El Mundo)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Isabel Pardo de Vera": {
+  "cargo": "Expresidenta de Adif",
+  "partido": "Institucion",
+  "fuente": "Voz 7-nov (El Mundo, El Pais)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alberto Nunez Feijoo (8-nov)": {
+  "cargo": "Presidente del PP",
+  "partido": "PP",
+  "fuente": "Tarjetas 8-nov (El Mundo, El Pais); coincide con el archivo",
+  "verificado": "2026-11-01"
+ },
+ "Pedro Sanchez (8-nov)": {
+  "cargo": "Presidente del Gobierno",
+  "partido": "PSOE",
+  "fuente": "Tarjetas 8-nov (Cadena SER, El Mundo, La Vanguardia); coincide con el archivo",
+  "verificado": "2026-11-01"
+ },
+ "Santiago Abascal (8-nov)": {
+  "cargo": "Lider de Vox (tarjeta de Guadalajara y de la campaña); 'Presidente de Vox' en la tarjeta de El Hierro: discrepancia de formula",
+  "partido": "Vox",
+  "fuente": "Tarjetas 8-nov (El Mundo, 20minutos, RTVE)",
+  "verificado": "2026-11-01"
+ },
+ "Salvador Illa (8-nov)": {
+  "cargo": "Presidente de la Generalitat",
+  "partido": "PSC",
+  "fuente": "Tarjeta 8-nov (elDiario.es); coincide con el archivo",
+  "verificado": "2026-11-01"
+ },
+ "Irene Montero (8-nov)": {
+  "cargo": "Candidata de Podemos (archivo: Numero 1 de Podemos al Congreso y eurodiputada)",
+  "partido": "Podemos",
+  "fuente": "Tarjetas 8-nov (Europa Press, elDiario.es)",
+  "verificado": "2026-11-01"
+ },
+ "Isabel Diaz Ayuso (8-nov)": {
+  "cargo": "Presidenta de la Comunidad de Madrid",
+  "partido": "PP",
+  "fuente": "Tarjetas 8-nov (El Mundo); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ester Muñoz (8-nov)": {
+  "cargo": "Portavoz del PP en el Congreso",
+  "partido": "PP",
+  "fuente": "Tarjeta 8-nov (X @EsterMunoz85); discrepancia de cargo con 7-nov sin aclarar",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Fernando Clavijo (8-nov)": {
+  "cargo": "Presidente de Canarias",
+  "partido": "CC",
+  "fuente": "Tarjeta 8-nov (El Mundo); partido SIN VERIFICAR en fuente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Alpidio Armas": {
+  "cargo": "Presidente del Cabildo de El Hierro",
+  "partido": "Institucion",
+  "fuente": "Tarjeta 8-nov (La Vanguardia); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Valeria Racu": {
+  "cargo": "Portavoz del Sindicato de Inquilinas",
+  "partido": "Institucion",
+  "fuente": "Tarjeta 8-nov (El Pais); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Cayetana Alvarez de Toledo": {
+  "cargo": "PP (cargo SIN VERIFICAR; solo aludida)",
+  "partido": "PP",
+  "fuente": "Voz 8-nov (elDiario.es)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ada Colau (8-nov)": {
+  "cargo": "Candidata del Frente Amplio",
+  "partido": "Frente Amplio",
+  "fuente": "Tarjeta 8-nov (elDiario.es)",
+  "verificado": "2026-11-04"
+ },
+ "Gabriel Rufian (8-nov)": {
+  "cargo": "Cabeza de lista de ERC por Barcelona",
+  "partido": "ERC",
+  "fuente": "Tarjeta 8-nov (El Mundo); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Emilio Delgado": {
+  "cargo": "Cabeza de lista del Frente Amplio por Madrid",
+  "partido": "Frente Amplio",
+  "fuente": "Tarjeta 8-nov (Europa Press); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Magnus Brunner": {
+  "cargo": "Comisario europeo de Interior y Migracion",
+  "partido": "Institucion",
+  "fuente": "Voz 8-nov (El Mundo, RTVE); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Isabel Diaz Ayuso (12-nov)": {
+  "cargo": "Presidenta de la Comunidad de Madrid",
+  "partido": "PP",
+  "fuente": "Tarjeta 12-nov (X)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Sergio Sayas": {
+  "cargo": "Diputado",
+  "partido": "PP",
+  "fuente": "Tarjeta 12-nov (20minutos); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Unai Sordo (12-nov)": {
+  "cargo": "Secretario general de CCOO (el 3-nov: 'Lider de CCOO')",
+  "partido": "CCOO (sindicato)",
+  "fuente": "Tarjeta 12-nov (20minutos)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Miguel Tellado (12-nov)": {
+  "cargo": "Secretario general (del PP)",
+  "partido": "PP",
+  "fuente": "Tarjeta 12-nov (El Mundo, elDiario.es, 20minutos)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Pepe Alvarez (12-nov)": {
+  "cargo": "UGT (en la voz: de la Union General de Trabajadores; tarjeta sin cargo)",
+  "partido": "UGT (sindicato)",
+  "fuente": "Tarjeta 12-nov (El Mundo, elDiario.es)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Isabel Rodriguez": {
+  "cargo": "Ministra (cartera SIN VERIFICAR)",
+  "partido": "PSOE",
+  "fuente": "Tarjeta 12-nov; la voz solo dice 'la ministra'",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ione Belarra (12-nov)": {
+  "cargo": "Secretaria general de Podemos",
+  "partido": "Podemos",
+  "fuente": "Tarjeta 12-nov (Europa Press)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Irene Montero (12-nov)": {
+  "cargo": "Cabeza de lista de Podemos",
+  "partido": "Podemos",
+  "fuente": "Tarjeta 12-nov (El Mundo, Europa Press)",
+  "verificado": "2026-11-01"
+ },
+ "Emilio Delgado (12-nov)": {
+  "cargo": "Candidato de Frente Amplio",
+  "partido": "Frente Amplio",
+  "fuente": "Tarjeta 12-nov (El Mundo, Europa Press); el 8-nov: cabeza de lista por Madrid",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Felix Bolaños": {
+  "cargo": "Ministro de la Presidencia",
+  "partido": "PSOE",
+  "fuente": "Tarjetas 12-nov (El Mundo, Europa Press); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Santiago Abascal (12-nov)": {
+  "cargo": "Lider de Vox (tarjeta: 'Lider')",
+  "partido": "Vox",
+  "fuente": "Tarjetas 12-nov (Europa Press)",
+  "verificado": "2026-11-01"
+ },
+ "Alberto Nunez Feijoo (12-nov)": {
+  "cargo": "Presidente (del PP)",
+  "partido": "PP",
+  "fuente": "Tarjeta 12-nov (El Pais)",
+  "verificado": "2026-11-01"
+ },
+ "Tesh Sidi": {
+  "cargo": "Frente Amplio (cargo SIN VERIFICAR; tarjeta sin cargo)",
+  "partido": "Frente Amplio",
+  "fuente": "Tarjeta 12-nov (Europa Press, 20minutos)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Gabriel Rufian (12-nov)": {
+  "cargo": "Sin cargo en la tarjeta (archivo: cabeza de lista de ERC por Barcelona)",
+  "partido": "ERC",
+  "fuente": "Tarjeta 12-nov (Europa Press, 20minutos)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Jordi Wild": {
+  "cargo": "Presentador de podcast (SIN VERIFICAR)",
+  "partido": "n/a",
+  "fuente": "Breve 12-nov (La Vanguardia)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Leire Diez": {
+  "cargo": "Autora de un libro; exmilitante socialista (SIN VERIFICAR)",
+  "partido": "n/a",
+  "fuente": "Breve 12-nov (elDiario.es)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Toni Comin": {
+  "cargo": "Junts (cargo SIN VERIFICAR)",
+  "partido": "Junts",
+  "fuente": "Titular de La Razon (tarjeta 4-nov); SIN VERIFICAR",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Carles Puigdemont (19-nov)": {
+  "cargo": "Lider de Junts",
+  "partido": "Junts",
+  "fuente": "Tarjeta 19-nov (El Mundo, Europa Press); cargo no contrastado en el archivo",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Oscar Puente (19-nov)": {
+  "cargo": "Socialista (tarjeta; el archivo lo da como dimitido de Transportes)",
+  "partido": "PSOE",
+  "fuente": "Tarjeta 19-nov (X cuenta oficial de Puente)",
+  "verificado": "2026-11-04"
+ },
+ "Alberto Nunez Feijoo (19-nov)": {
+  "cargo": "Presidente del PP",
+  "partido": "PP",
+  "fuente": "Tarjeta 19-nov (20minutos, La Vanguardia, El Mundo, Antena 3); coincide con el archivo",
+  "verificado": "2026-11-01"
+ },
+ "Pedro Sanchez (19-nov)": {
+  "cargo": "Presidente del Gobierno",
+  "partido": "PSOE",
+  "fuente": "Tarjetas 19-nov (La Vanguardia, Antena 3, El Mundo); coincide con el archivo",
+  "verificado": "2026-11-01"
+ },
+ "Isabel Diaz Ayuso (19-nov)": {
+  "cargo": "Presidenta de la Comunidad de Madrid",
+  "partido": "PP",
+  "fuente": "Tarjeta 19-nov (EFE, La Vanguardia); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Jose Ignacio Garcia": {
+  "cargo": "Portavoz de Adelante Andalucia",
+  "partido": "Adelante Andalucia",
+  "fuente": "Tarjeta 19-nov (La Vanguardia); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Idoia Sagastizabal": {
+  "cargo": "Cabeza de lista del PNV por Bizkaia",
+  "partido": "PNV",
+  "fuente": "Tarjeta 19-nov (La Vanguardia)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Oskar Matute": {
+  "cargo": "Cabeza de lista de EH Bildu por Bizkaia",
+  "partido": "EH Bildu",
+  "fuente": "Tarjeta 19-nov (El Mundo, La Vanguardia)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Gabriel Rufian (19-nov)": {
+  "cargo": "Candidato de ERC",
+  "partido": "ERC",
+  "fuente": "Tarjeta 19-nov (La Vanguardia); SIN VERIFICAR de forma independiente",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Ada Colau (19-nov)": {
+  "cargo": "Candidata de Frente Amplio",
+  "partido": "Frente Amplio",
+  "fuente": "Correccion 19-nov (EFE)",
+  "verificado": "SIN VERIFICAR"
+ },
+ "Patxi López": {
+  "cargo": "Portavoz del PSOE en el Congreso",
+  "partido": "PSOE",
+  "fuente": "noticias de noviembre de 2026 («portavoz socialista en el Congreso»); X @patxilopez",
+  "verificado": "22-nov-2026"
+ },
+ "Alfonso Serrano": {
+  "cargo": "Secretario general del PP de Madrid",
+  "partido": "PP",
+  "fuente": "bio de su cuenta oficial en X (@SerranoAlfonso), 22-nov-2026",
+  "verificado": "22-nov-2026"
+ },
+ "José Sacristán": {
+  "cargo": "Actor",
+  "partido": "",
+  "fuente": "laSexta, 21-nov-2026",
+  "verificado": "22-nov-2026"
+ }
 }

@@ -320,7 +320,9 @@ y no se usa hasta nueva orden del usuario.**
   o de un cruce a otro) **sale uno del todo y después entra el otro**: si la voz no deja hueco, se alarga el silencio
   (`presentador.HUECO_ESCENA`, 0,85 s, lo mete el montaje solo) y el guionista puede poner punto y aparte para dar ese
   respiro. El subtítulo del puente dentro de un cruce va en el hueco del globo derecho y se retira antes de que entre.
-  Todo tiene que verse dinámico y natural: relevo limpio, sin esperas largas. Se revisan los cambios de escena
+  Todo tiene que verse dinámico y natural: relevo limpio, sin esperas largas. En un cruce, cada personaje cabe en su mitad de la
+  pantalla y los dos van a la misma escala (con los brazos abiertos se pisaban); entre citas de grupos distintos el
+  presentador sale en pantalla (no se queda el escenario vacío). Se revisan los cambios de escena
   fotograma a fotograma (cada 0,15 s) antes de mandar el vídeo.
 - **Largo:** logo «EL HOYFORMATIVO» arriba a la derecha y título de la pieza arriba a la izquierda. **Shorts:** cabecera del
   canal con la etiqueta de formato, kicker rojo, personajes en la mitad de abajo, bocadillo o subtítulo encima, y cierre con
