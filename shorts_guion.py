@@ -398,7 +398,9 @@ def main(fecha, n=3):
         return mejores_frases(fecha, pedidos, enc, G, guion, redes)
     if enc.get("evita_temas"):
         obligada += f"\n\nEVITA estos temas (ya tratados o que no quiere el director): {', '.join(enc['evita_temas'])}."
-    if enc.get("verificada") and enc.get("cruce") and "short" in enc.get("para", ["short"]):
+    if enc.get("cruce") and enc.get("shorts_hechos"):     # 22-nov: el Short del cruce ya está montado: los demás, de otra cosa
+        obligada += f"\n\nEVITA el tema «{enc.get('tema', '')}»: su Short ya está hecho."
+    elif enc.get("verificada") and enc.get("cruce") and "short" in enc.get("para", ["short"]):
         # 21-nov-2026 (el usuario): Short de CRUCE DE DECLARACIONES por encargo: la frase que lo enciende y sus réplicas,
         # todas comprobadas (encargo.py); el material nuevo del día (redes.md, búsqueda en X del encargo) puede sumar más.
         buenas = [x for x in enc["cruce"] if x.get("verificada")]
@@ -433,9 +435,21 @@ def main(fecha, n=3):
     (dia / "shorts").mkdir(exist_ok=True)
     buenos, partidos, usadas = 0, set(), set()
     (dia / "shorts" / "imagenes_usadas.json").unlink(missing_ok=True)   # 11-nov: el registro de imágenes, de cero
+    hechos = [int(k) for k in enc.get("shorts_hechos") or []]   # 22-nov: Shorts del encargo ya montados a mano: se quedan
     for viejo in (dia / "shorts").glob("short_*"):       # los de una vuelta anterior, fuera
-        if viejo.is_file():
+        k_ = re.match(r"short_(\d+)", viejo.name)
+        if viejo.is_file() and not (k_ and int(k_.group(1)) in hechos):
             viejo.unlink()
+    for k_ in hechos:
+        f_ = dia / "shorts" / f"short_{k_}.json"
+        if f_.exists():
+            h_ = json.loads(f_.read_text(encoding="utf-8"))
+            buenos = max(buenos, k_)
+            partidos.add(h_.get("partido"))
+            for c_ in [h_.get("cita"), (h_.get("replica") or {}).get("cita")] + re.findall(r"«([^»]+)»", h_.get("voz", "")):
+                if c_:
+                    usadas.add(re.sub(r"^(y|e|pero|porque)\s+", "", _norm(c_)))
+            print(f"short_{k_}: ya montado (encargo del director), se queda")
     if fijo:                                             # el del director va primero, tal cual (ya comprobado)
         buenos = 1
         for x in (fijo, fijo.get("medio"), fijo.get("replica")):

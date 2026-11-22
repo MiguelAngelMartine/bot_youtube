@@ -600,6 +600,11 @@ class Jornada:
             if intento == 0:
                 time.sleep(180)
         jsons = sorted(carpeta.glob("short_*.json"), key=lambda x: int(x.stem.split("_")[1])) if carpeta.exists() else []
+        try:                                               # 22-nov: los Shorts del encargo ya montados no se retocan
+            hechos = {int(k) for k in (_json.loads(enc.read_text(encoding="utf-8")).get("shorts_hechos") or [])} if enc.exists() else set()
+        except (ValueError, TypeError, OSError):
+            hechos = set()
+        jsons = [j for j in jsons if int(j.stem.split("_")[1]) not in hechos]
         if not jsons:
             self.parte("hoy sin Shorts (sin frases válidas o Gemini no responde)")
             return True

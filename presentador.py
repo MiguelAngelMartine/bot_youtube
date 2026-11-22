@@ -794,7 +794,8 @@ def _render(esc, total, salida, audio, encabezado=None, nproc=None):
 def _cargos():
     try:
         import render_ambiente as RA
-        return {n: re.sub(r"\s*\([^)]*\)", "", c or "").strip() for n, c in RA._conocidas()}, RA._conocidas()
+        return {n: re.sub(r"\s*\([^)]*\)", "", (c or "").split(";")[0]).strip() for n, c in RA._conocidas()}, \
+            RA._conocidas()                            # 22-nov: sin las notas internas tras «;» (salían en el globo)
     except Exception:
         return {}, []
 
@@ -822,6 +823,7 @@ def short(fecha, n):
     quien = S.get("quien", "")
     medios = {quien: S.get("fuente", "")}
     citas_medio = {(_n(f.get("cita"))): f.get("fuente", "") for f in S.get("frases") or []}
+    medio_cita = {_n(c): f for c, f in (S.get("fuentes_citas") or {}).items()}   # 22-nov: la fuente de cada cita (cruces)
     rep = S.get("replica") or {}
     def quien_de(c):
         nc = _n(c)
@@ -833,7 +835,7 @@ def short(fecha, n):
     tr = tramos_de(cuerpo, quien, conocidas, quien_de=quien_de)
     for g in tr:
         if g["tipo"] == "Q":
-            g["medio"] = citas_medio.get(_n(g["cita"]), medios.get(g["quien"], ""))
+            g["medio"] = medio_cita.get(_n(g["cita"])) or citas_medio.get(_n(g["cita"]), medios.get(g["quien"], ""))
             cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos) or (S.get("cargo") if g["quien"] == quien else
                                                                             rep.get("cargo", "")))
     if cierre:

@@ -231,6 +231,9 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, «ladrillazo va,
   ese cruce: quien lanza la frase, a la izquierda con su cita; quien replica, a la derecha con la suya; el presentador da el
   contexto entre medias, con la contrarréplica si la hay y sin declarar ganador. Su noticia entra también en el largo. Si
   varias fuentes citan la frase con palabras distintas, se usa la literal (vídeo o noticia) y nunca una paráfrasis.
+  Si el director pide el Short antes de la jornada, se monta a mano y se apunta en `shorts_hechos`: la jornada lo
+  conserva tal cual y hace los demás Shorts de otros temas. En el globo, la fuente de cada cita (`fuentes_citas`: X,
+  medio) y el cargo limpio, sin notas internas.
 - **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
   (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras, en el formato presentador (§6). Etiqueta de formato arriba a la derecha:
   ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
