@@ -583,11 +583,19 @@ class Jornada:
         # 16-nov-2026 (petición del usuario): los Shorts se hacen y suben ANTES que el vídeo largo. Solo dependen del
         # cierre (episodio.json), no del largo. La cuota de FLUX es fresca a las 10:30; si se agota, la biblioteca cubre.
         carpeta = self.dia / "shorts"
-        if (carpeta / "youtube.json").exists() or (carpeta / "revision.json").exists():
-            return True
         import json as _json
         import time
         enc = self.dia / "encargo.json"
+        if (carpeta / "youtube.json").exists() or (carpeta / "revision.json").exists():
+            # 22-nov-2026: si lo único hecho es el Short del encargo (shorts_hechos), la jornada hace los demás
+            try:
+                hechos_ = {f"short_{k}" for k in (_json.loads(enc.read_text(encoding="utf-8")).get("shorts_hechos") or [])}
+                subidos = {x.get("short") for x in _json.loads((carpeta / "youtube.json").read_text(encoding="utf-8"))} \
+                    if (carpeta / "youtube.json").exists() else set()
+            except (ValueError, TypeError, OSError, AttributeError):
+                hechos_, subidos = set(), {None}
+            if not hechos_ or (carpeta / "revision.json").exists() or not subidos <= hechos_:
+                return True
         try:
             num = int(_json.loads(enc.read_text(encoding="utf-8")).get("num_shorts", 2)) if enc.exists() else 2
         except (ValueError, TypeError, OSError):
