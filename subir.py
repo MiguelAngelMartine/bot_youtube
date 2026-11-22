@@ -201,7 +201,9 @@ def subir_shorts(dia_txt, solo=None):
         maximo = int(json.loads((dia / "encargo.json").read_text(encoding="utf-8")).get("num_shorts", MAX_SHORTS))
     except (OSError, ValueError, TypeError):
         pass
-    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))[:maximo]
+    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))
+    if not solo:                                         # 22-nov-2026: si se pide uno concreto, el tope no lo deja fuera
+        shorts = shorts[:maximo]
     shorts = [f for f in shorts if f.with_suffix(".mp4").exists()]
     previos = json.loads(reg.read_text(encoding="utf-8")) if (reg := carpeta / "youtube.json").exists() else []
     for i, v in enumerate(previos):                      # los registros viejos no guardaban su Short: va por orden
