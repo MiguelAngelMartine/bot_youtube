@@ -361,6 +361,8 @@ def _locuta_entero(tramos, tmp, t_ini=0.0):
         trozos += [x, np.zeros((int(pausa * sr), ch), dtype=np.int16)]
         t += dur + pausa
     audio = np.concatenate(trozos)
+    audio, extra = _huecos_de_escena(tramos, audio, sr, t_ini)
+    t += extra
     with wave.open(str(tmp / "voz.wav"), "wb") as w:
         w.setnchannels(audio.shape[1]); w.setsampwidth(2); w.setframerate(sr); w.writeframes(audio.tobytes())
     env = np.abs(audio[:, 0].astype(np.float32))
@@ -368,6 +370,50 @@ def _locuta_entero(tramos, tmp, t_ini=0.0):
     env = np.array([env[i * n:(i + 1) * n].mean() if i * n < len(env) else 0 for i in range(len(env) // n + 2)])
     env = np.convolve(env / (env.max() + 1e-6), np.ones(4) / 4, "same")
     return t, env
+
+
+HUECO_ESCENA = 0.85        # s de silencio mínimo en cada cambio de escena (sale uno del todo y luego entra el otro)
+
+
+def _escena_de(g):
+    """Quién está en pantalla en este tramo: el presentador, o el grupo de personajes de la cita. El puente de un cruce
+    no cambia de escena."""
+    if g["tipo"] == "Q":
+        return ("G", g.get("grupo"))
+    return None if g.get("puente") else "P"
+
+
+def _huecos_de_escena(tramos, audio, sr, t_ini):
+    """22-nov-2026 (el usuario: «no se puede solapar nada, ni personajes entre ellos ni bocadillos… si hay que añadir una
+    pausa para que dé tiempo a que salga uno y entre otro, que se añada»). En cada cambio de escena (presentador ↔
+    personajes, o de un cruce a otro) alarga el silencio de la voz hasta HUECO_ESCENA, cortando en mitad del silencio que
+    ya hay, y corre los tiempos de lo que viene después. La salida tarda 0,05 + TRANS s y la entrada empieza 0,3 s antes
+    de hablar: con 0,85 s no coinciden nunca."""
+    cortes, prev = [], None
+    for k, g in enumerate(tramos):
+        esc = _escena_de(g)
+        if esc is None:
+            continue
+        if prev is not None and esc != prev[1]:
+            a = tramos[prev[0]]
+            falta = HUECO_ESCENA - (g["t0"] - a["t1"])
+            if falta > 0.01:
+                cortes.append(((a["t1"] + g["t0"]) / 2, falta, k))
+        prev = (k, esc)
+    if not cortes:
+        return audio, 0.0
+    trozos, desde, extra = [], 0, 0.0
+    ch = audio.shape[1]
+    for mitad, falta, k in cortes:
+        i = max(desde, min(len(audio), int((mitad - t_ini) * sr)))
+        trozos += [audio[desde:i], np.zeros((int(falta * sr), ch), dtype=np.int16)]
+        desde = i
+        for g in tramos[k:]:                           # todo lo que viene después se corre
+            g["t0"] += falta; g["t1"] += falta
+            g["pal"] = [(p, a + falta, b + falta) for p, a, b in g.get("pal", [])]
+        extra += falta
+    trozos.append(audio[desde:])
+    return np.concatenate(trozos), extra
 
 
 def locuta_tramos(tramos, tmp, t_ini=0.0):

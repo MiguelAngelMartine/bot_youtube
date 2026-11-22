@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma).**
+**Última actualización: 21-nov-2026 (formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -292,6 +292,13 @@ y no se usa hasta nueva orden del usuario.**
 - **Nunca dos globos superpuestos ni un globo encima de un personaje:** el globo de una cita se va antes de que entre el
   de la siguiente; la misma persona escrita de dos formas («Feijóo» / «Alberto Núñez Feijóo») es una sola figura (antes
   salía dos veces, una a cada lado, con los globos encima).
+- **Nada se solapa, NUNCA (usuario, 22-nov-2026, «importantísimo»):** ni personajes entre ellos (tampoco el presentador
+  con el personaje que entra), ni globos, ni subtítulos con globos. En cada cambio de escena (presentador ↔ personajes,
+  o de un cruce a otro) **sale uno del todo y después entra el otro**: si la voz no deja hueco, se alarga el silencio
+  (`presentador.HUECO_ESCENA`, 0,85 s, lo mete el montaje solo) y el guionista puede poner punto y aparte para dar ese
+  respiro. El subtítulo del puente dentro de un cruce va en el hueco del globo derecho y se retira antes de que entre.
+  Todo tiene que verse dinámico y natural: relevo limpio, sin esperas largas. Se revisan los cambios de escena
+  fotograma a fotograma (cada 0,15 s) antes de mandar el vídeo.
 - **Largo:** logo «EL HOYFORMATIVO» arriba a la derecha y título de la pieza arriba a la izquierda. **Shorts:** cabecera del
   canal con la etiqueta de formato, kicker rojo, personajes en la mitad de abajo, bocadillo o subtítulo encima, y cierre con
   la pregunta y suscríbete.
