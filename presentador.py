@@ -962,8 +962,8 @@ def short(fecha, n):
     kick = SH._kicker((S.get("kicker") or quien).upper())
     t_fin = next((g["t0"] for g in tr if g.get("cierre")), total)
     cortes = [g["t0"] - 0.3 for g in tr[1:] if g["tipo"] == "Q" or tr[tr.index(g) - 1]["tipo"] == "Q"]
-    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.2, [], efectos=[(x, "whoosh") for x in cortes],
-                  con_sintonia=False)
+    # 22-nov-2026 (el usuario): los personajes y el presentador entran y salen SIN efectos de sonido
+    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.2, [], efectos=(), con_sintonia=False)
     f_fuente = fuente("Inter-SemiBold.ttf", 26)
 
     def encabezado(fr, t):
@@ -1058,7 +1058,7 @@ def largo(fecha):
     for g, k in zip(tr, sec_de):
         t_sec.setdefault(k, g["t0"])
     cortes = [t_sec[k] for k in sorted(t_sec)[1:]] + [g["t0"] - 0.3 for g in tr if g["tipo"] == "Q"]
-    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.0, [], efectos=[(x, "whoosh") for x in sorted(cortes)],
+    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.0, [], efectos=(),   # sin efectos al entrar/salir
                   con_sintonia=True)
     fl, ft = fuente("Inter-Black.ttf", 34), fuente("Inter-Black.ttf", 30)
     lw = int(fl.getlength("EL HOYFORMATIVO"))
