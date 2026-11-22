@@ -187,6 +187,12 @@ def _quien_de_cita(texto, m, defecto, conocidas):
     return defecto
 
 
+_NO_PILA = {"y", "e", "o", "ni", "pero", "ademas", "tambien", "mientras", "ahora", "hoy", "ayer", "luego", "entonces",
+            "presidente", "presidenta", "ministro", "ministra", "lider", "portavoz", "candidato", "candidata", "el", "la",
+            "vicepresidenta", "vicepresidente", "secretario", "secretaria", "expresidente", "exministro", "alcalde",
+            "alcaldesa", "senor", "senora", "don", "dona"}
+
+
 def _apellidos(frag, conocidas):
     """Personas conocidas nombradas en frag que NO son destinatario («a/contra/sobre Fulano»), en orden de aparición."""
     out = []
@@ -194,7 +200,11 @@ def _apellidos(frag, conocidas):
         w = mm.group(1)
         if re.search(r"\b(?:a|al|contra|para|sobre|con|que|imitando a|de)\s+(?:\w+\s+){0,2}$", frag[:mm.start()]):
             continue
-        n = next((n for n, _ in conocidas if _n(n).split()[-1:] == [_n(w)]), None)
+        previa = re.search(r"\b([A-ZÁÉÍÓÚÑ][\wáéíóúñ]+)\s+$", frag[:mm.start()])
+        # 22-nov-2026: «Cayetana Álvarez» no es «Pepe Álvarez»: si delante va un nombre de pila, tiene que ser el suyo
+        pila = _n(previa.group(1)) if previa and _n(previa.group(1)) not in _NO_PILA else None
+        n = next((n for n, _ in conocidas if _n(n).split()[-1:] == [_n(w)] and (pila is None or pila in _n(n).split())),
+                 None)
         if n and n not in out:
             out.append(n)
     return out
@@ -236,8 +246,14 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
         cita = m.group(1)
         if len(cita.split()) < MIN_PAL_CITA:
             continue
+        # 22-nov-2026 (fallo real: «Vamos a seguir votando al PSOE», de 8 veteranos, salió con Sánchez; y la ironía de
+        # Urtasun «con Rufián» salió con Rufián): si la cita la introduce una frase («X firman:», «Y Fulano ironiza…:»)
+        # y en ella no consta un único hablante conocido, NO se adivina: la lee el presentador. Las conjeturas
+        # (_quien_de_cita, _quien_despues) solo valen cuando la cita abre su frase.
+        ini_f = max([texto.rfind(x, 0, m.start()) for x in (". ", "! ", "? ", "». ")] + [-1]) + 1
+        presentada = bool(re.sub(r"«[^»]*»", " ", texto[ini_f:m.start()]).strip())
         quien = (quien_de(cita) if quien_de else None) or _quien_antes(texto, m, conocidas) \
-            or _quien_de_cita(texto, m, defecto, conocidas) or _quien_despues(texto, m, conocidas)
+            or (None if presentada else (_quien_de_cita(texto, m, defecto, conocidas) or _quien_despues(texto, m, conocidas)))
         if not quien:
             continue
         antes = texto[pos:m.start()].strip()

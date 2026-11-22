@@ -289,6 +289,10 @@ y no se usa hasta nueva orden del usuario.**
   la dice. **Sin imagen** de esa persona en `Imagenes/Políticos`, la cita la lee el presentador **sin globo** (como
   narración, con subtítulo) y se avisa al usuario por Telegram de la imagen que falta (`presentador.sin_imagen`). Nunca
   el presentador con un globo de otro, ni una foto de otra fuente ni una cara inventada.
+- **Nunca se adivina quién dice una cita** (22-nov-2026, fallo real: «Vamos a seguir votando al PSOE», de ocho veteranos
+  socialistas, salió con Sánchez, y una ironía de Urtasun salió con Rufián): si la frase que la introduce no nombra a un
+  único hablante con imagen, la lee el presentador sin globo. Mismo apellido no es misma persona («Cayetana Álvarez de
+  Toledo» no es «Pepe Álvarez»). En el guion, quien dice la cita se nombra justo antes de ella.
 - **Nunca dos globos superpuestos ni un globo encima de un personaje:** el globo de una cita se va antes de que entre el
   de la siguiente; la misma persona escrita de dos formas («Feijóo» / «Alberto Núñez Feijóo») es una sola figura (antes
   salía dos veces, una a cada lado, con los globos encima).
