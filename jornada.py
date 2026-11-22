@@ -475,7 +475,7 @@ class Jornada:
         # 20-nov-2026 (el usuario): formato «presentador» SIEMPRE (presentador.py; NORMAS.md §6).
         if self.py("presentador.py", self.f, "largo", log="render.log", timeout=7200) != 0:
             return False
-        # render_ambiente no deja escenas.json: las hojas de contacto para el control visual (Gemini) las saca hojas.py
+        # presentador.py no deja escenas.json: las hojas de contacto para el control visual (Gemini) las saca hojas.py
         # muestreando el mp4.
         self.py("hojas.py", self.f, log="calidad.log")
         self.parte("montaje hecho y fotogramas de control sacados")
@@ -546,9 +546,11 @@ class Jornada:
         inf = (self.dia / "calidad" / "informe.md")
         if inf.exists() and "CORREGIR" in inf.read_text(encoding="utf-8"):
             (self.dia / "episodio.mp4").unlink(missing_ok=True)
-            self.claude("montador", "Arregla lo de calidad/informe.md y vuelve a montar con render_ambiente.py.",
+            # 22-nov-2026: SIEMPRE presentador.py (aquí quedaba render_ambiente.py, descartado desde el 20-nov)
+            self.claude("montador", "Arregla lo de calidad/informe.md y vuelve a montar con presentador.py (formato "
+                        "presentador, NORMAS.md §6; nunca render_ambiente.py).",
                         (self.dia / "episodio.mp4").relative_to(RAIZ), motivo="hay que corregir el montaje")
-            if not (self.dia / "episodio.mp4").exists() and self.py("render_ambiente.py", self.f, "largo", log="render.log", timeout=7200) != 0:
+            if not (self.dia / "episodio.mp4").exists() and self.py("presentador.py", self.f, "largo", log="render.log", timeout=7200) != 0:
                 return False
         return True
 
