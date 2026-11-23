@@ -258,6 +258,16 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
         presentada = bool(re.sub(r"«[^»]*»", " ", texto[ini_f:m.start()]).strip())
         quien = (quien_de(cita) if quien_de else None) or _quien_antes(texto, m, conocidas) \
             or (None if presentada else (_quien_de_cita(texto, m, defecto, conocidas) or _quien_despues(texto, m, conocidas)))
+        if not quien and presentada and out and out[-1]["tipo"] == "Q":
+            # 23-nov-2026: «…». Les acusa de «…»: la frase siguiente a una cita, sin nombre nuevo y con un verbo de
+            # continuidad, es del MISMO hablante (nunca con «responde/contesta/replica», que indican a otro)
+            frag = re.sub(r"«[^»]*»", " ", texto[ini_f:m.start()])
+            entre = texto[pos:m.start()]
+            if not _apellidos(frag, conocidas) and len(re.findall(r"[.!?]\s", entre)) <= 1 \
+                    and re.search(r"\b(acusa|acusan|añade|insiste|remata|sigue|advierte|avisa|critica|pide|exige|"
+                                  r"denuncia|recuerda|asegura|zanja|subraya|tacha|llama)\b", frag, re.I) \
+                    and not re.search(r"\b(responde|contesta|replica|le dice)\b", frag, re.I):
+                quien = out[-1]["quien"]
         if not quien:
             continue
         antes = texto[pos:m.start()].strip()
@@ -272,6 +282,27 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
     resto = texto[pos:].strip()
     if resto:
         out.append({"tipo": "P", "di": resto})
+    # 23-nov-2026 (el usuario: «parte de la cita quedó fuera del globo»): si la cita va en MITAD de una frase («Les acusa de
+    # «…» con el voto útil.»), la frase entera va en el globo (las comillas marcan lo literal) y el presentador no vuelve
+    # solo para decir la cola. Antes: el trozo sin puntuación justo delante de las comillas; después: la cola que sigue
+    # en minúscula hasta el punto (8 palabras como mucho).
+    for i, g in enumerate(out):
+        if g["tipo"] != "Q":
+            continue
+        if i > 0 and out[i - 1]["tipo"] == "P":
+            prev = out[i - 1]["di"]
+            corte = max(prev.rfind(x) for x in (". ", "! ", "? ", ": ", "». ", "; "))
+            frag = prev[corte + 2:] if corte >= 0 else prev
+            if frag and len(frag.split()) <= 5 and not frag.rstrip().endswith((":", ".", "!", "?", ";")):
+                g["di"] = frag.strip() + " " + g["di"]
+                out[i - 1]["di"] = prev[:corte + 1].strip() if corte >= 0 else ""
+        if i + 1 < len(out) and out[i + 1]["tipo"] == "P" and not g["di"].rstrip().endswith((".", "!", "?")):
+            sig = out[i + 1]["di"]
+            m2 = re.match(r"([a-záéíóúñ][^.!?]*[.!?])\s*", sig)
+            if m2 and len(m2.group(1).split()) <= 8:
+                g["di"] = g["di"].rstrip(",;:") + " " + m2.group(1)
+                out[i + 1]["di"] = sig[m2.end():].strip()
+    out = [g for g in out if g["tipo"] == "Q" or g["di"]]
     # puentes y cruces: narración corta entre dos citas -> el primero se queda; si es otra persona, entra a la derecha
     for i, g in enumerate(out):
         if g["tipo"] == "P" and 0 < i < len(out) - 1 and out[i - 1]["tipo"] == "Q" and out[i + 1]["tipo"] == "Q" \
@@ -682,20 +713,6 @@ class Escena:
         self.V = V
         self.grupos = grupos
 
-    def _escala_cruce(self, quien):
-        """Escala común de los cruces en los que sale `quien`: la que hace que el más ancho de cada pareja quepa en su
-        mitad de la pantalla (0,47 del ancho), sin pasar de 0,88."""
-        if not hasattr(self, "_esc_cruce"):
-            self._esc_cruce = {}
-            for k, gr in self.grupos.items():
-                if not self.cruce.get(k):
-                    continue
-                figs = [self.figs.get(x["quien"]) for x in gr]
-                e = min([0.88] + [0.47 * self.W / f.width for f in figs if f is not None])
-                for x in gr:
-                    self._esc_cruce[x["quien"]] = min(e, self._esc_cruce.get(x["quien"], 0.88))
-        return self._esc_cruce.get(quien, 0.88)
-
     def _fig(self, clave, pose):
         return self.poses[pose % len(self.poses)] if clave == "P" else self.figs[clave]
 
@@ -705,11 +722,33 @@ class Escena:
             self.sombras[k] = sombra(fig)
         return self.sombras[k]
 
+    FUERA = 0.15                  # parte de la figura (brazos del lado de fuera) que puede salirse por el borde en un cruce
+
+    def _escala_video(self):
+        """23-nov-2026: la escala común del vídeo. En vertical, la que hace que en el cruce más ancho cada figura quepa en
+        su mitad (con hasta un 15 % por fuera del borde), sin pasar de 0,92 si hay cruces ni de 1 si no los hay."""
+        if not hasattr(self, "_esc_v"):
+            e = 1.0
+            if self.vertical:
+                for k, gr in self.grupos.items():
+                    if self.cruce.get(k):
+                        e = min(e, 0.92)
+                        for x in gr:
+                            f = self.figs.get(x["quien"])
+                            if f is not None:
+                                e = min(e, (self.W / 2 - 14) / (f.width * (1 - self.FUERA)))
+            self._esc_v = max(0.6, e)
+        return self._esc_v
+
     def _pos(self, clave, lado, g_cruce):
         W, H = self.W, self.H
         if self.vertical:
             if g_cruce:
-                return (0.25 if lado == "izq" else 0.75) * W
+                # cada figura en su mitad: el borde de dentro a 14 px del centro; lo que sobra sale por el borde de fuera
+                f = self.figs.get(clave)
+                fw = (f.width if f is not None else W * 0.45) * self._escala_video()
+                cx = min(0.25 * W, W / 2 - 14 - fw / 2) if lado == "izq" else max(0.75 * W, W / 2 + 14 + fw / 2)
+                return cx
             return 0.38 * W
         if clave == "P" or not g_cruce:
             return (0.19 if lado == "izq" else 0.81) * W
@@ -747,9 +786,9 @@ class Escena:
                            for g in self.tr)
             # 20-nov-2026 (el usuario: «parece que están temblando, las quiero estáticas»): los personajes están QUIETOS en
             # pantalla; solo se mueven al entrar y salir (desliz + fundido). Nada de «respirar» ni de balanceo al hablar.
-            s = 0.88 if (self.vertical and en_cruce) else 1.0
-            if self.vertical and en_cruce:                # 22-nov-2026: en un cruce cada figura cabe en SU mitad (con los
-                s = min(s, self._escala_cruce(clave))     # brazos abiertos se pisaban), y las dos a la MISMA escala
+            # 23-nov-2026 (el usuario: «todos los personajes del mismo tamaño»): UNA escala para todo el vídeo, la misma
+            # para el presentador y para cada personaje, solo o en un cruce
+            s = self._escala_video()
             if s != 1.0:
                 k_ = (clave, pose % len(self.poses) if clave == "P" else 0, s)
                 if k_ not in self.sombras:
@@ -794,7 +833,7 @@ class Escena:
     def _vista(self, f, t):
         im = self.fondos[f]
         W, H = self.W, self.H
-        z = 1 + 0.04 * ((t % 20) / 20)
+        z = 1.0                    # 23-nov-2026 (el usuario): fondo ESTÁTICO, sin zoom (el lento acercamiento saltaba cada 20 s)
         fw, fh = int(W * z), int(H * z)
         k = min(im.width / fw, im.height / fh)
         fw, fh = int(fw * min(1, k)), int(fh * min(1, k))

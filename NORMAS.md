@@ -325,6 +325,11 @@ y no se usa hasta nueva orden del usuario.**
   izquierda). **Imágenes:** de cada político se usa la imagen individual; las recortadas de una foto de grupo
   (`Grupo/*_grupo.png`, poca resolución) solo si no hay otra (usuario, 23-nov-2026: «la de Sánchez no es la mejor»).
   Una cita corta (menos de 5 palabras) sale en globo si el guion dice quién la dice (`quien_citas`).
+- **Ajustes del 23-nov-2026 (usuario):** (1) si la cita va en mitad de una frase («Les acusa de «…» con el voto útil»), la
+  frase entera va en el globo, con las comillas marcando lo literal, y el presentador no vuelve solo para decir la cola;
+  (2) **todos los personajes y el presentador, del mismo tamaño** en todo el vídeo: una sola escala (la que necesita el cruce
+  más ancho; en un cruce, los brazos del lado de fuera pueden salirse un poco por el borde en vez de encoger a nadie);
+  (3) **fondo estático, sin zoom.**
 - **Sin efectos de sonido al entrar o salir** (usuario, 22-nov-2026): ni los personajes ni el presentador llevan
   «whoosh» ni ningún otro efecto; solo la voz y la música. Se revisan los cambios de escena
   fotograma a fotograma (cada 0,15 s) antes de mandar el vídeo.
