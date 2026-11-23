@@ -11,6 +11,8 @@ autor = la cuenta y la frase literal dentro; 2) si no, la frase literal en los a
 redes.md, con el apellido de la persona cerca. Escribe "verificada": true/false y "prueba" en el mismo fichero.
 Cruce (21-nov-2026): "cruce": [{persona, partido, cuenta, enlace, frase, papel}, ...] — un Short de cruce de declaraciones
 (frase y réplicas); cada frase se comprueba por separado y solo se usan las comprobadas.
+Tema (23-nov-2026): "short_tema": {"tema": "...", "instrucciones": "..."} — un Short sobre un tema, sin frase dada:
+lo más fuerte del material comprobado (con "busca_x" para traer los tuits de las cuentas del tema).
 Uso: python encargo.py AAAA-MM-DD   (salida 0 = verificada, 1 = no verificada, 2 = no hay encargo)"""
 from __future__ import annotations
 

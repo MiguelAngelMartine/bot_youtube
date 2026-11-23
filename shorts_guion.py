@@ -400,6 +400,11 @@ def main(fecha, n=3):
                      f", con su frase más fuerte del día (comprobada literal en el material) y {quien_p} de protagonista.")
     if pedidos and all(pd.get("mejores_frases") for pd in pedidos):    # 20-nov: Shorts de «mejores frases»
         return mejores_frases(fecha, pedidos, enc, G, guion, redes)
+    if enc.get("short_tema"):                           # 23-nov-2026: un Short sobre un TEMA (sin frase dada): lo más fuerte
+        st = enc["short_tema"]
+        obligada += (f"\n\nOBLIGATORIO (lo pide el director): el PRIMER Short trata de «{st.get('tema', '')}». "
+                     f"{st.get('instrucciones', '')} Solo frases LITERALES y comprobadas en el material (guion aprobado, "
+                     "redes.md y la búsqueda en X del encargo), con su autor real; elige la de más impacto para abrir.")
     if enc.get("evita_temas"):
         obligada += f"\n\nEVITA estos temas (ya tratados o que no quiere el director): {', '.join(enc['evita_temas'])}."
     if enc.get("cruce") and enc.get("shorts_hechos"):     # 22-nov: el Short del cruce ya está montado: los demás, de otra cosa

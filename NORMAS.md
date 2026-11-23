@@ -256,6 +256,10 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, «ladrillazo va,
   El sumario de `episodio.json` solo alimenta miniatura y título; no hay sección de breves aparte.
   Corrección (si la hay) al final, antes de la despedida: «Si te ha servido, suscríbete y dale a la campanita. Y si no, también, hombre, que no cuesta nada.
   Gracias por vernos. Mañana, más.» Tragedias: tono sobrio, sin ganchos llamativos, música baja.
+- **Short temático por encargo** (23-nov-2026, el usuario: «un Short de Vox y sus políticos con lo más impactante de
+  ayer y hoy»): `encargo.json` → `"short_tema": {"tema", "instrucciones"}`, con `"busca_x"` (cuentas oficiales comprobadas
+  del tema, 48 h) y `"claves"` (dossier propio). El primer Short del día trata ese tema con sus frases más fuertes,
+  literales y comprobadas.
 - **Día monográfico por encargo del director** (20-nov-2026, el usuario): si `encargo.json` trae `monografico`, el largo y
   los Shorts de ese día tratan SOLO ese tema (mismo formato «2 minutos», sus bloques = sus cruces), con
   equilibrio estricto de frases y tiempo entre las partes. Los Shorts pueden ser de **«mejores frases»** de una persona

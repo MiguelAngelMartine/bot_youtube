@@ -83,7 +83,8 @@ class Jornada:
                 return False
         for s in ("articulos.py", "erratas.py", "contexto.py", "redes.py", "ganchos.py"):
             self.py(s, self.f, log="recogida.log", timeout=1200)
-        enc_ok = (self.dia / "encargo.json").exists() and self.py("encargo.py", self.f, log="recogida.log") == 0
+        enc_ok = (self.dia / "encargo.json").exists() and (self.py("encargo.py", self.f, log="recogida.log") == 0
+                                                           or bool((self.json("encargo.json") or {}).get("short_tema")))
         temas = self.json("temas.json") or []
         ids = [t["id"] for t in temas[:6]]
         mono = self.monografico()
