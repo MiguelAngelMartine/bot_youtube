@@ -664,5 +664,17 @@
   "partido": "",
   "fuente": "laSexta, 21-nov-2026",
   "verificado": "22-nov-2026"
+ },
+ "Felipe González": {
+  "cargo": "Expresidente del Gobierno",
+  "partido": "PSOE",
+  "fuente": "EFE, 23-nov-2026",
+  "verificado": "23-nov-2026"
+ },
+ "José Bono": {
+  "cargo": "Exministro de Defensa",
+  "partido": "PSOE",
+  "fuente": "Europa Press, 21-nov-2026 («ex ministro de Defensa»)",
+  "verificado": "23-nov-2026"
  }
 }

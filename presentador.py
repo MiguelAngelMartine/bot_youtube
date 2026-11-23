@@ -816,7 +816,11 @@ class Escena:
                 # pisaba el globo izquierdo
                 dentro = any(self.cruce.get(k) and min(x["t0"] for x in gr) < g["t0"] < max(x["t0"] for x in gr)
                              for k, gr in self.grupos.items())
-                if not (dentro and t > g["t1"] - 0.3):  # se va antes: el globo derecho entra 0,25 s antes de la cita
+                # 23-nov-2026: puente entre dos citas FUERA de un cruce (la misma persona sigue): el globo anterior aún
+                # está donde iría el subtítulo; ese tramo corto va sin subtítulo (la voz lo dice igual)
+                if g.get("puente") and not dentro:
+                    pass
+                elif not (dentro and t > g["t1"] - 0.3):  # se va antes: el globo derecho entra 0,25 s antes de la cita
                     fr.alpha_composite(s, ((W - s.width) // 2, int(H * 0.30) if dentro else int(H * 0.39) - s.height))
             else:
                 s = subtitulo(g, t, 1050, 56)
