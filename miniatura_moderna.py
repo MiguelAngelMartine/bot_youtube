@@ -21,6 +21,7 @@ W, H = 1280, 720
 AMARILLO = (255, 205, 0)
 ROJO = (226, 30, 45)
 NAVY = (8, 14, 34)
+GROSOR = 4                 # contorno de la silueta (23-nov-2026, el usuario: «más fino»)
 F = RAIZ / "fuentes"
 
 
@@ -144,7 +145,7 @@ def duelo(salida, frase, destaca, fig_izq, fig_der, etiqueta, fondo_ruta):
         b = busto(ruta, alto)
         if lado == "der":
             b = b.transpose(Image.FLIP_LEFT_RIGHT) if False else b
-        c, pad = contorno(b, 9)
+        c, pad = contorno(b, GROSOR)
         x = -pad + 10 if lado == "izq" else W - c.width + pad - 10
         im.alpha_composite(c, (x, H - c.height + pad + 4))
     d = ImageDraw.Draw(im)
@@ -171,7 +172,7 @@ def duelo(salida, frase, destaca, fig_izq, fig_der, etiqueta, fondo_ruta):
 def protagonista(salida, frase, destaca, fig, etiqueta, fondo_ruta):
     im = fondo(fondo_ruta, lado="izq")
     b = busto(fig, int(H * 0.90), corte=0.40)
-    c, pad = contorno(b, 10)
+    c, pad = contorno(b, GROSOR)
     im.alpha_composite(c, (W - c.width + pad + 10, H - c.height + pad + 30))
     d = ImageDraw.Draw(im)
     _chip(d, 56, 60, etiqueta.upper())
@@ -186,7 +187,7 @@ def protagonista(salida, frase, destaca, fig, etiqueta, fondo_ruta):
 def cita(salida, frase, destaca, fig, etiqueta, quien, fondo_ruta):
     im = fondo(fondo_ruta, lado="izq")
     b = busto(fig, int(H * 0.88), corte=0.40)
-    c, pad = contorno(b, 10, color=AMARILLO)
+    c, pad = contorno(b, GROSOR, color=AMARILLO)
     im.alpha_composite(c, (W - c.width + pad + 20, H - c.height + pad + 30))
     d = ImageDraw.Draw(im)
     fq = fuente("Inter-Black.ttf", 200)
