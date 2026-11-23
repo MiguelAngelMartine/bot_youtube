@@ -781,7 +781,14 @@ class Escena:
                     fr.alpha_composite(s, ((W - s.width) // 2, int(H * 0.30) if dentro else int(H * 0.39) - s.height))
             else:
                 s = subtitulo(g, t, 1050, 56)
-                fr.alpha_composite(s, (int(W * 0.40), H - s.height - 80))
+                # 23-nov-2026: en un cruce del largo el globo derecho va ABAJO, donde el subtítulo: el puente se ve solo
+                # mientras ese globo no ha entrado y se retira antes; si ya está (segunda cita del mismo), va sin subtítulo
+                grupo = next((gr for k, gr in self.grupos.items() if self.cruce.get(k)
+                              and min(x["t0"] for x in gr) < g["t0"] < max(x["t0"] for x in gr)), None)
+                if grupo is None:
+                    fr.alpha_composite(s, (int(W * 0.40), H - s.height - 80))
+                elif not any(x["lado"] == "der" and x["t0"] < g["t0"] for x in grupo) and t <= g["t1"] - 0.3:
+                    fr.alpha_composite(s, (int(W * 0.40), H - s.height - 80))
         return fr
 
     def _vista(self, f, t):
