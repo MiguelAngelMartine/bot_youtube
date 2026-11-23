@@ -170,6 +170,7 @@ def vetadas(voz):
     return out
 
 
+CONTEXTO = """CONTEXTO EN LOS CRUCES (23-nov-2026, el usuario: «hay frases buenas que, sin contexto, no parecen tener conexión con lo que se está contando»): cada cita tiene que entenderse SOLA para quien no sabe nada de la noticia. Justo antes o justo después, una frase corta dice DE QUÉ habla (el tema concreto: «sobre su voto en blanco», «sobre la censura en Pinto») y, si hace falta, a qué responde. El puente de un cruce puede llevar el tema («Sobre el voto en blanco, Bono le pide:») sin pasar de 12 palabras. Mejor 2-3 citas bien explicadas que 5 sueltas (45 s como mucho); si una frase buena necesita demasiado contexto, cámbiala por otra. Antes de terminar, relee el guion como alguien que no sabe nada: si alguna cita no se entiende, añádele su contexto o quítala."""
 GANCHO = """ELIGE LA FRASE POR SU GANCHO (23-nov-2026, datos del canal): los Shorts más vistos abren con una expresión coloquial o una imagen potente («las santas narices», «garrapatismo», «el perro del hortelano», «suspende en inglés y en economía», «cuatro bofetadas»); las declaraciones institucionales planas no despegan. Entre dos citas del mismo peso informativo, gana la que tiene expresión coloquial, metáfora, insulto político o sorpresa (por ejemplo, el afectado que le quita hierro). Abre SIEMPRE con la más fuerte."""
 
 
@@ -437,7 +438,7 @@ def main(fecha, n=3):
         _, _, pols_ = PR.catalogo()
         con_imagen = sorted({" ".join(PR._NOMBRE.get(r_, [k_])).title() for k_, rs_ in pols_.items() for r_ in rs_})
         obligada += ("\n\nPERSONAJES CON IMAGEN (las citas y réplicas, SOLO de ellos; sin imagen no sale su cara): "
-                     + ", ".join(con_imagen) + ". " + GANCHO + " Prefiere los CRUCES (cita + réplica literal de otro partido); la sección «CRUCES DE DECLARACIONES EN X» de las redes trae intercambios reales entre cuentas oficiales y vale como fuente aunque no haya noticia (fuente «X (@cuenta)»). Un cruce también son varias voces sobre la misma historia (sección «VARIAS VOCES SOBRE LA MISMA HISTORIA»), aunque no se respondan ni quede equilibrado; «le contesta» solo si le contesta.")
+                     + ", ".join(con_imagen) + ". " + GANCHO + " " + CONTEXTO + " Prefiere los CRUCES (cita + réplica literal de otro partido); la sección «CRUCES DE DECLARACIONES EN X» de las redes trae intercambios reales entre cuentas oficiales y vale como fuente aunque no haya noticia (fuente «X (@cuenta)»). Un cruce también son varias voces sobre la misma historia (sección «VARIAS VOCES SOBRE LA MISMA HISTORIA»), aunque no se respondan ni quede equilibrado; «le contesta» solo si le contesta.")
     except Exception as ex:
         print(f"  (sin lista de imágenes: {type(ex).__name__})")
     r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)

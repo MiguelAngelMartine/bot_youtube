@@ -139,6 +139,10 @@ Referencia: `dia/2026-11-22/shorts/short_1.json` (Morant y las «cuatro bofetada
 - **Solo personajes con imagen** en `Imagenes/Políticos`; de los demás no se elige cita (no se mete un cruce sin cara).
 - **Remate neutral** del presentador sin declarar ganador («Y aquí cada uno entiende la metáfora a su manera.») y **pregunta
   corta con el nombre** de quien dijo la frase («¿Se pasó Morant?»): tiene que caber en una línea del cierre.
+- **Contexto en cada cita** (23-nov-2026, el usuario): cada cita se entiende sola para quien no sabe nada: antes o
+  justo después, una frase corta dice de qué habla y a qué responde; el puente puede llevar el tema («Sobre el voto en
+  blanco, Bono le pide:», ≤ 12 palabras). Mejor 2-3 citas bien explicadas que 5 sueltas; si una frase buena necesita
+  demasiado contexto, otra. El guionista relee como alguien que no sabe nada y añade contexto o quita la cita.
 - **≤ 45 s** (23-nov-2026, el usuario, con los datos de retención: a la mitad de un Short de 35-40 s sigue el 74-91 %; en uno
   de 60 s, el 33-44 %); con la voz a +8 %, unas 105 palabras con el cierre. Si pasa, se quita narración, nunca citas.
 - **En pantalla**: los dos globos del cruce, uno arriba (izquierda) y otro debajo (derecha), sin pisarse entre ellos ni
