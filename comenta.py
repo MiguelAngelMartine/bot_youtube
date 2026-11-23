@@ -48,7 +48,7 @@ def main():
                     if S.get("titulo", "")[:30] and S["titulo"][:30] in h.get("titulo", ""):
                         pregunta = S.get("pregunta", "")
                         break
-                txt = f"🎬 El vídeo completo de hoy, con todos los cruces: {largo['url']}" + (f"\n\n{pregunta} 👇" if pregunta else "")
+                txt = f"🎬 El vídeo completo de hoy, con todos los cruces: {largo['url']}" + (f"\n\n{pregunta}\n👍 Sí · 👎 No · Te leo 👇" if pregunta else "")   # 23-nov: responder fácil
                 try:
                     yt.commentThreads().insert(part="snippet", body={"snippet": {"videoId": h["id"], "topLevelComment": {
                         "snippet": {"textOriginal": txt}}}}).execute()

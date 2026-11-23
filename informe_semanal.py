@@ -9,11 +9,12 @@ import analitica
 import gem
 import notifica
 
-PROMPT = """Eres analista de un canal de YouTube de política española (Shorts diarios y un vídeo largo de 4-5 min).
+PROMPT = """Eres analista de un canal de YouTube de política española (Shorts diarios con cruces de declaraciones y un vídeo largo de 2 minutos).
 Con estas estadísticas, escribe en español, en lenguaje llano y sin tecnicismos, como mucho 12 líneas:
 1) los 3 vídeos que mejor funcionaron y POR QUÉ (gancho, duración, % visto, me gusta, comentarios);
 2) los 2 que peor y por qué;
-3) 3 cambios concretos para la próxima semana (duración, tipo de gancho, preguntas, títulos, horas).
+3) 3 cambios concretos para la próxima semana (duración, tipo de gancho, preguntas, títulos, horas), apoyados en la
+   tabla de RETENCIÓN: a los 3 s (gancho), a la mitad, al final, y la pérdida por tramo (presentador, cita, puente, cierre).
 Ten en cuenta que los datos de los 2-3 últimos días aún no están completos (YouTube Analytics tarda).
 
 ESTADÍSTICAS:
@@ -23,6 +24,11 @@ ESTADÍSTICAS:
 def main(dias=7):
     out = analitica.main(dias)
     datos = out.read_text(encoding="utf-8")
+    try:                                               # 23-nov-2026: retención por tramo (dónde se va la gente)
+        import retencion
+        datos += "\n\n" + retencion.main(14, 80)
+    except Exception as e:
+        print(f"(retención sin hacer: {type(e).__name__})")
     conclusiones = gem.pide(PROMPT.format(datos=datos[:20000]), temperatura=0.3) or "(Gemini no ha respondido: solo las cifras)"
     tabla = [l for l in datos.splitlines() if l.startswith("| 20")]
     mejores = sorted(tabla, key=lambda l: -int((l.split("|")[4].strip() or "0")))[:5]

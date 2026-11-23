@@ -40,8 +40,12 @@ def aviso_subida(info):
     """Aviso corto en cuanto hay un video subido a YouTube esperando a que el director lo publique (norma del 1-nov)."""
     tok, chat = credenciales()
     api = f"https://api.telegram.org/bot{tok}"
-    txt = (f"▶️ El Hoyformativo: vídeo subido a YouTube como PRIVADO, listo para que lo revises y lo publiques.\n"
-           f"{info['titulo']}\n{info['studio']}")
+    if info.get("publica"):                            # 23-nov-2026: publicación programada
+        txt = (f"▶️ El Hoyformativo: vídeo subido a YouTube y PROGRAMADO: se publica solo el {info['publica']} (hora de "
+               f"Madrid). Puedes cambiar la hora o anularlo en Studio.\n{info['titulo']}\n{info['studio']}")
+    else:
+        txt = (f"▶️ El Hoyformativo: vídeo subido a YouTube como PRIVADO, listo para que lo revises y lo publiques.\n"
+               f"{info['titulo']}\n{info['studio']}")
     if info.get("sustituye_a"):
         txt += "\n(Sustituye a la versión anterior de ese día, que se ha borrado.)"
     if info.get("avisos"):
@@ -101,8 +105,11 @@ def aviso_shorts(dia_txt, hechos):
     from pathlib import Path
     tok, chat = credenciales()
     api = f"https://api.telegram.org/bot{tok}"
-    txt = [f"📱 El Hoyformativo · {dia_txt}: {len(hechos)} Shorts subidos a YouTube como PRIVADOS, para revisar y publicar:"]
-    txt += [f"{k}. {h['titulo']}\n{h['studio']}" + (f"\n({h['aviso']})" if h.get("aviso") else "")
+    prog = any(h.get("publica") for h in hechos)
+    txt = [f"📱 El Hoyformativo · {dia_txt}: {len(hechos)} Shorts subidos a YouTube "
+           + ("y PROGRAMADOS (se publican solos a la hora indicada):" if prog else "como PRIVADOS, para revisar y publicar:")]
+    txt += [f"{k}. {h['titulo']}\n{h['studio']}" + (f"\n🕒 Se publica solo el {h['publica']} (cámbialo en Studio si quieres)"
+                                                      if h.get("publica") else "") + (f"\n({h['aviso']})" if h.get("aviso") else "")
             for k, h in enumerate(hechos, 1)]
     import json as _j                                  # 10-nov: el largo del día, para el «Vídeo relacionado»
     yl = Path(__file__).parent / "dia" / dia_txt[:10] / "youtube.json"

@@ -23,7 +23,7 @@
   (`notifica.py`), en lenguaje llano.
 - **Revisar antes de entregar:** mirar los fotogramas de cada escena antes de mandar un vídeo; no darlo por bueno sin verlo.
 - **Nada se sube sin el OK del usuario** (21-nov-2026): los vídeos se le mandan por Telegram (`notifica.py FECHA --pide-ok
-  largo|shorts`) y solo con su OK se suben a YouTube. **Nunca publicar:** se sube como privado y publica el usuario. Antes de rehacer algo, comprobar en YouTube si ya está
+  largo|shorts`) y solo con su OK se suben a YouTube. **Nunca publicar sin su OK:** con su OK se sube privado y programado (franjas en NORMAS.md, 23-nov-2026) o privado si lo pide. Antes de rehacer algo, comprobar en YouTube si ya está
   publicado: lo publicado no se toca.
 - Las búsquedas web sencillas se pueden delegar en un ayudante barato; el diseño, el análisis y los cambios de código, nunca.
 - No proponer de nuevo lo que el usuario ya descartó (está en `oficina/HISTORIAL_DECISIONES.md`): ritmo «TikTok» de cortes

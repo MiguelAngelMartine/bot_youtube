@@ -16,8 +16,9 @@ RAIZ = Path(__file__).parent
 PROMPT = """Eres el editor de plataforma de «El Hoyformativo», informativo diario de política española en YouTube,
 neutral y riguroso, con un tono desenfadado basado en el cruce de declaraciones entre políticos («salseo»).
 A partir del guion del vídeo de abajo, escribe:
-- "titulo": ≤ 70 caracteres, SIN el nombre del canal (decisión del usuario del 4-nov-2026). Mejor si empieza por la frase más impactante del día,
-  LITERAL y atribuida, que salga en el guion; si no, los 2-3 temas con el término que la gente buscaría al principio.
+- "titulo": ≤ 60 caracteres, SIN el nombre del canal (decisión del usuario del 4-nov-2026). 23-nov-2026: el apellido que
+  la gente busca + la expresión de gancho del día entre comillas, LITERAL y con el nombre de QUIEN LA DIJO («Cayetana, a
+  Sánchez: «Va ahora de corderito»»); nunca la frase con el nombre del aludido solo, ni la fórmula «"frase" afirma X».
   Sin mayúsculas gritonas, sin exclamaciones, sin prometer nada que el vídeo no cuente. Tacos e insultos vejatorios, no.
   Verbos neutros («dice», «responde a», «critica», «pide»); nunca «carga contra», «arremete», «estalla», «sentencia»,
   «zanja», «destroza», «humilla».
@@ -81,6 +82,23 @@ def main(fecha):
         titulo = EX.mejor_titulo(titulo, sumario, [x.get("titulo", "") for x in G["secciones"][1:]])
     except Exception as e:
         print(f"(experto sin respuesta: {type(e).__name__})")
+    try:                                               # 23-nov-2026: la frase del título, con el nombre de quien la dijo
+        import titulos as TT
+        cs = []
+        for s_ in G["secciones"]:
+            for p_ in s_.get("pasos", []):
+                ve = p_.get("ve") or {}
+                for it in (ve.get("items") or []) + [ve, ve.get("persona") if isinstance(ve.get("persona"), dict) else {}]:
+                    if isinstance(it, dict):
+                        q = it.get("persona") if isinstance(it.get("persona"), str) else it.get("nombre")
+                        c = it.get("titular") or it.get("cita")
+                        if isinstance(q, str) and isinstance(c, str) and q and c:
+                            cs.append((c.strip("«»\""), q))
+        titulo, aviso_t = TT.revisa(titulo, cs)
+        if aviso_t:
+            print("  " + aviso_t)
+    except Exception as e:
+        print(f"(control de título sin hacer: {type(e).__name__})")
     vistos, hs = set(), []
     rh = list(r.get("hashtags", []))
     rh = rh[:3] + [h for h in hs_busc if h.lower() not in {x.lower() for x in rh}] + rh[3:]   # los más buscados, tras los 3 visibles

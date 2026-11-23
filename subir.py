@@ -98,6 +98,36 @@ def personas_dibujadas(dia):
                    if d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()})
 
 
+FRANJAS = {"short": ["14:00", "18:30", "21:30"], "largo": ["20:00"]}   # hora de Madrid (23-nov-2026)
+PROGRAMAR = "--sin-programar" not in sys.argv
+
+
+def hueco(tipo):
+    """23-nov-2026 (el usuario aprueba publicar escalonado y en las horas de más audiencia): la primera franja libre
+    (dentro de 7 días, al menos 40 min después de ahora) para `tipo` («short» o «largo»), sin repetir franja. Devuelve
+    (iso_utc, texto_madrid) o (None, "") si no se programa. Registro: archivo/programacion.json."""
+    if not PROGRAMAR:
+        return None, ""
+    from datetime import datetime, timedelta, timezone
+    from zoneinfo import ZoneInfo
+    mad = ZoneInfo("Europe/Madrid")
+    reg = RAIZ / "archivo" / "programacion.json"
+    usados = json.loads(reg.read_text(encoding="utf-8")) if reg.exists() else {}
+    ahora = datetime.now(mad) + timedelta(minutes=40)
+    for d in range(8):
+        dia = (ahora + timedelta(days=d)).date()
+        for hm in FRANJAS[tipo]:
+            h, m = map(int, hm.split(":"))
+            t = datetime(dia.year, dia.month, dia.day, h, m, tzinfo=mad)
+            clave = f"{tipo} {t:%Y-%m-%d %H:%M}"
+            if t > ahora and clave not in usados:
+                usados[clave] = True
+                reg.write_text(json.dumps(usados, ensure_ascii=False, indent=1), encoding="utf-8")
+                dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+                return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), f"{dias[t.weekday()]} {t:%d} a las {t:%H:%M}"
+    return None, ""
+
+
 def subir(dia_txt):
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
@@ -118,6 +148,9 @@ def subir(dia_txt):
     cuerpo = {"snippet": {"title": titulo, "description": descripcion[:5000], "tags": etiquetas, "categoryId": "25",
                           "defaultLanguage": "es", "defaultAudioLanguage": "es"},
               "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
+    cuando, cuando_txt = hueco("largo")
+    if cuando:                                          # privado con publicación automática (se puede cambiar en Studio)
+        cuerpo["status"]["publishAt"] = cuando
     video = MediaFileUpload(str(dia / "episodio.mp4"), mimetype="video/mp4", chunksize=8 * 1024 * 1024, resumable=True)
     peticion = yt.videos().insert(part="snippet,status", body=cuerpo, media_body=video)
     respuesta = None
@@ -157,8 +190,17 @@ def subir(dia_txt):
                                  media_body=MediaFileUpload(str(srt), mimetype="application/octet-stream")).execute()
         except Exception as e:
             avisos.append(f"subtitulos no puestos ({type(e).__name__})")
+    try:                                                # 23-nov-2026: listas de reproducción
+        import listas
+        G_ = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+        pers = [it.get("persona") for s_ in G_["secciones"] for p_ in s_.get("pasos", [])
+                for it in (p_.get("ve") or {}).get("items", []) if isinstance(it, dict) and isinstance(it.get("persona"), str)]
+        listas.anade(yt, vid, "largo", pers)
+    except Exception as e:
+        avisos.append(f"listas sin actualizar ({type(e).__name__})")
     info = {"id": vid, "url": f"https://youtu.be/{vid}", "studio": f"https://studio.youtube.com/video/{vid}/edit",
-            "estado": "privado", "titulo": titulo, "avisos": avisos, "sustituye_a": anterior}
+            "estado": f"programado: {cuando_txt}" if cuando else "privado", "titulo": titulo, "avisos": avisos,
+            "sustituye_a": anterior, "publica": cuando_txt}
     (dia / "youtube.json").write_text(json.dumps(info, ensure_ascii=False, indent=1), encoding="utf-8")
     try:                                                # 8-nov: lo publicado no se repite en 7 días
         import variedad
@@ -230,6 +272,19 @@ def subir_shorts(dia_txt, solo=None):
     for f in shorts:
         S = json.loads(f.read_text(encoding="utf-8"))
         titulo = S["titulo"].strip()
+        try:                                             # 23-nov-2026: la frase del título, con el nombre de quien la dijo
+            import titulos as TT
+            cs = [(S.get("cita", ""), S.get("quien", ""))] + [((S.get("replica") or {}).get("cita", ""),
+                                                               (S.get("replica") or {}).get("quien", ""))]
+            cs += list((S.get("quien_citas") or {}).items()) + [(f.get("cita", ""), S.get("quien", ""))
+                                                                for f in S.get("frases") or []]
+            suf = " #Shorts" if titulo.endswith("#Shorts") else ""
+            nuevo, aviso_t = TT.revisa(titulo.removesuffix(" #Shorts"), [c for c in cs if c[0] and c[1]], suf)
+            if aviso_t:
+                print("  " + aviso_t)
+                titulo = nuevo
+        except Exception as e:
+            print(f"(control de título sin hacer: {type(e).__name__})")
         if "#shorts" not in titulo.lower():
             titulo = f"{titulo} #Shorts"
         cita = f"«{S['cita'].strip().rstrip('.')}», {S['quien']}"
@@ -283,6 +338,9 @@ def subir_shorts(dia_txt, solo=None):
                   "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
         if S.get("sintetico"):                          # persona real dibujada por IA: se declara (no afecta a ingresos)
             cuerpo["status"]["containsSyntheticMedia"] = True
+        cuando, cuando_txt = hueco("short")
+        if cuando:
+            cuerpo["status"]["publishAt"] = cuando
         vid = _sube(yt, f.with_suffix(".mp4"), cuerpo)
         print(f"short {f.stem} -> {vid} (PRIVADO)")
         aviso = ""
@@ -292,8 +350,15 @@ def subir_shorts(dia_txt, solo=None):
                 yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(portada), mimetype="image/png")).execute()
             except Exception as e:
                 aviso = f"miniatura no puesta ({type(e).__name__})"
+        try:                                            # 23-nov-2026: listas de reproducción (la general y por persona)
+            import listas
+            listas.anade(yt, vid, "short", list(S.get("personajes") or []) + [S.get("quien", ""),
+                                                                           (S.get("replica") or {}).get("quien", "")])
+        except Exception as e:
+            print(f"(listas: {type(e).__name__})")
         hechos.append({"short": f.stem, "id": vid, "url": f"https://youtube.com/shorts/{vid}", "titulo": titulo,
-                       "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada)})
+                       "studio": f"https://studio.youtube.com/video/{vid}/edit", "aviso": aviso, "portada": str(portada),
+                       "publica": cuando_txt})
         hechos.sort(key=lambda v: int(re.sub(r"\D", "", v.get("short", "")) or 0))
         reg.write_text(json.dumps(hechos, ensure_ascii=False, indent=1), encoding="utf-8")
     for vid_viejo in a_borrar:

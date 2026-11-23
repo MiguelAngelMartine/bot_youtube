@@ -900,7 +900,7 @@ def _render(esc, total, salida, audio, encabezado=None, nproc=None):
         a, b = bordes[k], bordes[k + 1]
         ff = subprocess.Popen([FF, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
                                f"{esc.W}x{esc.H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast",
-                               "-crf", "20", "-pix_fmt", "yuv420p", str(tmp / f"t{k}.mp4")], stdin=subprocess.PIPE)
+                               "-crf", "15", "-pix_fmt", "yuv420p", str(tmp / f"t{k}.mp4")], stdin=subprocess.PIPE)
         for n in range(a, b):
             fr = esc.cuadro(n / FPS)
             if encabezado:
@@ -928,7 +928,7 @@ def _render(esc, total, salida, audio, encabezado=None, nproc=None):
         raise RuntimeError("falló un trozo del render")
     (tmp / "lista.txt").write_text("".join(f"file 't{k}.mp4'\n" for k in range(nproc)), encoding="utf-8")
     subprocess.run([FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(tmp / "lista.txt"),
-                    "-i", str(audio), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+                    "-i", str(audio), "-c:v", "libx264", "-preset", "slow", "-crf", "17", "-pix_fmt", "yuv420p",   # 23-nov: más nitidez
                     "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "192k", "-shortest",
                     str(salida)], check=True)
     import shutil
@@ -1039,6 +1039,17 @@ def short(fecha, n):
     import shutil
     shutil.rmtree(tmp, ignore_errors=True)
     avisa_sin_imagen(fecha, f"Short {n}", faltan)
+    try:                                                # 23-nov-2026: tramos para el informe de retención (retencion.py)
+        cl = []
+        for k_, g in enumerate(tr):
+            c_ = ("cierre" if g.get("cierre") else "gancho" if k_ == 0 and g["tipo"] == "Q" else "cita" if g["tipo"] == "Q"
+                  else "puente" if g.get("puente") else "presentador")
+            cl.append({"clase": c_, "t0": round(g["t0"], 2), "t1": round(g["t1"], 2), "quien": g.get("quien", ""),
+                       "di": g["di"][:120]})
+        (dia / "shorts" / f"short_{n}_tramos.json").write_text(json.dumps({"total": round(total, 2), "tramos": cl},
+                                                                          ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception as e:
+        print(f"(tramos sin guardar: {type(e).__name__})")
     print(f"SHORT {n} (presentador): {total:.1f} s -> {out} · " +
           " | ".join(f"{g['tipo']}{'·' + g['quien'].split()[-1] if g['tipo'] == 'Q' else ''} {g['t0']:.1f}" for g in tr))
 

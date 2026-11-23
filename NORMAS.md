@@ -396,3 +396,16 @@ y no se usa hasta nueva orden del usuario.**
 - Requisitos del Programa de Socios: https://support.google.com/youtube/answer/72851
 - Preguntas frecuentes de Creative Commons: https://creativecommons.org/faq/
 - Ley de Propiedad Intelectual (arts. 32 y 33): https://www.boe.es/buscar/act.php?id=BOE-A-1996-8930
+
+## Mejoras de calidad aprobadas (23-nov-2026, el usuario: «aplica todos menos el 7»)
+- **Gancho:** se elige y abre con la frase de más gancho (expresión coloquial, metáfora, insulto político, sorpresa).
+- **Cierre de los Shorts:** pregunta + «Te leo en comentarios.» y nada más (≤ 2,5 s; el botón de suscribirse sale en
+  pantalla); el remate enlaza con la primera frase para que el Short se repita.
+- **Títulos:** ≤ 45 caracteres en Shorts (≤ 60 el largo), apellido que se busca + expresión de gancho; `titulos.py`
+  comprueba que la frase va con el nombre de quien la dijo y, si no, lo rehace.
+- **Publicación programada:** con el OK del usuario, se sube privado y PROGRAMADO (Shorts 14:00 / 18:30 / 21:30, largo
+  20:00, hora de Madrid, sin repetir franja); se cambia o anula en Studio; `subir.py ... --sin-programar` para no programar.
+- **Listas de reproducción** automáticas (`listas.py`): «Los cruces del día», «El resumen diario» y una por político principal.
+- **Calidad de imagen:** codificado final crf 17 preset slow (el sonido ya iba a −14 LUFS).
+- **Comentario del canal** con la pregunta y «👍 Sí · 👎 No» (fijarlo y las encuestas de comunidad, a mano: la API no deja).
+- **Retención:** `retencion.py` (en el informe semanal) mide la caída a los 3 s, a la mitad, al final y por tramo.

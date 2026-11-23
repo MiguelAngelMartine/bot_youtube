@@ -645,7 +645,10 @@ class Jornada:
                         "contexto no lo vuelve a contar, y si la réplica ya está, no se anuncia otra vez. Tampoco repitas "
                         "muletillas («según él», «lo suyo», «y claro»...) ni uses fórmulas fijas como «Y la explicación es "
                         "esta»: varía los enlaces. Al terminar, relee el guion entero buscando repeticiones. Nada de «.:» ni «?:», y cierra con la pregunta final nombrando a quien dijo la frase + «Te leo "
-                        "en comentarios» y suscríbete. En «ambiente», SOLO sitios relacionados con la política (Senado, Congreso, "
+                        "en comentarios.» y NADA MÁS (23-nov-2026: cierre de ≤ 2,5 s; el botón de suscribirse ya sale en "
+                        "pantalla). El remate, justo antes de la pregunta, enlaza con la frase del principio, para que al "
+                        "repetirse el Short el final lleve a la primera frase. ELIGE Y ABRE CON LA FRASE DE MÁS GANCHO: "
+                        "expresión coloquial, metáfora, insulto político o sorpresa (NORMAS.md §4). En «ambiente», SOLO sitios relacionados con la política (Senado, Congreso, "
                         "Moncloa, palacios de congresos, sedes de partidos, parlamentos, ayuntamientos, ministerios, salas de "
                         "prensa) o paisajes urbanos sobrios; nunca playas, puertos, terrazas ni calles turísticas. No toques "
                         "las citas «» ni los demás campos.",

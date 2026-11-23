@@ -68,8 +68,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   (#CaraACara), #PolíticaEspañola, #NoticiasDeHoy y #ElHoyformativo. Solo de lo que sale en el Short.
 - "etiquetas": 15-25: nombre completo y corto de cada persona que sale, su cargo, sus partidos, el tema con
   variantes de búsqueda, «política española», «noticias de hoy», «shorts política». Solo de lo que sale.
-- "titulo": ≤ 70 caracteres, con la frase o su parte más fuerte entre comillas y quién la dice, con verbo neutro
-  («dice», «afirma», «responde a»; nunca «sentencia», «zanja», «estalla», «arremete»). Sin el nombre del canal.
+- "titulo": ≤ 45 caracteres sin «#Shorts»: el apellido que la gente busca + la expresión de gancho entre comillas («Sánchez y el «perro del hortelano»», «Cayetana, a Sánchez: «corderito»»). Nada de la fórmula «"frase" afirma X». La frase va SIEMPRE con el nombre de QUIEN LA DIJO (nunca solo con el del aludido). Sin el nombre del canal; verbos neutros.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
@@ -167,6 +166,9 @@ def vetadas(voz):
     except (OSError, ValueError, KeyError, TypeError):
         pass
     return out
+
+
+GANCHO = """ELIGE LA FRASE POR SU GANCHO (23-nov-2026, datos del canal): los Shorts más vistos abren con una expresión coloquial o una imagen potente («las santas narices», «garrapatismo», «el perro del hortelano», «suspende en inglés y en economía», «cuatro bofetadas»); las declaraciones institucionales planas no despegan. Entre dos citas del mismo peso informativo, gana la que tiene expresión coloquial, metáfora, insulto político o sorpresa (por ejemplo, el afectado que le quita hierro). Abre SIEMPRE con la más fuerte."""
 
 
 def repeticiones(voz, n=4, muletillas=True, cierre=True):
@@ -357,7 +359,7 @@ def mejores_frases(fecha, pedidos, enc, G, guion, redes):
         voz = f"«{frases[0]['cita']}». {ent}. {frases[0]['contexto']}".strip()
         for i, f in enumerate(frases[1:]):
             voz += f" {enlaces[i % len(enlaces)]} «{f['cita']}». {f['contexto']}".rstrip()
-        voz += f" {preg} Te leo en comentarios. Y dale a suscribirte, que he visto que aún no lo has hecho."
+        voz += f" {preg} Te leo en comentarios."
         voz = re.sub(r"\s+", " ", voz).strip()
         import apto_anuncios as AA
         s = dict(r)
@@ -428,7 +430,7 @@ def main(fecha, n=3):
         _, _, pols_ = PR.catalogo()
         con_imagen = sorted({" ".join(PR._NOMBRE.get(r_, [k_])).title() for k_, rs_ in pols_.items() for r_ in rs_})
         obligada += ("\n\nPERSONAJES CON IMAGEN (las citas y réplicas, SOLO de ellos; sin imagen no sale su cara): "
-                     + ", ".join(con_imagen) + ". Prefiere los CRUCES (cita + réplica literal de otro partido); la sección «CRUCES DE DECLARACIONES EN X» de las redes trae intercambios reales entre cuentas oficiales y vale como fuente aunque no haya noticia (fuente «X (@cuenta)»). Un cruce también son varias voces sobre la misma historia (sección «VARIAS VOCES SOBRE LA MISMA HISTORIA»), aunque no se respondan ni quede equilibrado; «le contesta» solo si le contesta.")
+                     + ", ".join(con_imagen) + ". " + GANCHO + " Prefiere los CRUCES (cita + réplica literal de otro partido); la sección «CRUCES DE DECLARACIONES EN X» de las redes trae intercambios reales entre cuentas oficiales y vale como fuente aunque no haya noticia (fuente «X (@cuenta)»). Un cruce también son varias voces sobre la misma historia (sección «VARIAS VOCES SOBRE LA MISMA HISTORIA»), aunque no se respondan ni quede equilibrado; «le contesta» solo si le contesta.")
     except Exception as ex:
         print(f"  (sin lista de imágenes: {type(ex).__name__})")
     r = gem.pide("ASÍ ELIGE LOS GANCHOS EL DIRECTOR (imítalo):\n" + EJEMPLOS[:6000] + "\n\n" + PROMPT.format(n=n + 2, guion=guion[:40000], redes=redes) + obligada, como_json=True)
@@ -582,7 +584,7 @@ def main(fecha, n=3):
         if not (preg.startswith("¿") and preg.endswith("?") and len(preg.split()) <= 8 and ape and ape in preg):
             preg = f"¿Tiene razón {ape}?" if ape else "¿Qué opinas?"      # 11-nov: siempre sobre quien lo dijo
         s["pregunta"] = preg
-        voz += f" {preg} Te leo en comentarios. Y dale a suscribirte, que he visto que aún no lo has hecho."
+        voz += f" {preg} Te leo en comentarios."
         palabras = len(voz.split())                          # Tristán: ~2,75 palabras/s
         maximo = 170 if s.get("segmentos") else 115          # 10-nov: 25-40 s (40-60 s con varios ganchos)
         if palabras > maximo:
