@@ -241,6 +241,42 @@ def prueba(fecha):
     return out
 
 
+def auto(fecha):
+    """23-nov-2026 (el usuario elige la opción A): la miniatura del largo es el «duelo» con el gancho del día y su
+    rival (el aludido de la etiqueta «X a Y», o la otra persona con imagen del mismo bloque). Sin rival con imagen, la de
+    «protagonista». Escribe dia/<fecha>/miniatura.png. Devuelve el diseño usado o None."""
+    import json
+    import presentador as P
+    dia = RAIZ / "dia" / fecha
+    E = json.loads((dia / "episodio.json").read_text(encoding="utf-8"))
+    items = [it for s_ in E["secciones"] for p in s_.get("pasos", []) for it in (p.get("ve") or {}).get("items", [])
+             if isinstance(it, dict) and it.get("titular")]
+    item = next((it for it in items if it.get("persona") and _imagen(it["persona"])), None)
+    if not item:
+        return None
+    fondos, _, _ = P.catalogo()
+    try:
+        fnd = json.loads((dia / "fondos_elegidos.json").read_text(encoding="utf-8"))
+        fnd = next(iter(fnd.values())) if isinstance(fnd, dict) else fnd[0]
+    except Exception:
+        fnd = fondos[0]
+    frase = item["titular"].strip("«»\"").strip()
+    m = re.search(r"\ba\s+(.+)$", item.get("etiqueta", ""))
+    rival = m.group(1).strip() if m else ""
+    if not (rival and _imagen(rival)):
+        rival = next((it["persona"] for it in items if it.get("persona") and it["persona"] != item["persona"]
+                      and _imagen(it["persona"])), "") if not m else ""
+    salida = dia / "miniatura.png"
+    if rival and _imagen(rival) and P._n(rival).split()[-1] != P._n(item["persona"]).split()[-1]:
+        duelo(salida, frase, item.get("destaca", ""), _imagen(item["persona"]), _imagen(rival), item.get("etiqueta", ""), fnd)
+        return "duelo"
+    protagonista(salida, frase, item.get("destaca", ""), _imagen(item["persona"]), item.get("etiqueta", ""), fnd)
+    return "protagonista"
+
+
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["auto"]:
+        print(auto(sys.argv[2]) or "sin persona con imagen")
+        sys.exit()
     if sys.argv[1:2] == ["prueba"]:
         print("\n".join(map(str, prueba(sys.argv[2]))))

@@ -16,7 +16,7 @@ Te darán una fecha. Lee:
 Escribe `dia/<fecha>/episodio.json` con:
 1. **Sección 0, sumario** — **desde el 17-nov-2026 NO se narra ni se monta** (el usuario: «no hagas el mini resumen al principio, pasa directamente a las noticias»). Se sigue escribiendo porque de sus `items` salen la miniatura (frase gancho y persona), el título y la revisión del director de arte; el vídeo empieza directamente con la primera pieza, que abre con su gancho literal (sin «Vamos con ello» ni transición desde el sumario). Título «Lo más importante del día», tono normal.
    - **Sin presentación ni saludo:** nada de «Buenas noches», «soy Urni» ni «esto es El Hoyformativo»; el logo y la sintonía van después, en el golpe de marca.
-   - **Un solo paso:** una frase-titular corta y contundente por bloque principal, sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 25 y 40 palabras en total (formato «todo breves» del 17-nov-2026: solo las 3 piezas más fuertes, arranque fulminante).
+   - **Un solo paso:** una frase-titular corta y contundente por bloque principal, sin datos que no estén en los bloques, y al final «Vamos con ello.». Entre 25 y 40 palabras en total (no se narra: solo alimenta miniatura y título).
    - **El gancho es el salseo** (decisión del usuario del 3-nov-2026): **el primer titular es la frase más impactante del día, preferentemente de las redes oficiales de los políticos (`redes.md`, dossier `frases`)**, la acusación o la réplica más dura, la del cruce más fuerte (quién se lo dice a quién, con la cita literal), aunque su bloque no sea el primero. En los demás, si el bloque tiene cruce de declaraciones, su titular es la frase literal con más gancho y quién la dice («Abascal llama traidor a Sánchez; el PSOE responde: …»), no el dato frío. Descalificaciones políticas sí; tacos e insultos vejatorios, no (son los primeros 30 segundos). Mismo trato para todos: si sale la frase dura de un partido y hay réplica, que se oiga también (si no la hay, no se menciona).
      Ejemplo: «Sesenta y nueve fallecidos en Urda, y la investigación apunta a una cadena de fallos en el sistema de seguridad. Óscar Puente no dimite: me espera un calvario, dice. ...».
    - Escena `sumario` con ≤ 3 items, uno por pieza de las más fuertes y en su orden. Cada item sale a pantalla completa con el estilo de la miniatura, así que lleva:
@@ -36,7 +36,7 @@ Escribe `dia/<fecha>/episodio.json` con:
 5. **`titulo_video`:** el de la escaleta, sin el nombre del canal ni la fecha (decisión del usuario del 4-nov-2026). **`fecha`:** «Domingo, 1 de noviembre de 2026».
 
 Comprueba:
-- el total de palabras **sin contar el sumario** (**380-470, unos 2:30-3:00 con la voz de Tristán; formato «todo breves» desde el 17-nov-2026**). **Si pasa de 520 palabras, recorta tú las piezas más largas quitando datos secundarios** (no las citas ni la réplica) antes de cerrar. Las transiciones entre piezas, de una frase corta;
+- el total de palabras **sin contar el sumario** (**270-300 con la despedida, 2:00 como mucho; formato «2 minutos» desde el 23-nov-2026**). **Si pasa de 310 palabras, recorta tú las piezas más largas quitando datos secundarios y contexto** (nunca las citas ni la réplica) antes de cerrar. Las transiciones entre piezas, de 8 palabras como mucho;
 - que no se repitan datos entre bloques;
 - que todos los `cuando` estén literales en su texto.
 

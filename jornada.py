@@ -134,7 +134,7 @@ class Jornada:
             return ""
         return (f" ENCARGO DEL DIRECTOR (dia/{self.f}/encargo.json → monografico, manda sobre la línea editorial habitual): "
                 f"HOY EL VÍDEO ES MONOGRÁFICO: TODOS los bloques tratan SOLO de «{m['tema']}»; ningún otro tema del día "
-                f"entra. {m.get('instrucciones', '')} Mismo formato «todo breves» de 2:30-3:00 y breves vacío. El campo "
+                f"entra. {m.get('instrucciones', '')} Mismo formato «2 minutos» (4 bloques, 2:00 como mucho) y breves vacío. El campo "
                 "\"id\" de cada bloque tiene que ser el nombre de un dossier que exista en dossier/ (varios bloques pueden "
                 "compartir dossier). Equilibrio estricto entre los dos protagonistas (mismo número de frases y de tiempo).")
 
@@ -364,14 +364,15 @@ class Jornada:
         if ok:
             E = self.normaliza(self.json("episodio.json"))
             pal = sum(len(p["di"].split()) for s in E["secciones"] if not any((p.get("ve") or {}).get("tipo") == "sumario" for p in s.get("pasos", [])) for p in s["pasos"])
-            # 17-nov-2026 (formato «todo breves»): 2:30-3:00. Se corrige si se va de ese margen (antes: ampliar si < 3,8 min)
-            if not 2.2 <= pal / 2.75 / 60 <= 3.2:
-                largo_ = pal / 2.75 / 60 > 3.2
-                self.parte(f"episodio de ~{pal / 2.75 / 60:.1f} min: se {'recorta' if largo_ else 'amplía'} a 2:30-3:00")
-                self.puesto("editor-de-cierre", f"El episodio dura ~{pal / 2.75 / 60:.1f} min y debe durar 2:30-3:00 (410-500 "
-                            + ("palabras): recorta las piezas más largas quitando datos secundarios, sin tocar las citas ni las "
-                               "réplicas, ritmo de breves." if largo_ else
-                               "palabras): amplía un poco las piezas con datos de sus dossieres, sin inventar nada y sin tocar las citas.")
+            # 23-nov-2026 (formato «2 minutos»): 270-300 palabras con la despedida (2,6 palabras/s con pausas y relevos)
+            if not 250 <= pal <= 315:
+                largo_ = pal > 315
+                self.parte(f"episodio de {pal} palabras (~{pal / 2.6 / 60:.1f} min): se {'recorta' if largo_ else 'amplía'} a 2:00")
+                self.puesto("editor-de-cierre", f"El episodio tiene {pal} palabras (~{pal / 2.6 / 60:.1f} min) y debe durar 2:00 como "
+                            "mucho (270-300 palabras con la despedida, formato «2 minutos»): "
+                            + ("recorta contexto y datos secundarios de las piezas, sin tocar las citas ni las réplicas; si sigue "
+                               "largo, quita la pieza menos impactante (nunca la primera)." if largo_ else
+                               "amplía un poco las piezas con datos de sus dossieres, sin inventar nada y sin tocar las citas.")
                             + " Devuelve el episodio.json completo.",
                             [self.dia / "episodio.json", *sorted((self.dia / "dossier").glob("*.md")), *self.comunes()],
                             self.dia / "episodio.json", valida=lambda r: isinstance(r, dict) and len(r.get("secciones", [])) >= 3)
@@ -557,7 +558,11 @@ class Jornada:
     def miniatura(self):
         if (self.dia / "miniatura.png").exists():
             return True
-        rc = self.py("miniatura_auto.py", self.f, log="miniatura.log", timeout=1800)
+        # 23-nov-2026 (el usuario elige la «A»): miniatura moderna «duelo» (o «protagonista» si no hay rival con imagen);
+        # la antigua, solo si la nueva no puede (sin persona con imagen)
+        rc = self.py("miniatura_moderna.py", "auto", self.f, log="miniatura.log", timeout=600)
+        if rc != 0 or not (self.dia / "miniatura.png").exists():
+            rc = self.py("miniatura_auto.py", self.f, log="miniatura.log", timeout=1800)
         if rc != 0 or not (self.dia / "miniatura.png").exists():   # 10-nov (calidad): por debajo de 7, el diseñador
             (self.dia / "miniatura.png").unlink(missing_ok=True)
             self.claude("disenador-grafico", "Haz la miniatura del episodio (las versiones automáticas no llegaron a 7).",
