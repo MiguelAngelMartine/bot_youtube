@@ -119,9 +119,12 @@ def figura_de(nombre, pols, uso):
                 continue                               # «Montero» a secas puede ser Irene o María Jesús: sin imagen
             if otros and resto and not (otros & resto):
                 continue
+            # 23-nov-2026 (el usuario: «la imagen que siempre utilizas de Sánchez no es la mejor»): las recortadas de una
+            # foto de grupo (Grupo/*_grupo.png, poca resolución) solo si no hay otra de esa persona
+            buenas = [r for r in rutas if "_grupo" not in Path(str(r)).stem] or rutas
             k = uso.get(clave, 0)
             uso[clave] = k + 1
-            return rutas[k % len(rutas)]
+            return buenas[k % len(buenas)]
     return None
 
 
@@ -244,7 +247,8 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
     out, pos = [], 0
     for m in re.finditer(r"«([^»]+)»[.,;:]?", texto):
         cita = m.group(1)
-        if len(cita.split()) < MIN_PAL_CITA:
+        explicita = quien_de(cita) if quien_de else None     # 23-nov-2026: si el guion dice quién la dice, vale aunque
+        if len(cita.split()) < MIN_PAL_CITA and not explicita:  # sea corta («Educación socialista»)
             continue
         # 22-nov-2026 (fallo real: «Vamos a seguir votando al PSOE», de 8 veteranos, salió con Sánchez; y la ironía de
         # Urtasun «con Rufián» salió con Rufián): si la cita la introduce una frase («X firman:», «Y Fulano ironiza…:»)
@@ -522,7 +526,9 @@ def _palabra_actual(g, t):
     return sum(1 for p in g["pal"] if p[1] <= t)
 
 
-def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None):
+def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None, cola_dx=None):
+    """cola_dx (23-nov-2026): con lado «abajo», dónde va la flecha: (px desde la izquierda) o (-px desde la derecha), para
+    que apunte al personaje que habla (antes iba siempre a la izquierda y el globo de la derecha señalaba al otro)."""
     txt = g["di"]
     while True:
         fq = fuente("Inter-Black.ttf", tam)
@@ -559,7 +565,9 @@ def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None):
     ImageDraw.Draw(cola).polygon(pts, fill=(255, 255, 255, 240))
     if lado == "abajo":
         full = Image.new("RGBA", (c.width, c.height + 46), (0, 0, 0, 0))
-        full.alpha_composite(c, (0, 0)); full.alpha_composite(cola, (120, c.height - 10))
+        cx = 120 if cola_dx is None else (cola_dx if cola_dx >= 0 else c.width + cola_dx)
+        cx = max(30, min(c.width - 86, int(cx) - 28))
+        full.alpha_composite(c, (0, 0)); full.alpha_composite(cola, (cx, c.height - 10))
     else:
         full = Image.new("RGBA", (c.width + 46, c.height), (0, 0, 0, 0))
         if lado == "izq":
@@ -807,7 +815,9 @@ class Escena:
             sin_fig = self.figs.get(g["quien"]) is None
             if self.vertical:
                 if cruce:
-                    c = tarjeta(g, t, activo, "abajo", nombre, cargo, medio, W - 200, 46, max_h=int(H * 0.165))
+                    fx_ = self._pos(g["quien"], g["lado"], True)           # centro del personaje que habla
+                    cola = fx_ - 40 if g["lado"] == "izq" else -(W - 40 - fx_)
+                    c = tarjeta(g, t, activo, "abajo", nombre, cargo, medio, W - 200, 46, max_h=int(H * 0.165), cola_dx=cola)
                     x, y = (40, int(H * 0.125)) if g["lado"] == "izq" else (W - 40 - c.width, int(H * 0.125) + int(H * 0.175))
                 else:
                     c = tarjeta(g, t, activo, "abajo", nombre, cargo, medio, W - 180, 56, max_h=int(H * 0.27))
@@ -937,7 +947,8 @@ def short(fecha, n):
             return rep.get("quien")
         if nc in citas_medio or _n(S.get("cita")) == nc:      # sus frases (Shorts de «mejores frases») y su cita
             return quien
-        return None
+        return quien_cita.get(nc)                             # 23-nov-2026: «quien_citas» {cita: persona} del guion
+    quien_cita = {_n(c): q for c, q in (S.get("quien_citas") or {}).items()}
     tr = tramos_de(cuerpo, quien, conocidas, quien_de=quien_de)
     for g in tr:
         if g["tipo"] == "Q":

@@ -323,6 +323,10 @@ y no se usa hasta nueva orden del usuario.**
   Todo tiene que verse dinámico y natural: relevo limpio, sin esperas largas. En un cruce, cada personaje cabe en su mitad de la
   pantalla y los dos van a la misma escala (con los brazos abiertos se pisaban); entre citas de grupos distintos el
   presentador sale en pantalla (no se queda el escenario vacío).
+- **La flecha de cada globo apunta a quien habla** (23-nov-2026: en los cruces, el globo de la derecha señalaba al de la
+  izquierda). **Imágenes:** de cada político se usa la imagen individual; las recortadas de una foto de grupo
+  (`Grupo/*_grupo.png`, poca resolución) solo si no hay otra (usuario, 23-nov-2026: «la de Sánchez no es la mejor»).
+  Una cita corta (menos de 5 palabras) sale en globo si el guion dice quién la dice (`quien_citas`).
 - **Sin efectos de sonido al entrar o salir** (usuario, 22-nov-2026): ni los personajes ni el presentador llevan
   «whoosh» ni ningún otro efecto; solo la voz y la música. Se revisan los cambios de escena
   fotograma a fotograma (cada 0,15 s) antes de mandar el vídeo.
