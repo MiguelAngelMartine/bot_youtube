@@ -39,7 +39,7 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - VARIOS GANCHOS EN UN SHORT: si el día tiene más frases fuertes que Shorts, UNO de los Shorts puede reunir 2-3 ganchos
   de personas y partidos distintos con un hilo común (impuestos, corrupción, el voto...): ponlos en "segmentos" (cada
   uno con quien, cargo, partido, kicker, gancho, cita, destaca, fuente y un "contexto" de 2-3 frases) y deja "cita" y
-  "gancho" del Short iguales a los del primero. Con varios ganchos dura 40-60 s.
+  "gancho" del Short iguales a los del primero. Con varios ganchos, 45 s como mucho (23-nov-2026).
 - "entrada": cómo PRESENTA la voz la cita, en tono de bar y ≤ 16 palabras («Ojo a lo que suelta Ayuso en redes», «Y va
   Colau y le dice a la marquesa»). Sin «aseguró», «por su parte», «afirma».
 - "contexto": 4-6 frases FLUIDAS y coloquiales (60-90 palabras: el Short dura 25-40 s). Que fluya como una conversación:
@@ -68,7 +68,9 @@ para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
   (#CaraACara), #PolíticaEspañola, #NoticiasDeHoy y #ElHoyformativo. Solo de lo que sale en el Short.
 - "etiquetas": 15-25: nombre completo y corto de cada persona que sale, su cargo, sus partidos, el tema con
   variantes de búsqueda, «política española», «noticias de hoy», «shorts política». Solo de lo que sale.
-- "titulo": ≤ 45 caracteres sin «#Shorts»: el apellido que la gente busca + la expresión de gancho entre comillas («Sánchez y el «perro del hortelano»», «Cayetana, a Sánchez: «corderito»»). Nada de la fórmula «"frase" afirma X». La frase va SIEMPRE con el nombre de QUIEN LA DIJO (nunca solo con el del aludido). Sin el nombre del canal; verbos neutros.
+- "titulo": ≤ 45 caracteres sin «#Shorts». PRIMERO LA FRASE entre comillas y DESPUÉS los personajes (23-nov-2026, el
+  usuario): «Que no me hagan hablar»: González a Bono · «Va ahora de corderito»: Cayetana a Sánchez. El primer nombre es
+  SIEMPRE el de quien dijo la frase. Nada de la fórmula «"frase" afirma X». Sin el nombre del canal; verbos neutros.
 Responde SOLO con JSON: {{"shorts": [{{"quien": "...", "cargo": "...", "partido": "...", "a_quien": "...",
 "categoria": "POLÉMICA", "kicker": "...", "entrada": "...", "gancho": "...", "cita": "...", "destaca": "...", "fuente": "X (@cuenta) / Telegram / medio...",
 "enlace": "...", "contexto": "...", "replica": {{"quien": "...", "cargo": "...", "partido": "...", "cita": "...", "prueba": "..."}} o null,
@@ -586,7 +588,7 @@ def main(fecha, n=3):
         s["pregunta"] = preg
         voz += f" {preg} Te leo en comentarios."
         palabras = len(voz.split())                          # Tristán: ~2,75 palabras/s
-        maximo = 170 if s.get("segmentos") else 115          # 10-nov: 25-40 s (40-60 s con varios ganchos)
+        maximo = 120                                         # 23-nov-2026: 45 s como mucho, también con varios ganchos
         if palabras > maximo:
             print(f"  AVISO: «{s['cita'][:40]}» sale de ~{palabras / 2.75:.0f} s (objetivo ≤ {maximo / 2.75:.0f} s)")
         if enc.get("verificada") and enc.get("frase") and buenos == 1 and _norm(enc["frase"]) in _norm(s["cita"]):   # 9-nov: la del director

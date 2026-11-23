@@ -638,7 +638,7 @@ class Jornada:
                         "(NORMAS.md §4 «Escribir para el presentador»: cada cita literal sola, con quién la dice JUSTO antes, "
                         "y una frase del presentador entre cita y cita). Si tiene réplica, sigue «El Short de cruce modelo» "
                         "(NORMAS.md §4): frase que lo desata, puente de ≤ 12 palabras, réplica; contexto del presentador "
-                        "entre cruces; remate neutral; pregunta corta con el nombre; ≤ 60 s (unas 145 palabras con el cierre). Abre con el gancho literal, sin "
+                        "entre cruces; remate neutral; pregunta corta con el nombre; ≤ 45 s (unas 105 palabras con el cierre; 23-nov-2026: la retención cae a la mitad pasados los 45 s). Abre con el gancho literal, sin "
                         "preguntas en el cuerpo. El gancho se dice UNA SOLA VEZ: ni la entrada ni la cita que viene "
                         "después lo repiten (si la cita empieza por el gancho, tras él va solo el RESTO de la cita). NADA SE "
                         "DICE DOS VECES: cada dato, cada cita y cada idea, una sola vez; si la entrada ya lo cuenta, el "

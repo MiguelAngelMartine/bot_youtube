@@ -16,9 +16,9 @@ RAIZ = Path(__file__).parent
 PROMPT = """Eres el editor de plataforma de «El Hoyformativo», informativo diario de política española en YouTube,
 neutral y riguroso, con un tono desenfadado basado en el cruce de declaraciones entre políticos («salseo»).
 A partir del guion del vídeo de abajo, escribe:
-- "titulo": ≤ 60 caracteres, SIN el nombre del canal (decisión del usuario del 4-nov-2026). 23-nov-2026: el apellido que
-  la gente busca + la expresión de gancho del día entre comillas, LITERAL y con el nombre de QUIEN LA DIJO («Cayetana, a
-  Sánchez: «Va ahora de corderito»»); nunca la frase con el nombre del aludido solo, ni la fórmula «"frase" afirma X».
+- "titulo": ≤ 60 caracteres, SIN el nombre del canal (decisión del usuario del 4-nov-2026). 23-nov-2026: PRIMERO la
+  expresión de gancho del día entre comillas, LITERAL, y DESPUÉS los personajes, empezando por QUIEN LA DIJO («Va ahora de
+  corderito»: Cayetana a Sánchez); nunca la frase con el nombre del aludido solo, ni la fórmula «"frase" afirma X».
   Sin mayúsculas gritonas, sin exclamaciones, sin prometer nada que el vídeo no cuente. Tacos e insultos vejatorios, no.
   Verbos neutros («dice», «responde a», «critica», «pide»); nunca «carga contra», «arremete», «estalla», «sentencia»,
   «zanja», «destroza», «humilla».

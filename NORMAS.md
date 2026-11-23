@@ -139,7 +139,8 @@ Referencia: `dia/2026-11-22/shorts/short_1.json` (Morant y las «cuatro bofetada
 - **Solo personajes con imagen** en `Imagenes/Políticos`; de los demás no se elige cita (no se mete un cruce sin cara).
 - **Remate neutral** del presentador sin declarar ganador («Y aquí cada uno entiende la metáfora a su manera.») y **pregunta
   corta con el nombre** de quien dijo la frase («¿Se pasó Morant?»): tiene que caber en una línea del cierre.
-- **≤ 60 s** (con la voz a +8 %, unas 145 palabras con el cierre); si pasa, se quita narración, nunca citas.
+- **≤ 45 s** (23-nov-2026, el usuario, con los datos de retención: a la mitad de un Short de 35-40 s sigue el 74-91 %; en uno
+  de 60 s, el 33-44 %); con la voz a +8 %, unas 105 palabras con el cierre. Si pasa, se quita narración, nunca citas.
 - **En pantalla**: los dos globos del cruce, uno arriba (izquierda) y otro debajo (derecha), sin pisarse entre ellos ni
   tapar a los personajes ni al subtítulo; cada globo con el cargo limpio y **su fuente** («según The Objective», «según X
   (@cuenta)»: `fuentes_citas`). Se revisan los fotogramas de cada cruce antes de mandarlo.
@@ -270,7 +271,7 @@ Fuera de la paleta, para siempre: «zasca» en cualquier forma, «ladrillazo va,
   Si el director pide el Short antes de la jornada, se monta a mano y se apunta en `shorts_hechos`: la jornada lo
   conserva tal cual y hace los demás Shorts de otros temas. En el globo, la fuente de cada cita (`fuentes_citas`: X,
   medio) y el cargo limpio, sin notas internas.
-- **Shorts de 25-40 s** (40-60 s si reúnen varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
+- **Shorts de 25-45 s como mucho** (también los de varios ganchos con un hilo común, sin numerarlos), uno por frase con más gancho
   (sobre todo de redes), de partidos distintos, cita entera literal de 4+ palabras, en el formato presentador (§6). Etiqueta de formato arriba a la derecha:
   ÚLTIMA HORA (solo hechos de hoy), POLÉMICA, RÉPLICA o ANÁLISIS. Cierre de 3-4 s con la pregunta (§4).
 

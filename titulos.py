@@ -44,10 +44,15 @@ def revisa(titulo, citas, sufijo=""):
         i = antes.find(k)
         if i >= 0 and not re.search(destinatario, antes[:i] + " "):
             return titulo, ""
-        if re.match(r"^(?:dice|afirma|asegura|responde|replica|segun|advierte|avisa|critica|denuncia|pide)\s+(?:\w+\s+){0,3}"
-                    + re.escape(k), despues):
-            return titulo, ""
-    nuevo = f"{_apellido(q)}: «{m.group(1).strip()}»"
+    # «frase»: Quien a Otro  /  «frase», dice Quien: el PRIMER nombre tras la frase es el de quien la dijo
+    otros = [k for _, o in citas if o and o != q for k in {_n(x) for x in o.split() if len(x) > 3} | {_n(_apellido(o))} if k]
+    toks = despues.split()
+    for i, w in enumerate(toks):
+        if w in claves or w in otros:
+            if w in claves and (i == 0 or toks[i - 1] not in ("a", "al", "contra", "frente", "ante", "con", "para", "sobre")):
+                return titulo, ""
+            break
+    nuevo = f"«{m.group(1).strip()}»: {_apellido(q)}"      # 23-nov-2026: primero la frase, después quién
     if sufijo:
         nuevo += sufijo
     return nuevo, f"título rehecho: la frase es de {q} y el título no lo decía bien («{titulo}»)"
