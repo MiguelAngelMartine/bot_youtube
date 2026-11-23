@@ -651,7 +651,9 @@ class Escena:
             raise SystemExit("no hay presentador en Imagenes/Presentador")
         self.cargos, self.medios = cargos, medios
         uso = {}
-        alto = int(H * (0.60 if vertical else 0.86))
+        # 23-nov-2026 (el usuario: «haz los personajes más grandes»): en vertical, figuras más grandes con la cabeza a la
+        # misma altura (debajo de los globos) y el cuerpo cortado por el borde inferior (plano medio)
+        alto = int(H * (0.86 if vertical else 0.86))
         self.alto = alto
         self.figs = {}
         for g in tramos:
@@ -722,7 +724,7 @@ class Escena:
             self.sombras[k] = sombra(fig)
         return self.sombras[k]
 
-    FUERA = 0.15                  # parte de la figura (brazos del lado de fuera) que puede salirse por el borde en un cruce
+    FUERA = 0.32                  # parte de la figura (brazos del lado de fuera) que puede salirse por el borde en un cruce
 
     def _escala_video(self):
         """23-nov-2026: la escala común del vídeo. En vertical, la que hace que en el cruce más ancho cada figura quepa en
@@ -799,6 +801,8 @@ class Escena:
             dx = (1 - a) * (-90 if lado == "izq" else 90)
             cx = int(round(self._pos(clave, lado, en_cruce) + dx))
             x, y = cx - f2.width // 2, H - f2.height + 6
+            if self.vertical:                             # la cabeza nunca sube más que el 46 % de la pantalla (globos)
+                y = max(y, int(H * 0.46))
             sh = self._sombra(clave, pose, fig)
             if sh.size != f2.size:
                 sh = sh.resize(f2.size)
