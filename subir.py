@@ -125,6 +125,13 @@ def hueco(tipo):
                 reg.write_text(json.dumps(usados, ensure_ascii=False, indent=1), encoding="utf-8")
                 dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
                 return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), f"{dias[t.weekday()]} {t:%d} a las {t:%H:%M}"
+        if tipo == "largo" and d == 0:                # 24-nov-2026: el largo es del día: si su franja ya pasó, hoy mismo
+            t = (ahora + timedelta(minutes=14 - ahora.minute % 15)).replace(second=0, microsecond=0)
+            if t.hour < 23 and f"{tipo} {t:%Y-%m-%d %H:%M}" not in usados:
+                usados[f"{tipo} {t:%Y-%m-%d %H:%M}"] = True
+                reg.write_text(json.dumps(usados, ensure_ascii=False, indent=1), encoding="utf-8")
+                dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+                return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), f"{dias[t.weekday()]} {t:%d} a las {t:%H:%M}"
     return None, ""
 
 
