@@ -482,6 +482,25 @@ def main(fecha, n=3):
         cands = EX.pule_shorts(cands)
     except Exception as e:
         print(f"  (experto sin respuesta: {type(e).__name__})")
+    if enc.get("short_tema"):                            # 24-nov-2026 (fallo real: el Short de Vox encargado no salió)
+        st = enc["short_tema"]
+        claves_t = [c.lower() for c in (enc.get("claves") or st.get("tema", "").split()) if len(c) > 2]
+
+        def _del_tema(x):
+            return any(c in json.dumps(x, ensure_ascii=False).lower() for c in claves_t)
+        del_tema = [c for c in cands if _del_tema(c)]
+        if not del_tema:                                 # se vuelve a pedir, solo ese Short
+            r2 = gem.pide(PROMPT.format(n=1, guion=guion[:40000], redes=redes) + obligada +
+                          f"\n\nHAZ SOLO UN SHORT, y es OBLIGATORIO que trate de «{st.get('tema', '')}» "
+                          f"({', '.join(claves_t)}). {st.get('instrucciones', '')}", como_json=True)
+            r2 = {"shorts": r2} if isinstance(r2, list) else (r2 if isinstance(r2, dict) else {})
+            del_tema = [c for c in r2.get("shorts", []) if _del_tema(c)]
+        if del_tema:
+            del_tema[0]["encargo_tema"] = True           # el del encargo va primero y no lo descarta el experto
+            cands = [del_tema[0]] + [c for c in cands if c is not del_tema[0]]
+            print(f"  encargo «{st.get('tema', '')}»: «{del_tema[0].get('cita', '')[:60]}»")
+        else:
+            print(f"  AVISO: no se encontró material de «{st.get('tema', '')}» para su Short")
     vistos_p, orden, resto = set(), [], []                # reparto: primero un Short por partido; si faltan, repite
     for s in cands:
         (resto if s.get("partido") in vistos_p else orden).append(s)
@@ -494,7 +513,7 @@ def main(fecha, n=3):
                 v = (obj.get(campo) or "").strip()
                 if len(v) > 2 and v[0] in "«“\"" and v[-1] in "»”\"" and not re.search(r"[«»“”\"]", v[1:-1]):
                     obj[campo] = v[1:-1].strip()
-        if s.get("nota_experto") is not None and s["nota_experto"] < 6:   # menos, pero mejor (10-nov)
+        if s.get("nota_experto") is not None and s["nota_experto"] < 6 and not s.get("encargo_tema"):   # menos, pero mejor (10-nov)
             print(f"  descartada por el experto ({s['nota_experto']:.0f}/10): «{s.get('cita', '')[:50]}»")
             continue
         if re.search(r"[«»“”\"]", s.get("cita", "")):
