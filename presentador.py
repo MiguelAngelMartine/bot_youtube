@@ -997,7 +997,8 @@ def short(fecha, n):
     fx = _fuente_x(dia)
     tmp = dia / "shorts" / f"tmp_pres_{n}"
     tmp.mkdir(parents=True, exist_ok=True)
-    texto = S["voz"]
+    import coletillas as COL                           # 24-nov-2026: coletillas sin «¡!» (la voz no cambia de tono)
+    texto = COL.sin_exclamaciones(S["voz"])
     preg = (S.get("pregunta") or "").strip()
     k_fin = texto.find(preg) if preg and preg in texto else texto.find("Te leo en comentarios")
     cuerpo, cierre = (texto[:k_fin].strip(), texto[k_fin:].strip()) if k_fin > 0 else (texto, "")
@@ -1101,7 +1102,8 @@ def largo(fecha):
                     q = q.get("nombre") if isinstance(q, dict) else q
                     return q if isinstance(q, str) and q else None
             return None
-        texto = " ".join(p.get("di", "") for p in s["pasos"]).strip()
+        import coletillas as COL
+        texto = COL.sin_exclamaciones(" ".join(p.get("di", "") for p in s["pasos"]).strip())
         defecto = next((p["ve"].get("persona") for p in s["pasos"] if (p.get("ve") or {}).get("persona")), "")
         if isinstance(defecto, dict):
             defecto = defecto.get("nombre") or defecto.get("persona") or ""

@@ -264,3 +264,4 @@ Cada dato, cita, idea y muletilla sale una sola vez (fallos reales: Feijóo «pr
 - 23-nov-2026: erratas.py (Gemini) propuso dos correcciones falsas del 22-nov (Bono sí dijo «no hagas el tonto»; lo de las llaves de la Moncloa sí es de Yolanda Díaz) y llegaron al guion. Rechazadas a mano; filtro nuevo: prueba literal en las noticias de hoy y la fuente original no puede confirmar lo que dijimos.
 - 23-nov-2026: el usuario pide para los vídeos siguientes: la cita de Abascal partida (cola fuera del globo) va entera en el globo; todos los personajes del mismo tamaño; fondo sin zoom.
 - 23-nov-2026: el usuario pide más contexto en los cruces de los Shorts (frases buenas que sueltas no se conectan con la historia): cada cita, con su tema; mejor 2-3 bien explicadas.
+- 24-nov-2026: el usuario pide las coletillas sin exclamaciones (la voz las leía con otro tono). Paleta sin «¡!» y el montaje se los quita a cualquier coletilla (no a las citas).

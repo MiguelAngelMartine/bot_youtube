@@ -212,6 +212,7 @@ cosa acabó en la Diputación Permanente, donde se lió. Sergio Sayas, del PP, p
 dejado a los sindicatos ver la realidad… la resaca de la gamba, en pleno Congreso, con dos tazas.»
 
 ### Paleta de coletillas y chascarrillos (lista del usuario; adaptar pronombres al contexto, ritmo normal, sin tacos)
+**Sin exclamaciones** (24-nov-2026, el usuario: «para que la voz no las lea distinto al resto»): se escriben como frase normal, con punto; el montaje quita los «¡!» de cualquier coletilla de la paleta (`coletillas.sin_exclamaciones`), nunca los de las citas literales.
 - Esto es un sindiós de proporciones bíblicas.
 - Esto es un sindiós.
 - Estoy más perdido que un pulpo en un garaje.
@@ -222,21 +223,21 @@ dejado a los sindicatos ver la realidad… la resaca de la gamba, en pleno Congr
 - Qué fantasía más turbia.
 - Esto es una bacanal de sinsentidos.
 - Se me está poniendo el cuerpo como un botijo.
-- ¡Qué escándalo de criatura!
+- Qué escándalo de criatura.
 - Estoy más agobiado que un gremlin en una sauna.
 - Esto es más raro que un ciervo con flequillo.
 - Menudo percal.
 - Estoy en un sinvivir de categoría.
 - Qué despropósito de dimensiones industriales.
 - Se ha liao la mundial en el convento.
-- ¡Al turrón!
-- ¡Venga, que nos vamos!
+- Al turrón.
+- Venga, que nos vamos.
 - Esto es así y punto pelota.
-- ¡Qué movida más gorda!
-- ¡Ni tan mal!
+- Qué movida más gorda.
+- Ni tan mal.
 - Se nos está yendo de las manos.
-- ¡Qué barbaridad!
-- ¡Estamos apañados!
+- Qué barbaridad.
+- Estamos apañados.
 - Cada palo que aguante su vela.
 - Quien mucho abarca, poco aprieta.
 - A perro flaco, todo son pulgas.

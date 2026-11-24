@@ -59,6 +59,8 @@ CLAVES = {
     r"vaya repaso": "vaya repaso",       # («zasca» no es coletilla: está prohibida siempre, ver prechequeo.PROHIBIDAS)
     r"no lo has visto venir": "esto no lo has visto venir",
     r"de traca": "de traca",
+    r"que barbaridad": "qué barbaridad",
+    r"venga, que nos vamos|que nos vamos": "venga, que nos vamos",
 }
 _RE = [(re.compile(k), v) for k, v in CLAVES.items()]
 
@@ -70,6 +72,19 @@ def _norm(s):
 def detecta(texto):
     t = _norm(texto)
     return {v for r, v in _RE if r.search(t)}
+
+
+def sin_exclamaciones(texto):
+    """24-nov-2026 (el usuario: «deja las frases pero sin exclamaciones para que la voz no las lea distinto al resto»):
+    una coletilla de la paleta escrita entre «¡ … !» pasa a frase normal con punto («¡Qué barbaridad!» -> «Qué
+    barbaridad.»). Las exclamaciones de las CITAS «…» no se tocan (son literales)."""
+    def cambia(m):
+        dentro = m.group(1).strip()
+        if any(r.search(_norm(dentro)) for r, _ in _RE):
+            return dentro[:1].upper() + dentro[1:].rstrip(".") + "."
+        return m.group(0)
+    partes = re.split(r"(«[^»]*»)", texto)               # fuera de las citas literales
+    return "".join(x if x.startswith("«") else re.sub(r"¡([^¡!«»]+)!", cambia, x) for x in partes)
 
 
 def _carga():
