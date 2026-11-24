@@ -18,6 +18,8 @@ Busca SOLO contradicciones reales e importantes: una cifra que cambió de forma 
 desmentido por la parte afectada o por una fuente oficial, una cita mal atribuida, o una versión importante que no
 dimos y que ya existía ese día. Una cifra que simplemente avanza (más identificados, más detenidos) NO es corrección.
 Cada corrección tiene que apoyarse en un texto de abajo, citado literalmente. Ante la duda, NO hay corrección.
+Un hecho POSTERIOR que no contradice lo que dijimos (hoy pasó otra cosa, alguien cambió de postura, un debate fue distinto)
+NO es una corrección: lo que dijimos sigue siendo verdad. Solo es corrección si lo que dijimos era FALSO cuando lo dijimos.
 Responde SOLO con JSON: {"correcciones": [{"bloque": n, "dijimos": "frase exacta del episodio",
 "ahora_sabemos": "hecho nuevo", "medio": "...", "enlace": "...", "prueba": "fragmento literal del artículo",
 "propuesta": "1-2 frases neutrales para leer"}]}  (lista vacía si no hay ninguna)."""
@@ -53,6 +55,11 @@ def _se_sostiene(c, dia, dia_prev):
     nombres = {_n(w) for w in re.findall(r"\b[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{3,}\b", fuera)}
     nombres |= {_n(w) for w in re.findall(r"\b(vicepresident\w+|ministr\w+|president\w+|portavoz|alcald\w+)\b", fuera, re.I)}
     antes = [_n(f.read_text(encoding="utf-8")) for f in (dia_prev / "articulos").glob("*.txt")]
+    try:                                                 # 24-nov-2026: y los titulares de ese día (fallo real: la cita solo
+        antes += [_n(f"{n.get('titular', '')} {n.get('resumen') or ''}")   # estaba en un titular de RTVE)
+                  for n in json.loads((dia_prev / "noticias.json").read_text(encoding="utf-8"))]
+    except (OSError, ValueError):
+        pass
     for cita in citas:
         trozo = " ".join(cita.split()[:6])
         for t in antes:

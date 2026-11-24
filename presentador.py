@@ -113,12 +113,15 @@ def figura_de(nombre, pols, uso):
     for clave, rutas in pols.items():
         if clave in toks:
             # Apellidos comunes (Muñoz, Díaz…): si el archivo trae nombre de pila y la cita también, tienen que coincidir.
-            otros = set(_NOMBRE.get(rutas[0], [clave])[:-1])
             resto = set(toks) - {clave}
             if clave in APELLIDOS_AMBIGUOS and not resto:
                 continue                               # «Montero» a secas puede ser Irene o María Jesús: sin imagen
-            if otros and resto and not (otros & resto):
-                continue
+            # 24-nov-2026: con varias personas del mismo apellido (Irene y María Jesús Montero), la imagen es la del
+            # nombre de pila que trae la cita (antes solo se miraba la primera imagen y la otra se perdía)
+            if resto:
+                rutas = [r for r in rutas if not set(_NOMBRE.get(r, [clave])[:-1]) or set(_NOMBRE.get(r, [clave])[:-1]) & resto]
+                if not rutas:
+                    continue
             # 23-nov-2026 (el usuario: «la imagen que siempre utilizas de Sánchez no es la mejor»): las recortadas de una
             # foto de grupo (Grupo/*_grupo.png, poca resolución) solo si no hay otra de esa persona
             buenas = [r for r in rutas if "_grupo" not in Path(str(r)).stem] or rutas
@@ -560,7 +563,7 @@ def _palabra_actual(g, t):
 def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None, cola_dx=None):
     """cola_dx (23-nov-2026): con lado «abajo», dónde va la flecha: (px desde la izquierda) o (-px desde la derecha), para
     que apunte al personaje que habla (antes iba siempre a la izquierda y el globo de la derecha señalaba al otro)."""
-    txt = g["di"]
+    txt = pantalla(g["di"])
     while True:
         fq = fuente("Inter-Black.ttf", tam)
         lineas = envuelve(txt, fq, ancho)
@@ -610,9 +613,18 @@ def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None, co
     return full
 
 
+def pantalla(txt):
+    """24-nov-2026: lo que se ESCRIBE para la voz (voz.ESCRIBE, p. ej. «Estér») nunca sale en pantalla: ahí, la forma
+    correcta («Ester»)."""
+    import voz
+    for bien, para_voz in voz.ESCRIBE.items():
+        txt = re.sub(r"(?<!\w)" + re.escape(para_voz) + r"(?!\w)", bien, txt)
+    return txt
+
+
 def subtitulo(g, t, ancho, tam, max_lineas=3):
     f = fuente("Inter-Black.ttf", tam)
-    lineas = envuelve(g["di"], f, ancho)
+    lineas = envuelve(pantalla(g["di"]), f, ancho)
     k = _palabra_actual(g, t)
     # karaoke por páginas de max_lineas: se ve el trozo en el que va la voz
     pal_l = [len(ln.split()) for ln in lineas]
