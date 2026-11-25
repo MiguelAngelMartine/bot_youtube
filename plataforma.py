@@ -62,7 +62,10 @@ def main(fecha):
         titulo = titulo[:70].rsplit(" ", 1)[0]
     desc_base = (dia / "episodio_descripcion.txt").read_text(encoding="utf-8")
     desc_base = desc_base.split("\n\n", 1)[1] if desc_base.startswith(G.get("titulo_video", "\0")) else desc_base
-    descripcion = (" ".join(r.get("lineas", [])) + "\n\n" + desc_base.strip()
+    lineas = r.get("lineas") or []
+    if isinstance(lineas, str):                          # 25-nov-2026: Gemini a veces da un texto, no una lista, y el
+        lineas = [lineas]                                # join lo separaba letra a letra («A l b e r t o»)
+    descripcion = (" ".join(lineas) + "\n\n" + desc_base.strip()
                    + "\n\nEl Hoyformativo: la actualidad, en un minuto. Frases literales y comprobadas en su fuente, con todas "
                    "las partes. Contenido revisado por el equipo editorial antes de publicarse.")
     etiquetas = [e.strip() for e in r.get("etiquetas", []) if e.strip()]
