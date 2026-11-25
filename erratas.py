@@ -50,6 +50,16 @@ def _se_sostiene(c, dia, dia_prev):
         print(f"  descartada (la prueba no está literal en las noticias de hoy): {c.get('dijimos', '')[:70]}")
         return False
     dijimos = c.get("dijimos", "")
+    # 25-nov-2026 (fallo real: «Unos ven trampas y otros malos perdedores» se «corrigió» con que las urnas de cartón de los
+    # consulados son legales; el episodio nunca habló de urnas): la corrección tiene que hablar de LO QUE DIJIMOS, así que
+    # lo que «ahora sabemos» comparte al menos dos palabras con contenido con la frase corregida.
+    def _llenas(t):
+        return {w[:6] for w in re.findall(r"\w{5,}", _n(t))} - {"porque", "aunque", "sobre", "desde", "hasta", "entre",
+                                                                 "donde", "cuand", "tambi", "ahora", "otros", "estos"}
+    comunes = _llenas(dijimos) & _llenas(c.get("ahora_sabemos", "") + " " + c.get("prueba", ""))
+    if len(comunes) < 2:
+        print(f"  descartada (no corrige lo que dijimos, habla de otra cosa): {dijimos[:70]}")
+        return False
     citas = [_n(x) for x in re.findall(r"«([^»]+)»", dijimos) if len(x.split()) >= 4]
     fuera = re.sub(r"«[^»]*»", " ", dijimos)
     nombres = {_n(w) for w in re.findall(r"\b[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{3,}\b", fuera)}
