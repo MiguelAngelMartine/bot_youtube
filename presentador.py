@@ -893,8 +893,9 @@ class Escena:
                     lados = {x["lado"]: x["quien"] for x in self.grupos[g["grupo"]]}
                     hx0 = int(W * 0.14) + self.figs[lados["izq"]].width // 2 + 10
                     hx1 = int(W * 0.86) - self.figs[lados["der"]].width // 2 - 10
-                    c = tarjeta(g, t, activo, g["lado"], nombre, cargo, medio, hx1 - hx0 - 130, 46, max_h=(H - 150) // 2)
-                    x, y = (hx0, 50) if g["lado"] == "izq" else (hx1 - c.width, H - c.height - 50)
+                    c = tarjeta(g, t, activo, g["lado"], nombre, cargo, medio, hx1 - hx0 - 130, 46, max_h=(H - 210) // 2)
+                    # 25-nov-2026: el globo izquierdo empieza bajo el rótulo de la sección (antes, a 50 px, lo pisaba)
+                    x, y = (hx0, 108) if g["lado"] == "izq" else (hx1 - c.width, H - c.height - 50)
                 else:
                     c = tarjeta(g, t, activo, "izq", nombre, cargo, medio, 860 if sin_fig else 760, 50,
                                 max_h=int(H * 0.62))
