@@ -269,7 +269,11 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
             if not _apellidos(frag, conocidas) and len(re.findall(r"[.!?]\s", entre)) <= 1 \
                     and re.search(r"\b(acusa|acusan|añade|insiste|remata|sigue|advierte|avisa|critica|pide|exige|"
                                   r"denuncia|recuerda|asegura|zanja|subraya|tacha|llama)\b", frag, re.I) \
-                    and not re.search(r"\b(responde|contesta|replica|le dice)\b", frag, re.I):
+                    and not re.search(r"\b(responde|contesta|replica|le dice)\b", frag, re.I) \
+                    and not re.search(r"\b(PSOE|PP|Vox|Sumar|Podemos|ERC|Junts|Bildu|PNV|Frente Amplio|Gobierno|Ferraz|"
+                                      r"G[eé]nova|Moncloa|partido|ministerio|fuentes|comunicado)\b", frag):
+                # 26-nov-2026 (fallo real: «El PSOE le pide desde Ferraz: «…»» salió en el globo de Feijóo): si la frase
+                # trae otro sujeto (un partido, el Gobierno, una sede…), la cita NO es del hablante anterior
                 quien = out[-1]["quien"]
         if not quien:
             continue
