@@ -869,6 +869,12 @@ class Escena:
             sig = next((x for x in self.grupos[g["grupo"]] if x["t0"] > g["t0"] and x["lado"] == g["lado"]), None)
             if sig is not None:                       # la misma persona dice otra cita: este bocadillo se va antes
                 fin_g = min(fin_g, sig["t0"] - 0.55)
+                # 26-nov-2026 (fallo real: «Asalto tres, González otra vez:» pisaba el globo anterior de González): en
+                # vertical, el globo derecho está donde va el subtítulo del puente; si hay un puente antes de su siguiente
+                # cita, el globo se ha ido ANTES de que empiece el puente
+                pu = next((x for x in self.tr if x.get("puente") and g["t1"] <= x["t0"] < sig["t0"]), None)
+                if pu is not None and self.vertical and g["lado"] == "der":
+                    fin_g = min(fin_g, pu["t0"] - 0.32)
             otro = next((x for x in self.tr if x["tipo"] == "Q" and x["t0"] > g["t0"] and x["grupo"] != g["grupo"]), None)
             if otro is not None:                      # 21-nov: el globo de otra cita no entra hasta que este se ha ido
                 fin_g = min(fin_g, otro["t0"] - 0.6)
