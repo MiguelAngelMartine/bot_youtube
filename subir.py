@@ -26,6 +26,24 @@ PERMISOS = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googl
 PUERTO = 8765
 
 
+
+def _largo_tags(tags):
+    """26-nov-2026 (fallo real: «invalid video keywords» con 480 caracteres según ", ".join): YouTube cuenta las comillas
+    que pone a las etiquetas con espacios, así que cada una de esas suma 2 más."""
+    return sum(len(t) + (2 if " " in t else 0) for t in tags) + max(0, len(tags) - 1)
+
+
+def _limpia_tags(tags, maximo=470):
+    vistos, out = set(), []
+    for t in tags:
+        t = re.sub(r"[<>,\"]", "", str(t)).strip()
+        if t and t.lower() not in vistos:
+            vistos.add(t.lower())
+            out.append(t)
+    while out and _largo_tags(out) > maximo:
+        out.pop(-2 if len(out) > 1 else -1)
+    return out
+
 def credenciales():
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
@@ -146,8 +164,7 @@ def subir(dia_txt):
     if hashtags:
         descripcion = f"{descripcion}\n\n{hashtags}"
     etiquetas = [e.strip() for e in bloque(md, "Etiquetas").split(",") if e.strip()]
-    while len(", ".join(etiquetas)) > 480:                  # limite de YouTube: 500 caracteres en total
-        etiquetas.pop()
+    etiquetas = _limpia_tags(etiquetas)                  # límite de YouTube: 500 caracteres, contados a su manera
     if not titulo or not descripcion:
         raise SystemExit("publicacion.md no tiene titulo o descripcion en el formato esperado")
     yt = build("youtube", "v3", credentials=credenciales())
@@ -336,9 +353,7 @@ def subir_shorts(dia_txt, solo=None):
         tags = list(dict.fromkeys(busc + [t.strip() for t in (S.get("etiquetas") or []) if str(t).strip()] +
                                   [S["quien"], (S.get("replica") or {}).get("quien", ""), S.get("partido", ""),
                                    "política española", "noticias de hoy", "Shorts", "El Hoyformativo"]))
-        tags = [t for t in tags if t]
-        while len(", ".join(tags)) > 480:
-            tags.pop(-2)
+        tags = _limpia_tags([t for t in tags if t])
         cuerpo = {"snippet": {"title": titulo[:100], "description": "\n".join(partes)[:5000], "categoryId": "25",
                               "tags": tags,
                               "defaultLanguage": "es", "defaultAudioLanguage": "es"},
