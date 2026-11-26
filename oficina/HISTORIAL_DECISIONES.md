@@ -265,3 +265,4 @@ Cada dato, cita, idea y muletilla sale una sola vez (fallos reales: Feijóo «pr
 - 23-nov-2026: el usuario pide para los vídeos siguientes: la cita de Abascal partida (cola fuera del globo) va entera en el globo; todos los personajes del mismo tamaño; fondo sin zoom.
 - 23-nov-2026: el usuario pide más contexto en los cruces de los Shorts (frases buenas que sueltas no se conectan con la historia): cada cita, con su tema; mejor 2-3 bien explicadas.
 - 24-nov-2026: el usuario pide las coletillas sin exclamaciones (la voz las leía con otro tono). Paleta sin «¡!» y el montaje se los quita a cualquier coletilla (no a las citas).
+- 26-nov-2026: prueba de fondos por noticia y posturas con FLUX.2 klein (Cloudflare, gratis). Los fondos encajan con la noticia pero tienen menos detalle que los de Imagenes/; las posturas de Rufián perdieron el parecido de la cara. El usuario: los rasgos faciales se tienen que mantener siempre (NORMAS §6).
