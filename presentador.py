@@ -780,7 +780,7 @@ class Escena:
         # fundido de fondo al cambiar de noticia
         j = next((k for k in range(i, 0, -1) if self.fondo_tr[k] != self.fondo_tr[k - 1]), None)
         if j is not None and j == i:
-            q = ease((t - (self.tr[j]["t0"] - 0.3)) / 0.6)
+            q = 1.0   # 26-nov: corte seco (el fundido dejaba fondos superpuestos y un presentador fantasma)
             if q < 1:
                 prev = self._vista(self.fondo_tr[j - 1], t)
                 fr = Image.blend(prev, fr, q)
@@ -990,6 +990,52 @@ def _fuente_x(dia):
 
 
 # ---------------------------------------------------------------- Short (vertical)
+def _cifra_img(pares):
+    """Rótulo de cifra (26-nov-2026, idea del TikTok del debate a ocho): «8 ATRILES» en una línea, número en amarillo;
+    con varios pares, uno detrás de otro («4 MUJERES  4 HOMBRES»). Va en el hueco entre el subtítulo (que acaba en
+    0,39 H) y la cabeza del presentador (0,46 H): 120 px de alto."""
+    fn, fr_ = fuente("Inter-Black.ttf", 104), fuente("Inter-Black.ttf", 54)
+    medidas = [(int(fn.getlength(c)), int(fr_.getlength(r))) for c, r in pares]
+    w = 34 + sum(wn + 30 + wr + 16 for wn, wr in medidas) + 44 * (len(medidas) - 1) + 30
+    c = Image.new("RGBA", (w, 120), (0, 0, 0, 0))
+    d = ImageDraw.Draw(c)
+    d.rounded_rectangle((0, 0, w - 1, 119), 26, fill=(10, 14, 28, 228))
+    x = 34
+    for (cifra, rotulo), (wn, wr) in zip(pares, medidas):
+        d.text((x, -12), cifra, font=fn, fill=AMARILLO + (255,))
+        d.rounded_rectangle((x + wn + 12, 26, x + wn + 30 + wr + 16, 94), 14, fill=ROJO + (255,))
+        d.text((x + wn + 30, 28), rotulo, font=fr_, fill=(255, 255, 255, 255))
+        x += wn + 30 + wr + 16 + 44
+    return c
+
+
+def _cifras(lista, tr):
+    """[(t0, t1, imagen)]: cada cifra sale cuando el presentador dice su palabra «cuando» y dura hasta 2,4 s, sin salir
+    de su tramo (en los tramos de cita hay globo y no cabe). Formato en el JSON del Short:
+    "cifras": [{"cuando": "atriles", "cifra": "8", "rotulo": "ATRILES"}] o, con varios datos seguidos en un solo rótulo,
+    {"cuando": "cuatro mujeres", "pares": [["4", "mujeres"], ["4", "hombres"]]}."""
+    out = []
+    for c in lista:
+        clave = _n(c.get("cuando", "")).split()
+        for g in tr:
+            if g["tipo"] != "P" or g.get("cierre") or not clave:
+                continue
+            pal = [(_n(w), a, b) for w, a, b in g.get("pal", [])]
+            hit = next((a for k, (w, a, b) in enumerate(pal)
+                        if [x for x, _, _ in pal[k:k + len(clave)]] == clave), None)
+            if hit is not None:
+                pares = c.get("pares") or [[c.get("cifra", ""), c.get("rotulo", "")]]
+                out.append((max(g["t0"], hit - 0.15), min(g["t1"] + 0.1, hit + 2.4),
+                            _cifra_img([(str(a), str(b).upper()) for a, b in pares])))
+                break
+    # nunca dos a la vez: la siguiente espera a que se vaya la anterior
+    out.sort(key=lambda x: x[0])
+    for k in range(1, len(out)):
+        if out[k][0] < out[k - 1][1] + 0.1:
+            out[k - 1] = (out[k - 1][0], out[k][0] - 0.1, out[k - 1][2])
+    return [x for x in out if x[1] - x[0] > 0.6]
+
+
 def short(fecha, n):
     import musica
     import short as SH
@@ -1030,6 +1076,7 @@ def short(fecha, n):
     _ordena_lados(tr)
     total, env = locuta_tramos(tr, tmp)
     total += 1.2
+    cifras = _cifras(S.get("cifras") or [], tr)
     fondos, _, _ = catalogo()
     fondo = elige_fondos([f"{S.get('titulo', '')}. {S.get('contexto', '')}"], fondos, tmp / "fondo.json")[0]
     esc = Escena(tr, total, env, 1080, 1920, [fondo] * len(tr), cargos, medios, vertical=True)
@@ -1053,6 +1100,14 @@ def short(fecha, n):
         fr.alpha_composite(cab, (0, 0))
         if t < t_fin:
             fr.alpha_composite(kick, (50, 160))
+        for c0, c1, im in cifras:                       # 26-nov-2026: la cifra del dato, grande, mientras se dice
+            if c0 <= t <= c1:
+                a_ = min(1.0, (t - c0) / 0.2, (c1 - t) / 0.2)
+                sc = 0.85 + 0.15 * ease(min(1.0, (t - c0) / 0.25))
+                im2 = im.resize((max(1, int(im.width * sc)), max(1, int(im.height * sc))))
+                if a_ < 1:
+                    im2.putalpha(im2.getchannel("A").point(lambda v, a_=a_: int(v * a_)))
+                fr.alpha_composite(im2, ((1080 - im2.width) // 2, int(1920 * 0.39) + 10 + (im.height - im2.height) // 2))
         d = ImageDraw.Draw(fr)
         d.rectangle([0, 1920 - 12, int(1080 * min(1.0, t / total)), 1920], fill=AMARILLO)
 
