@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -131,10 +132,11 @@ def _cabecera(fecha, categoria=""):
     d = ImageDraw.Draw(cab)
     d.rectangle([0, 0, AN, 10], fill=ROJO + (255,))
     d.rectangle([0, 10, AN, 16], fill=AMARILLO + (255,))
-    cab.alpha_composite(G2.logo(80), (40, 42))
-    f_ = fuente("Inter-Black.ttf", 40)
-    d.text((140, 82), "EL HOY ", font=f_, fill=BLANCO + (255,), anchor="lm")
-    d.text((140 + f_.getlength("EL HOY "), 82), "FORMATIVO", font=f_, fill=AMARILLO + (255,), anchor="lm")
+    if not os.environ.get("EH_SIN_MARCA"):              # 27-nov-2026: sin la marca EH (pruebas del canal de fútbol)
+        cab.alpha_composite(G2.logo(80), (40, 42))
+        f_ = fuente("Inter-Black.ttf", 40)
+        d.text((140, 82), "EL HOY ", font=f_, fill=BLANCO + (255,), anchor="lm")
+        d.text((140 + f_.getlength("EL HOY "), 82), "FORMATIVO", font=f_, fill=AMARILLO + (255,), anchor="lm")
     y, m, dd = (int(x) for x in fecha[:10].split("-"))
     fe = f"{dd} {['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][m - 1]}"
     cat = (categoria or "").upper().strip()
@@ -404,8 +406,9 @@ def _cierre(fr, tl, pregunta="¿Qué opinas?"):
     d.text((AN // 2, 560 + int(30 * (1 - a_))), pregunta, font=fuente("Inter-Black.ttf", tam_p),
            fill=AMARILLO + (int(255 * a_),), anchor="mm")
     d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
-    d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
-           fill=BLANCO + (220,), anchor="mm")
+    if not os.environ.get("EH_SIN_MARCA"):              # sin vídeo largo del día (canal de fútbol), sin la línea
+        d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
+               fill=BLANCO + (220,), anchor="mm")
     e = G2.suave(min(1.0, tl / 0.35)) * (1.0 + 0.05 * math.sin(tl * 6))
     bw, bh = int(400 * e), int(80 * e)
     if bw > 10:

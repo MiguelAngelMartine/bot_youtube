@@ -28,7 +28,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 RAIZ = Path(__file__).parent
-IMG = RAIZ / "Imagenes"
+IMG = Path(os.environ.get("EH_IMAGENES") or (RAIZ / "Imagenes"))   # 27-nov-2026: otra carpeta (canal de fútbol)
+PERSONAJES = "Políticos" if (IMG / "Políticos").exists() else "Personajes"
 FUENTES = RAIZ / "fuentes"
 FPS = 30
 ROJO, AMARILLO = (200, 16, 46), (255, 205, 0)
@@ -85,7 +86,7 @@ def catalogo():
             (pres if len(ps) == 1 else laminas).extend(ps)   # las sueltas (más resolución) primero
     pres += laminas
     pols = {}
-    for p in sorted((IMG / "Políticos").rglob("*.png")):   # también subcarpetas (p. ej., «Nuevas»)
+    for p in sorted((IMG / PERSONAJES).rglob("*.png")):   # también subcarpetas (p. ej., «Nuevas»)
         im = Image.open(p)
         if not _alfa(im):
             continue                                   # sin fondo transparente (p. ej., fotos de grupo): no vale
@@ -978,8 +979,18 @@ def _cargos():
 def _cargo_de(nombre, cargos):
     if nombre in cargos:
         return cargos[nombre]
-    ape = _n(nombre).split()[-1] if nombre else ""
-    return next((c for n, c in cargos.items() if _n(n).split()[-1:] == [ape]), "")
+    # 27-nov-2026: por apellido solo si no hay otro nombre de pila que lo contradiga (fallo real: a «Florentino Pérez» le
+    # salió el cargo de Alvise Pérez, «Eurodiputado y líder de Se Acabó La Fiesta»)
+    toks = _n(nombre).split() if nombre else []
+    if not toks:
+        return ""
+    for n, c in cargos.items():
+        tn = _n(n).split()
+        if tn[-1:] != toks[-1:]:
+            continue
+        if len(toks) == 1 or len(tn) == 1 or set(toks[:-1]) & set(tn[:-1]):
+            return c
+    return ""
 
 
 def _fuente_x(dia):
