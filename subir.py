@@ -116,10 +116,10 @@ def personas_dibujadas(dia):
                    if d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()})
 
 
-# 27-nov-2026 (el usuario: «primero se sube el vídeo largo y después los Shorts, espaciados según la mejor hora»): el largo,
-# a la hora de la comida (14:00, pico de móvil en España) y los Shorts después, por la tarde y la noche (18:30, 21:30,
-# 22:45), siempre al menos 1 h después del largo para que su enlace ya funcione. Hora de Madrid.
-FRANJAS = {"short": ["18:30", "21:30", "22:45"], "largo": ["14:00"]}
+# 27-nov-2026 (el usuario: «primero se sube el vídeo largo y después los Shorts»; «programa a las 20 y a las 22 para todos
+# los días»): el largo a las 14:00 y los Shorts a las 20:00 y a las 22:00, siempre al menos 1 h después del largo para que
+# su enlace ya funcione. Un tercer Short pasa a la primera franja libre (el día siguiente). Hora de Madrid.
+FRANJAS = {"short": ["20:00", "22:00"], "largo": ["14:00"]}
 TRAS_LARGO_MIN = 60
 PROGRAMAR = "--sin-programar" not in sys.argv
 
