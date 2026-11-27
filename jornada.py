@@ -759,6 +759,9 @@ class Jornada:
 
     def corre(self):
         self.parte("coordinador en Python (Gemini; Claude solo de respaldo) en marcha")
+        # 27-nov-2026 (el usuario): las imágenes nuevas sin fondo transparente se recortan solas (si no, el montaje las
+        # descartaba sin avisar)
+        self.py("recorta_imagenes.py", log="recogida.log", timeout=1800)
         try:                                               # coletillas usadas estos días -> el redactor NO las repite
             import coletillas as COL
             COL.escribe_evitar(RAIZ / "archivo" / "coletillas_evitar.txt")
