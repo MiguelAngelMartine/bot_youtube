@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 27-nov-2026 (publicación AUTOMÁTICA: el largo y los Shorts se suben solos, privados y programados en su franja, con aviso por Telegram, sin esperar el OK; los Shorts llevan portada propia en el primer fotograma y de miniatura; 26-nov: los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
+**Última actualización: 27-nov-2026 (brief de miniaturas: caras grandes, 2-4 palabras, comillas solo si es literal, cuatro diseños y juez con `miniatura_pro.py`; publicación AUTOMÁTICA: el largo y los Shorts se suben solos, privados y programados en su franja, con aviso por Telegram, sin esperar el OK; los Shorts llevan portada propia en el primer fotograma y de miniatura; 26-nov: los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -355,8 +355,20 @@ y no se usa hasta nueva orden del usuario.**
   canal con la etiqueta de formato, kicker rojo, personajes en la mitad de abajo, bocadillo o subtítulo encima, y cierre con
   la pregunta y suscríbete.
 - **Sin fondos borrosos.** Una viñeta oscura suave en los bordes para que se lea el texto.
-- **Miniatura del largo:** la genera OpenAI con la frase gancho incrustada y un fondo del contexto, más el recorte de quien
-  dice la frase y una etiqueta roja con quién lo dice (canal verificado: se pone sola al subir).
+- **Miniaturas: el brief** (27-nov-2026, el usuario: «muy importante, la calidad de las miniaturas tiene que subir mucho»;
+  sustituye a todo lo anterior sobre miniaturas, incluidos OpenAI y el estilo de brocha):
+  - **Caras GRANDES**, del pecho para arriba, ocupando al menos el 55 % del alto; nítidas y reconocibles a 320 px (móvil).
+    Las imágenes de `Imagenes/Políticos`, tal cual (solo escala y recorte; los rasgos son intocables).
+  - **Un solo punto de atención**: se entiende en 1 s quién dice qué o quién contra quién.
+  - **2-4 palabras**, enormes (Anton), con la palabra clave en un bloque amarillo. **Entre comillas solo si es literal**
+    (sale dentro de una cita «…» de lo locutado); si es un titular nuestro, sin comillas.
+  - **Nada tapa una cara**; la esquina de abajo a la derecha (la duración de YouTube) queda libre.
+  - Contraste alto, fondo de `Imagenes/Fondos` oscurecido (nunca borroso), halo de color detrás de cada persona.
+  - El gesto debe encajar con la noticia; hoy hay una o dos imágenes por político, así que se amplía el catálogo con gestos
+    (serio, enfadado, señalando) cuando el usuario las aporte.
+  - **Proceso** (`miniatura_pro.py`, en la jornada): cuatro diseños (duelo, reacción, primer plano, cita) y un juez con
+    visión (Gemini) los puntúa con este brief a tamaño completo y a 320 px; se queda el mejor (informe en
+    `revision/miniatura.md`). Si el juez no responde, el duelo (o el primer plano si no hay rival). Se pone sola al subir.
 - **Portada de los Shorts** (27-nov-2026, el usuario: «en los shorts podemos poner en el fotograma 1 la miniatura»):
   `portada_short.py` dibuja una portada vertical (fondo del Short, la persona o las dos del cruce con su imagen de
   `Imagenes/Políticos` sin tocar la cara, la frase gancho grande con la palabra destacada en amarillo y el rótulo de quién),
@@ -366,7 +378,7 @@ y no se usa hasta nueva orden del usuario.**
 - **Riesgo n.º 1: «contenido no auténtico».** Guion original cada día con narrativa propia, estructura variable, imágenes que
   no se repiten, metadatos únicos.
 - Licencia comercial de todo: voz Azure, música propia, imágenes de `Imagenes/` (las aporta el usuario para uso en el canal),
-  OpenAI (miniatura), tipografías OFL. Si falta algo, **no se sube**.
+  tipografías OFL. Si falta algo, **no se sube**.
 - Anuncios: nada de detalles gráficos de víctimas, cuerpos ni violencia; miniatura y título sin morbo ni gritos.
 - Elecciones: nunca dar como cierto algo falso sobre cómo, cuándo o dónde votar.
 - IA: la descripción dice que hay voz sintética y ayuda de IA, que los fondos, el presentador (ficticio) y las ilustraciones

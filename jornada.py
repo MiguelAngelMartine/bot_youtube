@@ -561,7 +561,11 @@ class Jornada:
             return True
         # 23-nov-2026 (el usuario elige la «A»): miniatura moderna «duelo» (o «protagonista» si no hay rival con imagen);
         # la antigua, solo si la nueva no puede (sin persona con imagen)
-        rc = self.py("miniatura_moderna.py", "auto", self.f, log="miniatura.log", timeout=600)
+        # 27-nov-2026 (el usuario: «la calidad de las miniaturas tiene que subir mucho»): 4 diseños y juez (miniatura_pro);
+        # la «moderna» de antes, solo si la nueva no puede
+        rc = self.py("miniatura_pro.py", self.f, log="miniatura.log", timeout=900)
+        if rc != 0 or not (self.dia / "miniatura.png").exists():
+            rc = self.py("miniatura_moderna.py", "auto", self.f, log="miniatura.log", timeout=600)
         if rc != 0 or not (self.dia / "miniatura.png").exists():
             rc = self.py("miniatura_auto.py", self.f, log="miniatura.log", timeout=1800)
         if rc != 0 or not (self.dia / "miniatura.png").exists():   # 10-nov (calidad): por debajo de 7, el diseñador
