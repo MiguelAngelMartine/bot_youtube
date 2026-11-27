@@ -698,6 +698,12 @@ class Escena:
             gt = Image.linear_gradient("L").resize((W, 260)).point(lambda v: int(max(0, 170 - v)))
             st = Image.new("RGBA", (W, 260), (6, 10, 22, 255)); st.putalpha(gt)
             vi.alpha_composite(st, (0, 0))
+            if os.environ.get("EH_VELO"):               # 27-nov-2026 (canal de fútbol): fondos con letreros detrás de los
+                hv = int(H * 0.47)                       # subtítulos; velo oscuro (sin desenfocar) hasta las cabezas
+                gv = Image.linear_gradient("L").resize((W, hv)).point(
+                    lambda v: int(165 if v < 200 else 165 * (255 - v) / 55))
+                sv = Image.new("RGBA", (W, hv), (6, 10, 22, 255)); sv.putalpha(gv)
+                vi.alpha_composite(sv, (0, 0))
         self.vi = vi
         self._ventanas()
 

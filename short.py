@@ -402,9 +402,22 @@ def _cierre(fr, tl, pregunta="¿Qué opinas?"):
     # 8-nov: sin el logo de Urni; botón de suscribirse
     d = ImageDraw.Draw(fr)
     a_ = G2.suave(min(1.0, tl / 0.25))
-    tam_p = 104 if len(pregunta) <= 16 else max(60, int(104 * 16 / len(pregunta)))
-    d.text((AN // 2, 560 + int(30 * (1 - a_))), pregunta, font=fuente("Inter-Black.ttf", tam_p),
-           fill=AMARILLO + (int(255 * a_),), anchor="mm")
+    # 27-nov-2026: la pregunta se ajusta al ancho (antes una larga se salía por los dos lados); si no cabe en una línea
+    # a 64 px, va en dos
+    tam_p, lineas = 104, [pregunta]
+    while tam_p > 64 and fuente("Inter-Black.ttf", tam_p).getlength(pregunta) > AN - 90:
+        tam_p -= 4
+    if fuente("Inter-Black.ttf", tam_p).getlength(pregunta) > AN - 90:
+        pal = pregunta.split()
+        corte = min(range(1, len(pal)), key=lambda k: abs(len(" ".join(pal[:k])) - len(" ".join(pal[k:]))))
+        lineas, tam_p = [" ".join(pal[:corte]), " ".join(pal[corte:])], 84
+        while tam_p > 52 and max(fuente("Inter-Black.ttf", tam_p).getlength(l) for l in lineas) > AN - 90:
+            tam_p -= 4
+    fp = fuente("Inter-Black.ttf", tam_p)
+    y0 = 560 - (len(lineas) - 1) * int(tam_p * 1.2)            # la última línea, donde iba la única
+    for k, l in enumerate(lineas):
+        d.text((AN // 2, y0 + k * int(tam_p * 1.15) + int(30 * (1 - a_))), l, font=fp,
+               fill=AMARILLO + (int(255 * a_),), anchor="mm")
     d.text((AN // 2, 680), "Te leo en comentarios", font=fuente("Inter-Black.ttf", 58), fill=BLANCO + (255,), anchor="mm")
     if not os.environ.get("EH_SIN_MARCA"):              # sin vídeo largo del día (canal de fútbol), sin la línea
         d.text((AN // 2, 800), "Más información en el vídeo de hoy", font=fuente("Inter-Bold.ttf", 42),
