@@ -260,7 +260,7 @@ class Jornada:
             seg = next((b.get("segundos") for b in e.get("bloques", []) if f"{b['n']:02d}" == nn), None)
             for intento in range(2):                   # lo mecánico y la calidad medible, antes de la mesa
                 r = subprocess.run([PY, "prechequeo.py", self.f, nn], cwd=RAIZ, capture_output=True, text=True)
-                pre = "" if r.stdout.strip().endswith("OK") else r.stdout[-2500:]
+                pre = "" if (r.stdout.strip().splitlines() or [""])[-1].startswith("OK") else r.stdout[-2500:]
                 cal = self.calidad_bloque(sal, seg) if sal.exists() else ["no existe"]
                 if not pre and not cal:
                     break
