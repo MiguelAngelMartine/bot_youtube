@@ -19,6 +19,7 @@ EJEMPLOS = (RAIZ / "oficina" / "EJEMPLOS_GANCHOS.md").read_text(encoding="utf-8"
 PROMPT = """Eres el guionista de Shorts de «El Hoyformativo»: política española en tono DESENFADADO Y CON OPINIÓN LIGERA, estilo «La
 Pulla» o «Vikingo Blanco» (lee NORMAS.md (§4)). Humor e ironía sobre TODOS por igual, SIN tomar partido. Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
 para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
+- 27-nov-2026 (el usuario): el guion es un RELATO fluido y conexo, nunca un telegrama: cada frase nace de la anterior con conectores naturales, las citas se presentan dentro de la frase («…», remató) y nunca se apilan fragmentos sin verbo. Para ajustar la duración se quita una idea entera, nunca conectores ni verbos. Léelo en voz alta: si suena a lista, reescríbelo.
 - Prioriza los de la sección «GANCHOS DEL DÍA» (al principio del material; los «del director», primero): frases cortas
   con impacto, zascas y cruces con respuesta.
 - La frase tiene que estar LITERAL en el material de abajo (cópiala letra a letra; un programa lo comprueba) y ser
@@ -225,6 +226,7 @@ def _norm(s):
 MEJORES = """Eres el guionista de Shorts de «El Hoyformativo» (tono Vikingo desenfadado, NEUTRAL: lee NORMAS.md §3-§4).
 El director quiere un Short de 25-40 s con LAS MEJORES FRASES de {persona} sobre «{tema}». Elige sus {k} frases con más
 impacto (las más comentadas por los medios, las más directas, las que más retratan el cara a cara), de más a menos. Reglas:
+- 27-nov-2026 (el usuario): el guion es un RELATO fluido y conexo, nunca un telegrama: cada frase nace de la anterior con conectores naturales, las citas se presentan dentro de la frase («…», remató) y nunca se apilan fragmentos sin verbo. Para ajustar la duración se quita una idea entera, nunca conectores ni verbos. Léelo en voz alta: si suena a lista, reescríbelo.
 - Cada frase tiene que ser de {persona} DICHA en «{tema}» (no de otro día ni de su entorno) y estar LITERAL en el material
   de abajo, entre comillas del medio (cópiala letra a letra; un programa lo comprueba). Entera palabras suyas, 4+ palabras,
   sin comillas dentro. Nada de tacos ni insultos vejatorios. NUNCA frases de su equipo, su entorno, «fuentes» o su
