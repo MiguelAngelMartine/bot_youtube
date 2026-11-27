@@ -20,6 +20,7 @@ PROMPT = """Eres el guionista de Shorts de «El Hoyformativo»: política españ
 Pulla» o «Vikingo Blanco» (lee NORMAS.md (§4)). Humor e ironía sobre TODOS por igual, SIN tomar partido. Elige las {n} FRASES MÁS IMPACTANTES (de más a menos) del día
 para hacer un Short de alrededor de 1 minuto con cada una. Reglas:
 - 27-nov-2026 (el usuario): el guion es un RELATO fluido y conexo, nunca un telegrama: cada frase nace de la anterior con conectores naturales, las citas se presentan dentro de la frase («…», remató) y nunca se apilan fragmentos sin verbo. Para ajustar la duración se quita una idea entera, nunca conectores ni verbos. Léelo en voz alta: si suena a lista, reescríbelo.
+- IRONÍA ENLAZADA (NORMAS §4, estilo modelo del 27-nov-2026): la pulla va DENTRO de la frase que la provoca y lleva a la siguiente («…aunque sea el único que ha ganado sus cinco partidos; así que, o la máquina no ve el fútbol, o él no lee las estadísticas»; «Con esa delicadeza tan suya respondió…»; «y sacó su lado más tierno: «…»»; «En realidad tiene seis, así que…»). Nunca frases sueltas de dos palabras ni remates aislados; la guasa reparte dentro de la misma frase.
 - Prioriza los de la sección «GANCHOS DEL DÍA» (al principio del material; los «del director», primero): frases cortas
   con impacto, zascas y cruces con respuesta.
 - La frase tiene que estar LITERAL en el material de abajo (cópiala letra a letra; un programa lo comprueba) y ser
@@ -227,6 +228,7 @@ MEJORES = """Eres el guionista de Shorts de «El Hoyformativo» (tono Vikingo de
 El director quiere un Short de 25-40 s con LAS MEJORES FRASES de {persona} sobre «{tema}». Elige sus {k} frases con más
 impacto (las más comentadas por los medios, las más directas, las que más retratan el cara a cara), de más a menos. Reglas:
 - 27-nov-2026 (el usuario): el guion es un RELATO fluido y conexo, nunca un telegrama: cada frase nace de la anterior con conectores naturales, las citas se presentan dentro de la frase («…», remató) y nunca se apilan fragmentos sin verbo. Para ajustar la duración se quita una idea entera, nunca conectores ni verbos. Léelo en voz alta: si suena a lista, reescríbelo.
+- IRONÍA ENLAZADA (NORMAS §4, estilo modelo del 27-nov-2026): la pulla va DENTRO de la frase que la provoca y lleva a la siguiente («…aunque sea el único que ha ganado sus cinco partidos; así que, o la máquina no ve el fútbol, o él no lee las estadísticas»; «Con esa delicadeza tan suya respondió…»; «y sacó su lado más tierno: «…»»; «En realidad tiene seis, así que…»). Nunca frases sueltas de dos palabras ni remates aislados; la guasa reparte dentro de la misma frase.
 - Cada frase tiene que ser de {persona} DICHA en «{tema}» (no de otro día ni de su entorno) y estar LITERAL en el material
   de abajo, entre comillas del medio (cópiala letra a letra; un programa lo comprueba). Entera palabras suyas, 4+ palabras,
   sin comillas dentro. Nada de tacos ni insultos vejatorios. NUNCA frases de su equipo, su entorno, «fuentes» o su
