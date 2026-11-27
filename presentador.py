@@ -1088,7 +1088,9 @@ def short(fecha, n):
     total += 1.2
     cifras = _cifras(S.get("cifras") or [], tr)
     fondos, _, _ = catalogo()
-    fondo = elige_fondos([f"{S.get('titulo', '')}. {S.get('contexto', '')}"], fondos, tmp / "fondo.json")[0]
+    # 27-nov-2026: el fondo elegido se guarda junto al Short (lo usa portada_short.py para la portada)
+    fondo = elige_fondos([f"{S.get('titulo', '')}. {S.get('contexto', '')}"], fondos,
+                         dia / "shorts" / f"fondo_short_{n}.json")[0]
     esc = Escena(tr, total, env, 1080, 1920, [fondo] * len(tr), cargos, medios, vertical=True)
     dibujados = sorted(q for q, f in esc.figs.items() if f is not None)
     if dibujados:                                      # personas reales ilustradas: subir.py lo declara (contenido sintético)

@@ -577,14 +577,17 @@ class Jornada:
         self.py("descripcion.py", self.f, log="publicacion.log")
         if not (self.dia / "publicacion.md").exists() and self.py("plataforma.py", self.f, log="publicacion.log") != 0:
             self.claude("editor-plataforma", "Prepara publicacion.md.", self.dia.relative_to(RAIZ) / "publicacion.md")
-        # 21-nov-2026 (el usuario): NO se sube a YouTube sin su OK. Se le manda por Telegram y se sube cuando lo aprueba
-        # (`subir.py FECHA`), así no se gastan subidas en versiones que luego se rehacen (límite diario de YouTube).
-        if not (self.dia / "youtube.json").exists() and not (self.dia / "revision.json").exists():
+        # 27-nov-2026 (el usuario: «quiero automatizar todo el proceso, no quiero tener que ocuparme de nada del canal»):
+        # se sube SOLO, privado y PROGRAMADO en su franja (20:00); subir.py avisa por Telegram con el enlace y la hora, y
+        # hasta esa hora el usuario puede pedir que se pare. Sustituye al OK previo del 21-nov-2026.
+        if not (self.dia / "youtube.json").exists():
             self.py("control_calidad.py", self.f, "--ligero")
-            if self.py("notifica.py", self.f, "--pide-ok", "largo") != 0:
-                self.parte("NO SE PUDO MANDAR EL VÍDEO POR TELEGRAM")
+            if self.py("subir.py", self.f, log="publicacion.log", timeout=3600) != 0 or \
+                    not (self.dia / "youtube.json").exists():
+                self.parte("NO SE PUDO SUBIR EL VÍDEO LARGO A YOUTUBE")
+                self.py("notifica.py", self.f, "--error", "no se pudo subir el vídeo largo a YouTube (mira publicacion.log)")
                 return False
-            self.parte("vídeo enviado por Telegram para revisar; se sube a YouTube cuando el usuario dé el OK")
+            self.parte("vídeo largo subido a YouTube y programado (aviso por Telegram)")
         return True
 
     def shorts(self):
@@ -726,8 +729,14 @@ class Jornada:
         if hechos:
             import shorts_dia
             shorts_dia.hoja(carpeta)
-            self.py("notifica.py", self.f, "--pide-ok", "shorts")      # 21-nov-2026: sin el OK del usuario no se suben
-            self.parte(f"{len(hechos)} Shorts (guion Opus) enviados por Telegram para revisar; se suben con el OK del usuario")
+            # 27-nov-2026 (el usuario): la portada va en el fotograma 1 y de miniatura; se suben SOLOS y programados
+            # en sus franjas (aviso por Telegram con enlaces y horas). Sustituye al OK previo del 21-nov-2026.
+            self.py("portada_short.py", self.f, *hechos, log="shorts.log", timeout=900)
+            if self.py("subir.py", self.f, "shorts", log="shorts.log", timeout=3600) != 0:
+                self.parte("NO SE PUDIERON SUBIR LOS SHORTS A YOUTUBE")
+                self.py("notifica.py", self.f, "--error", "no se pudieron subir los Shorts a YouTube (mira shorts.log)")
+            else:
+                self.parte(f"{len(hechos)} Shorts subidos a YouTube y programados (aviso por Telegram)")
         else:
             self.parte("hoy sin Shorts (fallo al renderizar)")
         return True

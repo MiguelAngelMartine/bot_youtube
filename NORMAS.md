@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 26-nov-2026 (los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; nada se sube a YouTube sin el OK del usuario por Telegram; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
+**Última actualización: 27-nov-2026 (publicación AUTOMÁTICA: el largo y los Shorts se suben solos, privados y programados en su franja, con aviso por Telegram, sin esperar el OK; los Shorts llevan portada propia en el primer fotograma y de miniatura; 26-nov: los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -356,7 +356,11 @@ y no se usa hasta nueva orden del usuario.**
   la pregunta y suscríbete.
 - **Sin fondos borrosos.** Una viñeta oscura suave en los bordes para que se lea el texto.
 - **Miniatura del largo:** la genera OpenAI con la frase gancho incrustada y un fondo del contexto, más el recorte de quien
-  dice la frase y una etiqueta roja con quién lo dice. **Los Shorts no llevan miniatura**: la elige el usuario en Studio.
+  dice la frase y una etiqueta roja con quién lo dice (canal verificado: se pone sola al subir).
+- **Portada de los Shorts** (27-nov-2026, el usuario: «en los shorts podemos poner en el fotograma 1 la miniatura»):
+  `portada_short.py` dibuja una portada vertical (fondo del Short, la persona o las dos del cruce con su imagen de
+  `Imagenes/Políticos` sin tocar la cara, la frase gancho grande con la palabra destacada en amarillo y el rótulo de quién),
+  la mete en el PRIMER FOTOGRAMA del vídeo y `subir.py` la pone de miniatura. Nada se pisa: el texto va sobre las cabezas.
 
 ## 7. Monetización (todo lo que se sube tiene que serlo)
 - **Riesgo n.º 1: «contenido no auténtico».** Guion original cada día con narrativa propia, estructura variable, imágenes que
@@ -397,12 +401,12 @@ y no se usa hasta nueva orden del usuario.**
 - **Antes de entregar cualquier vídeo se miran sus fotogramas.** El control de calidad marca CORREGIR si: el tono es plano;
   falta el karaoke o no es TikTok; una escena sale sin personaje o con la cara equivocada; hay repeticiones; un fondo no es
   político; o se incumple cualquier punto de esta guía.
-- **Nada se sube a YouTube sin el OK del usuario** (21-nov-2026, para no agotar el límite diario de subidas con
-  versiones que luego se rehacen): la jornada le manda cada vídeo por Telegram (`notifica.py FECHA --pide-ok largo|shorts`)
-  y solo cuando lo aprueba se sube (`subir.py FECHA`, `subir.py FECHA shorts [N]`). La versión anterior se borra después
-  de subir la nueva, nunca antes.
-- **Todo se sube como PRIVADO** (`subir.py`); **publicar es siempre decisión del usuario**. De cada día queda solo la última
-  versión (se borra la anterior si sigue privada). **Antes de rehacer algo se comprueba si ya está publicado: lo publicado no
+- **Publicación automática** (27-nov-2026, el usuario: «quiero automatizar todo el proceso, no quiero tener que ocuparme
+  de nada del canal»; sustituye al OK previo por Telegram del 21-nov): la jornada sube SOLOS el largo (`subir.py FECHA`) y
+  los Shorts (`subir.py FECHA shorts`), privados y PROGRAMADOS en su franja, y avisa por Telegram con el enlace y la hora.
+  Hasta esa hora el usuario puede pedir que se pare o se cambie. Antes de subir, el control de calidad y los fotogramas
+  se revisan igual. La versión anterior se borra después de subir la nueva, nunca antes.
+- De cada día queda solo la última versión (se borra la anterior si sigue privada). **Antes de rehacer algo se comprueba si ya está publicado: lo publicado no
   se toca.**
 - Aviso por Telegram al terminar o si algo falla, en lenguaje llano. Nunca se muestran claves ni secretos.
 - Cada cambio de código o de esta guía: commit y push a `origin/main` (el servidor es la propia copia de trabajo).
@@ -421,7 +425,7 @@ y no se usa hasta nueva orden del usuario.**
   pantalla); el remate enlaza con la primera frase para que el Short se repita.
 - **Títulos:** ≤ 45 caracteres en Shorts (≤ 60 el largo), apellido que se busca + expresión de gancho; `titulos.py`
   comprueba que la frase va con el nombre de quien la dijo y, si no, lo rehace.
-- **Publicación programada:** con el OK del usuario, se sube privado y PROGRAMADO (Shorts 14:00 / 18:30 / 21:30, largo
+- **Publicación programada:** se sube privado y PROGRAMADO (Shorts 14:00 / 18:30 / 21:30, largo
   20:00, hora de Madrid, sin repetir franja); se cambia o anula en Studio; `subir.py ... --sin-programar` para no programar.
 - **Listas de reproducción** automáticas (`listas.py`): «Los cruces del día», «El resumen diario» y una por político principal.
 - **Calidad de imagen:** codificado final crf 17 preset slow (el sonido ya iba a −14 LUFS).

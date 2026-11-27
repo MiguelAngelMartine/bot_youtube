@@ -22,8 +22,9 @@
 - **Informar sin que pregunte:** en las tareas largas (renders, jornadas), avisar al terminar, también si falla. Por Telegram
   (`notifica.py`), en lenguaje llano.
 - **Revisar antes de entregar:** mirar los fotogramas de cada escena antes de mandar un vídeo; no darlo por bueno sin verlo.
-- **Nada se sube sin el OK del usuario** (21-nov-2026): los vídeos se le mandan por Telegram (`notifica.py FECHA --pide-ok
-  largo|shorts`) y solo con su OK se suben a YouTube. **Nunca publicar sin su OK:** con su OK se sube privado y programado (franjas en NORMAS.md, 23-nov-2026) o privado si lo pide. Antes de rehacer algo, comprobar en YouTube si ya está
+- **Publicación automática** (27-nov-2026, sustituye al OK previo del 21-nov): la jornada sube sola el largo y los
+  Shorts, privados y programados en sus franjas (NORMAS.md), y avisa por Telegram; el usuario puede pedir que se pare
+  antes de la hora. Antes de rehacer algo, comprobar en YouTube si ya está
   publicado: lo publicado no se toca.
 - Las búsquedas web sencillas se pueden delegar en un ayudante barato; el diseño, el análisis y los cambios de código, nunca.
 - No proponer de nuevo lo que el usuario ya descartó (está en `oficina/HISTORIAL_DECISIONES.md`): ritmo «TikTok» de cortes
@@ -46,4 +47,4 @@
 - **Publicación:** `subir.py <fecha> [shorts]` (privado; `autorizar` si caduca el token), `descripcion.py`,
   `plataforma.py`, `apto_anuncios.py`, `comenta.py` (cron horario), `notifica.py`, `analitica.py`, `informe_semanal.py`.
 - **Pendientes conocidos:** consulta con un abogado de propiedad intelectual antes de monetizar; avatar y banner EH a mano;
-  «Vídeo relacionado» y miniatura de cada Short a mano en Studio; TikTok aparcado (solo API oficial, en borrador).
+  «Vídeo relacionado» de los Shorts y fijar comentarios, sin API (no se pueden automatizar); TikTok aparcado (solo API oficial, en borrador).

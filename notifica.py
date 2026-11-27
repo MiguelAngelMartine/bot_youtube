@@ -107,7 +107,7 @@ def aviso_shorts(dia_txt, hechos):
     api = f"https://api.telegram.org/bot{tok}"
     prog = any(h.get("publica") for h in hechos)
     txt = [f"📱 El Hoyformativo · {dia_txt}: {len(hechos)} Shorts subidos a YouTube "
-           + ("y PROGRAMADOS (se publican solos a la hora indicada):" if prog else "como PRIVADOS, para revisar y publicar:")]
+           + ("y PROGRAMADOS, con su portada de miniatura (se publican solos a la hora indicada):" if prog else "como PRIVADOS, para revisar y publicar:")]
     txt += [f"{k}. {h['titulo']}\n{h['studio']}" + (f"\n🕒 Se publica solo el {h['publica']} (cámbialo en Studio si quieres)"
                                                       if h.get("publica") else "") + (f"\n({h['aviso']})" if h.get("aviso") else "")
             for k, h in enumerate(hechos, 1)]
@@ -115,9 +115,8 @@ def aviso_shorts(dia_txt, hechos):
     yl = Path(__file__).parent / "dia" / dia_txt[:10] / "youtube.json"
     if yl.exists():
         largo = _j.loads(yl.read_text(encoding="utf-8"))
-        txt.append(f"🔗 Al publicar cada Short, en «Vídeo relacionado» elige el vídeo largo del día (publícalo antes):\n"
-                   f"«{largo.get('titulo', '')}»\n{largo.get('url', '')}\n"
-                   f"El comentario del canal con el enlace se pone solo cuando el Short esté público.")
+        txt.append(f"🔗 El comentario del canal con el enlace al largo («{largo.get('titulo', '')}») se pone solo cuando "
+                   f"el Short esté público. No tienes que hacer nada; si quieres parar alguno, dímelo antes de su hora.")
     envia(api, "sendMessage", data={"chat_id": chat, "text": "\n\n".join(txt)[:4000]}, timeout=30)
     for k, h in enumerate(hechos, 1):
         portada = Path(h["portada"])

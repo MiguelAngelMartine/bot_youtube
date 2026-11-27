@@ -267,7 +267,8 @@ def subir_shorts(dia_txt, solo=None):
         maximo = int(json.loads((dia / "encargo.json").read_text(encoding="utf-8")).get("num_shorts", MAX_SHORTS))
     except (OSError, ValueError, TypeError):
         pass
-    shorts = sorted(carpeta.glob("short_*.json"), key=lambda f: int(re.sub(r"\D", "", f.stem)))
+    shorts = sorted((f for f in carpeta.glob("short_*.json") if re.fullmatch(r"short_\d+", f.stem)),   # 27-nov-2026: sin
+                    key=lambda f: int(re.sub(r"\D", "", f.stem)))   # los _tramos/_fondo.json, que se comían el tope
     if not solo:                                         # 22-nov-2026: si se pide uno concreto, el tope no lo deja fuera
         shorts = shorts[:maximo]
     shorts = [f for f in shorts if f.with_suffix(".mp4").exists()]
