@@ -592,7 +592,22 @@ class Jornada:
                 self.py("notifica.py", self.f, "--error", "no se pudo subir el vídeo largo a YouTube (mira publicacion.log)")
                 return False
             self.parte("vídeo largo subido a YouTube y programado (aviso por Telegram)")
+        self.sube_shorts()
         return True
+
+    def sube_shorts(self):
+        """27-nov-2026 (el usuario: «primero se sube el vídeo largo y después los Shorts, con el enlace al largo»): con el
+        largo ya en YouTube, los Shorts renderizados que falten se suben programados después de él, con su enlace."""
+        carpeta = self.dia / "shorts"
+        if not (self.dia / "youtube.json").exists() or (carpeta / "youtube.json").exists():
+            return
+        if not any(carpeta.glob("short_*.mp4")):
+            return
+        if self.py("subir.py", self.f, "shorts", log="shorts.log", timeout=3600) != 0:
+            self.parte("NO SE PUDIERON SUBIR LOS SHORTS A YOUTUBE")
+            self.py("notifica.py", self.f, "--error", "no se pudieron subir los Shorts a YouTube (mira shorts.log)")
+        else:
+            self.parte("Shorts subidos a YouTube, programados después del largo y con su enlace (aviso por Telegram)")
 
     def shorts(self):
         # 16-nov-2026 (petición del usuario): los Shorts se hacen y suben ANTES que el vídeo largo. Solo dependen del
@@ -735,12 +750,9 @@ class Jornada:
             shorts_dia.hoja(carpeta)
             # 27-nov-2026 (el usuario): la portada va en el fotograma 1 y de miniatura; se suben SOLOS y programados
             # en sus franjas (aviso por Telegram con enlaces y horas). Sustituye al OK previo del 21-nov-2026.
+            # 27-nov-2026 (el usuario): se suben DESPUÉS del largo (en publicacion), con su enlace y en franjas posteriores
             self.py("portada_short.py", self.f, *hechos, log="shorts.log", timeout=900)
-            if self.py("subir.py", self.f, "shorts", log="shorts.log", timeout=3600) != 0:
-                self.parte("NO SE PUDIERON SUBIR LOS SHORTS A YOUTUBE")
-                self.py("notifica.py", self.f, "--error", "no se pudieron subir los Shorts a YouTube (mira shorts.log)")
-            else:
-                self.parte(f"{len(hechos)} Shorts subidos a YouTube y programados (aviso por Telegram)")
+            self.parte(f"{len(hechos)} Shorts listos con su portada; se suben después del vídeo largo")
         else:
             self.parte("hoy sin Shorts (fallo al renderizar)")
         return True

@@ -116,11 +116,15 @@ def personas_dibujadas(dia):
                    if d.get("persona") and (dia / "vinetas" / f"{k}.jpg").exists()})
 
 
-FRANJAS = {"short": ["14:00", "18:30", "21:30"], "largo": ["20:00"]}   # hora de Madrid (23-nov-2026)
+# 27-nov-2026 (el usuario: «primero se sube el vídeo largo y después los Shorts, espaciados según la mejor hora»): el largo,
+# a la hora de la comida (14:00, pico de móvil en España) y los Shorts después, por la tarde y la noche (18:30, 21:30,
+# 22:45), siempre al menos 1 h después del largo para que su enlace ya funcione. Hora de Madrid.
+FRANJAS = {"short": ["18:30", "21:30", "22:45"], "largo": ["14:00"]}
+TRAS_LARGO_MIN = 60
 PROGRAMAR = "--sin-programar" not in sys.argv
 
 
-def hueco(tipo):
+def hueco(tipo, despues=None):
     """23-nov-2026 (el usuario aprueba publicar escalonado y en las horas de más audiencia): la primera franja libre
     (dentro de 7 días, al menos 40 min después de ahora) para `tipo` («short» o «largo»), sin repetir franja. Devuelve
     (iso_utc, texto_madrid) o (None, "") si no se programa. Registro: archivo/programacion.json."""
@@ -132,6 +136,12 @@ def hueco(tipo):
     reg = RAIZ / "archivo" / "programacion.json"
     usados = json.loads(reg.read_text(encoding="utf-8")) if reg.exists() else {}
     ahora = datetime.now(mad) + timedelta(minutes=40)
+    if despues:                                         # 27-nov-2026: los Shorts, después del largo del día
+        try:
+            t_l = datetime.strptime(despues, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).astimezone(mad)
+            ahora = max(ahora, t_l + timedelta(minutes=TRAS_LARGO_MIN - 1))
+        except ValueError:
+            pass
     for d in range(8):
         dia = (ahora + timedelta(days=d)).date()
         for hm in FRANJAS[tipo]:
@@ -144,7 +154,7 @@ def hueco(tipo):
                 dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
                 return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), f"{dias[t.weekday()]} {t:%d} a las {t:%H:%M}"
         if tipo == "largo" and d == 0:                # 24-nov-2026: el largo es del día: si su franja ya pasó, hoy mismo
-            t = (ahora + timedelta(minutes=14 - ahora.minute % 15)).replace(second=0, microsecond=0)
+            t = (ahora + timedelta(minutes=(15 - ahora.minute % 15) % 15)).replace(second=0, microsecond=0)   # al cuarto
             if t.hour < 23 and f"{tipo} {t:%Y-%m-%d %H:%M}" not in usados:
                 usados[f"{tipo} {t:%Y-%m-%d %H:%M}"] = True
                 reg.write_text(json.dumps(usados, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -224,7 +234,7 @@ def subir(dia_txt):
         avisos.append(f"listas sin actualizar ({type(e).__name__})")
     info = {"id": vid, "url": f"https://youtu.be/{vid}", "studio": f"https://studio.youtube.com/video/{vid}/edit",
             "estado": f"programado: {cuando_txt}" if cuando else "privado", "titulo": titulo, "avisos": avisos,
-            "sustituye_a": anterior, "publica": cuando_txt}
+            "sustituye_a": anterior, "publica": cuando_txt, "publica_iso": cuando}
     (dia / "youtube.json").write_text(json.dumps(info, ensure_ascii=False, indent=1), encoding="utf-8")
     try:                                                # 8-nov: lo publicado no se repite en 7 días
         import variedad
@@ -361,7 +371,7 @@ def subir_shorts(dia_txt, solo=None):
                   "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True}}
         if S.get("sintetico"):                          # persona real dibujada por IA: se declara (no afecta a ingresos)
             cuerpo["status"]["containsSyntheticMedia"] = True
-        cuando, cuando_txt = hueco("short")
+        cuando, cuando_txt = hueco("short", despues=largo.get("publica_iso"))
         if cuando:
             cuerpo["status"]["publishAt"] = cuando
         vid = _sube(yt, f.with_suffix(".mp4"), cuerpo)

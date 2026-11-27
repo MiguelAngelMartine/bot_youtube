@@ -59,7 +59,7 @@ Lleva un **parte** en `dia/<fecha>/parte_del_dia.md`: añade una línea con la h
    - **Shorts** (decisión del usuario del 5-nov-2026), siempre **después** de subir el vídeo largo, que va primero:
      - `.venv/bin/python shorts_dia.py <fecha>`: elige hasta 3 frases con gancho (o las que diga `num_shorts` en `encargo.json`) (comprobadas literales, de partidos distintos), renderiza un Short por frase con su portada y deja `dia/<fecha>/shorts/hoja.png` (~3 min). Si sale con 2, hoy no hay Shorts: anótalo en el parte y sigue (no gastes agentes en ello).
      - Mira `hoja.png` (una fila por Short): foto de la persona correcta, cita legible, nada tapado. Si un Short está mal, borra su `short_N.json` y su `short_N.mp4`.
-     - **Súbelos tú** (27-nov-2026): primero la portada `.venv/bin/python portada_short.py <fecha>` y luego `.venv/bin/python subir.py <fecha> shorts` (privados y programados; avisa por Telegram).
+     - **Súbelos tú, SIEMPRE DESPUÉS DEL LARGO** (27-nov-2026): primero la portada `.venv/bin/python portada_short.py <fecha>`; cuando el largo ya esté subido (`dia/<fecha>/youtube.json`), `.venv/bin/python subir.py <fecha> shorts` (programados después del largo y con su enlace; avisa por Telegram).
 8. **Archivo.** `documentalista` («archivo <fecha>»).
 
 ## Reglas
