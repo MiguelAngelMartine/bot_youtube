@@ -165,6 +165,7 @@ PRONUNCIA = {
 ESCRIBE = {
     "enterarais": "enterárais",
     "Ester": "Estér",          # 22-nov-2026: Ester Muñoz; el usuario elige la prueba B
+    "Chiringuito": "Chirin-guito",   # 28-nov-2026: decía «Chidinguito»/«Chilinguito»; el usuario elige la prueba C, SIEMPRE así
 }
 # Versión del procesado de la voz: entra en la clave de la caché. Se sube SOLO cuando cambia cómo se genera la voz (no al
 # añadir palabras al diccionario: esas entran en la clave de los trozos que las llevan).
