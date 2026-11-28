@@ -1089,18 +1089,48 @@ def short(fecha, n):
             return rep.get("quien")
         if nc in citas_medio or _n(S.get("cita")) == nc:      # sus frases (Shorts de «mejores frases») y su cita
             return quien
-        return quien_cita.get(nc)                             # 23-nov-2026: «quien_citas» {cita: persona} del guion
+        if nc in quien_cita:                                  # 23-nov-2026: «quien_citas» {cita: persona} del guion
+            return quien_cita[nc]
+        # 28-nov-2026 (el usuario: «en los Shorts de hoy solo sale el presentador»): el guion parte la cita comprobada
+        # en trozos («Van de patriotas» … «y el único que la ha hecho…») y ningún trozo era la cita entera. Un trozo de
+        # 2+ palabras que está LITERAL dentro de una cita de la que ya se sabe el dueño es de ese dueño (no se adivina).
+        if len(nc.split()) >= 2:
+            duenos = {q for c, q in conocidas_citas if f" {nc} " in f" {c} "}
+            if len(duenos) == 1:
+                return duenos.pop()
+        return None
     quien_cita = {_n(c): q for c, q in (S.get("quien_citas") or {}).items()}
+    conocidas_citas = [(_n(S.get("cita")), quien)] + [(c, quien) for c in citas_medio] + \
+        ([(_n(rep.get("cita")), rep.get("quien"))] if rep.get("cita") else []) + list(quien_cita.items()) + \
+        [(_n(g.get("cita")), g.get("quien")) for g in (S.get("segmentos") or []) if isinstance(g, dict) and g.get("cita")]
+    conocidas_citas = [(c, q) for c, q in conocidas_citas if c and q]
     tr = tramos_de(cuerpo, quien, conocidas, quien_de=quien_de)
     for g in tr:
         if g["tipo"] == "Q":
             g["medio"] = medio_cita.get(_n(g["cita"])) or fx(g["cita"]) or \
                 citas_medio.get(_n(g["cita"]), medios.get(g["quien"], ""))
-            cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos) or (S.get("cargo") if g["quien"] == quien else
-                                                                            rep.get("cargo", "")))
+            # 28-nov-2026 (fallo real: a Cayetana le salió «número tres», del archivo del 23-nov, cuando el Short del día y
+            # las noticias decían «número dos»): manda el cargo que trae el Short (sale de la noticia de hoy); el archivo,
+            # solo si el Short no lo trae.
+            propio = S.get("cargo") if g["quien"] == quien else (rep.get("cargo") if g["quien"] == rep.get("quien") else "")
+            if propio:
+                cargos[g["quien"]] = propio
+            cargos.setdefault(g["quien"], _cargo_de(g["quien"], cargos) or "")
     if cierre:
         tr.append({"tipo": "P", "di": cierre, "cierre": True})
     faltan = sin_imagen(tr)
+    # 28-nov-2026: aviso si una cita del guion se queda sin dueño (la lee el presentador y no sale el político)
+    dichas = {_n(g.get("cita")) for g in tr if g["tipo"] == "Q"}
+    sueltas = [c for c in re.findall(r"«([^»]+)»", cuerpo) if len(c.split()) >= MIN_PAL_CITA and _n(c) not in dichas]
+    if sueltas:
+        txt = (f"Short {n}: no sé quién dice {len(sueltas)} cita(s) y las lee el presentador sin el político: "
+               + "; ".join(f"«{c[:60]}»" for c in sueltas) + ". Falta «quien_citas» en el guion.")
+        print("AVISO:", txt)
+        try:
+            import notifica
+            notifica.aviso(fecha, "🗣️ " + txt)
+        except (SystemExit, Exception) as e:
+            print(f"(Telegram: {e})")
     _ordena_lados(tr)
     total, env = locuta_tramos(tr, tmp)
     total += 1.2

@@ -654,7 +654,7 @@ class Jornada:
             extra = (" Es un Short de LAS MEJORES FRASES de una sola persona (campo \"frases\"): salen TODAS sus frases "
                      "literales «», en ese orden, cada una con su contexto breve, sin declarar ganador ni valorar quién "
                      "estuvo mejor (NORMAS.md §3).") if mf else ""
-            self.claude("redactor", extra.strip() + f" Reescribe SOLO los campos \"voz\" y \"ambiente\" de {j.name} (un Short vertical de "
+            self.claude("redactor", extra.strip() + f" Reescribe SOLO los campos \"voz\", \"ambiente\" y \"quien_citas\" de {j.name} (un Short vertical de "
                         "25-40 s). Tono Vikingo ácido y desenfadado con coletillas y frases hechas (lee tu agente y "
                         "NORMAS.md (§4)). Usa SOLO el tema de ESTE Short (su gancho, cita, contexto y réplica); "
                         "PROHIBIDO colar material de otros Shorts o bloques (bleed). Escribe para el formato PRESENTADOR "
@@ -674,7 +674,10 @@ class Jornada:
                         "expresión coloquial, metáfora, insulto político o sorpresa (NORMAS.md §4). CONTEXTO EN LOS CRUCES (23-nov-2026, el usuario: «hay frases buenas que, sin contexto, no parecen tener conexión con lo que se está contando»): cada cita tiene que entenderse SOLA para quien no sabe nada de la noticia. Justo antes o justo después, una frase corta dice DE QUÉ habla (el tema concreto: «sobre su voto en blanco», «sobre la censura en Pinto») y, si hace falta, a qué responde. El puente de un cruce puede llevar el tema («Sobre el voto en blanco, Bono le pide:») sin pasar de 12 palabras. Mejor 2-3 citas bien explicadas que 5 sueltas (45 s como mucho); si una frase buena necesita demasiado contexto, cámbiala por otra. Antes de terminar, relee el guion como alguien que no sabe nada: si alguna cita no se entiende, añádele su contexto o quítala. En «ambiente», SOLO sitios relacionados con la política (Senado, Congreso, "
                         "Moncloa, palacios de congresos, sedes de partidos, parlamentos, ayuntamientos, ministerios, salas de "
                         "prensa) o paisajes urbanos sobrios; nunca playas, puertos, terrazas ni calles turísticas. No toques "
-                        "las citas «» ni los demás campos.",
+                        "las citas «» ni los demás campos. En \"quien_citas\" (28-nov-2026: sin él, el político no sale en "
+                        "pantalla y la cita la lee el presentador) pon {\"cita tal cual va entre «» en voz\": \"Nombre "
+                        "Apellido de quien la dijo\"} para CADA cita «» de voz, comprobando en el material quién la "
+                        "dijo; si no consta quién, esa cita fuera.",
                         j.relative_to(RAIZ), modelo="opus", motivo="el guion de los Shorts siempre lo escribe Opus")
         import shorts_guion as SG                          # 19-nov (usuario: «estás repitiendo partes»): control medible
         for j in jsons:
