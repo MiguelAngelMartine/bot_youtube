@@ -36,6 +36,10 @@ ROJO, AMARILLO = (200, 16, 46), (255, 205, 0)
 MIN_PAL_CITA = 5          # citas más cortas («vivienda», «que es el PP») se quedan en la narración
 PAUSA = {"P>Q": 0.55, "Q>puente": 0.25, "puente>Q": 0.3, "Q>Q": 0.4, "Q>P": 0.6, "seccion": 0.5}
 TRANS = 0.4               # duración de entradas y salidas
+# 28-nov-2026 (PRUEBA, el usuario: «centrarnos en el aspecto visual, de forma provisional y para pruebas sin tocar nada de
+# lo estandarizado»): EH_PRUEBA_VISUAL=1 activa subtítulos por frases con franja, cambio de pose y plano del presentador en
+# los tramos largos y la etiqueta de categoría fuera de la zona de iconos de YouTube. Apagado, todo queda como estaba.
+PRUEBA_VISUAL = os.environ.get("EH_PRUEBA_VISUAL") == "1"
 
 
 # ---------------------------------------------------------------- catálogo de imágenes
@@ -643,7 +647,53 @@ def pantalla(txt):
     return txt
 
 
+def _subtitulo_frases(g, t, ancho, tam):
+    """PRUEBA_VISUAL: se ve la frase en la que va la voz (corte en la puntuación, 7 palabras como mucho, 2 líneas),
+    sobre una franja oscura redondeada; la palabra que suena, en amarillo."""
+    f = fuente("Inter-Black.ttf", tam)
+    pal = pantalla(g["di"]).split()
+    k = _palabra_actual(g, t)
+    frases, ini = [], 0                                 # frases por la puntuación fuerte; las de más de 8 palabras se
+    for i, w in enumerate(pal):                         # parten en trozos parecidos, antes de un nexo si lo hay cerca
+        if w[-1] in ".:;?!" or i == len(pal) - 1:
+            frases.append((ini, i + 1)); ini = i + 1
+    NEXOS = {"y", "e", "o", "que", "a", "de", "con", "por", "para", "en", "pero", "porque", "como", "sin", "le", "les"}
+    trozos = []
+    for a0, b0 in frases:
+        n = b0 - a0
+        partes = -(-n // 7) if n > 8 else 1
+        cortes = []
+        for q in range(1, partes):
+            c = a0 + round(n * q / partes)
+            for d_ in (0, 1, -1, 2, -2):               # el corte, antes de un nexo o después de una coma
+                cc = c + d_
+                if a0 < cc < b0 and (_n(pal[cc]) in NEXOS or pal[cc - 1][-1] == ","):
+                    c = cc
+                    break
+            cortes.append(c)
+        lim = [a0] + cortes + [b0]
+        trozos += [(lim[j], lim[j + 1]) for j in range(len(lim) - 1)]
+    a, b = next(((a, b) for a, b in trozos if k - 1 < b), trozos[-1])
+    lineas = envuelve(" ".join(pal[a:b]), f, ancho - 60)
+    lh = int(tam * 1.32)
+    anchos = [f.getlength(ln) for ln in lineas]
+    c = Image.new("RGBA", (int(max(anchos)) + 60, lh * len(lineas) + 34), (0, 0, 0, 0))
+    d = ImageDraw.Draw(c)
+    d.rounded_rectangle([0, 0, c.width - 1, c.height - 1], radius=22, fill=(8, 12, 24, 175))
+    iw, y = a, 14
+    for ln, an in zip(lineas, anchos):
+        x = (c.width - an) / 2
+        for w in ln.split():
+            d.text((x, y), w, font=f, fill=AMARILLO if iw == k - 1 else "white", stroke_width=max(3, tam // 14),
+                   stroke_fill=(10, 10, 20))
+            x += f.getlength(w + " "); iw += 1
+        y += lh
+    return c
+
+
 def subtitulo(g, t, ancho, tam, max_lineas=3):
+    if PRUEBA_VISUAL:
+        return _subtitulo_frases(g, t, ancho, tam)
     f = fuente("Inter-Black.ttf", tam)
     lineas = envuelve(pantalla(g["di"]), f, ancho)
     k = _palabra_actual(g, t)
@@ -752,6 +802,20 @@ class Escena:
         if pres_ini is not None:
             V.append(("P", "izq", pres_ini, self.total + 5, pose))
         self.V = V
+        # PRUEBA_VISUAL: en un tramo del presentador de más de 6 s, corte limpio de pose y plano al acabar una frase
+        # (tramos de 2,5 s como mínimo); sin zoom ni fundido, nunca dos figuras a la vez
+        self.cortes_p = []
+        if PRUEBA_VISUAL:
+            for g in tr:
+                if g["tipo"] != "P" or g.get("cierre") or g.get("puente") or g["t1"] - g["t0"] <= 6:
+                    continue
+                ult = g["t0"]
+                pal = g.get("pal") or []
+                for j, (w, a, b) in enumerate(pal[:-1]):
+                    c = pal[j + 1][1]
+                    if w[-1:] in ".:?!" and c - ult >= 2.5 and g["t1"] - c >= 2.5:
+                        self.cortes_p.append(c); ult = c
+            print("PRUEBA_VISUAL cortes del presentador:", [round(c, 1) for c in self.cortes_p])
         self.grupos = grupos
 
     def _fig(self, clave, pose):
@@ -820,6 +884,10 @@ class Escena:
             a = min(ease((t - t_in) / TRANS), 1 - ease((t - t_out) / TRANS))
             if a <= 0.01:
                 continue
+            plano = 1.0
+            if clave == "P" and self.cortes_p:
+                kc = sum(1 for c in self.cortes_p if t_in < c <= t)
+                pose, plano = pose + kc * 2, (1.25 if kc % 2 else 1.0)
             fig = self._fig(clave, pose)
             en_cruce = clave != "P" and any(self.cruce.get(g["grupo"]) for g in self.tr
                                             if g["tipo"] == "Q" and g["quien"] == clave and g["t0"] - 0.4 <= t_out)
@@ -829,7 +897,7 @@ class Escena:
             # pantalla; solo se mueven al entrar y salir (desliz + fundido). Nada de «respirar» ni de balanceo al hablar.
             # 23-nov-2026 (el usuario: «todos los personajes del mismo tamaño»): UNA escala para todo el vídeo, la misma
             # para el presentador y para cada personaje, solo o en un cruce
-            s = self._escala_video()
+            s = self._escala_video() * plano
             if s != 1.0:
                 k_ = (clave, pose % len(self.poses) if clave == "P" else 0, s)
                 if k_ not in self.sombras:
@@ -1158,6 +1226,9 @@ def short(fecha, n):
     # cita sale en el fondo de su persona y el presentador en el fondo general (con fundido al cambiar)
     fq = {k: IMG / "Fondos" / v for k, v in (S.get("fondos_quien") or {}).items() if (IMG / "Fondos" / v).exists()}
     fondos_tr = [fq.get(g.get("quien"), fondo) if g["tipo"] == "Q" else fondo for g in tr]
+    for k_, g in enumerate(tr):                        # el puente entre dos citas de la misma persona (sigue en pantalla)
+        if k_ and g.get("puente"):                     # se queda en su fondo: no vuelve al general debajo de ella
+            fondos_tr[k_] = fondos_tr[k_ - 1]
     esc = Escena(tr, total, env, 1080, 1920, fondos_tr, cargos, medios, vertical=True)
     dibujados = sorted(q for q, f in esc.figs.items() if f is not None)
     if dibujados:                                      # personas reales ilustradas: subir.py lo declara (contenido sintético)
@@ -1165,6 +1236,13 @@ def short(fecha, n):
         (dia / "shorts" / f"short_{n}.json").write_text(json.dumps(S, ensure_ascii=False, indent=1), encoding="utf-8")
     cab = SH._cabecera(fecha, S.get("categoria", ""))
     kick = SH._kicker((S.get("kicker") or quien).upper())
+    if PRUEBA_VISUAL:                                  # la etiqueta y la fecha bajan a la fila del kicker, a la derecha:
+        eti = cab.crop((1080 - 420, 40, 1080, 145))    # arriba a la derecha las tapan los iconos de YouTube
+        limpia = cab.copy()
+        ImageDraw.Draw(limpia).rectangle([1080 - 420, 30, 1080, 150], fill=(0, 0, 0, 0))
+        cab = Image.new("RGBA", (1080, 150 + 112), (0, 0, 0, 0))
+        cab.alpha_composite(limpia, (0, 0))
+        cab.alpha_composite(eti, (1080 - 420, 150))
     t_fin = next((g["t0"] for g in tr if g.get("cierre")), total)
     cortes = [g["t0"] - 0.3 for g in tr[1:] if g["tipo"] == "Q" or tr[tr.index(g) - 1]["tipo"] == "Q"]
     # 22-nov-2026 (el usuario): los personajes y el presentador entran y salen SIN efectos de sonido
