@@ -282,8 +282,9 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
         if antes:
             out.append({"tipo": "P", "di": antes})
         di = m.group(0).strip()
-        if not di.endswith((".", "»")):
-            di = di.rstrip(",;:") + "»" if not di.endswith("»") else di
+        if not di.endswith((".", "»")):                   # 28-nov-2026: «…», salía «…»» (se le añadía otra comilla)
+            di = di.rstrip(",;:")
+            di = di if di.endswith("»") else di + "»"
         out.append({"tipo": "Q", "di": di.rstrip(",;:") if di.endswith(("»,", "»;", "»:")) else di, "quien": quien,
                     "cita": cita})
         pos = m.end()
