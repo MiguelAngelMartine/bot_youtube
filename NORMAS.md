@@ -1,6 +1,6 @@
 # GUÍA ÚNICA DE *El Hoyformativo* — normas que se cumplen SIEMPRE
 
-**Última actualización: 27-nov-2026 (estilo modelo «ironía enlazada»: la pulla va dentro de la frase que la provoca, con conectores, nunca suelta; las imágenes con fondo se recortan solas con `recorta_imagenes.py`; guion como un relato fluido y conexo, nunca un telegrama; primero el largo a las 14:00 y después los Shorts a las 20:00 y 22:00 con el enlace al largo; brief de miniaturas: caras grandes, 2-4 palabras, comillas solo si es literal, cuatro diseños y juez con `miniatura_pro.py`; publicación AUTOMÁTICA: el largo y los Shorts se suben solos, privados y programados en su franja, con aviso por Telegram, sin esperar el OK; los Shorts llevan portada propia en el primer fotograma y de miniatura; 26-nov: los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
+**Última actualización: 28-nov-2026 (el guion es la «partitura» de Tristán: signos medidos con Whisper large-v3 — punto y nexo para enlazar, nada de comas tras incisos, dos puntos para las citas, frases de 15 palabras entre pausas —; control de voz con Whisper large-v3 y uniones entre frases; 27-nov: estilo modelo «ironía enlazada»: la pulla va dentro de la frase que la provoca, con conectores, nunca suelta; las imágenes con fondo se recortan solas con `recorta_imagenes.py`; guion como un relato fluido y conexo, nunca un telegrama; primero el largo a las 14:00 y después los Shorts a las 20:00 y 22:00 con el enlace al largo; brief de miniaturas: caras grandes, 2-4 palabras, comillas solo si es literal, cuatro diseños y juez con `miniatura_pro.py`; publicación AUTOMÁTICA: el largo y los Shorts se suben solos, privados y programados en su franja, con aviso por Telegram, sin esperar el OK; los Shorts llevan portada propia en el primer fotograma y de miniatura; 26-nov: los rasgos de la cara de los políticos son intocables: nada de posturas generadas por IA que cambien la cara; formato «presentador» SIEMPRE con personajes estáticos; «¡Virgen del camino seco!» vetada; catálogo de políticos con subcarpetas y nombres «NombreApellido»; 21-nov: control de calidad de voz y guion local; la voz no cambia de ritmo en coletillas; voz «A3 + B3»: temperatura 1,2 y diccionario SAPI; «mitin/mitines» fuera de la lista negra al ir en el diccionario; cierre de los Shorts como antes; nunca estirar la voz grabada; «enterarais» escrita con tilde para la voz; pausa al cerrar y abrir las citas de la narración; voz en LECTURA ENTERA como estándar: el guion gestiona las pausas; globos de cita solo con su personaje y nunca superpuestos; Short de cruce de declaraciones por encargo; 22-nov: voz +8 % de velocidad salvo el cierre; «mitin» fuera del diccionario; el Short de cruce modelo como norma; nada se solapa nunca: relevo limpio en cada cambio de escena; sin efectos de sonido al entrar o salir; nunca se adivina quién dice una cita; X como fuente de los cruces, también en el largo; un cruce son varias voces sobre la misma historia, sin exigir respuesta directa ni equilibrio; «Ester» se le escribe «Estér» a la voz; largo de 2 minutos como mucho con el cruce más duro primero; miniatura «duelo»; etiquetas y hashtags con las búsquedas reales de YouTube).**
 
 Esta es **la única guía del canal**. La siguen todos por igual: Claude (sesiones y agentes de `.claude/agents/`), Gemini y
 freellmpool en `jornada.py`/`agente_gemini.py`, y cualquier script que genere guion, imagen o vídeo.
@@ -239,6 +239,40 @@ fútbol, o Mourinho no lee las estadísticas. Como estaba lanzado, le preguntaro
 tierno: «Es problema suyo, no mío». Y ya puesto, bromeó con que las elecciones no le afectan porque no tiene españoles, aunque
 enseguida se corrigió: «Solo tenemos tres o cuatro». En realidad tiene seis, así que en eso de contar, la máquina y él van
 empatados. ¿Con quién te quedas? Te leo en comentarios.
+
+### Escribir para la voz de Tristán: la partitura (28-nov-2026, el usuario: «el guionista tiene que hacer un esfuerzo máximo para entender la voz que va a leer el guion, para darle desde el guion los tiempos necesarios para que las entonaciones y la conexión entre frases sean naturales», sin perder ironía, acidez ni sarcasmo)
+El guion es la **partitura** de Tristán: la voz lee de corrido y entona solo con lo que el guion le da. Medido con Whisper
+large-v3 y el tono de la voz (`voz_calidad.uniones`, 28-nov-2026), Tristán hace esto con cada signo:
+- **Punto:** para 0,6-0,9 s y baja el tono (3-5 semitonos): cierra bien. Es el mejor sitio para respirar; el enlace lo
+  pone la **palabra** que abre la frase siguiente («Y José Álvarez…», «Pero Pedrerol…», «Y remató…»), no una coma.
+- **Coma normal:** para 0,25-0,35 s y deja el tono **en el aire** (sube): bien para enumerar o para «Desde Barcelona, …».
+- **Coma que cierra un inciso o que va justo antes de «porque», «qué casualidad», «se vino…»:** Tristán **baja como si
+  fuera un punto** (4-7 semitonos) y la frase se corta: suena a telegrama. Medido: «Pero Pedrerol, lejos de calmarse, se
+  vino arriba con la ironía, porque si tan importantes…» y «no se calmó, se vino arriba». Un inciso como mucho por frase y
+  sin coletilla detrás; si hay dos ideas, punto y nexo.
+- **Dos puntos:** pausa clara y la cita entra con fuerza; es la mejor forma de presentar una cita o una explicación
+  («se vino arriba: tan importantes eran los informes, que…»).
+- **Más de unas 15 palabras entre pausas** o una idea larga tras dos puntos: Tristán acelera (7-9 sílabas por segundo) y
+  se oye atropellado. Pártelo o dale una coma donde respiraría una persona.
+- **Cita que empieza por «Que», «Cómo», «Cuándo», «Quién»** tras dos puntos: a veces la lee como **pregunta** («¿Qué
+  hubieran esperado…?»). Dale aire dentro con comas que marquen cómo se dijo («Que hubieran esperado un año, al menos,
+  para disimular»: las palabras no se tocan) o preséntala dentro de la frase.
+- **Remate de una sola palabra o frase muy corta en medio** («se vino arriba.»): sale más rápido que el resto; mejor
+  dentro de una frase con su consecuencia.
+- **Exclamación irónica corta al final de la frase** («…justo al irse Negreira, qué casualidad.»): Tristán la exclama
+  sola y suena a sorna; es la forma de meter la pulla sin pregunta en el cuerpo.
+- **Palabras que traga** (Whisper las oye con poca seguridad, p. ej. «justo cuando» tras una frase larga): cambia el orden o
+  la palabra («justo al irse Negreira»).
+**Control:** cada locución pasa por `voz_calidad.py` con **Whisper large-v3** (el de más calidad; tarda unos 6 minutos por
+Short) más fonemas y tono: avisa de «coma que suena a punto», «punto comido», «corte sin signo», tramos sin respirar,
+atropellados y cambios de ritmo, y el guionista lo arregla **en el guion**. Modelo, el Short del Chiringuito contra el Barça
+(28-nov-2026), que pasó de cuatro cortes de entonación y un remate leído como pregunta a ninguno:
+«No hay una mentira, hay una realidad: el Barça pagó al vicepresidente arbitral durante unos años». Así abrió fuego Pedrerol
+en El Chiringuito. Y José Álvarez, que en esa mesa juega de central del Barça, despejó como pudo: «A la empresa que hacía
+informes, no es lo mismo». Pero Pedrerol, lejos de calmarse, se vino arriba: tan importantes eran los informes, que dejaron
+de pagarlos justo al irse Negreira, qué casualidad. Y remató con sorna: «Que hubieran esperado un año, al menos, para
+disimular». Desde Barcelona, Sport le devuelve hoy la pelota con un titular: «Florentino Pérez no es guionista de El
+Chiringuito». ¿Quién escribe el guion? Te leo en comentarios.
 
 ### Paleta de coletillas y chascarrillos (lista del usuario; adaptar pronombres al contexto, ritmo normal, sin tacos)
 **Sin exclamaciones** (24-nov-2026, el usuario: «para que la voz no las lea distinto al resto»): se escriben como frase normal, con punto; el montaje quita los «¡!» de cualquier coletilla de la paleta (`coletillas.sin_exclamaciones`), nunca los de las citas literales.

@@ -9,7 +9,7 @@ solo entonces se monta el vídeo.
 Uso:  from prevuelo_voz import revisa;  v = revisa(texto)  -> {"ok": bool, "problemas": [...], "oido": str}
 CLI:  python prevuelo_voz.py <fecha>   -> revisa el largo y los Shorts, deja dia/<fecha>/calidad/prevuelo_voz.md
 21-nov-2026 (el usuario: «100 % gratuito», y que la voz suene lo más humana posible): el oído principal es voz_calidad.py
-(local: fonemas wav2vec2 + espeak, Whisper small, ritmo y entonación) sobre la locución por tramos tal como sale en el
+(local: fonemas wav2vec2 + espeak, Whisper large-v3 desde el 28-nov-2026, ritmo, entonación y uniones entre frases) sobre la locución por tramos tal como sale en el
 vídeo. Gemini queda como oído extra cuando tiene cuota; OpenAI (de pago) ya no se usa.
 """
 from __future__ import annotations
@@ -195,7 +195,7 @@ def _whisper_citas(wf, texto):
 
 def revisa(texto, auto_veta=False):
     """CONTROL DE CALIDAD DE VOZ Y GUION (21-nov-2026): genera la locución como sale en el vídeo y la escucha con el oído
-    LOCAL Y GRATUITO de voz_calidad (fonemas, Whisper small, ritmo y entonación). Gemini, si tiene cuota, es un oído más.
+    LOCAL Y GRATUITO de voz_calidad (fonemas, Whisper large-v3, ritmo, entonación y uniones). Gemini, si tiene cuota, es un oído más.
     Devuelve {ok, problemas, en_citas, oido}: «problemas» se arreglan reescribiendo el guion (palabra, pausa o frase);
     «en_citas» no se pueden reescribir (cita literal o nombre propio) y se avisan."""
     import voz_calidad as VC

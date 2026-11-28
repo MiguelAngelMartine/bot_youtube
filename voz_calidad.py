@@ -3,7 +3,7 @@ de la voz Y del guion: la voz lee lo que el guion escribe, así que lo que suena
 una coma, partir una frase). 100 % gratis y local (sin APIs):
   1) PRONUNCIACIÓN por fonemas: wav2vec2 fonético (facebook/wav2vec2-xlsr-53-espeak-cv-ft) oye los sonidos uno a uno, sin
      «corregir» palabras como Whisper; espeak-ng (espeakng-loader) dice cómo deberían sonar. Se comparan palabra a palabra.
-  2) Whisper «small» con nota de seguridad por palabra: las que oye con poca seguridad, dudosas.
+  2) Whisper «large-v3» (28-nov-2026, el de más calidad) con nota de seguridad por palabra: las que oye con poca seguridad, dudosas.
   3) RITMO y ENTONACIÓN (con los tiempos de Whisper y el tono con librosa.pyin): tramos largos sin respirar, tramos con la
      entonación plana (de robot), velocidad atropellada o lenta y pausas raras a mitad de frase. Propone DÓNDE poner la pausa.
 Uso:  from voz_calidad import analiza;  r = analiza(wav, texto)  -> {"problemas": [...], "en_citas": [...], "medidas": {...}}
@@ -21,7 +21,7 @@ import numpy as np
 
 RAIZ = Path(__file__).parent
 MODELO_FONEMAS = "facebook/wav2vec2-xlsr-53-espeak-cv-ft"
-WHISPER = "small"
+WHISPER = "large-v3"     # 28-nov-2026 (el usuario: «aunque tarde un poco más, Whisper al nivel más alto de calidad»). Antes, small.
 
 # Umbrales (calibrados el 21-nov-2026 con frases buenas del canal y con «ladrillazo va, ladrillazo viene», que sonaba mal).
 PER_MAL = 0.34          # error de fonemas por palabra a partir del cual la palabra «no se dice como se escribe»
@@ -212,9 +212,13 @@ def ritmo(y, texto, pals):
     dudosas = [{"texto": w.word.strip(), "prob": round(w.probability, 2), "t": round(w.start, 2)}
                for w in ws if w.probability < PROB_DUDOSA and len(re.sub(r"\W", "", w.word)) >= 4]
     # tramos de voz seguida (entre pausas)
+    # 28-nov-2026: las pausas se miden en el audio (Whisper large estira las palabras y tapa los huecos)
+    pausa_tras, fin_de = _pausas_tras(y, ws)
+    vuelve = dict(_pausas_tras.vuelve)
+    idx = {id(w): k for k, w in enumerate(ws)}
     tramos, cur = [], []
     for i, w in enumerate(ws):
-        if cur and w.start - cur[-1].end >= PAUSA_MIN:
+        if cur and pausa_tras.get(i - 1, 0.0) >= PAUSA_MIN:
             tramos.append(cur); cur = []
         cur.append(w)
     if cur:
@@ -223,6 +227,11 @@ def ritmo(y, texto, pals):
     problemas, medidas = [], []
     for tr in tramos:
         t0, t1 = tr[0].start, tr[-1].end
+        k0, k1 = idx[id(tr[0])] - 1, idx[id(tr[-1])]   # el tramo va de silencio a silencio, medido en el audio
+        if k0 in vuelve:
+            t0 = vuelve[k0]
+        if k1 in fin_de:
+            t1 = fin_de[k1]
         dur = max(0.01, t1 - t0)
         texto_tr = "".join(w.word for w in tr).strip()
         sil = sum(_silabas(w.word) for w in tr) / dur
@@ -258,13 +267,130 @@ def ritmo(y, texto, pals):
                                   "pausa_tras": None})
     # pausas largas a mitad de frase (donde el guion no tiene signo)
     con_signo = {_sin_tildes(p["w"].lower()) for p in pals if p["signo"]}
-    for a_, b_ in zip(ws, ws[1:]):
-        hueco = b_.start - a_.end
+    for i_, (a_, b_) in enumerate(zip(ws, ws[1:])):
+        hueco = pausa_tras.get(i_, 0.0)
         prev = _sin_tildes(re.sub(r"[^\w]", "", a_.word.lower()))
         if hueco > PAUSA_RARA and not re.search(r"[.,;:!?…]$", a_.word.strip()) and prev not in con_signo:
             problemas.append({"tipo": "pausa rara", "texto": f"{a_.word.strip()} … {b_.word.strip()}", "t": round(a_.end, 2),
                               "detalle": f"silencio de {hueco:.1f} s a mitad de frase", "pausa_tras": None})
+    problemas += uniones(y, f0, voz, ws, texto)
     return " ".join(w.word.strip() for w in ws), dudosas, problemas, medidas
+
+
+# 28-nov-2026 (el usuario: «hay entonaciones que no quedan naturales; el guionista tiene que entender la voz para darle desde
+# el guion los tiempos, que las entonaciones y la conexión entre frases sean naturales»). UNIONES: en cada signo del guion se
+# mide lo que hace Tristán (pausa y caída del tono al final del tramo, en semitonos frente al cuerpo de la frase) y se compara
+# con lo que pide el signo: el punto cierra (cae y para), la coma deja la frase en el aire (no cae del todo, pausa corta), el
+# nexo sin signo va pegado. Lo que no cuadra es un corte de telegrama o una unión que suena forzada.
+CAIDA_FINAL = -2.0       # st: menos que esto es un final de frase (bajada de punto)
+CAIDA_COMA = -3.2        # st: una coma que cae tanto suena a punto (la frase se corta y lo siguiente suena suelto)
+PAUSA_PUNTO = (0.28, 0.95)
+PAUSA_COMA_MAX = 0.55
+PEGADO_MAX = 0.20        # sin signo: más hueco que esto entre nexo y frase rompe la unión
+
+
+def _st_tramo(f0, voz, t0, t1):
+    a, b = int(max(0, t0) / 0.02), int(t1 / 0.02)
+    f = f0[a:b][voz[a:b]] if b > a else np.array([])
+    return f[np.isfinite(f)] if len(f) else f
+
+
+def _signos_por_palabra(texto):
+    """[(palabra normalizada, signo tras ella)] en el orden del guion (las comillas no cuentan como signo)."""
+    out = []
+    for m in re.finditer(r"([\wÁÉÍÓÚÜÑáéíóúüñ'’-]+)([»\"”]*\s*[.,;:!?…]*)", texto):
+        sig = re.sub(r"[^.,;:!?…]", "", m.group(2))
+        out.append((_sin_tildes(m.group(1).lower()), sig[:1]))
+    return out
+
+
+def _silencios(y, sr=16000, umbral_db=-38, minimo=0.08):
+    """Tramos de silencio del audio (por energía; Whisper large alarga las palabras y tapa los huecos)."""
+    import librosa
+    rms = librosa.feature.rms(y=y, frame_length=640, hop_length=320)[0]
+    db = 20 * np.log10(np.maximum(rms, 1e-9) / max(rms.max(), 1e-9))
+    sil, out, ini = db < umbral_db, [], None
+    for i, v in enumerate(list(sil) + [False]):
+        if v and ini is None:
+            ini = i
+        elif not v and ini is not None:
+            if (i - ini) * 0.02 >= minimo:
+                out.append((ini * 0.02, i * 0.02))
+            ini = None
+    return out
+
+
+def _pausas_tras(y, ws):
+    """{índice de palabra: segundos de silencio tras ella} y {índice: instante en que se calla}, medidos en el audio.
+    Cada silencio va a UNA unión: si empieza en la primera mitad de una palabra de Whisper, es que Whisper ha estirado
+    esa palabra hacia atrás (el silencio va antes de ella); si no, va después."""
+    pausa_tras, fin_de = {}, {}
+    _pausas_tras.vuelve = {}
+    if not ws:
+        return pausa_tras, fin_de
+    for s0, s1 in _silencios(y):
+        j = next((k for k, w in enumerate(ws) if w.start <= s0 < w.end), None)
+        if j is None:
+            j = min(range(len(ws)), key=lambda k: abs(ws[k].end - s0))
+        elif (s0 - ws[j].start) < 0.5 * (ws[j].end - ws[j].start):
+            j -= 1
+        if j >= 0:
+            pausa_tras[j] = pausa_tras.get(j, 0.0) + (s1 - s0)
+            fin_de.setdefault(j, s0)
+            _pausas_tras.vuelve[j] = s1                 # cuándo vuelve a hablar tras esa palabra
+    return pausa_tras, fin_de
+
+
+def uniones(y, f0, voz, ws, texto):
+    import difflib
+    guion = _signos_por_palabra(texto)
+    oid = [_sin_tildes(re.sub(r"[^\w]", "", w.word.lower())) for w in ws]
+    sm = difflib.SequenceMatcher(None, [g[0] for g in guion], oid, autojunk=False)
+    casa = {}
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            for k in range(i2 - i1):
+                casa[i1 + k] = j1 + k
+    pausa_tras, fin_de = _pausas_tras(y, ws)
+    out = []
+    for i, (w, sig) in enumerate(guion[:-1]):
+        j = casa.get(i)
+        if j is None or j + 1 >= len(ws):
+            continue
+        if [g[0] for g in guion[i + 1:i + 3]] == ["te", "leo"]:
+            continue                                   # el cierre va en su propio trozo (voz.CIERRE): pausa puesta a mano
+        a, b = ws[j], ws[j + 1]
+        hueco = pausa_tras.get(j, 0.0)
+        fin_voz = fin_de.get(j, a.end)
+        cola = _st_tramo(f0, voz, fin_voz - 0.30, fin_voz)              # final del tramo
+        cuerpo = _st_tramo(f0, voz, fin_voz - 1.6, fin_voz - 0.30)       # lo de antes
+        if len(cola) < 4 or len(cuerpo) < 8:
+            continue
+        caida = float(12 * np.log2(np.median(cola) / np.median(cuerpo)))
+        sig_txt = f"«{a.word.strip()}{sig if sig and not a.word.strip().endswith(sig) else ''} {b.word.strip()}»"
+        det = f"pausa {hueco:.2f} s, tono final {caida:+.1f} semitonos"
+        if sig in (".", "!", "…", ":") and hueco < 0.12:
+            out.append({"tipo": "punto comido", "texto": sig_txt, "t": round(a.end, 2), "detalle": det, "pausa_tras": None,
+                        "arreglo": "la voz se come el punto y junta dos frases: parte en dos frases más cortas o une con "
+                        "un nexo que pida seguir («y», «porque», «así que»)"})
+        elif sig in (".", "!", "…") and caida > CAIDA_FINAL and hueco < PAUSA_PUNTO[0]:
+            out.append({"tipo": "punto sin cerrar", "texto": sig_txt, "t": round(a.end, 2), "detalle": det,
+                        "pausa_tras": None, "arreglo": "la frase no se cierra: más corta, o termina en una palabra fuerte"})
+        elif sig in (".", "!", "…") and hueco > PAUSA_PUNTO[1]:
+            out.append({"tipo": "corte largo", "texto": sig_txt, "t": round(a.end, 2), "detalle": det, "pausa_tras": None,
+                        "arreglo": "parón excesivo: une con coma y un nexo («y», «porque», «así que») si sigue el hilo"})
+        elif sig == "," and caida < CAIDA_COMA and hueco > 0.18:
+            out.append({"tipo": "coma que suena a punto", "texto": sig_txt, "t": round(a.end, 2), "detalle": det,
+                        "pausa_tras": None, "arreglo": "la voz cierra donde debería seguir: cambia el orden para que la "
+                        "coma no caiga tras un final fuerte, o une sin coma, o usa dos puntos si lo que sigue lo explica"})
+        elif sig == "," and hueco > PAUSA_COMA_MAX:
+            out.append({"tipo": "coma demasiado larga", "texto": sig_txt, "t": round(a.end, 2), "detalle": det,
+                        "pausa_tras": None, "arreglo": "la coma se alarga como un punto: acorta el inciso o quita la coma"})
+        elif not sig and hueco > PEGADO_MAX:
+            out.append({"tipo": "corte sin signo", "texto": sig_txt, "t": round(a.end, 2), "detalle": det, "pausa_tras": None,
+                        "arreglo": "la voz corta donde no hay signo: la frase es demasiado larga o el nexo queda lejos; "
+                        "pon la coma donde tú respirarías o reordena"})
+    return out
 
 
 def _donde_pausa(tr):
@@ -340,22 +466,24 @@ def analiza(wav, texto):
         else:
             (en_citas if pals[k]["cita"] else problemas).append(it)
     malas = {_sin_tildes(p["texto"].lower()) for p in pron}
-    for w, oyo in _diferencias(texto, oido):           # Whisper small oye otra palabra (p. ej., «ladrillazo» → «trilazova»)
+    for w, oyo in _diferencias(texto, oido):           # Whisper oye otra palabra (p. ej., «ladrillazo» → «trilazova»)
         if w in malas:
             continue
         malas.add(w)
-        it = {"texto": w, "tipo": "se oye otra cosa", "fuente": "whisper small",
+        it = {"texto": w, "tipo": "se oye otra cosa", "fuente": f"whisper {WHISPER}",
               "detalle": f"Whisper entiende «{oyo or '(nada)'}»", "alternativa": "otra palabra que la voz diga claro"}
         (en_citas if _en_cita(texto, w) else problemas).append(it)
     for d in dudosas:                                  # Whisper duda y los fonemas no lo han marcado ya
         w = _sin_tildes(re.sub(r"[^\w]", "", d["texto"].lower()))
         if w in malas:
             continue
-        it = {"texto": d["texto"], "tipo": "dudosa", "fuente": "whisper small",
+        it = {"texto": d["texto"], "tipo": "dudosa", "fuente": f"whisper {WHISPER}",
               "detalle": f"se entiende con poca seguridad ({d['prob']:.0%})", "alternativa": "otra palabra más clara"}
         (en_citas if _en_cita(texto, d["texto"]) else problemas).append(it)
     for p in prosodia:
-        if p["tipo"] == "cambio de ritmo":
+        if p.get("arreglo"):
+            p["alternativa"] = p.pop("arreglo")
+        elif p["tipo"] == "cambio de ritmo":
             p["alternativa"] = ("la voz cambia de velocidad aquí: vuelve a generar la voz (voz.py corrige el ritmo de cada "
                                 "trozo); si se repite, cambia la coletilla por otra o intégrala en la frase anterior")
         elif p["tipo"] in ("sin respirar", "plano", "atropellado") and p.get("pausa_tras"):
