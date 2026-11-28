@@ -241,6 +241,8 @@ def mezcla(voz_wav, salida, intro, outro, cortes, nivel_fondo=0.16, nivel_hablan
             suma(ef, bp, te, 0.13, pan=float(rng.uniform(-0.3, 0.3)))
         elif tipo == "clic":
             suma(ef, clic(), te, 0.35)
+        elif tipo == "golpe":                    # 28-nov-2026 (prueba visual): golpe grave para la palabra del remate
+            suma(ef, bombo(), te, 0.5)
         elif tipo == "campana":
             suma(ef, campana(), te, 0.22, pan=-0.2)
         else:

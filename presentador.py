@@ -591,9 +591,20 @@ def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None, co
     """cola_dx (23-nov-2026): con lado «abajo», dónde va la flecha: (px desde la izquierda) o (-px desde la derecha), para
     que apunte al personaje que habla (antes iba siempre a la izquierda y el globo de la derecha señalaba al otro)."""
     txt = pantalla(g["di"])
+    pal_txt, off, paginas = txt.split(), 0, None
+    if PRUEBA_VISUAL and len(pal_txt) > 12:           # PRUEBA: la cita larga, por partes (corte en comas, 7+ palabras);
+        paginas, ini = [], 0                          # literal y entera, solo cambia cómo se lee
+        for i, w in enumerate(pal_txt):
+            if (w[-1] in ",;:" and i - ini + 1 >= 7 and len(pal_txt) - i - 1 >= 4) or i == len(pal_txt) - 1:
+                paginas.append((ini, i + 1)); ini = i + 1
+        k_ = _palabra_actual(g, t)
+        a_, b_ = next(((a, b) for a, b in paginas if k_ - 1 < b), paginas[-1])
+        off, txt = a_, " ".join(pal_txt[a_:b_])
     while True:
         fq = fuente("Inter-Black.ttf", tam)
         lineas = envuelve(txt, fq, ancho)
+        if paginas:                                   # el globo no cambia de tamaño entre partes
+            lineas += [""] * (max(len(envuelve(" ".join(pal_txt[a:b]), fq, ancho)) for a, b in paginas) - len(lineas))
         lh = int(tam * 1.28)
         alto = len(lineas) * lh + int(tam * 2.9) + 10
         if not max_h or alto <= max_h or tam <= 28:
@@ -610,7 +621,7 @@ def tarjeta(g, t, activo, lado, nombre, cargo, medio, ancho, tam, max_h=None, co
     sub = " · ".join(x for x in (cargo, f"según {medio}" if medio else "") if x)
     d.text((40, alto - pie + int(tam * 0.98)), sub[:80], font=fc, fill=(255, 225, 225))
     k = _palabra_actual(g, t)
-    y, iw = 24, 0
+    y, iw = 24, off
     for ln in lineas:
         x = 40
         for w in ln.split():
@@ -898,6 +909,10 @@ class Escena:
         W, H = self.W, self.H
         i = self.fondo_en(t)
         f = self.fondo_tr[i]
+        j0 = i                                        # PRUEBA: el acercamiento empieza donde empieza este fondo
+        while j0 > 0 and self.fondo_tr[j0 - 1] == f:
+            j0 -= 1
+        self._t_fondo = 0.0 if j0 == 0 else self.tr[j0]["t0"] - 0.3
         fr = self._vista(f, t)
         # fundido de fondo al cambiar de noticia
         j = next((k for k in range(i, 0, -1) if self.fondo_tr[k] != self.fondo_tr[k - 1]), None)
@@ -982,6 +997,12 @@ class Escena:
         im = self.fondos[f]
         W, H = self.W, self.H
         z = 1.0                    # 23-nov-2026 (el usuario): fondo ESTÁTICO, sin zoom (el lento acercamiento saltaba cada 20 s)
+        if PRUEBA_VISUAL:          # PRUEBA (28-nov): acercamiento continuo y lento (0,5 %/s, tope 5 %) que solo vuelve a
+            # empezar cuando cambia el fondo (ahí hay corte); con coordenadas no enteras, para que no tiemble ni parpadee
+            z = 1.0 + min(0.05, 0.005 * max(0.0, t - getattr(self, "_t_fondo", 0.0)))
+            k = min(im.width / W, im.height / H) / z
+            cx, cy = im.width / 2, im.height / 2
+            return im.transform((W, H), Image.AFFINE, (k, 0, cx - W * k / 2, 0, k, cy - H * k / 2), Image.BICUBIC)
         fw, fh = int(W * z), int(H * z)
         k = min(im.width / fw, im.height / fh)
         fw, fh = int(fw * min(1, k)), int(fh * min(1, k))
@@ -1180,6 +1201,38 @@ def _cifras(lista, tr):
     return [x for x in out if x[1] - x[0] > 0.6]
 
 
+def _golpe_img(texto):
+    """PRUEBA: rótulo de una palabra del remate, en el hueco entre el subtítulo y la cabeza (como las cifras)."""
+    f = fuente("Inter-Black.ttf", 100)
+    w = int(f.getlength(texto)) + 80
+    c = Image.new("RGBA", (w, 120), (0, 0, 0, 0))
+    d = ImageDraw.Draw(c)
+    d.rounded_rectangle((0, 0, w - 1, 119), 28, fill=ROJO + (240,))
+    d.text((w / 2, 58), texto, font=f, fill=AMARILLO + (255,), anchor="mm", stroke_width=4, stroke_fill=(20, 10, 10))
+    return c
+
+
+def _golpes(lista, tr):
+    """[(t0, t1, imagen)]: «golpes»: [{"cuando": "reclutas", "texto": "RECLUTAS"}]; sale al decirse y se va al empezar el
+    siguiente o a los 1,8 s (nunca dos a la vez)."""
+    out = []
+    for c in lista:
+        clave = _n(c.get("cuando", "")).split()
+        for g in tr:
+            if g["tipo"] != "P" or g.get("cierre") or not clave:
+                continue
+            pal = [(re.sub(r"[^\w]", "", _n(w)), a, b) for w, a, b in g.get("pal", [])]   # «reclutas.» = «reclutas»
+            hit = next((a for k, (w, a, b) in enumerate(pal) if [x for x, _, _ in pal[k:k + len(clave)]] == clave), None)
+            if hit is not None:
+                out.append((hit - 0.05, min(g["t1"] + 0.6, hit + 1.8), _golpe_img(c.get("texto", "").upper())))
+                break
+    out.sort(key=lambda x: x[0])
+    for k in range(1, len(out)):
+        if out[k][0] < out[k - 1][1] + 0.05:
+            out[k - 1] = (out[k - 1][0], out[k][0] - 0.05, out[k - 1][2])
+    return out
+
+
 def short(fecha, n):
     import musica
     import short as SH
@@ -1278,13 +1331,30 @@ def short(fecha, n):
         cab.alpha_composite(eti, (1080 - 420, 150))
     t_fin = next((g["t0"] for g in tr if g.get("cierre")), total)
     cortes = [g["t0"] - 0.3 for g in tr[1:] if g["tipo"] == "Q" or tr[tr.index(g) - 1]["tipo"] == "Q"]
+    golpes, efectos = [], ()
+    if PRUEBA_VISUAL:
+        golpes = _golpes(S.get("golpes") or [], tr)
+        # PRUEBA (28-nov, el usuario: «puedes añadir efectos de sonido»): barrido suave al entrar cada figura, burbuja al
+        # salir cada globo, golpe grave con cada palabra del remate
+        ef = [(w[2] + 0.1, "whoosh") for w in esc.V if w[2] > 0.3]
+        ef += [(max(0.0, g["t0"] - 0.25), "pop") for g in tr if g["tipo"] == "Q"]
+        ef += [(g0, "golpe") for g0, _, _ in golpes]
+        efectos = sorted(ef)
     # 22-nov-2026 (el usuario): los personajes y el presentador entran y salen SIN efectos de sonido
-    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.2, [], efectos=(), con_sintonia=False)
+    musica.mezcla(tmp / "voz.wav", tmp / "audio.wav", 0.0, 1.2, [], efectos=efectos, con_sintonia=False)
     f_fuente = fuente("Inter-SemiBold.ttf", 26)
 
     def encabezado(fr, t):
+        for g0, g1, im in golpes:                       # PRUEBA: la palabra del remate, grande, entra con un pequeño rebote
+            if g0 <= t <= g1:
+                a_ = min(1.0, (t - g0) / 0.12, (g1 - t) / 0.2)
+                sc = 1.0 + 0.18 * (1 - ease(min(1.0, (t - g0) / 0.22)))
+                im2 = im.resize((max(1, int(im.width * sc)), max(1, int(im.height * sc))))
+                if a_ < 1:
+                    im2.putalpha(im2.getchannel("A").point(lambda v, a_=a_: int(v * a_)))
+                fr.alpha_composite(im2, ((1080 - im2.width) // 2, int(1920 * 0.39) + 8 + (im.height - im2.height) // 2))
         if t >= t_fin:
-            capa = Image.new("RGBA", fr.size, (8, 12, 24, int(200 * ease((t - t_fin) / 0.3))))
+            capa = Image.new("RGBA", fr.size, (8, 12, 24, int((150 if PRUEBA_VISUAL else 200) * ease((t - t_fin) / 0.3))))
             fr.alpha_composite(capa)
             SH._cierre(fr, t - t_fin, preg or "¿Qué opinas?")
         fr.alpha_composite(cab, (0, 0))
