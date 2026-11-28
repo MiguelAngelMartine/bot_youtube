@@ -18,6 +18,12 @@ REGLAS = ("photorealistic editorial news photograph, dramatic cinematic lighting
           "no text, no letters, no logos, no flags with text. Scene: ")
 
 
+def clave_openai():
+    """La clave de OpenAI del .env (nunca se imprime)."""
+    return dict(l.split("=", 1) for l in (RAIZ / ".env").read_text().splitlines()
+                if "=" in l and not l.strip().startswith("#")).get("OPENAI_API_KEY", "").strip().strip('"')
+
+
 def _openai(prompt, destino, size="1536x1024"):
     import base64
     key = dict(l.split("=", 1) for l in (RAIZ / ".env").read_text().splitlines()
