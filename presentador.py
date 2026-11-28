@@ -91,6 +91,8 @@ def catalogo():
     pres += laminas
     pols = {}
     for p in sorted((IMG / PERSONAJES).rglob("*.png")):   # también subcarpetas (p. ej., «Nuevas»)
+        if "poses" in p.relative_to(IMG / PERSONAJES).parts or "_originales" in p.parts:
+            continue                                   # 28-nov-2026: poses extra (solo PRUEBA_VISUAL) y originales con fondo
         im = Image.open(p)
         if not _alfa(im):
             continue                                   # sin fondo transparente (p. ej., fotos de grupo): no vale
@@ -743,6 +745,17 @@ class Escena:
             if g["tipo"] == "Q" and g["quien"] not in self.figs:
                 r = figura_de(g["quien"], pols, uso)
                 self.figs[g["quien"]] = recorte(r, alto) if r else None
+        # PRUEBA_VISUAL: poses extra de un personaje (<catálogo>/IA/poses/NombreApellido_poseN.png, la cabeza original
+        # pegada sobre el cuerpo nuevo): cada cita suya cambia de pose con un corte limpio
+        self.figs_mas = {}
+        if PRUEBA_VISUAL:
+            for q, f0 in list(self.figs.items()):
+                r = figura_de(q, pols, {}) if f0 is not None else None
+                if r:
+                    base = Path(r).stem.split("_")[0]
+                    extra = sorted((IMG / PERSONAJES / "IA" / "poses").glob(f"{base}_pose*.png"))
+                    if extra:
+                        self.figs_mas[q] = [f0] + [recorte(e, alto) for e in extra]
         # el presentador cambia de pose cada vez que vuelve (variedad), en orden
         self.poses = [recorte(p, alto, 0.62) for p in poses]
         self.sombras = {}
@@ -802,6 +815,22 @@ class Escena:
         if pres_ini is not None:
             V.append(("P", "izq", pres_ini, self.total + 5, pose))
         self.V = V
+        # PRUEBA_VISUAL: relevo sin hueco. Quien sale termina de irse justo cuando empieza a entrar el siguiente (nunca
+        # dos a la vez): el presentador aguanta hasta que entra el personaje, y vuelve en cuanto el personaje se ha ido
+        if PRUEBA_VISUAL:
+            V.sort(key=lambda w: w[2])
+            for j in range(1, len(V)):
+                w2 = V[j]
+                previos = [k for k in range(j) if V[k][3] + TRANS <= w2[2] + 0.01 and w2[2] - (V[k][3] + TRANS) < 1.2]
+                if not previos or any(V[k][3] > w2[2] for k in range(j) if k not in previos and V[k][2] < w2[2]):
+                    continue
+                k = max(previos, key=lambda k: V[k][3])
+                w1 = V[k]
+                if w1[0] == "P" and w2[0] != "P":
+                    V[k] = (w1[0], w1[1], w1[2], w2[2] - TRANS, w1[4])
+                elif w1[0] != "P" and w2[0] == "P":
+                    V[j] = (w2[0], w2[1], max(w1[3] + TRANS, w2[2] - 0.08), w2[3], w2[4])
+            self.V = V
         # PRUEBA_VISUAL: en un tramo del presentador de más de 6 s, corte limpio de pose y plano al acabar una frase
         # (tramos de 2,5 s como mínimo); sin zoom ni fundido, nunca dos figuras a la vez
         self.cortes_p = []
@@ -812,17 +841,19 @@ class Escena:
                 ult = g["t0"]
                 pal = g.get("pal") or []
                 for j, (w, a, b) in enumerate(pal[:-1]):
-                    c = pal[j + 1][1]
-                    if w[-1:] in ".:?!" and c - ult >= 2.5 and g["t1"] - c >= 2.5:
+                    c = max(a + 0.25, pal[j + 1][1] - 0.2)  # en la pausa del punto (Whisper alarga el final)
+                    if w[-1:] in ".:?!" and c - ult >= 2.5 and g["t1"] - c >= 1.8:
                         self.cortes_p.append(c); ult = c
             print("PRUEBA_VISUAL cortes del presentador:", [round(c, 1) for c in self.cortes_p])
         self.grupos = grupos
 
     def _fig(self, clave, pose):
+        if clave != "P" and clave in self.figs_mas:
+            return self.figs_mas[clave][pose % len(self.figs_mas[clave])]
         return self.poses[pose % len(self.poses)] if clave == "P" else self.figs[clave]
 
     def _sombra(self, clave, pose, fig):
-        k = (clave, pose % len(self.poses) if clave == "P" else 0)
+        k = (clave, pose % len(self.poses) if clave == "P" else pose)
         if k not in self.sombras:
             self.sombras[k] = sombra(fig)
         return self.sombras[k]
@@ -888,6 +919,8 @@ class Escena:
             if clave == "P" and self.cortes_p:
                 kc = sum(1 for c in self.cortes_p if t_in < c <= t)
                 pose, plano = pose + kc * 2, (1.25 if kc % 2 else 1.0)
+            if clave != "P" and clave in self.figs_mas:   # la pose de la cita suya que va (o la última que dijo)
+                pose = max(0, sum(1 for g in self.tr if g["tipo"] == "Q" and g["quien"] == clave and g["t0"] - 0.3 <= t) - 1)
             fig = self._fig(clave, pose)
             en_cruce = clave != "P" and any(self.cruce.get(g["grupo"]) for g in self.tr
                                             if g["tipo"] == "Q" and g["quien"] == clave and g["t0"] - 0.4 <= t_out)
@@ -899,7 +932,7 @@ class Escena:
             # para el presentador y para cada personaje, solo o en un cruce
             s = self._escala_video() * plano
             if s != 1.0:
-                k_ = (clave, pose % len(self.poses) if clave == "P" else 0, s)
+                k_ = (clave, pose % len(self.poses) if clave == "P" else pose, s)
                 if k_ not in self.sombras:
                     self.sombras[k_] = fig.resize((int(fig.width * s), int(fig.height * s)), Image.LANCZOS)
                 f2 = self.sombras[k_]
