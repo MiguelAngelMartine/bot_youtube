@@ -185,6 +185,11 @@ def subir(dia_txt):
     cuando, cuando_txt = hueco("largo")
     if cuando:                                          # privado con publicación automática (se puede cambiar en Studio)
         cuerpo["status"]["publishAt"] = cuando
+    # 28-nov-2026: la marca va en la propia subida. Antes se ponía después con videos.update(status) sin publishAt, y
+    # YouTube borraba la programación: el largo se quedaba privado y no salía (26 y 28-nov).
+    sintetico = bool(personas_dibujadas(dia))           # persona real dibujada por IA: se declara (no afecta a ingresos)
+    if sintetico:
+        cuerpo["status"]["containsSyntheticMedia"] = True
     video = MediaFileUpload(str(dia / "episodio.mp4"), mimetype="video/mp4", chunksize=8 * 1024 * 1024, resumable=True)
     peticion = yt.videos().insert(part="snippet,status", body=cuerpo, media_body=video)
     respuesta = None
@@ -204,15 +209,11 @@ def subir(dia_txt):
             yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(mini), mimetype="image/png")).execute()
         except Exception as e:                              # sin verificar el canal con el telefono no se permite
             avisos.append(f"miniatura no puesta ({type(e).__name__}): verifica el canal en youtube.com/verify")
-    if personas_dibujadas(dia):                         # persona real dibujada por IA: se declara (no afecta a ingresos)
-        try:
-            yt.videos().update(part="status", body={"id": vid, "status": {
-                "privacyStatus": "private", "selfDeclaredMadeForKids": False, "embeddable": True,
-                "containsSyntheticMedia": True}}).execute()
-            print("declarado como contenido alterado o sintético (personas reales dibujadas por IA)")
-        except Exception as e:
-            avisos.append(f"no se pudo marcar «contenido alterado o sintético» ({type(e).__name__}): márcalo en "
-                          "YouTube Studio antes de publicar, porque el vídeo dibuja con IA a personas reales")
+    if sintetico:
+        print("declarado como contenido alterado o sintético (personas reales dibujadas por IA)")
+    r = yt.videos().list(part="status", id=vid).execute().get("items", [])
+    if cuando and not (r and r[0]["status"].get("publishAt")):
+        avisos.append("YouTube no guardó la hora de publicación: prográmalo en Studio o no saldrá")
     srt = dia / "episodio.srt"
     # Decision del usuario (3-nov-2026): los subtitulos ya van incrustados en la imagen, asi que no se sube pista de
     # subtitulos a YouTube (si no, se podrian activar encima de los nuestros). SUBIR_SRT=1 solo para probar.
