@@ -213,6 +213,16 @@ def pausas_citas(ssml):
     return re.sub(r":\s+«", rf":<break time='{PAUSA_INI_CITA}ms'/> «", s)
 
 
+# 28-nov-2026 (el usuario: «la cita de José Álvarez no la lee fluida, suena raro»): Tristán para casi medio segundo al abrir
+# unas comillas en MITAD de una frase («el dinero fue «a la empresa…»») y la frase se rompe. Las comillas que se abren tras
+# una palabra (no tras «:» ni al empezar la frase) no se le pasan a la voz: la cita se ve en el globo, no hace falta oírla.
+_EN_FRASE = re.compile(r"(?<=[\wÁÉÍÓÚÑáéíóúñ]) «([^«»]+)»")
+
+
+def comillas_en_frase(texto):
+    return _EN_FRASE.sub(r" \1", texto)
+
+
 def clave_de(pasos, tono_seccion, modo, cola):
     """Clave de la caché de voz: texto, config, VERSION_VOZ y los ajustes que afectan a ESTE texto (diccionario, pausas
     de las citas). Así un ajuste nuevo solo vuelve a grabar los trozos a los que afecta."""
@@ -223,6 +233,8 @@ def clave_de(pasos, tono_seccion, modo, cola):
     extra = [["pausas citas", PAUSA_FIN_CITA, PAUSA_INI_CITA]] if pausas_citas(texto) != texto else []
     if LECTURA_ENTERA:
         extra.append("lectura entera")
+    if comillas_en_frase(texto) != texto:
+        extra.append("comillas en frase")
     return hashlib.sha1(json.dumps([[p["di"], p.get("entona")] for p in pasos] + [tono_seccion, modo, cola, VERSION_VOZ,
                         motor(), dicc_de(texto)] + cfg + extra, ensure_ascii=False).encode()).hexdigest()[:20]
 
@@ -231,7 +243,7 @@ def _azure_mp3(texto, mp3, vel=None, temp=None):
     from xml.sax.saxutils import escape
     clave, region = _credenciales_azure()
     ssml = (f"<speak version='1.0' xml:lang='es-ES' xmlns='http://www.w3.org/2001/10/synthesis'>"
-            f"<voice name='{AZURE_VOZ}' parameters='temperature={temp or AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{pausas_citas(_siglas_ssml(escape(texto)))}</prosody></voice></speak>")
+            f"<voice name='{AZURE_VOZ}' parameters='temperature={temp or AZURE_TEMP}'><prosody rate='{vel or AZURE_VEL}'>{pausas_citas(_siglas_ssml(escape(comillas_en_frase(texto))))}</prosody></voice></speak>")
     for intento in range(4):
         try:
             r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),

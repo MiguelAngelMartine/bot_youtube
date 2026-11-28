@@ -257,6 +257,11 @@ large-v3 y el tono de la voz (`voz_calidad.uniones`, 28-nov-2026), Tristán hace
 - **Cita que empieza por «Que», «Cómo», «Cuándo», «Quién»** tras dos puntos: a veces la lee como **pregunta** («¿Qué
   hubieran esperado…?»). Dale aire dentro con comas que marquen cómo se dijo («Que hubieran esperado un año, al menos,
   para disimular»: las palabras no se tocan) o preséntala dentro de la frase.
+- **Cita que es un trozo de frase** (empieza por «a», «que», «de»…, como «A la empresa que hacía informes, no es lo mismo»):
+  suelta tras dos puntos suena rara porque le falta el principio. Se mete **dentro** de una frase que la complete («despejó
+  como pudo: el dinero fue «a la empresa que hacía informes», y eso «no es lo mismo»»; las palabras de la cita no cambian).
+  Las comillas que se abren en mitad de una frase **no se le pasan a la voz** (`voz.comillas_en_frase`, 28-nov-2026: Tristán
+  paraba casi medio segundo al abrirlas y rompía la frase); en pantalla y en los globos siguen.
 - **Remate de una sola palabra o frase muy corta en medio** («se vino arriba.»): sale más rápido que el resto; mejor
   dentro de una frase con su consecuencia.
 - **Exclamación irónica corta al final de la frase** («…justo al irse Negreira, qué casualidad.»): Tristán la exclama
