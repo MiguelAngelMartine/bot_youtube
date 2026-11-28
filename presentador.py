@@ -1154,7 +1154,11 @@ def short(fecha, n):
     # 27-nov-2026: el fondo elegido se guarda junto al Short (lo usa portada_short.py para la portada)
     fondo = elige_fondos([f"{S.get('titulo', '')}. {S.get('contexto', '')}"], fondos,
                          dia / "shorts" / f"fondo_short_{n}.json")[0]
-    esc = Escena(tr, total, env, 1080, 1920, [fondo] * len(tr), cargos, medios, vertical=True)
+    # 28-nov-2026 (canal neutral: Laporta salía en la sala de prensa del Madrid): «fondos_quien» = {persona: fondo}; cada
+    # cita sale en el fondo de su persona y el presentador en el fondo general (con fundido al cambiar)
+    fq = {k: IMG / "Fondos" / v for k, v in (S.get("fondos_quien") or {}).items() if (IMG / "Fondos" / v).exists()}
+    fondos_tr = [fq.get(g.get("quien"), fondo) if g["tipo"] == "Q" else fondo for g in tr]
+    esc = Escena(tr, total, env, 1080, 1920, fondos_tr, cargos, medios, vertical=True)
     dibujados = sorted(q for q, f in esc.figs.items() if f is not None)
     if dibujados:                                      # personas reales ilustradas: subir.py lo declara (contenido sintético)
         S["sintetico"], S["personajes"] = True, dibujados
