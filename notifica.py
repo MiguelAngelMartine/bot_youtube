@@ -172,6 +172,15 @@ def aviso(dia_txt, texto):
     print("aviso enviado")
 
 
+def manda_foto(dia_txt, ruta, texto):
+    """28-nov-2026: una imagen para que el director la vea (p. ej., la figura nueva que se hizo con IA)."""
+    tok, chat = credenciales()
+    with open(ruta, "rb") as fh:
+        envia(f"https://api.telegram.org/bot{tok}", "sendPhoto", files={"photo": fh}, timeout=120,
+              data={"chat_id": chat, "caption": f"🎬 El Hoyformativo · {dia_txt}: {texto}"[:1000]})
+    print("foto enviada")
+
+
 def manda_audio(dia_txt, ruta, texto):
     """21-nov-2026: pruebas de sonido (control de calidad de voz) para que el director las escuche y dé el visto bueno."""
     tok, chat = credenciales()

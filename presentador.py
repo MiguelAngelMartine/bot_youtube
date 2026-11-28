@@ -320,6 +320,9 @@ def tramos_de(texto, defecto="", conocidas=(), quien_de=None):
     return out
 
 
+_FIGURA_INTENTADA = set()
+
+
 def sin_imagen(tr):
     """21-nov-2026 (el usuario): una cita con globo va SIEMPRE con el personaje que la dice. Si no hay imagen de esa
     persona en Imagenes/Políticos, la lee el presentador SIN globo (como narración) y se avisa por Telegram de la imagen
@@ -331,6 +334,18 @@ def sin_imagen(tr):
         if g["tipo"] != "Q":
             continue
         r = figura_de(g["quien"], pols, uso)
+        if r is None and g["quien"] not in _FIGURA_INTENTADA:
+            # 28-nov-2026 (el usuario: «cuando falte una imagen haz lo mismo y la guardas»): se hace con IA desde sus
+            # fotos reales y el estilo del catálogo (figura_ia.py), se guarda en <catálogo>/IA/ y se le manda al usuario
+            _FIGURA_INTENTADA.add(g["quien"])
+            try:
+                import figura_ia
+                if figura_ia.crea(g["quien"], IMG / PERSONAJES,
+                                  contexto="fútbol" if PERSONAJES == "Personajes" else "política"):
+                    _, _, pols = catalogo()
+                    r = figura_de(g["quien"], pols, uso)
+            except Exception as e:
+                print(f"figura IA de {g['quien']}: {type(e).__name__}: {e}")
         if r is None:
             g["tipo"], g["sin_imagen"] = "P", g["quien"]
             faltan.append(g["quien"])
